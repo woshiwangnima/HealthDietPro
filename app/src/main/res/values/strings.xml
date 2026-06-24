@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">HealthDietPro</string>
+    <string name="app_name">观颐</string>
+    <string name="nav_nutrition">营养表</string>
+    <string name="nav_record">记录</string>
+    <string name="nav_profile">我的</string>
+    <string name="tab_nutrition_title">营养表</string>
+    <string name="tab_record_title">记录</string>
+    <string name="tab_profile_title">我的</string>
 </resources>

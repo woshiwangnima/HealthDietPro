@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.profile.ProfileEditActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorSurface"
+            android:elevation="2dp"
+            app:titleTextColor="?attr/colorOnSurface" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
+
+                <TextView style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="姓名"
+                    android:layout_marginTop="16dp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/nameInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/nameInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="性别"
+                    android:layout_marginTop="16dp" />
+
+                <RadioGroup
+                    android:id="@+id/genderGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp">
+
+                    <RadioButton
+                        android:id="@+id/genderMale"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="男" />
+
+                    <RadioButton
+                        android:id="@+id/genderFemale"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="女" />
+                </RadioGroup>
+
+                <TextView style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="生日"
+                    android:layout_marginTop="16dp" />
+
+                <TextView
+                    android:id="@+id/birthdayDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="点击选择"
+                    android:textColor="?attr/colorOnSurface"
+                    android:layout_marginTop="4dp" />
+
+                <TextView style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="地区"
+                    android:layout_marginTop="16dp" />
+
+                <TextView
+                    android:id="@+id/provinceDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="点击选择"
+                    android:textColor="?attr/colorOnSurface"
+                    android:layout_marginTop="4dp" />
+
+                <TextView style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="特殊病史"
+                    android:layout_marginTop="16dp" />
+
+                <TextView
+                    android:id="@+id/diseaseDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="点击选择"
+                    android:textColor="?attr/colorOnSurface"
+                    android:layout_marginTop="4dp" />
+
+                <TextView style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="身高历史记录"
+                    android:layout_marginTop="24dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/heightList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+                <Button
+                    android:id="@+id/addHeightBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="+ 添加身高记录"
+                    style="@style/Widget.Material3.Button.UnelevatedButton"
+                    android:layout_marginTop="8dp" />
+
+                <TextView style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="体重历史记录"
+                    android:layout_marginTop="24dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/weightList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+                <Button
+                    android:id="@+id/addWeightBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="+ 添加体重记录"
+                    style="@style/Widget.Material3.Button.UnelevatedButton"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/saveBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_margin="16dp"
+            android:text="保存"
+            style="@style/Widget.Material3.Button" />
+
+    </LinearLayout>
+</layout>
