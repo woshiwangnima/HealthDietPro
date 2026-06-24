@@ -73,3 +73,6 @@ Thumbs.db
 
 # VS Code
 .vscode/
+
+# Opencode
+docs/
