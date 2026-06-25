@@ -164,7 +164,7 @@ abstract class BaseChartActivity : BaseBackActivity() {
         binding.chartTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (!chartTypeReady) return
-                updateChartStyle(position == 1)
+                updateChartStyle(LineStyle.fromSpinnerPosition(position))
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
@@ -216,11 +216,12 @@ abstract class BaseChartActivity : BaseBackActivity() {
         return allOptions.filter { it.millis == Long.MAX_VALUE || it.millis <= totalSpan }
     }
 
-    private fun updateChartStyle(smooth: Boolean) {
+    private fun updateChartStyle(style: LineStyle) {
         val data = chart.data ?: return
+        val mode = mpModeFor(style)
         for (i in 0 until data.dataSetCount) {
             val ds = data.getDataSetByIndex(i) as? LineDataSet ?: continue
-            ds.mode = if (smooth) LineDataSet.Mode.CUBIC_BEZIER else LineDataSet.Mode.LINEAR
+            ds.mode = mode
         }
         chart.invalidate()
     }
