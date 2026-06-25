@@ -453,20 +453,24 @@ abstract class BaseChartActivity : BaseBackActivity() {
 
     private fun updateDragArrows() {
         val visibleRange = chart.highestVisibleX - chart.lowestVisibleX
-        if (visibleRange <= 0f || filteredDataPoints.isEmpty()) {
+        if (visibleRange <= 0f || filteredDataPoints.size < 2) {
             binding.dragArrowLeft.visibility = View.GONE
             binding.dragArrowRight.visibility = View.GONE
             return
         }
-        val lastIndex = (filteredDataPoints.size - 1).toFloat()
-        val tolerance = 0.5f
-        binding.dragArrowLeft.visibility = if (chart.lowestVisibleX > tolerance) View.VISIBLE else View.GONE
-        binding.dragArrowRight.visibility = if (chart.highestVisibleX < lastIndex - tolerance) View.VISIBLE else View.GONE
+        val firstTs = filteredDataPoints.first().timestamp.toFloat()
+        val lastTs = filteredDataPoints.last().timestamp.toFloat()
+        val toleranceMs = 60_000f
+        binding.dragArrowLeft.visibility =
+            if (chart.lowestVisibleX > firstTs + toleranceMs) View.VISIBLE else View.GONE
+        binding.dragArrowRight.visibility =
+            if (chart.highestVisibleX < lastTs - toleranceMs) View.VISIBLE else View.GONE
     }
 
     private fun initDragIndicator() {
         binding.dragIndicator.setOnTouchListener { _, event ->
-            if (currentRangeMillis == Long.MAX_VALUE || filteredDataPoints.isEmpty()) return@setOnTouchListener false
+            if (currentRangeMillis == Long.MAX_VALUE || filteredDataPoints.size < 2)
+                return@setOnTouchListener false
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     lastDragX = event.x
@@ -477,10 +481,14 @@ abstract class BaseChartActivity : BaseBackActivity() {
                     lastDragX = event.x
                     val visibleRange = chart.highestVisibleX - chart.lowestVisibleX
                     if (visibleRange <= 0f) return@setOnTouchListener true
-                    val pxPerEntry = binding.dragIndicatorContainer.width / visibleRange
-                    val deltaEntry = -(deltaX / pxPerEntry)
-                    val maxStart = (filteredDataPoints.size - visibleRange.toInt()).coerceAtLeast(0)
-                    val newLow = (chart.lowestVisibleX + deltaEntry).coerceIn(0f, maxStart.toFloat())
+                    val stripWidth = binding.dragIndicatorContainer.width.toFloat()
+                    if (stripWidth <= 0f) return@setOnTouchListener true
+                    val pxPerMs = stripWidth / visibleRange
+                    val deltaMs = -(deltaX / pxPerMs)
+                    val firstTs = filteredDataPoints.first().timestamp.toFloat()
+                    val lastTs = filteredDataPoints.last().timestamp.toFloat()
+                    val maxStart = (lastTs - visibleRange).coerceAtLeast(firstTs)
+                    val newLow = (chart.lowestVisibleX + deltaMs).coerceIn(firstTs, maxStart)
                     chart.moveViewToX(newLow)
                     chart.post { updateDragArrows() }
                     true
@@ -491,20 +499,24 @@ abstract class BaseChartActivity : BaseBackActivity() {
 
         binding.dragArrowLeft.setOnClickListener {
             val visibleRange = chart.highestVisibleX - chart.lowestVisibleX
-            if (visibleRange <= 0f) return@setOnClickListener
+            if (visibleRange <= 0f || filteredDataPoints.size < 2) return@setOnClickListener
             val step = (visibleRange * 0.3f).coerceAtLeast(1f)
-            val maxStart = (filteredDataPoints.size - visibleRange.toInt()).coerceAtLeast(0)
-            val newLow = (chart.lowestVisibleX - step).coerceIn(0f, maxStart.toFloat())
+            val firstTs = filteredDataPoints.first().timestamp.toFloat()
+            val lastTs = filteredDataPoints.last().timestamp.toFloat()
+            val maxStart = (lastTs - visibleRange).coerceAtLeast(firstTs)
+            val newLow = (chart.lowestVisibleX - step).coerceIn(firstTs, maxStart)
             chart.moveViewToX(newLow)
             chart.post { updateDragArrows() }
         }
 
         binding.dragArrowRight.setOnClickListener {
             val visibleRange = chart.highestVisibleX - chart.lowestVisibleX
-            if (visibleRange <= 0f) return@setOnClickListener
+            if (visibleRange <= 0f || filteredDataPoints.size < 2) return@setOnClickListener
             val step = (visibleRange * 0.3f).coerceAtLeast(1f)
-            val maxStart = (filteredDataPoints.size - visibleRange.toInt()).coerceAtLeast(0)
-            val newLow = (chart.lowestVisibleX + step).coerceIn(0f, maxStart.toFloat())
+            val firstTs = filteredDataPoints.first().timestamp.toFloat()
+            val lastTs = filteredDataPoints.last().timestamp.toFloat()
+            val maxStart = (lastTs - visibleRange).coerceAtLeast(firstTs)
+            val newLow = (chart.lowestVisibleX + step).coerceIn(firstTs, maxStart)
             chart.moveViewToX(newLow)
             chart.post { updateDragArrows() }
         }
