@@ -403,25 +403,18 @@ abstract class BaseChartActivity : BaseBackActivity() {
         val touchVals = transformer.getValuesByTouchPoint(px, py)
         val chartX = touchVals.x.toFloat().coerceIn(entries.first().x, entries.last().x)
 
-        val i = chartX.toInt().coerceIn(0, entries.size - 2)
-        val t = chartX - i
-        val y0 = entries[i].y
-        val y1 = entries[i + 1].y
-        val interpolatedY = y0 + t * (y1 - y0)
-
-        val isSmooth = binding.chartTypeSpinner.selectedItemPosition == 1
-        if (isSmooth) {
-            val ds0 = chart.data?.getDataSetByIndex(0) as? LineDataSet ?: return
-            if (ds0.mode == LineDataSet.Mode.CUBIC_BEZIER) {
+        val style = LineStyle.fromSpinnerPosition(binding.chartTypeSpinner.selectedItemPosition)
+        val y = when (style) {
+            LineStyle.LINEAR -> ChartSegmentMath.interpolateLinear(entries, chartX)
+            LineStyle.STEPPED -> ChartSegmentMath.interpolateStepped(entries, chartX)
+            LineStyle.CUBIC_BEZIER -> {
+                val i = ChartSegmentMath.findSegmentIndex(entries, chartX)
                 val cubicY = interpolateCubicBezier(entries, chartX.toDouble(), i)
-                if (cubicY.isFinite()) {
-                    crosshairView.setCrosshair(chartX, cubicY.toFloat(), entries, filteredDataPoints)
-                    return
-                }
+                if (cubicY.isFinite()) cubicY.toFloat()
+                else ChartSegmentMath.interpolateLinear(entries, chartX)
             }
         }
-
-        crosshairView.setCrosshair(chartX, interpolatedY, entries, filteredDataPoints)
+        crosshairView.setCrosshair(chartX, y, entries, filteredDataPoints)
     }
 
     private fun interpolateCubicBezier(entries: List<Entry>, x: Double, i: Int): Double {
