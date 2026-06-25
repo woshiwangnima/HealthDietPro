@@ -6,7 +6,7 @@ Bring the existing `BaseChartActivity` / `ChartFragment` chart in line with user
 
 1. **X axis uses real time**, not index. Two data points whose timestamps differ by 3 days are spaced 3× farther apart than two points 1 day apart. Today every point sits at integer index, so a missing day looks identical to a recorded day.
 2. **The bottom drag strip controls the *visible* range correctly under the new time-spaced axis.** The strip's visual is unchanged (a uniform track with arrows) but the drag math is now proportional to *visible time span*, not to *entry count*.
-3. **The crosshair reads the value the user actually sees.** Today the crosshair does linear interpolation regardless of style, so on a smoothed curve it briefly diverges from the visible curve, and there is no path for stepped styles at all. Add *前置阶梯线* and *后置阶梯线* to the chart-type list and let each style drive its own Y-readback.
+3. **The crosshair reads the value the user actually sees.** Today the crosshair does linear interpolation regardless of style, so on a smoothed curve it briefly diverges from the visible curve, and there is no path for stepped styles at all. Add *后置阶梯线* to the chart-type list (no native 前置阶梯 exists in MPAndroidChart; user chose to skip it) and let each style drive its own Y-readback.
 
 Also add a new time unit **旬 (10 days)** between **周** and **月** in `units.json`.
 
@@ -31,34 +31,31 @@ Out of scope:
 
 ### 1. New enum: `LineStyle`
 
-`BaseChartActivity.kt` (line 39 already declares `LineType`; the new enum sits next to it).
+`BaseChartActivity.kt` (line 39 already declares `LineType`; the new enum sits next to it). MPAndroidChart's `LineDataSet.Mode` exposes only one stepped variant (`STEPPED`, which is a *后置阶梯*); no native 前置阶梯 exists. Per user decision, we add only 后置阶梯线.
 
 ```kotlin
 enum class LineStyle {
     LINEAR,
     CUBIC_BEZIER,
-    STEPPED_BEFORE,
-    STEPPED_AFTER;
+    STEPPED;
 
     companion object {
         fun fromSpinnerPosition(pos: Int): LineStyle = when (pos) {
             1 -> CUBIC_BEZIER
-            2 -> STEPPED_BEFORE
-            3 -> STEPPED_AFTER
+            2 -> STEPPED
             else -> LINEAR
         }
 
         fun toSpinnerPosition(style: LineStyle): Int = when (style) {
             LINEAR -> 0
             CUBIC_BEZIER -> 1
-            STEPPED_BEFORE -> 2
-            STEPPED_AFTER -> 3
+            STEPPED -> 2
         }
     }
 }
 ```
 
-The four-way mapping matches the array order set in `arrays.xml`.
+The three-way mapping matches the array order set in `arrays.xml`.
 
 ### 2. X axis uses timestamp
 
@@ -144,11 +141,7 @@ private fun updateCrosshair(px: Float, py: Float) {
             val i = findSegmentIndex(entries, chartX)
             interpolateCubicBezier(entries, chartX.toDouble(), i).toFloat()
         }
-        LineStyle.STEPPED_BEFORE -> {
-            val i = findSegmentIndex(entries, chartX)
-            entries[i].y
-        }
-        LineStyle.STEPPED_AFTER -> {
+        LineStyle.STEPPED -> {
             val i = findSegmentIndex(entries, chartX)
             entries[i + 1].y
         }
@@ -178,7 +171,6 @@ private fun findSegmentIndex(entries: List<Entry>, x: Float): Int {
 <string-array name="chart_type_options">
     <item>折线图</item>
     <item>平滑曲线</item>
-    <item>前置阶梯线</item>
     <item>后置阶梯线</item>
 </string-array>
 ```
@@ -198,7 +190,7 @@ private fun updateChartStyle(style: LineStyle) {
     val mpMode = when (style) {
         LineStyle.LINEAR -> LineDataSet.Mode.LINEAR
         LineStyle.CUBIC_BEZIER -> LineDataSet.Mode.CUBIC_BEZIER
-        LineStyle.STEPPED_BEFORE, LineStyle.STEPPED_AFTER -> LineDataSet.Mode.STEPPED
+        LineStyle.STEPPED -> LineDataSet.Mode.STEPPED
     }
     for (i in 0 until data.dataSetCount) {
         val ds = data.getDataSetByIndex(i) as? LineDataSet ?: continue
@@ -246,7 +238,7 @@ updateChartStyle(style) -> mutates ds.mode
 updateCrosshair()
    ├─ chartX = touchVals.x (now a timestamp)
    ├─ style = LineStyle.fromSpinnerPosition(...)
-   └─ y = branch on style: linear / cubic / before / after
+   └─ y = branch on style: linear / cubic / stepped
    ↓
 crosshairView.setCrosshair(chartX, y, entries, dps)
    ↓
@@ -282,7 +274,7 @@ Unit-testable surface (no Android dependency):
 Manual verification on device or emulator:
 
 1. **Time spacing**: open the height chart (or weight chart) with two records 1 day apart and two records 30 days apart. The two pairs must be visibly different widths on screen.
-2. **Stepped lines**: switch spinner to 前置阶梯线 / 后置阶梯线. The chart should show a step pattern. Touching the chart, the info bubble's value must equal the left endpoint (前置) or right endpoint (后置) of the step the touch falls into.
+2. **Stepped line**: switch spinner to 后置阶梯线. The chart should show a step pattern (value at `x_i` held flat until `x_{i+1}`). Touching the chart, the info bubble's value must equal the right endpoint of the step the touch falls into.
 3. **Smooth line crosshair**: select 平滑曲线. Touch and slide. The info bubble's Y must track the actual cubic curve within ~1 px.
 4. **Drag strip**: select "1周" time range, drag the strip left/right by ~10 px. The visible window should pan a corresponding amount, proportional to the visible time span, not to the entry count.
 5. **Xun unit**: open unit picker for time; confirm "旬" appears between "周" and "月". Pick "旬" then enter "3旬"; conversion back and forth via kg or another category should not blow up (just confirms parsing loads).
@@ -305,6 +297,6 @@ Manual verification on device or emulator:
 2. `app/src/main/java/com/woshiwangnima/healthdietpro/ui/profile/chart/ChartFragment.kt`
    - Mirror the timestamp-as-X change and switch default `mode` to `LINEAR`.
 3. `app/src/main/res/values/arrays.xml`
-   - Append "前置阶梯线" and "后置阶梯线" entries.
+   - Append "后置阶梯线" entry.
 4. `app/src/main/assets/units.json`
    - Insert "旬" between "周" and "月".
