@@ -1,33 +1,78 @@
 [
   {
-    "category": "height",
-    "categoryCn": "身高",
+    "id": "length",
+    "categoryCn": "长度",
+    "categoryEn": "Length",
     "baseUnit": "cm",
     "units": [
-      { "id": "cm",  "symbolCn": "厘米", "symbolEn": "cm",  "toBase": 1.0 },
-      { "id": "m",   "symbolCn": "米",   "symbolEn": "m",   "toBase": 100.0 },
-      { "id": "mm",  "symbolCn": "毫米", "symbolEn": "mm",  "toBase": 0.1 },
-      { "id": "in",  "symbolCn": "英寸", "symbolEn": "in",  "toBase": 2.54 },
-      { "id": "ft",  "symbolCn": "英尺", "symbolEn": "ft",  "toBase": 30.48 }
+      { "id": "mm", "symbolCn": "毫米(公厘)",     "symbolEn": "mm",  "toBase": 0.1 },
+      { "id": "cm", "symbolCn": "厘米(公分)",     "symbolEn": "cm",  "toBase": 1.0 },
+      { "id": "m",  "symbolCn": "米(公尺)",       "symbolEn": "m",   "toBase": 100.0 },
+      { "id": "in", "symbolCn": "英寸(吋)",       "symbolEn": "in",  "toBase": 2.54 },
+      { "id": "ft", "symbolCn": "英尺(呎)",       "symbolEn": "ft",  "toBase": 30.48 }
     ]
   },
   {
-    "category": "weight",
-    "categoryCn": "体重",
+    "id": "weight",
+    "categoryCn": "重量",
+    "categoryEn": "Weight",
     "baseUnit": "kg",
     "units": [
-      { "id": "kg",  "symbolCn": "千克", "symbolEn": "kg",  "toBase": 1.0 },
-      { "id": "g",   "symbolCn": "克",   "symbolEn": "g",   "toBase": 0.001 },
-      { "id": "lb",  "symbolCn": "磅",   "symbolEn": "lb",  "toBase": 0.453592 }
+      { "id": "liang", "symbolCn": "两",             "symbolEn": "liang", "toBase": 0.05 },
+      { "id": "jin",   "symbolCn": "斤",             "symbolEn": "jin",   "toBase": 0.5 },
+      { "id": "g",     "symbolCn": "克(公克)",       "symbolEn": "g",     "toBase": 0.001 },
+      { "id": "kg",    "symbolCn": "千克(公斤)",     "symbolEn": "kg",    "toBase": 1.0 },
+      { "id": "lb",    "symbolCn": "磅(英磅)",       "symbolEn": "lb",    "toBase": 0.453592 }
     ]
   },
   {
-    "category": "energy",
+    "id": "volume",
+    "categoryCn": "体积",
+    "categoryEn": "Volume",
+    "baseUnit": "l",
+    "units": [
+      { "id": "ml",   "symbolCn": "毫升(毫公升)",    "symbolEn": "mL",    "toBase": 0.001 },
+      { "id": "l",    "symbolCn": "升(公升)",        "symbolEn": "L",     "toBase": 1.0 },
+      { "id": "floz", "symbolCn": "液量盎司(盎司)",  "symbolEn": "fl oz", "toBase": 0.0295735 },
+      { "id": "cup",  "symbolCn": "杯(量杯)",        "symbolEn": "cup",   "toBase": 0.236588 },
+      { "id": "gal",  "symbolCn": "加仑(美制加仑)",  "symbolEn": "gal",   "toBase": 3.78541 }
+    ]
+  },
+  {
+    "id": "density",
+    "categoryCn": "密度",
+    "categoryEn": "Density",
+    "baseUnit": "g_ml",
+    "units": [
+      { "id": "kg_m3", "symbolCn": "千克/立方米",   "symbolEn": "kg/m³", "toBase": 0.001 },
+      { "id": "g_ml",  "symbolCn": "克/毫升",       "symbolEn": "g/mL",  "toBase": 1.0 },
+      { "id": "kg_l",  "symbolCn": "千克/升",       "symbolEn": "kg/L",  "toBase": 1.0 }
+    ]
+  },
+  {
+    "id": "time",
+    "categoryCn": "时间",
+    "categoryEn": "Time",
+    "baseUnit": "s",
+    "units": [
+      { "id": "ms",  "symbolCn": "毫秒",       "symbolEn": "ms",  "toBase": 0.001 },
+      { "id": "s",   "symbolCn": "秒",         "symbolEn": "s",   "toBase": 1.0 },
+      { "id": "min", "symbolCn": "分钟",       "symbolEn": "min", "toBase": 60 },
+      { "id": "h",   "symbolCn": "小时",       "symbolEn": "h",   "toBase": 3600 },
+      { "id": "d",    "symbolCn": "天(日)",          "symbolEn": "d",   "toBase": 86400 },
+      { "id": "week", "symbolCn": "周(星期)",       "symbolEn": "wk",  "toBase": 604800 },
+      { "id": "xun",  "symbolCn": "旬(10天)",       "symbolEn": "xun", "toBase": 864000 },
+      { "id": "month","symbolCn": "月(月份)",       "symbolEn": "mo",  "toBase": 2592000 }
+    ]
+  },
+  {
+    "id": "energy",
     "categoryCn": "热量",
+    "categoryEn": "Energy",
     "baseUnit": "kcal",
     "units": [
-      { "id": "kcal", "symbolCn": "千卡", "symbolEn": "kcal", "toBase": 1.0 },
-      { "id": "kJ",   "symbolCn": "千焦", "symbolEn": "kJ",   "toBase": 0.239006 }
+      { "id": "kj",   "symbolCn": "千焦(千焦耳)",  "symbolEn": "kJ",   "toBase": 0.239006 },
+      { "id": "kcal", "symbolCn": "千卡(大卡)",    "symbolEn": "kcal", "toBase": 1.0 }
     ]
   }
 ]
