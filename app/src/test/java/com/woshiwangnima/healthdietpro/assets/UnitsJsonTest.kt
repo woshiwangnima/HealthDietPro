@@ -37,10 +37,7 @@ class UnitsJsonTest {
     }
 
     private fun readUnits(): List<JSONObject> {
-        val raw = javaClass.classLoader!!
-            .getResourceAsStream("assets/units.json")!!
-            .bufferedReader(Charsets.UTF_8)
-            .use { it.readText() }
+        val raw = java.io.File("src/main/assets/units.json").readText()
         val arr = org.json.JSONArray(raw)
         return (0 until arr.length()).map { arr.getJSONObject(it) }
     }
