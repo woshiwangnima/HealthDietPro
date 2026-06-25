@@ -10,16 +10,16 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 
 class ChartFragment : Fragment() {
 
     private var records: List<BodyRecord> = emptyList()
-    private var unitId: String = "cm"
-    private var category: String = "height"
+    private var unitId: String = UnitCategory.DEFAULT_UNIT_LENGTH
+    private var category: String = UnitCategory.ID_LENGTH
 
     companion object {
         private const val ARG_RECORDS = "records"
@@ -41,9 +41,9 @@ class ChartFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             @Suppress("UNCHECKED_CAST")
-            records = (it.getSerializable(ARG_RECORDS) as? ArrayList<BodyRecord>) ?: emptyList()
-            unitId = it.getString(ARG_UNIT, "cm") ?: "cm"
-            category = it.getString(ARG_CATEGORY, "height") ?: "height"
+            records = (it.getSerializable(ARG_RECORDS, ArrayList::class.java) as? ArrayList<BodyRecord>) ?: emptyList()
+            unitId = it.getString(ARG_UNIT, UnitCategory.DEFAULT_UNIT_LENGTH) ?: UnitCategory.DEFAULT_UNIT_LENGTH
+            category = it.getString(ARG_CATEGORY, UnitCategory.ID_LENGTH) ?: UnitCategory.ID_LENGTH
         }
     }
 
@@ -60,11 +60,19 @@ class ChartFragment : Fragment() {
             return
         }
         val sorted = records.sortedBy { it.date }
-        val entries = sorted.mapIndexed { index, record ->
+        val entries = sorted.map { record ->
             val convertedValue = UnitConverter.fromBase(category, record.value, unitId)
-            Entry(index.toFloat(), convertedValue)
+            val localDate = java.time.LocalDate.parse(record.date)
+            val ts = localDate.atStartOfDay(java.time.ZoneId.systemDefault())
+                .toInstant().toEpochMilli()
+            Entry(ts.toFloat(), convertedValue)
         }
-        val labels = sorted.map { it.date.takeLast(5) }
+        val labelsByTimestamp: Map<Long, String> = sorted.associate { record ->
+            val localDate = java.time.LocalDate.parse(record.date)
+            val ts = localDate.atStartOfDay(java.time.ZoneId.systemDefault())
+                .toInstant().toEpochMilli()
+            ts to record.date.takeLast(5)
+        }
 
         val dataSet = LineDataSet(entries, "").apply {
             color = resources.getColor(R.color.primary, null)
@@ -72,12 +80,15 @@ class ChartFragment : Fragment() {
             lineWidth = 2f
             circleRadius = 4f
             setDrawValues(false)
-            mode = LineDataSet.Mode.CUBIC_BEZIER
+            mode = LineDataSet.Mode.LINEAR
         }
         chart.apply {
             data = LineData(dataSet)
             xAxis.apply {
-                valueFormatter = IndexAxisValueFormatter(labels)
+                valueFormatter = object : com.github.mikephil.charting.formatter.ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String =
+                        labelsByTimestamp[value.toLong()] ?: ""
+                }
                 position = XAxis.XAxisPosition.BOTTOM
                 granularity = 1f
                 setDrawGridLines(false)
@@ -86,6 +97,7 @@ class ChartFragment : Fragment() {
             axisRight.isEnabled = false
             legend.isEnabled = false
             description.isEnabled = false
+            fitScreen()
             animateX(1000)
             invalidate()
         }
