@@ -22,6 +22,8 @@ class UnitsJsonTest {
         assertTrue("month index must exist", monthIdx >= 0)
         assertTrue("xun must come after week", xunIdx > weekIdx)
         assertTrue("xun must come before month", xunIdx < monthIdx)
+        assertEquals(6, xunIdx)
+        assertEquals(1, ids.count { it == "xun" })
     }
 
     @Test
@@ -35,8 +37,10 @@ class UnitsJsonTest {
     }
 
     private fun readUnits(): List<JSONObject> {
-        val raw = java.io.File("src/main/assets/units.json")
-            .readText()
+        val raw = javaClass.classLoader!!
+            .getResourceAsStream("assets/units.json")!!
+            .bufferedReader(Charsets.UTF_8)
+            .use { it.readText() }
         val arr = org.json.JSONArray(raw)
         return (0 until arr.length()).map { arr.getJSONObject(it) }
     }
