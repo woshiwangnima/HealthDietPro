@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="chart_type_options">
+        <item>折线图</item>
+        <item>平滑曲线</item>
+        <item>后置阶梯线</item>
+    </string-array>
+    <string-array name="time_range_options">
+        <item>全部</item>
+        <item>15分钟</item>
+        <item>30分钟</item>
+        <item>1小时</item>
+        <item>6小时</item>
+        <item>12小时</item>
+        <item>1天</item>
+        <item>1周</item>
+        <item>1个月</item>
+    </string-array>
+</resources>
