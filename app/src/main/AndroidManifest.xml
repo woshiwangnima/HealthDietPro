@@ -24,6 +24,18 @@
         <activity
             android:name=".ui.profile.ProfileEditActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.profile.HeightDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.WeightDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.settings.AppSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.settings.PreferencesActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

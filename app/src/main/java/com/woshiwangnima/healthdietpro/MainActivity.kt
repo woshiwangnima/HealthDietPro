@@ -1,17 +1,20 @@
 package com.woshiwangnima.healthdietpro
 
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.Fragment
 import com.woshiwangnima.healthdietpro.config.NavConfig
 import com.woshiwangnima.healthdietpro.databinding.ActivityMainBinding
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.ui.nutrition.NutritionFragment
+import com.woshiwangnima.healthdietpro.ui.profile.ProfileEditActivity
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileFragment
 import com.woshiwangnima.healthdietpro.ui.record.RecordFragment
+import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,21 +27,37 @@ class MainActivity : AppCompatActivity() {
     )
 
     private var currentIndex = -1
+    private var onboardingLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        AppPrefs.markFirstLaunchComplete(this)
+        switchTab(2)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
-            val navBar = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-            view.setPadding(0, 0, 0, navBar.bottom)
-            WindowInsetsCompat.CONSUMED
-        }
+        binding.main.applySystemBarInsets()
 
         setupNavSizing()
         setupNavClickListeners()
         switchTab(0)
+        checkFirstLaunch()
+    }
+
+    private fun checkFirstLaunch() {
+        if (!AppPrefs.isFirstLaunch(this)) return
+        AlertDialog.Builder(this)
+            .setTitle("欢迎使用健康饮食计划")
+            .setMessage("首次使用，请先填写您的个人信息，以便为您提供个性化的饮食建议。")
+            .setCancelable(false)
+            .setPositiveButton("开始填写") { _, _ ->
+                val intent = Intent(this, ProfileEditActivity::class.java)
+                onboardingLauncher.launch(intent)
+            }
+            .show()
     }
 
     private fun setupNavSizing() {
@@ -113,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         val selectedColor = ContextCompat.getColor(this, R.color.primary)
-        val defaultColor = ContextCompat.getColor(this, R.color.black)
+        val defaultColor = ContextCompat.getColor(this, R.color.on_surface_variant)
 
         icons.forEachIndexed { i, icon ->
             icon.setColorFilter(if (i == selectedIndex) selectedColor else defaultColor)

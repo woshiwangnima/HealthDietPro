@@ -9,18 +9,32 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.woshiwangnima.healthdietpro.databinding.FragmentProfileBinding
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsActivity
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var diseaseRepo: DiseaseRepository
+    private lateinit var editLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
+    private lateinit var settingsLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
 
-    private val editLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        refreshProfile()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        UnitConverter.init(requireContext())
+        editLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            refreshProfile()
+        }
+        settingsLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            refreshProfile()
+        }
     }
 
     override fun onCreateView(
@@ -35,6 +49,11 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         diseaseRepo = DiseaseRepository(requireContext())
+
+        binding.settingsBtn.setOnClickListener {
+            val intent = Intent(requireContext(), AppSettingsActivity::class.java)
+            settingsLauncher.launch(intent)
+        }
 
         binding.editProfileBtn.setOnClickListener {
             val intent = Intent(requireContext(), ProfileEditActivity::class.java)
@@ -63,11 +82,15 @@ class ProfileFragment : Fragment() {
             binding.profileDiseases.text = names.joinToString("、")
         }
 
+        val heightUnit = AppPrefs.getHeightUnit(requireContext())
+        val weightUnit = AppPrefs.getWeightUnit(requireContext())
         val latestHeight = profile.latestHeight
-        binding.profileHeight.text = if (latestHeight != null) "${latestHeight.value} cm" else "无记录"
+        binding.profileHeight.text = if (latestHeight != null)
+            UnitConverter.formatWithUnit("height", latestHeight.value, heightUnit) else "无记录"
 
         val latestWeight = profile.latestWeight
-        binding.profileWeight.text = if (latestWeight != null) "${latestWeight.value} kg" else "无记录"
+        binding.profileWeight.text = if (latestWeight != null)
+            UnitConverter.formatWithUnit("weight", latestWeight.value, weightUnit) else "无记录"
     }
 
     override fun onDestroyView() {

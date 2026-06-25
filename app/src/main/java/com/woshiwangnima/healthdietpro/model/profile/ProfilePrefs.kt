@@ -21,4 +21,5 @@ object ProfilePrefs {
             UserProfile()
         }
     }
+
 }

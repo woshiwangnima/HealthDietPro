@@ -7,4 +7,5 @@
     <string name="tab_nutrition_title">营养表</string>
     <string name="tab_record_title">记录</string>
     <string name="tab_profile_title">我的</string>
+    <string name="no_record">暂无数据</string>
 </resources>
