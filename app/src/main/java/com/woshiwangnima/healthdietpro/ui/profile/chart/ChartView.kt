@@ -211,7 +211,7 @@ class ChartView @JvmOverloads constructor(
 
     private var chartStateKey: String = ""
     private var timeRangeOptions: List<TimeRangeOption> = emptyList()
-    private val labelIntervalValues = mutableListOf(0L)
+    private var labelIntervalValues: MutableList<Long>? = mutableListOf(0L)
 
     fun setChartStateKey(key: String) {
         chartStateKey = key
@@ -232,8 +232,11 @@ class ChartView @JvmOverloads constructor(
 
         // Label interval spinner: find option matching saved millis
         val savedInterval = AppPrefs.getChartLabelInterval(ctx, chartStateKey)
-        val liIdx = labelIntervalValues.indexOfFirst { it == savedInterval }
-        if (liIdx >= 0) labelIntervalSpinner.setSelection(liIdx)
+        val liVals = labelIntervalValues
+        if (liVals != null) {
+            val liIdx = liVals.indexOfFirst { it == savedInterval }
+            if (liIdx >= 0) labelIntervalSpinner.setSelection(liIdx)
+        }
         if (savedInterval > 0L) chartCanvas.labelIntervalMs = savedInterval
 
         val yMin = AppPrefs.getChartYMin(ctx, chartStateKey)
@@ -356,11 +359,12 @@ class ChartView @JvmOverloads constructor(
             "1月" to 30 * 86_400_000L
         )
         val filtered = baseOpts.filter { it.second == 0L || it.second * 2 <= chartCanvas.visibleRangeMs } + baseOpts.filter { it.second >= chartCanvas.visibleRangeMs }.take(1)
-        labelIntervalValues.clear()
+        val liVals = mutableListOf<Long>()
+        labelIntervalValues = liVals
         val labels = mutableListOf<String>()
         for ((label, millis) in filtered.distinctBy { it.second }) {
             labels.add(label)
-            labelIntervalValues.add(millis)
+            liVals.add(millis)
         }
         val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, labels)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -368,7 +372,8 @@ class ChartView @JvmOverloads constructor(
         labelIntervalSpinner.setSelection(0)
         labelIntervalSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                chartCanvas.labelIntervalMs = labelIntervalValues[position.coerceIn(0, labelIntervalValues.size - 1)]
+                val vals = labelIntervalValues ?: return
+                chartCanvas.labelIntervalMs = vals[position.coerceIn(0, vals.size - 1)]
                 saveChartState()
                 chartCanvas.invalidate()
             }
