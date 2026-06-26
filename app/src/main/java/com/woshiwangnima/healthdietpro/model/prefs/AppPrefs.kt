@@ -85,4 +85,14 @@ object AppPrefs {
         prefs(context).getFloat("chart_ymax_$key", 100f)
     fun setChartYMax(context: Context, key: String, pct: Float) =
         prefs(context).edit().putFloat("chart_ymax_$key", pct).apply()
+
+    fun getChartLabelInterval(context: Context, key: String): Long =
+        prefs(context).getLong("chart_label_$key", 0L)
+    fun setChartLabelInterval(context: Context, key: String, ms: Long) =
+        prefs(context).edit().putLong("chart_label_$key", ms).apply()
+
+    fun getBmiChartTab(context: Context): Int =
+        prefs(context).getInt("tab_bmi_chart", 0)
+    fun setBmiChartTab(context: Context, tab: Int) =
+        prefs(context).edit().putInt("tab_bmi_chart", tab).apply()
 }

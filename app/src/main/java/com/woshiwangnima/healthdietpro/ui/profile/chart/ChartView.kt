@@ -29,6 +29,7 @@ class ChartView @JvmOverloads constructor(
     private val chartCanvas: ChartCanvas
     private val chartTypeSpinner: Spinner
     private val timeRangeSpinner: Spinner
+    private val labelIntervalSpinner: Spinner
     private val btnFullscreen: MaterialButton
     private val btnFullscreenOverlay: MaterialButton
     private val yMinInput: EditText
@@ -44,6 +45,7 @@ class ChartView @JvmOverloads constructor(
     private val dragArrowRight: ImageButton
     private val legendScrollView: HorizontalScrollView
     private val legendLayout: LinearLayout
+    private val chartTitle: TextView
 
     private var seriesList: List<ChartSeries> = emptyList()
     private var unitLabel: String = ""
@@ -83,9 +85,12 @@ class ChartView @JvmOverloads constructor(
         dragArrowRight = findViewById(R.id.dragArrowRight)
         legendScrollView = findViewById(R.id.legendScrollView)
         legendLayout = findViewById(R.id.legendLayout)
+        labelIntervalSpinner = findViewById(R.id.labelIntervalSpinner)
+        chartTitle = findViewById(R.id.chartTitle)
 
         initChartTypeSpinner()
         initTimeRangeSpinner()
+        initLabelIntervalSpinner()
         initFullscreenButtons()
         initYAxisInputs()
         initDragIndicator()
@@ -104,8 +109,17 @@ class ChartView @JvmOverloads constructor(
             return
         }
         val totalSpan = allPoints.maxOf { it.timestamp } - allPoints.minOf { it.timestamp }
-        chartCanvas.visibleRangeMs = totalSpan
-        chartCanvas.windowStartMs = allPoints.minOf { it.timestamp }
+        // Only set defaults if no pending state or pending state says "全部" (Long.MAX_VALUE)
+        val pendingTimeRange = if (chartStateKey.isNotEmpty()) AppPrefs.getChartTimeRange(context, chartStateKey) else Long.MAX_VALUE
+        if (pendingTimeRange != Long.MAX_VALUE) {
+            chartCanvas.visibleRangeMs = pendingTimeRange
+            val latestTs = allPoints.maxOf { it.timestamp }
+            chartCanvas.windowStartMs = (latestTs - pendingTimeRange).coerceAtLeast(allPoints.minOf { it.timestamp })
+        } else {
+            chartCanvas.visibleRangeMs = totalSpan
+            chartCanvas.windowStartMs = allPoints.minOf { it.timestamp }
+        }
+        restoreChartState()
         applyYAxisRange()
         rebuildTimeRangeSpinner()
         updateDragIndicator()
@@ -159,6 +173,11 @@ class ChartView @JvmOverloads constructor(
         chartCanvas.invalidate()
     }
 
+    fun setChartTitle(title: String) {
+        chartTitle.text = title
+        chartTitle.visibility = View.VISIBLE
+    }
+
     fun toggleFullscreen() {
         isFullscreen = !isFullscreen
         onFullscreenListener?.invoke(isFullscreen) // call BEFORE visual changes for atomic transition
@@ -194,7 +213,6 @@ class ChartView @JvmOverloads constructor(
 
     fun setChartStateKey(key: String) {
         chartStateKey = key
-        if (key.isNotEmpty()) restoreChartState()
     }
 
     private fun restoreChartState() {
@@ -203,14 +221,9 @@ class ChartView @JvmOverloads constructor(
         val stylePos = AppPrefs.getChartStyle(ctx, chartStateKey)
         chartTypeSpinner.setSelection(stylePos.coerceIn(0, chartTypeSpinner.adapter.count - 1))
 
-        val timeRange = AppPrefs.getChartTimeRange(ctx, chartStateKey)
-        if (timeRange != Long.MAX_VALUE) {
-            chartCanvas.visibleRangeMs = timeRange
-            val allPoints = seriesList.flatMap { it.points }
-            if (allPoints.isNotEmpty()) {
-                val latestTs = allPoints.maxOf { it.timestamp }
-                chartCanvas.windowStartMs = (latestTs - timeRange).coerceAtLeast(allPoints.minOf { it.timestamp })
-            }
+        val intervalMs = AppPrefs.getChartLabelInterval(ctx, chartStateKey)
+        if (intervalMs > 0L) {
+            chartCanvas.labelIntervalMs = intervalMs
         }
 
         val yMin = AppPrefs.getChartYMin(ctx, chartStateKey)
@@ -223,6 +236,7 @@ class ChartView @JvmOverloads constructor(
         val ctx = context
         AppPrefs.setChartStyle(ctx, chartStateKey, chartTypeSpinner.selectedItemPosition)
         AppPrefs.setChartTimeRange(ctx, chartStateKey, chartCanvas.visibleRangeMs)
+        AppPrefs.setChartLabelInterval(ctx, chartStateKey, chartCanvas.labelIntervalMs)
         AppPrefs.setChartYMin(ctx, chartStateKey, chartCanvas.yMinPct)
         AppPrefs.setChartYMax(ctx, chartStateKey, chartCanvas.yMaxPct)
     }
@@ -313,6 +327,23 @@ class ChartView @JvmOverloads constructor(
         timeRangeReady = true
     }
 
+    private fun initLabelIntervalSpinner() {
+        val items = arrayOf("自动", "1分钟", "5分钟", "30分钟", "1小时", "2小时", "6小时", "1天", "3天")
+        val values = longArrayOf(0L, 60_000L, 5 * 60_000L, 30 * 60_000L, 3_600_000L, 2 * 3_600_000L, 6 * 3_600_000L, 86_400_000L, 3 * 86_400_000L)
+        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, items.toList())
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        labelIntervalSpinner.adapter = adapter
+        labelIntervalSpinner.setSelection(0)
+        labelIntervalSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                chartCanvas.labelIntervalMs = values[position.coerceIn(0, values.size - 1)]
+                saveChartState()
+                chartCanvas.invalidate()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
     private fun initFullscreenButtons() {
         val listener = View.OnClickListener { toggleFullscreen() }
         btnFullscreen.setOnClickListener(listener)
@@ -340,8 +371,8 @@ class ChartView @JvmOverloads constructor(
         yMaxInput.addTextChangedListener(watcher)
 
         // Vertical swipe to adjust percentage values
-        addSwipeAdjust(yMinInput, -10f, 100f)
-        addSwipeAdjust(yMaxInput, -10f, 120f)
+        addSwipeAdjust(yMinInput, -200f, 200f)
+        addSwipeAdjust(yMaxInput, -200f, 200f)
 
         yAxisReady = true
     }

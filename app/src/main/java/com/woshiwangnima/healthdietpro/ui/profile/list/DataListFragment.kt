@@ -82,6 +82,7 @@ class DataListFragment : Fragment() {
     private fun refreshList() {
         records.sortByDescending { it.date }
         adapter.records = records
+        view?.findViewById<TextView>(R.id.totalCount)?.text = "共 ${records.size} 条记录"
     }
 
     private fun showAddDialog() {
