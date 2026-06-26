@@ -40,8 +40,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-enum class LineType { SOLID, DASHED, DOTTED }
-
 abstract class BaseChartActivity : BaseBackActivity() {
 
     private lateinit var binding: ActivityBaseChartBinding
