@@ -157,13 +157,17 @@
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnFullscreen"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="32dp"
                 android:text="全屏"
-                android:textSize="13sp"
-                android:minWidth="80dp" />
+                android:textSize="11sp"
+                android:paddingHorizontal="8dp"
+                app:icon="@drawable/ic_fullscreen"
+                app:iconGravity="textStart"
+                app:iconSize="16dp"
+                style="@style/Widget.Material3.Button.TextButton" />
         </LinearLayout>
     </LinearLayout>
 

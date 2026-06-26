@@ -1,7 +1,6 @@
 package com.woshiwangnima.healthdietpro.ui.profile.chart
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
@@ -19,6 +18,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.*
 import androidx.core.content.ContextCompat
+import com.google.android.material.button.MaterialButton
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 
@@ -30,7 +30,7 @@ class ChartView @JvmOverloads constructor(
     private val chartTypeSpinner: Spinner
     private val timeRangeSpinner: Spinner
     private val labelIntervalSpinner: Spinner
-    private val btnFullscreen: Button
+    private val btnFullscreen: MaterialButton
     private val yMinInput: EditText
     private val yMaxInput: EditText
     private val controlsRow: LinearLayout
@@ -370,18 +370,9 @@ class ChartView @JvmOverloads constructor(
     }
 
     private fun initFullscreenButtons() {
-        btnFullscreen.setBackgroundColor(0xFFFF0000.toInt())
-        btnFullscreen.minimumWidth = 100
         btnFullscreen.setOnClickListener {
-            chartTitle.text = "点击了全屏"
-            chartTitle.visibility = View.VISIBLE
-            try {
-                val data = buildFullscreenData(chartTitle.text.toString())
-                ChartFullscreenActivity.launch(context, data)
-            } catch (e: Exception) {
-                chartTitle.text = "错误: ${e.message}"
-                chartTitle.visibility = View.VISIBLE
-            }
+            val data = buildFullscreenData(chartTitle.text.toString())
+            ChartFullscreenActivity.launch(context, data)
         }
     }
 

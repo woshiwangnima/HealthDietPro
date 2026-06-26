@@ -49,6 +49,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.profile.chart.ChartFullscreenActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="false" />
         <activity
             android:name=".ui.profile.BmiDetailActivity"
