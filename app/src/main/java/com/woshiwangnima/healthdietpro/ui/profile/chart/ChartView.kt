@@ -19,7 +19,6 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.*
 import androidx.core.content.ContextCompat
-import com.google.android.material.button.MaterialButton
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 
@@ -31,7 +30,7 @@ class ChartView @JvmOverloads constructor(
     private val chartTypeSpinner: Spinner
     private val timeRangeSpinner: Spinner
     private val labelIntervalSpinner: Spinner
-    private val btnFullscreen: MaterialButton
+    private val btnFullscreen: Button
     private val yMinInput: EditText
     private val yMaxInput: EditText
     private val controlsRow: LinearLayout
@@ -374,7 +373,11 @@ class ChartView @JvmOverloads constructor(
         btnFullscreen.setOnClickListener {
             val data = buildFullscreenData(chartTitle.text.toString())
             ChartFullscreenHolder.data = data
-            context.startActivity(Intent(context, ChartFullscreenActivity::class.java))
+            try {
+                context.startActivity(Intent(context, ChartFullscreenActivity::class.java))
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(context, "全屏启动失败: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
