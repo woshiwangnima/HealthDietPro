@@ -6,10 +6,12 @@ import org.junit.Test
 class LineStyleTest {
 
     @Test
-    fun fromSpinnerPosition_mapsAllFourSlots() {
+    fun fromSpinnerPosition_mapsAllFiveSlots() {
         assertEquals(LineStyle.LINEAR, LineStyle.fromSpinnerPosition(0))
-        assertEquals(LineStyle.CUBIC_BEZIER, LineStyle.fromSpinnerPosition(1))
-        assertEquals(LineStyle.STEPPED, LineStyle.fromSpinnerPosition(2))
+        assertEquals(LineStyle.BEZIER, LineStyle.fromSpinnerPosition(1))
+        assertEquals(LineStyle.SPLINE, LineStyle.fromSpinnerPosition(2))
+        assertEquals(LineStyle.STEPPED_FRONT, LineStyle.fromSpinnerPosition(3))
+        assertEquals(LineStyle.STEPPED_BACK, LineStyle.fromSpinnerPosition(4))
     }
 
     @Test
@@ -20,7 +22,7 @@ class LineStyleTest {
 
     @Test
     fun toSpinnerPosition_roundTrip() {
-        val all = listOf(LineStyle.LINEAR, LineStyle.CUBIC_BEZIER, LineStyle.STEPPED)
+        val all = LineStyle.entries
         for (style in all) {
             assertEquals(style, LineStyle.fromSpinnerPosition(LineStyle.toSpinnerPosition(style)))
         }

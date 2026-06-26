@@ -2,20 +2,27 @@ package com.woshiwangnima.healthdietpro.ui.profile.chart
 
 enum class LineStyle {
     LINEAR,
-    CUBIC_BEZIER,
-    STEPPED;
+    BEZIER,
+    SPLINE,
+    STEPPED_FRONT,
+    STEPPED_BACK;
 
     companion object {
-        fun fromSpinnerPosition(pos: Int): LineStyle = when (pos) {
-            1 -> CUBIC_BEZIER
-            2 -> STEPPED
+        fun fromSpinnerPosition(position: Int): LineStyle = when (position) {
+            0 -> LINEAR
+            1 -> BEZIER
+            2 -> SPLINE
+            3 -> STEPPED_FRONT
+            4 -> STEPPED_BACK
             else -> LINEAR
         }
 
         fun toSpinnerPosition(style: LineStyle): Int = when (style) {
             LINEAR -> 0
-            CUBIC_BEZIER -> 1
-            STEPPED -> 2
+            BEZIER -> 1
+            SPLINE -> 2
+            STEPPED_FRONT -> 3
+            STEPPED_BACK -> 4
         }
     }
 }

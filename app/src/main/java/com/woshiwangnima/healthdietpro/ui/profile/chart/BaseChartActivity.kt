@@ -4,13 +4,18 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.*
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -52,6 +57,14 @@ abstract class BaseChartActivity : BaseBackActivity() {
     private var yAxisReady = false
     private var lastDragX = 0f
     private lateinit var crosshairView: ChartCrosshairView
+    private var baseTimestampOffset: Long = 0L
+
+    private val timelineHandler = Handler(Looper.getMainLooper())
+    private var isTimelineVisible = false
+    private val timelineHideRunnable = Runnable {
+        hideTimeline()
+    }
+    private val timelineShowDurationMs = 4000L
 
     companion object {
         const val EXTRA_RECORDS = "records"
@@ -68,8 +81,8 @@ abstract class BaseChartActivity : BaseBackActivity() {
     private fun currentScrollWindow(): ScrollWindow? {
         val visibleRange = chart.highestVisibleX - chart.lowestVisibleX
         if (visibleRange <= 0f || filteredDataPoints.size < 2) return null
-        val firstTs = filteredDataPoints.first().timestamp.toFloat()
-        val lastTs = filteredDataPoints.last().timestamp.toFloat()
+        val firstTs = 0f
+        val lastTs = (filteredDataPoints.last().timestamp - baseTimestampOffset).toFloat()
         return ScrollWindow(firstTs, lastTs, (lastTs - visibleRange).coerceAtLeast(firstTs))
     }
 
@@ -104,6 +117,7 @@ abstract class BaseChartActivity : BaseBackActivity() {
         initYAxisInputs()
         initChartTouch()
         initDragIndicator()
+        setupTimeline()
         initBackHandler()
         applyChartLayout()
         updateChart()
@@ -227,7 +241,22 @@ abstract class BaseChartActivity : BaseBackActivity() {
         )
         if (dataPoints.isEmpty()) return allOptions.take(1)
         val totalSpan = dataPoints.maxOf { it.timestamp } - dataPoints.minOf { it.timestamp }
-        return allOptions.filter { it.millis == Long.MAX_VALUE || it.millis <= totalSpan }
+        val minInterval = if (dataPoints.size >= 2) {
+            dataPoints.zipWithNext { a, b -> b.timestamp - a.timestamp }.minOrNull() ?: 0L
+        } else 0L
+        val withinSpan = allOptions.filter { option ->
+            option.millis != Long.MAX_VALUE &&
+            option.millis <= totalSpan &&
+            option.millis >= minInterval
+        }
+        val nextAbove = allOptions.filter { it.millis != Long.MAX_VALUE && it.millis > totalSpan }
+            .minByOrNull { it.millis }
+        val result = withinSpan.toMutableList()
+        if (nextAbove != null && nextAbove !in result) {
+            result.add(nextAbove)
+        }
+        result.add(TimeRangeOption("\u5168\u90E8", Long.MAX_VALUE))
+        return result
     }
 
     private fun updateChartStyle(style: LineStyle) {
@@ -251,6 +280,7 @@ abstract class BaseChartActivity : BaseBackActivity() {
         }
         updateChart()
         updateDragIndicator()
+        showTimeline()
         crosshairView.clear()
     }
 
@@ -415,20 +445,21 @@ abstract class BaseChartActivity : BaseBackActivity() {
 
         val transformer = chart.getTransformer(YAxis.AxisDependency.RIGHT)
         val touchVals = transformer.getValuesByTouchPoint(px, py)
-        val chartX = touchVals.x.toFloat().coerceIn(entries.first().x, entries.last().x)
+        val relativeX = touchVals.x.toFloat().coerceIn(entries.first().x, entries.last().x)
+        val absoluteX = relativeX + baseTimestampOffset
 
         val style = LineStyle.fromSpinnerPosition(binding.chartTypeSpinner.selectedItemPosition)
         val y = when (style) {
-            LineStyle.LINEAR -> ChartSegmentMath.interpolateLinear(entries, chartX)
-            LineStyle.STEPPED -> ChartSegmentMath.interpolateStepped(entries, chartX)
-            LineStyle.CUBIC_BEZIER -> {
-                val i = ChartSegmentMath.findSegmentIndex(entries, chartX)
-                val cubicY = interpolateCubicBezier(entries, chartX.toDouble(), i)
+            LineStyle.LINEAR -> ChartSegmentMath.interpolateLinear(entries, relativeX)
+            LineStyle.STEPPED_FRONT, LineStyle.STEPPED_BACK -> ChartSegmentMath.interpolateStepped(entries, relativeX)
+            LineStyle.BEZIER, LineStyle.SPLINE -> {
+                val i = ChartSegmentMath.findSegmentIndex(entries, relativeX)
+                val cubicY = interpolateCubicBezier(entries, relativeX.toDouble(), i)
                 if (cubicY.isFinite()) cubicY.toFloat()
-                else ChartSegmentMath.interpolateLinear(entries, chartX)
+                else ChartSegmentMath.interpolateLinear(entries, relativeX)
             }
         }
-        crosshairView.setCrosshair(chartX, y, entries, filteredDataPoints)
+        crosshairView.setCrosshair(absoluteX, y, entries, filteredDataPoints)
     }
 
     private fun interpolateCubicBezier(entries: List<Entry>, x: Double, i: Int): Double {
@@ -438,26 +469,26 @@ abstract class BaseChartActivity : BaseBackActivity() {
         val p3x = entries[i + 1].x.toDouble()
         val p3y = entries[i + 1].y.toDouble()
         val dx = p3x - p0x
+        if (dx == 0.0) return ChartSegmentMath.interpolateLinear(entries, x.toFloat()).toDouble()
         val dy = p3y - p0y
-        val cpx1 = p0x + dx * 0.2
-        val cpx2 = p3x - dx * 0.2
         val cIntensity = 0.2
         val prevY = if (i > 0) entries[i - 1].y.toDouble() else p0y - (p3y - p0y)
         val nextY = if (i + 2 < entries.size) entries[i + 2].y.toDouble() else p3y + (p3y - p0y)
         val cpy1 = p0y + (dy * cIntensity) + ((p3y - prevY) * cIntensity) * 0.5
         val cpy2 = p3y - (dy * cIntensity) - ((nextY - p0y) * cIntensity) * 0.5
 
-        val t = if (dx != 0.0) (x - p0x) / dx else 0.0
+        val t = (x - p0x) / dx
         if (t < 0.0 || t > 1.0) return Double.NaN
         val ti = 1.0 - t
         return ti * ti * ti * p0y + 3 * ti * ti * t * cpy1 + 3 * ti * t * t * cpy2 + t * t * t * p3y
     }
 
-    // --- Drag Indicator ---
+    // --- Timeline / Drag Indicator ---
 
     private fun updateDragIndicator() {
         val dragEnabled = currentRangeMillis != Long.MAX_VALUE && filteredDataPoints.isNotEmpty()
         binding.dragIndicatorContainer.visibility = if (dragEnabled) View.VISIBLE else View.GONE
+        binding.progressBarContainer.visibility = if (dragEnabled) View.VISIBLE else View.GONE
         if (dragEnabled) {
             val color = resolveThemeColor(com.google.android.material.R.attr.colorSecondaryContainer)
             binding.dragIndicator.setBackgroundColor(Color.argb(100, Color.red(color), Color.green(color), Color.blue(color)))
@@ -468,14 +499,19 @@ abstract class BaseChartActivity : BaseBackActivity() {
     private fun updateDragArrows() {
         val window = currentScrollWindow()
         if (window == null) {
-            binding.dragArrowLeft.visibility = View.GONE
-            binding.dragArrowRight.visibility = View.GONE
+            setArrowEnabled(binding.dragArrowLeft, false)
+            setArrowEnabled(binding.dragArrowRight, false)
             return
         }
-        binding.dragArrowLeft.visibility =
-            if (chart.lowestVisibleX > window.firstTs + ARROW_TOLERANCE_MS) View.VISIBLE else View.GONE
-        binding.dragArrowRight.visibility =
-            if (chart.highestVisibleX < window.lastTs - ARROW_TOLERANCE_MS) View.VISIBLE else View.GONE
+        val canScrollLeft = chart.lowestVisibleX > window.firstTs + ARROW_TOLERANCE_MS
+        val canScrollRight = chart.highestVisibleX < window.lastTs - ARROW_TOLERANCE_MS
+        setArrowEnabled(binding.dragArrowLeft, canScrollLeft)
+        setArrowEnabled(binding.dragArrowRight, canScrollRight)
+    }
+
+    private fun setArrowEnabled(btn: View, enabled: Boolean) {
+        btn.isEnabled = enabled
+        btn.alpha = if (enabled) 1f else 0.3f
     }
 
     private fun initDragIndicator() {
@@ -485,6 +521,7 @@ abstract class BaseChartActivity : BaseBackActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     lastDragX = event.x
+                    showTimeline()
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -498,7 +535,14 @@ abstract class BaseChartActivity : BaseBackActivity() {
                     val pxPerMs = stripWidth / visibleRange
                     val deltaMs = -(deltaX / pxPerMs)
                     chart.moveViewToX(window.clamp(chart.lowestVisibleX, deltaMs))
-                    chart.post { updateDragArrows() }
+                    chart.post {
+                        updateDragArrows()
+                        updateTimelineBar()
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    showTimeline()
                     true
                 }
                 else -> false
@@ -506,19 +550,87 @@ abstract class BaseChartActivity : BaseBackActivity() {
         }
 
         binding.dragArrowLeft.setOnClickListener {
+            showTimeline()
             val window = currentScrollWindow() ?: return@setOnClickListener
             val visibleRange = chart.highestVisibleX - chart.lowestVisibleX
             val step = visibleRange * 0.3f
             chart.moveViewToX(window.clamp(chart.lowestVisibleX, -step))
-            chart.post { updateDragArrows() }
+            chart.post {
+                updateDragArrows()
+                updateTimelineBar()
+            }
         }
 
         binding.dragArrowRight.setOnClickListener {
+            showTimeline()
             val window = currentScrollWindow() ?: return@setOnClickListener
             val visibleRange = chart.highestVisibleX - chart.lowestVisibleX
             val step = visibleRange * 0.3f
             chart.moveViewToX(window.clamp(chart.lowestVisibleX, step))
-            chart.post { updateDragArrows() }
+            chart.post {
+                updateDragArrows()
+                updateTimelineBar()
+            }
+        }
+    }
+
+    private fun setupTimeline() {
+        binding.progressBarContainer.visibility = View.GONE
+        isTimelineVisible = false
+    }
+
+    private fun showTimeline() {
+        val dragEnabled = currentRangeMillis != Long.MAX_VALUE && filteredDataPoints.size >= 2
+        if (!dragEnabled) return
+        timelineHandler.removeCallbacks(timelineHideRunnable)
+        if (!isTimelineVisible) {
+            isTimelineVisible = true
+            binding.progressBarContainer.visibility = View.VISIBLE
+            val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 200 }
+            binding.progressBarContainer.startAnimation(fadeIn)
+        }
+        timelineHandler.postDelayed(timelineHideRunnable, timelineShowDurationMs)
+        binding.progressBarContainer.post { updateTimelineBar() }
+    }
+
+    private fun hideTimeline() {
+        isTimelineVisible = false
+        val fadeOut = AlphaAnimation(1f, 0f).apply {
+            duration = 300
+            setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation) {}
+                override fun onAnimationEnd(animation: Animation) {
+                    binding.progressBarContainer.visibility = View.GONE
+                }
+                override fun onAnimationRepeat(animation: Animation) {}
+            })
+        }
+        binding.progressBarContainer.startAnimation(fadeOut)
+    }
+
+    private fun updateTimelineBar() {
+        if (filteredDataPoints.size < 2) return
+        val absMin = dataPoints.minOf { it.timestamp }
+        val totalDataSpan = dataPoints.maxOf { it.timestamp } - absMin
+        if (totalDataSpan <= 0L) return
+        val visibleRange = chart.highestVisibleX - chart.lowestVisibleX
+        if (visibleRange <= 0f) return
+        val barWidth = binding.dragIndicatorContainer.width - binding.dragIndicatorContainer.paddingLeft - binding.dragIndicatorContainer.paddingRight
+        if (barWidth <= 0) return
+
+        val thumbWidthFraction = (visibleRange / totalDataSpan.toFloat()).coerceIn(0.05f, 1f)
+        val thumbWidth = (barWidth * thumbWidthFraction).coerceAtLeast(20f)
+
+        val absCenter = baseTimestampOffset + ((chart.lowestVisibleX + chart.highestVisibleX) / 2f).toLong()
+        val relCenter = (absCenter - absMin).toFloat().coerceAtLeast(0f)
+        val thumbCenterFraction = (relCenter / totalDataSpan.toFloat()).coerceIn(0f, 1f)
+        val thumbLeft = (barWidth * thumbCenterFraction) - (thumbWidth / 2f)
+        val clampedLeft = thumbLeft.coerceIn(0f, (barWidth - thumbWidth).coerceAtLeast(0f))
+
+        binding.progressBarThumb.layoutParams = (binding.progressBarThumb.layoutParams as FrameLayout.LayoutParams).also {
+            it.width = thumbWidth.toInt()
+            it.leftMargin = (clampedLeft + binding.dragIndicatorContainer.paddingLeft).toInt()
+            it.rightMargin = 0
         }
     }
 
@@ -580,11 +692,12 @@ abstract class BaseChartActivity : BaseBackActivity() {
             return
         }
 
+        baseTimestampOffset = filteredDataPoints.first().timestamp
         val entries = filteredDataPoints.map { dp ->
-            Entry(dp.timestamp.toFloat(), dp.value)
+            Entry((dp.timestamp - baseTimestampOffset).toFloat(), dp.value)
         }
         val labelsByTimestamp: Map<Long, String> =
-            filteredDataPoints.associate { it.timestamp to it.dateLabel }
+            filteredDataPoints.associate { (it.timestamp - baseTimestampOffset) to it.dateLabel }
 
         val style = LineStyle.fromSpinnerPosition(binding.chartTypeSpinner.selectedItemPosition)
 
@@ -633,8 +746,8 @@ abstract class BaseChartActivity : BaseBackActivity() {
 
     private fun mpModeFor(style: LineStyle): LineDataSet.Mode = when (style) {
         LineStyle.LINEAR -> LineDataSet.Mode.LINEAR
-        LineStyle.CUBIC_BEZIER -> LineDataSet.Mode.CUBIC_BEZIER
-        LineStyle.STEPPED -> LineDataSet.Mode.STEPPED
+        LineStyle.BEZIER, LineStyle.SPLINE -> LineDataSet.Mode.CUBIC_BEZIER
+        LineStyle.STEPPED_FRONT, LineStyle.STEPPED_BACK -> LineDataSet.Mode.STEPPED
     }
 
     private fun LineDataSet.applyLineType(type: LineType) {
@@ -693,15 +806,23 @@ abstract class BaseChartActivity : BaseBackActivity() {
             chartY = y
             hasCrosshair = true
 
-            val i = x.toInt().coerceIn(0, dps.size - 2)
-            val t = x - i
-            val dp = dps[i.coerceAtMost(dps.size - 1)]
-            val dpNext = dps[(i + 1).coerceAtMost(dps.size - 1)]
-            val ts = dp.timestamp + ((dpNext.timestamp - dp.timestamp) * t).toLong()
-            val instant = Instant.ofEpochMilli(ts)
-            val localDt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-            dateText = localDt.format(dateFormatter)
-            valueText = String.format("%.2f %s", y, unitLabel)
+            val ts = x.toLong()
+            val idx = findDataSegment(dps, ts)
+            dateText = if (idx in 0 until dps.size - 1) {
+                val dp0 = dps[idx]
+                val dp1 = dps[idx + 1]
+                val seg = dp1.timestamp - dp0.timestamp
+                val t = if (seg > 0) ((ts - dp0.timestamp).toFloat() / seg).coerceIn(0f, 1f) else 0f
+                val interpolatedTs = dp0.timestamp + (seg * t).toLong()
+                val instant = Instant.ofEpochMilli(interpolatedTs)
+                val localDt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+                localDt.format(dateFormatter)
+            } else if (dps.isNotEmpty()) {
+                val instant = Instant.ofEpochMilli(dps.last().timestamp)
+                val localDt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+                localDt.format(dateFormatter)
+            } else ""
+            valueText = String.format("%.1f %s", y, unitLabel)
             invalidate()
         }
 
@@ -726,6 +847,9 @@ abstract class BaseChartActivity : BaseBackActivity() {
 
             if (px < contentLeft || px > contentRight) return
 
+            // horizontal dashed line
+            canvas.drawLine(contentLeft, py, contentRight, py, linePaint)
+
             // vertical dashed line
             canvas.drawLine(px, contentTop, px, contentBottom, linePaint)
 
@@ -734,6 +858,13 @@ abstract class BaseChartActivity : BaseBackActivity() {
 
             // info bubble
             drawInfoBubble(canvas, px, py, contentLeft, contentTop, contentRight, contentBottom)
+        }
+
+        private fun findDataSegment(dps: List<DataPoint>, ts: Long): Int {
+            for (i in 0 until dps.size - 1) {
+                if (ts >= dps[i].timestamp && ts <= dps[i + 1].timestamp) return i
+            }
+            return dps.size - 2
         }
 
         private fun drawInfoBubble(
