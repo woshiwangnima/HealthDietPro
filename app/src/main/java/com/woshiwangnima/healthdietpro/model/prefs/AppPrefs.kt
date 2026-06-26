@@ -65,4 +65,24 @@ object AppPrefs {
         prefs(context).getFloat("pref_font_scale", 1.0f)
     fun setFontScale(context: Context, scale: Float) =
         prefs(context).edit().putFloat("pref_font_scale", scale).apply()
+
+    fun getChartStyle(context: Context, key: String): Int =
+        prefs(context).getInt("chart_style_$key", 0)
+    fun setChartStyle(context: Context, key: String, pos: Int) =
+        prefs(context).edit().putInt("chart_style_$key", pos).apply()
+
+    fun getChartTimeRange(context: Context, key: String): Long =
+        prefs(context).getLong("chart_timerange_$key", Long.MAX_VALUE)
+    fun setChartTimeRange(context: Context, key: String, range: Long) =
+        prefs(context).edit().putLong("chart_timerange_$key", range).apply()
+
+    fun getChartYMin(context: Context, key: String): Float =
+        prefs(context).getFloat("chart_ymin_$key", 0f)
+    fun setChartYMin(context: Context, key: String, pct: Float) =
+        prefs(context).edit().putFloat("chart_ymin_$key", pct).apply()
+
+    fun getChartYMax(context: Context, key: String): Float =
+        prefs(context).getFloat("chart_ymax_$key", 100f)
+    fun setChartYMax(context: Context, key: String, pct: Float) =
+        prefs(context).edit().putFloat("chart_ymax_$key", pct).apply()
 }

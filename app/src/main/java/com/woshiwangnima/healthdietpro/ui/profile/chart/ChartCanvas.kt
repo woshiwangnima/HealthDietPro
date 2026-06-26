@@ -11,6 +11,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+data class YAxisBand(val minValue: Float, val maxValue: Float, val color: Int)
+
 class ChartCanvas @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : View(context, attrs) {
@@ -22,6 +24,7 @@ class ChartCanvas @JvmOverloads constructor(
     var yMinPct: Float = 0f
     var yMaxPct: Float = 100f
     var labelIntervalMs: Long = 0L
+    var yAxisBands: List<YAxisBand> = emptyList()
     var onCrosshairUpdate: ((String, String) -> Unit)? = null
 
     private var touchX: Float = -1f
@@ -151,6 +154,15 @@ class ChartCanvas @JvmOverloads constructor(
 
         val yMin = chartYMin; val yMax = chartYMax
         val yRange = if (yMax > yMin) yMax - yMin else 1f
+        fun screenY(yVal: Float) = chartB - ((yVal - yMin) / yRange) * chartH
+
+        // Background color bands for Y-axis classification
+        for (band in yAxisBands) {
+            val bTop = screenY(band.maxValue.coerceAtMost(yMax).coerceAtLeast(yMin))
+            val bBot = screenY(band.minValue.coerceAtLeast(yMin).coerceAtMost(yMax))
+            val bandPaint = Paint().apply { color = band.color; style = Paint.Style.FILL }
+            canvas.drawRect(chartL, bTop, chartR, bBot, bandPaint)
+        }
 
         val (niceMin, niceMax) = ChartMath.niceScale(yMin, yMax, 5)
         val niceRange = if (niceMax > niceMin) niceMax - niceMin else 1f

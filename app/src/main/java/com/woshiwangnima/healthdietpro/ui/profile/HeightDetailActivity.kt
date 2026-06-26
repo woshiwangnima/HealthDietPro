@@ -110,6 +110,7 @@ class HeightDetailActivity : BaseBackActivity() {
             chartView = newCv
             newCv
         }
+        cv.setChartStateKey("height_history")
         val dataPoints = if (records.isEmpty()) emptyList() else {
             val sorted = records.sortedBy { it.date }
             sorted.map { record ->

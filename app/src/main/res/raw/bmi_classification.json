@@ -1,0 +1,26 @@
+[
+  {
+    "min": -1,
+    "max": 18.5,
+    "label": "体重过低",
+    "color": "#4D9E9E9E"
+  },
+  {
+    "min": 18.5,
+    "max": 24,
+    "label": "体重正常",
+    "color": "#4D4CAF50"
+  },
+  {
+    "min": 24,
+    "max": 28,
+    "label": "超重",
+    "color": "#4DFFEB3B"
+  },
+  {
+    "min": 28,
+    "max": -1,
+    "label": "肥胖",
+    "color": "#4DFF5722"
+  }
+]

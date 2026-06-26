@@ -20,6 +20,7 @@ import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
+import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 import java.util.Calendar
 
@@ -150,6 +151,10 @@ class ProfileEditActivity : BaseBackActivity() {
                 putExtra("unit", AppPrefs.getUnit(context, UnitCategory.ID_WEIGHT, UnitCategory.DEFAULT_UNIT_WEIGHT))
             }
             weightDetailLauncher.launch(intent)
+        }
+
+        binding.bmiRow.setOnClickListener {
+            startActivity(Intent(this@ProfileEditActivity, BmiDetailActivity::class.java))
         }
 
         binding.nameInput.addTextChangedListener(object : android.text.TextWatcher {
@@ -284,6 +289,19 @@ class ProfileEditActivity : BaseBackActivity() {
     private fun updateWeightDisplay() {
         val latest = weightRecords.maxByOrNull { it.date }
         binding.weightDisplay.text = if (latest != null) "${latest.value} kg" else "无记录"
+        updateBmiDisplay()
+    }
+
+    private fun updateBmiDisplay() {
+        val latestH = heightRecords.maxByOrNull { it.date }
+        val latestW = weightRecords.maxByOrNull { it.date }
+        if (latestH != null && latestW != null) {
+            val bmi = BmiUtil.computeBmi(latestW.value, latestH.value)
+            val label = BmiUtil.getBmiLabel(bmi)
+            binding.bmiDisplay.text = "%.1f %s".format(bmi, label)
+        } else {
+            binding.bmiDisplay.text = "无记录"
+        }
     }
 
     private fun saveProfile() {

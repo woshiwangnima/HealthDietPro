@@ -20,6 +20,7 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 
 class ChartView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -153,6 +154,11 @@ class ChartView @JvmOverloads constructor(
     fun getYAxisMinPct(): Float = chartCanvas.yMinPct
     fun getYAxisMaxPct(): Float = chartCanvas.yMaxPct
 
+    fun setYAxisBands(bands: List<YAxisBand>) {
+        chartCanvas.yAxisBands = bands
+        chartCanvas.invalidate()
+    }
+
     fun toggleFullscreen() {
         isFullscreen = !isFullscreen
         onFullscreenListener?.invoke(isFullscreen) // call BEFORE visual changes for atomic transition
@@ -184,6 +190,43 @@ class ChartView @JvmOverloads constructor(
     fun isFullscreen(): Boolean = isFullscreen
     fun setOnFullscreenListener(listener: ((Boolean) -> Unit)?) { onFullscreenListener = listener }
 
+    private var chartStateKey: String = ""
+
+    fun setChartStateKey(key: String) {
+        chartStateKey = key
+        if (key.isNotEmpty()) restoreChartState()
+    }
+
+    private fun restoreChartState() {
+        if (chartStateKey.isEmpty()) return
+        val ctx = context
+        val stylePos = AppPrefs.getChartStyle(ctx, chartStateKey)
+        chartTypeSpinner.setSelection(stylePos.coerceIn(0, chartTypeSpinner.adapter.count - 1))
+
+        val timeRange = AppPrefs.getChartTimeRange(ctx, chartStateKey)
+        if (timeRange != Long.MAX_VALUE) {
+            chartCanvas.visibleRangeMs = timeRange
+            val allPoints = seriesList.flatMap { it.points }
+            if (allPoints.isNotEmpty()) {
+                val latestTs = allPoints.maxOf { it.timestamp }
+                chartCanvas.windowStartMs = (latestTs - timeRange).coerceAtLeast(allPoints.minOf { it.timestamp })
+            }
+        }
+
+        val yMin = AppPrefs.getChartYMin(ctx, chartStateKey)
+        val yMax = AppPrefs.getChartYMax(ctx, chartStateKey)
+        setYAxisRange(yMin, yMax)
+    }
+
+    private fun saveChartState() {
+        if (chartStateKey.isEmpty()) return
+        val ctx = context
+        AppPrefs.setChartStyle(ctx, chartStateKey, chartTypeSpinner.selectedItemPosition)
+        AppPrefs.setChartTimeRange(ctx, chartStateKey, chartCanvas.visibleRangeMs)
+        AppPrefs.setChartYMin(ctx, chartStateKey, chartCanvas.yMinPct)
+        AppPrefs.setChartYMax(ctx, chartStateKey, chartCanvas.yMaxPct)
+    }
+
     private fun initChartTypeSpinner() {
         val adapter = ArrayAdapter.createFromResource(context, R.array.chart_type_options, android.R.layout.simple_spinner_item)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -196,6 +239,7 @@ class ChartView @JvmOverloads constructor(
                 lineStyle = LineStyle.fromSpinnerPosition(position)
                 seriesList = seriesList.map { it.copy(lineStyle = lineStyle) }
                 chartCanvas.series = seriesList
+                saveChartState()
                 chartCanvas.invalidate()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -255,6 +299,7 @@ class ChartView @JvmOverloads constructor(
                     chartCanvas.windowStartMs = (latestTs - rangeMs).coerceAtLeast(allPoints.minOf { it.timestamp })
                 }
                 chartCanvas.invalidate()
+                saveChartState()
                 updateDragIndicator()
                 showTimeline()
             }
@@ -341,6 +386,7 @@ class ChartView @JvmOverloads constructor(
         val maxPct = yMaxInput.text.toString().trim().toFloatOrNull() ?: return
         chartCanvas.yMinPct = minPct
         chartCanvas.yMaxPct = maxPct
+        saveChartState()
         chartCanvas.invalidate()
     }
 

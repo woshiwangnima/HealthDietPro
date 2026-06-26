@@ -110,6 +110,7 @@ class WeightDetailActivity : BaseBackActivity() {
             chartView = newCv
             newCv
         }
+        cv.setChartStateKey("weight_history")
         // Always refresh data
         val dataPoints = if (records.isEmpty()) emptyList() else {
             val sorted = records.sortedBy { it.date }
