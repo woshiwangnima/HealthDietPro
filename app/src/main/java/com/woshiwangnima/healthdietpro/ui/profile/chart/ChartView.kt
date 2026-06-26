@@ -370,15 +370,14 @@ class ChartView @JvmOverloads constructor(
     }
 
     private fun initFullscreenButtons() {
-        btnFullscreen.setBackgroundColor(0xFFFF0000.toInt()) // red - verify button is visible
+        btnFullscreen.setBackgroundColor(0xFFFF0000.toInt())
         btnFullscreen.minimumWidth = 100
         btnFullscreen.setOnClickListener {
             chartTitle.text = "点击了全屏"
             chartTitle.visibility = View.VISIBLE
             try {
                 val data = buildFullscreenData(chartTitle.text.toString())
-                ChartFullscreenHolder.data = data
-                context.startActivity(Intent(context, ChartFullscreenActivity::class.java))
+                ChartFullscreenActivity.launch(context, data)
             } catch (e: Exception) {
                 chartTitle.text = "错误: ${e.message}"
                 chartTitle.visibility = View.VISIBLE

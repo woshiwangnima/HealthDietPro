@@ -1,5 +1,6 @@
 package com.woshiwangnima.healthdietpro.ui.profile.chart
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.Gravity
@@ -12,18 +13,28 @@ import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class ChartFullscreenActivity : BaseBackActivity() {
 
+    companion object {
+        @Volatile
+        var pendingData: ChartFullscreenData? = null
+
+        fun launch(context: android.content.Context, data: ChartFullscreenData) {
+            pendingData = data
+            context.startActivity(Intent(context, ChartFullscreenActivity::class.java))
+        }
+    }
+
     override fun getTitleText(): String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val data = ChartFullscreenHolder.data
+        val data = pendingData
+        pendingData = null
         if (data == null) { finish(); return }
-        ChartFullscreenHolder.data = null
 
         try {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
+            window?.decorView?.windowInsetsController?.hide(WindowInsets.Type.systemBars())
         } catch (_: Exception) {}
 
         val root = FrameLayout(this).apply { applySystemBarInsets() }
@@ -34,7 +45,6 @@ class ChartFullscreenActivity : BaseBackActivity() {
             setChartStateKey(data.chartStateKey)
             if (data.yAxisBands.isNotEmpty()) setYAxisBands(data.yAxisBands)
             setSeries(data.series, data.unitLabel)
-            // Apply state after setSeries to not be overwritten
             post {
                 setVisibleRange(data.visibleRangeMs)
                 setYAxisRange(data.yMinPct, data.yMaxPct)
@@ -47,7 +57,6 @@ class ChartFullscreenActivity : BaseBackActivity() {
             text = "缩放"
             setIconResource(R.drawable.ic_fullscreen_exit)
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
-            iconSize = 20
             contentDescription = "退出全屏"
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
