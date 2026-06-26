@@ -5,7 +5,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="12dp">
 
         <LinearLayout
             android:id="@+id/prefRoot"
@@ -23,234 +24,238 @@
                 app:titleTextColor="?attr/colorOnSurface" />
 
             <!-- Block 1: 默认字体大小 -->
-            <TextView
-                android:id="@+id/fontSizeHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="默认字体大小"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="4dp" />
-
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="A"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginEnd="8dp" />
-
-                <SeekBar
-                    android:id="@+id/fontScaleSeekBar"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:max="70" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="A"
-                    android:textSize="24sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginStart="8dp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/fontScaleValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="100%"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="4dp" />
-
-            <LinearLayout
-                android:id="@+id/fontPreviewContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="12dp" />
+                android:background="@drawable/card_bg"
+                android:padding="12dp"
+                android:layout_marginTop="12dp"
+                android:elevation="1dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginHorizontal="16dp"
-                android:background="?attr/colorOutlineVariant" />
+                <TextView
+                    android:id="@+id/fontSizeHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="默认字体大小"
+                    android:paddingBottom="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginEnd="8dp" />
+
+                    <SeekBar
+                        android:id="@+id/fontScaleSeekBar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:max="70" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textSize="24sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/fontScaleValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100%"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:paddingBottom="4dp" />
+
+                <LinearLayout
+                    android:id="@+id/fontPreviewContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
 
             <!-- Block 2: 默认单位偏好 -->
-            <TextView
-                android:id="@+id/unitHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="默认单位偏好"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="4dp" />
-
             <LinearLayout
-                android:id="@+id/unitSettingsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                android:background="@drawable/card_bg"
+                android:padding="12dp"
+                android:layout_marginTop="12dp"
+                android:elevation="1dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginHorizontal="16dp"
-                android:background="?attr/colorOutlineVariant" />
+                <TextView
+                    android:id="@+id/unitHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="默认单位偏好"
+                    android:paddingBottom="8dp" />
+
+                <LinearLayout
+                    android:id="@+id/unitSettingsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
 
             <!-- Block 3: 其他偏好 -->
-            <TextView
-                android:id="@+id/otherHeader"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="其他偏好"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="4dp" />
-
-            <LinearLayout
-                android:id="@+id/firstDayRow"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground">
+                android:orientation="vertical"
+                android:background="@drawable/card_bg"
+                android:padding="12dp"
+                android:layout_marginTop="12dp"
+                android:elevation="1dp">
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="每周第一天" />
-
-                <TextView
-                    android:id="@+id/firstDayValue"
+                    android:id="@+id/otherHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="周一" />
+                    android:text="其他偏好"
+                    android:paddingBottom="8dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=">"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="20sp"
-                    android:layout_marginStart="8dp" />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/firstDayRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
 
-            <LinearLayout
-                android:id="@+id/darkModeRow"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="每周第一天" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="深色模式" />
+                    <TextView
+                        android:id="@+id/firstDayValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="周一" />
 
-                <TextView
-                    android:id="@+id/darkModeValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="跟随系统" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=">"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="20sp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=">"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="20sp"
-                    android:layout_marginStart="8dp" />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/darkModeRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
 
-            <LinearLayout
-                android:id="@+id/textOverflowRow"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="深色模式" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="文字溢出处理" />
+                    <TextView
+                        android:id="@+id/darkModeValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="跟随系统" />
 
-                <TextView
-                    android:id="@+id/textOverflowValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="自适应缩小" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=">"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="20sp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=">"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="20sp"
-                    android:layout_marginStart="8dp" />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/textOverflowRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
 
-            <LinearLayout
-                android:id="@+id/marqueeSpeedRow"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:visibility="gone"
-                tools:visibility="visible">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="文字溢出处理" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="轮播速度(ms/字)" />
+                    <TextView
+                        android:id="@+id/textOverflowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="自适应缩小" />
 
-                <TextView
-                    android:id="@+id/marqueeSpeedValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="200" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=">"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="20sp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=">"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="20sp"
-                    android:layout_marginStart="8dp" />
+                <LinearLayout
+                    android:id="@+id/marqueeSpeedRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="轮播速度(ms/字)" />
+
+                    <TextView
+                        android:id="@+id/marqueeSpeedValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="200" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=">"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="20sp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
