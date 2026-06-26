@@ -2,7 +2,7 @@ package com.woshiwangnima.healthdietpro.ui.profile.chart
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.view.View
+import android.view.Gravity
 import android.view.WindowInsets
 import android.widget.FrameLayout
 import com.google.android.material.button.MaterialButton
@@ -17,24 +17,30 @@ class ChartFullscreenActivity : BaseBackActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val data = ChartFullscreenHolder.data ?: run { finish(); return }
+        val data = ChartFullscreenHolder.data
+        if (data == null) { finish(); return }
         ChartFullscreenHolder.data = null
 
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
+        try {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
+        } catch (_: Exception) {}
 
         val root = FrameLayout(this).apply { applySystemBarInsets() }
 
-        val chartView = ChartView(this)
-        chartView.setChartTitle(data.chartTitle)
-        chartView.setChartStateKey(data.chartStateKey)
-        chartView.setFullscreenMode(true)
-        if (data.yAxisBands.isNotEmpty()) chartView.setYAxisBands(data.yAxisBands)
-        chartView.setSeries(data.series, data.unitLabel)
-        chartView.setVisibleRange(data.visibleRangeMs)
-        chartView.setYAxisRange(data.yMinPct, data.yMaxPct)
-        chartView.setLabelInterval(data.labelIntervalMs)
-        chartView.invalidateChart()
+        val chartView = ChartView(this).apply {
+            setFullscreenMode(true)
+            setChartTitle(data.chartTitle)
+            setChartStateKey(data.chartStateKey)
+            if (data.yAxisBands.isNotEmpty()) setYAxisBands(data.yAxisBands)
+            setSeries(data.series, data.unitLabel)
+            // Apply state after setSeries to not be overwritten
+            post {
+                setVisibleRange(data.visibleRangeMs)
+                setYAxisRange(data.yMinPct, data.yMaxPct)
+                setLabelInterval(data.labelIntervalMs)
+            }
+        }
         root.addView(chartView)
 
         val exitBtn = MaterialButton(this).apply {
@@ -42,10 +48,12 @@ class ChartFullscreenActivity : BaseBackActivity() {
             setIconResource(R.drawable.ic_fullscreen_exit)
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
             iconSize = 20
-            setPadding(8, 0, 8, 0)
-            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT).apply {
-                gravity = android.view.Gravity.TOP or android.view.Gravity.END
+            contentDescription = "退出全屏"
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.TOP or Gravity.END
                 setMargins(8, 8, 8, 8)
             }
             setOnClickListener { finish() }
