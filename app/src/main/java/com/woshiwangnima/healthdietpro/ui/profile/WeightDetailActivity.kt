@@ -1,18 +1,30 @@
 package com.woshiwangnima.healthdietpro.ui.profile
 
-import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.view.View
+import android.view.WindowInsets
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.config.NavConfig
 import com.woshiwangnima.healthdietpro.databinding.ActivityWeightDetailBinding
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
+import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
-import com.woshiwangnima.healthdietpro.ui.profile.chart.WeightChartActivity
+import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
+import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartView
+import com.woshiwangnima.healthdietpro.ui.profile.chart.LineStyle
+import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
+import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
+import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.profile.list.DataListFragment
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
+import java.time.LocalDate
+import java.time.ZoneId
 
 class WeightDetailActivity : BaseBackActivity() {
 
@@ -21,6 +33,7 @@ class WeightDetailActivity : BaseBackActivity() {
     private var unit: String = UnitCategory.DEFAULT_UNIT_WEIGHT
     private var category: String = UnitCategory.ID_WEIGHT
     private var currentTab = -1
+    private var chartView: ChartView? = null
 
     override fun getTitleText(): String = "体重历史"
 
@@ -37,11 +50,17 @@ class WeightDetailActivity : BaseBackActivity() {
         category = UnitCategory.ID_WEIGHT
 
         setupBottomBar()
-        switchTab(1)
+        val savedTab = AppPrefs.getWeightChartTab(this)
+        switchTab(savedTab)
         setupTabListeners()
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                saveAndFinish()
+                val cv = chartView
+                if (cv != null && cv.isFullscreen()) {
+                    cv.toggleFullscreen()
+                } else {
+                    saveAndFinish()
+                }
             }
         })
     }
@@ -62,15 +81,59 @@ class WeightDetailActivity : BaseBackActivity() {
     }
 
     private fun switchTab(index: Int) {
-        if (index == currentTab || index == 0) return
+        if (index == currentTab) return
         currentTab = index
+        AppPrefs.setWeightChartTab(this, index)
+        updateTabSelection()
+        when (index) {
+            0 -> showChartTab()
+            1 -> showDataTab()
+        }
+    }
+
+    private fun showChartTab() {
+        val cv = ChartView(this).also { chartView = it }
+        val dataPoints = if (records.isEmpty()) emptyList() else {
+            val sorted = records.sortedBy { it.date }
+            sorted.map { record ->
+                val converted = UnitConverter.fromBase(category, record.value, unit)
+                val localDate = LocalDate.parse(record.date)
+                val ts = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                DataPoint(timestamp = ts, value = converted, dateLabel = record.date.takeLast(5))
+            }
+        }
+        val series = ChartSeries(
+            points = dataPoints, label = "测量值",
+            color = resources.getColor(R.color.primary, null),
+            lineStyle = LineStyle.LINEAR, lineType = LineType.SOLID,
+            pointShape = PointShape.CIRCLE, pointFill = PointFill.FILLED
+        )
+        cv.setSeries(listOf(series), unit)
+        cv.setOnFullscreenListener { isFs ->
+            if (isFs) {
+                binding.toolbar.visibility = View.GONE
+                binding.bottomBar.visibility = View.GONE
+                window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            } else {
+                binding.toolbar.visibility = View.VISIBLE
+                binding.bottomBar.visibility = View.VISIBLE
+                window.decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+        }
+        binding.contentFrame.removeAllViews()
+        binding.contentFrame.addView(cv)
+    }
+
+    private fun showDataTab() {
+        chartView = null
         val fragment = DataListFragment.newInstance(ArrayList(records), unit, category, isHeight = false).also {
             it.onRecordsChanged = { this.records = it.records }
         }
         supportFragmentManager.beginTransaction()
             .replace(R.id.contentFrame, fragment)
             .commit()
-        updateTabSelection()
     }
 
     private fun updateTabSelection() {
@@ -83,13 +146,7 @@ class WeightDetailActivity : BaseBackActivity() {
     }
 
     private fun setupTabListeners() {
-        binding.tabChart.setOnClickListener {
-            val intent = Intent(this, WeightChartActivity::class.java).apply {
-                putExtra(WeightChartActivity.EXTRA_RECORDS, ArrayList(records))
-                putExtra(WeightChartActivity.EXTRA_UNIT, unit)
-            }
-            startActivity(intent)
-        }
+        binding.tabChart.setOnClickListener { switchTab(0) }
         binding.tabData.setOnClickListener { switchTab(1) }
     }
 }

@@ -155,8 +155,8 @@ class ChartView @JvmOverloads constructor(
 
     fun toggleFullscreen() {
         isFullscreen = !isFullscreen
+        onFullscreenListener?.invoke(isFullscreen) // call BEFORE visual changes for atomic transition
         updateFullscreenButton()
-        onFullscreenListener?.invoke(isFullscreen)
         if (isFullscreen) {
             controlsRow.visibility = View.GONE
             yAxisRow.visibility = View.GONE
@@ -293,7 +293,46 @@ class ChartView @JvmOverloads constructor(
         }
         yMinInput.addTextChangedListener(watcher)
         yMaxInput.addTextChangedListener(watcher)
+
+        // Vertical swipe to adjust percentage values
+        addSwipeAdjust(yMinInput, -10f, 100f)
+        addSwipeAdjust(yMaxInput, -10f, 120f)
+
         yAxisReady = true
+    }
+
+    private fun addSwipeAdjust(editText: EditText, minVal: Float, maxVal: Float) {
+        var startY = 0f
+        var startPct = 0f
+        var tracking = false
+        editText.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (event.pointerCount == 1) {
+                        startY = event.y
+                        startPct = editText.text.toString().trim().toFloatOrNull() ?: 0f
+                        tracking = true
+                    }
+                    false // let EditText handle the event for text input too
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (tracking && event.pointerCount == 1) {
+                        val dy = startY - event.y
+                        val sensitivity = 0.5f
+                        val newPct = (startPct + dy * sensitivity).coerceIn(minVal, maxVal)
+                        val rounded = Math.round(newPct * 10f) / 10f
+                        editText.setText("%.1f".format(rounded))
+                        editText.setSelection(editText.text.length)
+                        true
+                    } else false
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    tracking = false
+                    false // let EditText handle cursor positioning
+                }
+                else -> false
+            }
+        }
     }
 
     private fun applyYAxisRange() {

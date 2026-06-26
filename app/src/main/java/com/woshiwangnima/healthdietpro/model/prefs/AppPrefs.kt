@@ -50,4 +50,14 @@ object AppPrefs {
         prefs(context).getBoolean("reminder_fasting", false)
     fun setReminderFasting(context: Context, enabled: Boolean) =
         prefs(context).edit().putBoolean("reminder_fasting", enabled).apply()
+
+    fun getWeightChartTab(context: Context): Int =
+        prefs(context).getInt("tab_weight_chart", 0)
+    fun setWeightChartTab(context: Context, tab: Int) =
+        prefs(context).edit().putInt("tab_weight_chart", tab).apply()
+
+    fun getHeightChartTab(context: Context): Int =
+        prefs(context).getInt("tab_height_chart", 0)
+    fun setHeightChartTab(context: Context, tab: Int) =
+        prefs(context).edit().putInt("tab_height_chart", tab).apply()
 }
