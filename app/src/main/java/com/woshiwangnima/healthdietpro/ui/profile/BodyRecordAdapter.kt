@@ -20,6 +20,7 @@ class BodyRecordAdapter(
         }
 
     var onDelete: ((Int) -> Unit)? = null
+    var onClick: ((Int) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -31,6 +32,7 @@ class BodyRecordAdapter(
         val record = records[position]
         holder.dateText.text = record.date
         holder.valueText.text = "${record.value} $unit"
+        holder.itemView.setOnClickListener { onClick?.invoke(position) }
         holder.deleteBtn.setOnClickListener { onDelete?.invoke(position) }
     }
 

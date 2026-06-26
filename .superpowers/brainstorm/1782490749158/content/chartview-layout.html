@@ -1,0 +1,96 @@
+<h2>ChartView 组件布局设计</h2>
+<p class="subtitle">自定义 ViewGroup，可嵌入任何 XML 布局。所有子元素均为内部组件。</p>
+
+<div class="mockup">
+  <div class="mockup-header">ChartView 组件结构（纵向 LinearLayout）</div>
+  <div class="mockup-body" style="font-family: monospace; font-size: 12px; line-height: 1.6;">
+    <div style="background: #1a1a2e; color: #e0e0e0; padding: 12px; border-radius: 8px;">
+      <div style="margin-bottom: 4px; color: #888;">┌─ ChartView (LinearLayout vertical) ─────────────────────┐</div>
+      <div style="padding-left: 20px;">
+        <div style="color: #ffd700;">│ ① 控制条 (ControlsRow)</div>
+        <div style="padding-left: 16px; color: #aaa;">
+          ├─ <span style="color: #4fc3f7;">图表样式 Spinner</span> (折线图/平滑曲线/后置阶梯线)<br/>
+          ├─ <span style="color: #4fc3f7;">时间范围 Spinner</span> (全部/1天/1周/1月...)<br/>
+          └─ <span style="color: #4fc3f7;">全屏按钮</span> [⛶] 
+        </div>
+        <div style="margin-top: 6px; color: #ffd700;">│ ② Y轴控制行 (YAxisRow)</div>
+        <div style="padding-left: 16px; color: #aaa;">
+          ├─ Y轴: <span style="color: #81c784;">[ 0 %]</span> ~ <span style="color: #81c784;">[100 %]</span>
+        </div>
+        <div style="margin-top: 6px; color: #ffd700;">│ ③ 图表内容区 (ChartCanvas) — 纯 Canvas 自绘</div>
+        <div style="padding-left: 16px; color: #aaa;">
+          ├─ 网格线和 Y轴刻度<br/>
+          ├─ 数据曲线 (3种样式切换)<br/>
+          ├─ X轴时间标签 (按时间范围间隔)<br/>
+          ├─ 十字线 + 交点气泡<br/>
+          └─ [⛶] 全屏浮层按钮 (全屏时显示)
+        </div>
+        <div style="margin-top: 6px; color: #ffd700;">│ ④ 时间轴滑动区 (TimelineArea)</div>
+        <div style="padding-left: 16px; color: #aaa;">
+          ├─ <span style="background: #333; padding: 2px 6px; border-radius: 3px;">━━━━━■━━━━━</span> 进度条 + 位置块<br/>
+          └─ <span style="background: rgba(100,150,255,0.2); padding: 2px 6px; border-radius: 3px;">◀ ████████████████ ▶</span> 交互拖拽区 + 左右按钮
+        </div>
+        <div style="margin-top: 6px; color: #ffd700;">│ ⑤ 图例行 (LegendRow)</div>
+        <div style="padding-left: 16px; color: #aaa;">
+          ├─ <span style="color: #4fc3f7;">━━━ 测量值</span><br/>
+          └─ <span style="color: #ff7043;">--- 目标值</span>
+        </div>
+      </div>
+      <div style="color: #888;">└──────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>关键设计决策</h3>
+  
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>纯 Canvas 自绘方案优势</h4>
+      <ul>
+        <li>统一坐标系：图表数据、十字线、时间轴共用一套 Canvas 坐标</li>
+        <li>无第三方依赖：去除 MPAndroidChart，减少约 2MB APK 体积</li>
+        <li>完全控制：触摸事件、动画、样式全部可控</li>
+        <li>更流畅：避免 View 覆盖层叠加导致的渲染开销</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>需要重建的功能</h4>
+      <ul>
+        <li>数据曲线渲染（折线/贝塞尔/阶梯）</li>
+        <li>Y轴刻度计算和网格线</li>
+        <li>X轴标签定位和格式化</li>
+        <li>触摸 → 数据点坐标映射</li>
+        <li>十字线交点插值计算</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>图表内容区 Canvas 绘制层级</h3>
+  <div style="background: #1a1a2e; color: #e0e0e0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px;">
+    <span style="color: #888;">第1层</span> <span style="color: #4fc3f7;">drawGrid()</span>        — Y轴水平网格线<br/>
+    <span style="color: #888;">第2层</span> <span style="color: #4fc3f7;">drawDataLine()</span>    — 主数据曲线 + 数据点圆点<br/>
+    <span style="color: #888;">第3层</span> <span style="color: #4fc3f7;">drawTargetLine()</span>  — 目标值虚线<br/>
+    <span style="color: #888;">第4层</span> <span style="color: #4fc3f7;">drawXAxis()</span>       — X轴时间标签 + 刻度线<br/>
+    <span style="color: #888;">第5层</span> <span style="color: #4fc3f7;">drawCrosshair()</span>   — 十字虚线 + 交点圆 + 信息气泡
+  </div>
+</div>
+
+<div class="section">
+  <h3>坐标系统设计（统一使用相对时间戳）</h3>
+  <div style="background: #1a1a2e; color: #e0e0e0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px;">
+    <span style="color: #ffd700;">时间轴 (X轴)</span><br/>
+    chartMinX = 0 (最左 = 可见窗口最早时间点)<br/>
+    chartMaxX = visibleRange (最右 = 可见窗口最晚时间点)<br/>
+    数据点 X = dp.timestamp - windowStartTimestamp<br/><br/>
+    
+    <span style="color: #ffd700;">数值轴 (Y轴)</span><br/>
+    chartMinY = 用户设定最小值 (百分比换算)<br/>
+    chartMaxY = 用户设定最大值 (百分比换算)<br/><br/>
+    
+    <span style="color: #4fc3f7;">屏幕像素 = (值 - 轴最小值) / (轴范围) * 图表区像素</span>
+  </div>
+</div>
+</div>

@@ -13,6 +13,8 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityProfileEditBinding
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.model.profile.AppDate
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.Gender
@@ -76,6 +78,24 @@ class ProfileEditActivity : BaseBackActivity() {
 
         loadProfile()
         setupClickListeners()
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val name = binding.nameInput.text.toString().trim()
+                val gender = if (binding.genderMale.isChecked) Gender.MALE else Gender.FEMALE
+                val profile = UserProfile(
+                    name = name,
+                    gender = gender,
+                    birthday = selectedBirthday,
+                    province = selectedProvince,
+                    diseaseIds = selectedDiseaseIds.toList(),
+                    heightRecords = heightRecords.toList(),
+                    weightRecords = weightRecords.toList()
+                )
+                ProfilePrefs.save(this@ProfileEditActivity, profile)
+                setResult(RESULT_OK)
+                finish()
+            }
+        })
     }
 
     private fun loadProfile() {
@@ -116,16 +136,18 @@ class ProfileEditActivity : BaseBackActivity() {
         }
 
         binding.heightRow.setOnClickListener {
-            val intent = Intent(this, HeightDetailActivity::class.java).apply {
+            val context = this@ProfileEditActivity
+            val intent = Intent(context, HeightDetailActivity::class.java).apply {
                 putExtra("records", ArrayList(heightRecords))
-                putExtra("unit", "cm")
+                putExtra("unit", AppPrefs.getUnit(context, UnitCategory.ID_LENGTH, UnitCategory.DEFAULT_UNIT_LENGTH))
             }
             heightDetailLauncher.launch(intent)
         }
         binding.weightRow.setOnClickListener {
-            val intent = Intent(this, WeightDetailActivity::class.java).apply {
+            val context = this@ProfileEditActivity
+            val intent = Intent(context, WeightDetailActivity::class.java).apply {
                 putExtra("records", ArrayList(weightRecords))
-                putExtra("unit", "kg")
+                putExtra("unit", AppPrefs.getUnit(context, UnitCategory.ID_WEIGHT, UnitCategory.DEFAULT_UNIT_WEIGHT))
             }
             weightDetailLauncher.launch(intent)
         }

@@ -17,102 +17,21 @@
             android:elevation="2dp"
             app:titleTextColor="?attr/colorOnSurface" />
 
-        <LinearLayout
-            android:id="@+id/heightUnitRow"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="默认单位偏好"
+            android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+            android:textColor="?attr/colorPrimary"
             android:paddingHorizontal="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground"
-            android:layout_marginTop="8dp">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="身高单位"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
-            <TextView
-                android:id="@+id/heightUnitValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                tools:text="cm" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=">"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="20sp"
-                android:layout_marginStart="8dp" />
-        </LinearLayout>
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
 
         <LinearLayout
-            android:id="@+id/weightUnitRow"
+            android:id="@+id/unitSettingsContainer"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="体重单位"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
-            <TextView
-                android:id="@+id/weightUnitValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                tools:text="kg" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=">"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="20sp"
-                android:layout_marginStart="8dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/energyUnitRow"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="热量单位"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
-            <TextView
-                android:id="@+id/energyUnitValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                tools:text="kcal" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=">"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="20sp"
-                android:layout_marginStart="8dp" />
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
 
         <LinearLayout
             android:id="@+id/firstDayRow"

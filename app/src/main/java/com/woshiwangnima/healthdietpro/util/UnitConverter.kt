@@ -5,13 +5,21 @@ import com.woshiwangnima.healthdietpro.model.unit.UnitRepository
 
 object UnitConverter {
     private var repository: UnitRepository? = null
+    private var appContext: Context? = null
 
     fun init(context: Context) {
+        appContext = context.applicationContext
         repository = UnitRepository(context)
         repository?.getCategories()
     }
 
-    fun getRepository(): UnitRepository? = repository
+    fun getRepository(): UnitRepository? {
+        if (repository == null && appContext != null) {
+            repository = UnitRepository(appContext!!)
+            repository?.getCategories()
+        }
+        return repository
+    }
 
     fun toBase(category: String, value: Float, fromUnitId: String): Float {
         val repo = repository ?: return value

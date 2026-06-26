@@ -36,6 +36,15 @@
         <activity
             android:name=".ui.settings.PreferencesActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.settings.ReminderSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.chart.HeightChartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.chart.WeightChartActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

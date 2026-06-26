@@ -3,13 +3,14 @@ package com.woshiwangnima.healthdietpro.ui.profile
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.config.NavConfig
 import com.woshiwangnima.healthdietpro.databinding.ActivityWeightDetailBinding
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
-import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartFragment
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.ui.profile.chart.WeightChartActivity
 import com.woshiwangnima.healthdietpro.ui.profile.list.DataListFragment
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
@@ -17,7 +18,9 @@ class WeightDetailActivity : BaseBackActivity() {
 
     private lateinit var binding: ActivityWeightDetailBinding
     private var records: MutableList<BodyRecord> = mutableListOf()
-    private var currentTab = 0
+    private var unit: String = UnitCategory.DEFAULT_UNIT_WEIGHT
+    private var category: String = UnitCategory.ID_WEIGHT
+    private var currentTab = -1
 
     override fun getTitleText(): String = "体重历史"
 
@@ -30,12 +33,12 @@ class WeightDetailActivity : BaseBackActivity() {
 
         @Suppress("UNCHECKED_CAST")
         records = (intent.getSerializableExtra("records", ArrayList::class.java) as? ArrayList<BodyRecord>)?.toMutableList() ?: mutableListOf()
-        val unit = intent.getStringExtra("unit") ?: "kg"
-        val category = "weight"
+        unit = intent.getStringExtra("unit") ?: UnitCategory.DEFAULT_UNIT_WEIGHT
+        category = UnitCategory.ID_WEIGHT
 
         setupBottomBar()
-        switchTab(0, unit, category)
-        setupTabListeners(unit, category)
+        switchTab(1)
+        setupTabListeners()
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 saveAndFinish()
@@ -58,24 +61,35 @@ class WeightDetailActivity : BaseBackActivity() {
         binding.bottomBar.layoutParams = params
     }
 
-    private fun switchTab(index: Int, unit: String, category: String) {
+    private fun switchTab(index: Int) {
+        if (index == currentTab || index == 0) return
         currentTab = index
-        val fragment: Fragment = if (index == 0) {
-            ChartFragment.newInstance(ArrayList(records), unit, category)
-        } else {
-            DataListFragment.newInstance(ArrayList(records), unit, category, isHeight = false).also {
-                it.onRecordsChanged = { this.records = it.records }
-            }
+        val fragment = DataListFragment.newInstance(ArrayList(records), unit, category, isHeight = false).also {
+            it.onRecordsChanged = { this.records = it.records }
         }
         supportFragmentManager.beginTransaction()
             .replace(R.id.contentFrame, fragment)
             .commit()
-        binding.tabChart.isSelected = index == 0
-        binding.tabData.isSelected = index == 1
+        updateTabSelection()
     }
 
-    private fun setupTabListeners(unit: String, category: String) {
-        binding.tabChart.setOnClickListener { switchTab(0, unit, category) }
-        binding.tabData.setOnClickListener { switchTab(1, unit, category) }
+    private fun updateTabSelection() {
+        val bgSelected = ContextCompat.getDrawable(this, R.drawable.tab_selected_bg)
+        val bgDefault = ContextCompat.getDrawable(this, R.drawable.tab_default_bg)
+        binding.tabChart.background = if (currentTab == 0) bgSelected else bgDefault
+        binding.tabData.background = if (currentTab == 1) bgSelected else bgDefault
+        binding.tabChart.isSelected = currentTab == 0
+        binding.tabData.isSelected = currentTab == 1
+    }
+
+    private fun setupTabListeners() {
+        binding.tabChart.setOnClickListener {
+            val intent = Intent(this, WeightChartActivity::class.java).apply {
+                putExtra(WeightChartActivity.EXTRA_RECORDS, ArrayList(records))
+                putExtra(WeightChartActivity.EXTRA_UNIT, unit)
+            }
+            startActivity(intent)
+        }
+        binding.tabData.setOnClickListener { switchTab(1) }
     }
 }

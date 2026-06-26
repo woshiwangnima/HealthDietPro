@@ -17,9 +17,12 @@ class UnitRepository(private val context: Context) {
         return categories
     }
 
-    fun getCategory(category: String): UnitCategory? =
-        getCategories().find { it.category == category }
+    fun getCategory(categoryId: String): UnitCategory? =
+        getCategories().find { it.id == categoryId }
 
-    fun getUnit(category: String, unitId: String): UnitDef? =
-        getCategory(category)?.units?.find { it.id == unitId }
+    fun getUnit(categoryId: String, unitId: String): UnitDef? =
+        getCategory(categoryId)?.units?.find { it.id == unitId }
+
+    fun getUnitIds(categoryId: String): Array<String> =
+        getCategory(categoryId)?.units?.map { it.id }?.toTypedArray() ?: emptyArray()
 }

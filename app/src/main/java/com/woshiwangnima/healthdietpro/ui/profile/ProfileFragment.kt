@@ -11,6 +11,7 @@ import com.woshiwangnima.healthdietpro.databinding.FragmentProfileBinding
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsActivity
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 
@@ -82,15 +83,15 @@ class ProfileFragment : Fragment() {
             binding.profileDiseases.text = names.joinToString("、")
         }
 
-        val heightUnit = AppPrefs.getHeightUnit(requireContext())
-        val weightUnit = AppPrefs.getWeightUnit(requireContext())
+        val heightUnit = AppPrefs.getUnit(requireContext(), UnitCategory.ID_LENGTH, UnitCategory.DEFAULT_UNIT_LENGTH)
+        val weightUnit = AppPrefs.getUnit(requireContext(), UnitCategory.ID_WEIGHT, UnitCategory.DEFAULT_UNIT_WEIGHT)
         val latestHeight = profile.latestHeight
         binding.profileHeight.text = if (latestHeight != null)
-            UnitConverter.formatWithUnit("height", latestHeight.value, heightUnit) else "无记录"
+            UnitConverter.formatWithUnit(UnitCategory.ID_LENGTH, latestHeight.value, heightUnit) else "无记录"
 
         val latestWeight = profile.latestWeight
         binding.profileWeight.text = if (latestWeight != null)
-            UnitConverter.formatWithUnit("weight", latestWeight.value, weightUnit) else "无记录"
+            UnitConverter.formatWithUnit(UnitCategory.ID_WEIGHT, latestWeight.value, weightUnit) else "无记录"
     }
 
     override fun onDestroyView() {

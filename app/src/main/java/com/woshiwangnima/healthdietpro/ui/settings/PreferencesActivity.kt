@@ -1,11 +1,17 @@
 package com.woshiwangnima.healthdietpro.ui.settings
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityPreferencesBinding
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class PreferencesActivity : BaseBackActivity() {
@@ -21,14 +27,40 @@ class PreferencesActivity : BaseBackActivity() {
         binding.root.applySystemBarInsets()
         setupToolbar(binding.toolbar)
 
+        UnitConverter.init(this)
+        buildUnitRows()
         refreshDisplay()
         setupClickListeners()
     }
 
+    private fun buildUnitRows() {
+        val repo = UnitConverter.getRepository() ?: return
+        val container = binding.unitSettingsContainer
+        container.removeAllViews()
+
+        for (category in repo.getCategories()) {
+            val row = LayoutInflater.from(this).inflate(R.layout.item_preference_row, null)
+            val label = row.findViewById<TextView>(R.id.rowLabel)
+            val value = row.findViewById<TextView>(R.id.rowValue)
+
+            label.text = category.categoryCn
+            val currentId = AppPrefs.getUnit(this, category.id, category.baseUnit)
+            val currentUnit = category.units.find { it.id == currentId }
+            value.text = currentUnit?.let { "${it.symbolCn} ${it.symbolEn}" } ?: currentId
+
+            row.setOnClickListener {
+                val items = category.units.map { "${it.symbolCn}  ${it.symbolEn}" }.toTypedArray()
+                val checkedIndex = category.units.indexOfFirst { u -> u.id == AppPrefs.getUnit(this@PreferencesActivity, category.id, category.baseUnit) }.coerceAtLeast(0)
+                showPicker(category.categoryCn, items, checkedIndex) { which ->
+                    AppPrefs.setUnit(this@PreferencesActivity, category.id, category.units[which].id)
+                    buildUnitRows()
+                }
+            }
+            container.addView(row)
+        }
+    }
+
     private fun refreshDisplay() {
-        binding.heightUnitValue.text = AppPrefs.getHeightUnit(this)
-        binding.weightUnitValue.text = AppPrefs.getWeightUnit(this)
-        binding.energyUnitValue.text = AppPrefs.getEnergyUnit(this)
         binding.firstDayValue.text =
             if (AppPrefs.getFirstDayOfWeek(this) == "MONDAY") "周一" else "周日"
         binding.darkModeValue.text = when (AppPrefs.getDarkMode(this)) {
@@ -39,49 +71,24 @@ class PreferencesActivity : BaseBackActivity() {
     }
 
     private fun setupClickListeners() {
-        binding.heightUnitRow.setOnClickListener {
-            showPicker("身高单位", arrayOf("cm", "m", "mm", "in", "ft"),
-                AppPrefs.getHeightUnit(this)) { selected ->
-                AppPrefs.setHeightUnit(this, selected)
-                refreshDisplay()
-            }
-        }
-        binding.weightUnitRow.setOnClickListener {
-            showPicker("体重单位", arrayOf("kg", "g", "lb"),
-                AppPrefs.getWeightUnit(this)) { selected ->
-                AppPrefs.setWeightUnit(this, selected)
-                refreshDisplay()
-            }
-        }
-        binding.energyUnitRow.setOnClickListener {
-            showPicker("热量单位", arrayOf("kcal", "kJ"),
-                AppPrefs.getEnergyUnit(this)) { selected ->
-                AppPrefs.setEnergyUnit(this, selected)
-                refreshDisplay()
-            }
-        }
         binding.firstDayRow.setOnClickListener {
-            showPicker("每周第一天", arrayOf("周一", "周日"),
-                if (AppPrefs.getFirstDayOfWeek(this) == "MONDAY") "周一" else "周日") { selected ->
-                AppPrefs.setFirstDayOfWeek(this, if (selected == "周一") "MONDAY" else "SUNDAY")
+            val items = arrayOf("周一", "周日")
+            val checkedIndex = if (AppPrefs.getFirstDayOfWeek(this) == "MONDAY") 0 else 1
+            showPicker("每周第一天", items, checkedIndex) { which ->
+                AppPrefs.setFirstDayOfWeek(this, if (which == 0) "MONDAY" else "SUNDAY")
                 refreshDisplay()
             }
         }
+
         binding.darkModeRow.setOnClickListener {
-            showPicker("深色模式", arrayOf("跟随系统", "深色模式", "浅色模式"),
-                when (AppPrefs.getDarkMode(this)) {
-                    "FOLLOW_SYSTEM" -> "跟随系统"
-                    "YES" -> "深色模式"
-                    else -> "浅色模式"
-                }) { selected ->
-                val mode = when (selected) {
-                    "深色模式" -> "YES"
-                    "浅色模式" -> "NO"
-                    else -> "FOLLOW_SYSTEM"
-                }
-                AppPrefs.setDarkMode(this, mode)
+            val items = arrayOf("跟随系统", "深色模式", "浅色模式")
+            val modes = arrayOf("FOLLOW_SYSTEM", "YES", "NO")
+            val currentMode = AppPrefs.getDarkMode(this)
+            val checkedIndex = modes.indexOf(currentMode).coerceAtLeast(0)
+            showPicker("深色模式", items, checkedIndex) { which ->
+                AppPrefs.setDarkMode(this, modes[which])
                 refreshDisplay()
-                val nightMode = when (mode) {
+                val nightMode = when (modes[which]) {
                     "YES" -> AppCompatDelegate.MODE_NIGHT_YES
                     "NO" -> AppCompatDelegate.MODE_NIGHT_NO
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -91,12 +98,11 @@ class PreferencesActivity : BaseBackActivity() {
         }
     }
 
-    private fun showPicker(title: String, items: Array<String>, current: String, onSelected: (String) -> Unit) {
-        val checkedIndex = items.indexOf(current).coerceAtLeast(0)
+    private fun showPicker(title: String, items: Array<String>, checkedIndex: Int, onSelected: (Int) -> Unit) {
         AlertDialog.Builder(this)
             .setTitle(title)
             .setSingleChoiceItems(items, checkedIndex) { dialog, which ->
-                onSelected(items[which])
+                onSelected(which)
                 dialog.dismiss()
             }
             .setNegativeButton("取消", null)
