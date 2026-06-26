@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id="@+id/controlsRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp">
+
+        <Spinner
+            android:id="@+id/chartTypeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:id="@+id/timeRangeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFullscreen"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="全屏"
+            android:paddingHorizontal="8dp"
+            android:contentDescription="全屏"
+            app:icon="@drawable/ic_fullscreen"
+            app:iconGravity="textStart"
+            app:iconSize="20dp"
+            style="@style/Widget.Material3.Button.TextButton" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/yAxisRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="2dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Y轴:"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <EditText
+            android:id="@+id/yMinInput"
+            android:layout_width="56dp"
+            android:layout_height="32dp"
+            android:hint="0"
+            android:text="0"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:inputType="numberDecimal|numberSigned"
+            android:background="@drawable/input_bg"
+            android:paddingHorizontal="4dp"
+            android:layout_marginStart="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="%"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="~"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginHorizontal="4dp" />
+
+        <EditText
+            android:id="@+id/yMaxInput"
+            android:layout_width="56dp"
+            android:layout_height="32dp"
+            android:hint="100"
+            android:text="100"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:inputType="numberDecimal|numberSigned"
+            android:background="@drawable/input_bg"
+            android:paddingHorizontal="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="%"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/chartFrame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.woshiwangnima.healthdietpro.ui.profile.chart.ChartCanvas
+            android:id="@+id/chartCanvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFullscreenOverlay"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:text="缩放"
+            android:paddingHorizontal="8dp"
+            android:contentDescription="退出全屏"
+            android:visibility="gone"
+            app:icon="@drawable/ic_fullscreen_exit"
+            app:iconGravity="textStart"
+            app:iconSize="20dp"
+            style="@style/Widget.Material3.Button.TextButton" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/dragIndicatorContainer"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:id="@+id/progressBarContainer"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_gravity="top"
+            android:paddingHorizontal="32dp"
+            android:visibility="gone">
+
+            <View
+                android:id="@+id/progressBarBg"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_gravity="center_vertical"
+                android:background="?attr/colorOutlineVariant" />
+
+            <View
+                android:id="@+id/progressBarThumb"
+                android:layout_width="40dp"
+                android:layout_height="6dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/timeline_thumb_bg" />
+
+        </FrameLayout>
+
+        <View
+            android:id="@+id/dragIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <ImageButton
+            android:id="@+id/dragArrowLeft"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start|center_vertical"
+            android:src="@drawable/ic_arrow_left"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="左移"
+            android:elevation="2dp" />
+
+        <ImageButton
+            android:id="@+id/dragArrowRight"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/ic_arrow_right"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="右移"
+            android:elevation="2dp" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/legendLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingVertical="4dp"
+        android:visibility="gone" />
+
+</merge>

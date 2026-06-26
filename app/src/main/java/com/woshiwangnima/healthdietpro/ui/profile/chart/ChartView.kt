@@ -1,0 +1,512 @@
+package com.woshiwangnima.healthdietpro.ui.profile.chart
+
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.DashPathEffect
+import android.graphics.Paint
+import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.AttributeSet
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.widget.*
+import androidx.core.content.ContextCompat
+import com.google.android.material.button.MaterialButton
+import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.model.profile.DataPoint
+
+class ChartView @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
+) : LinearLayout(context, attrs) {
+
+    private val chartCanvas: ChartCanvas
+    private val chartTypeSpinner: Spinner
+    private val timeRangeSpinner: Spinner
+    private val btnFullscreen: MaterialButton
+    private val btnFullscreenOverlay: MaterialButton
+    private val yMinInput: EditText
+    private val yMaxInput: EditText
+    private val controlsRow: LinearLayout
+    private val yAxisRow: LinearLayout
+    private val chartFrame: FrameLayout
+    private val dragIndicatorContainer: FrameLayout
+    private val progressBarContainer: FrameLayout
+    private val progressBarThumb: View
+    private val dragIndicator: View
+    private val dragArrowLeft: ImageButton
+    private val dragArrowRight: ImageButton
+    private val legendLayout: LinearLayout
+
+    private var seriesList: List<ChartSeries> = emptyList()
+    private var unitLabel: String = ""
+    private var isFullscreen = false
+    private var lineStyle: LineStyle = LineStyle.LINEAR
+    private var onFullscreenListener: ((Boolean) -> Unit)? = null
+    private var chartTypeReady = false
+    private var timeRangeReady = false
+    private var yAxisReady = false
+
+    private var lastDragX = 0f
+
+    private val timelineHandler = Handler(Looper.getMainLooper())
+    private var isTimelineVisible = false
+    private val timelineHideRunnable = Runnable { hideTimeline() }
+    private val timelineShowDurationMs = 4000L
+
+    init {
+        orientation = VERTICAL
+        LayoutInflater.from(context).inflate(R.layout.view_chart, this, true)
+
+        chartCanvas = findViewById(R.id.chartCanvas)
+        chartTypeSpinner = findViewById(R.id.chartTypeSpinner)
+        timeRangeSpinner = findViewById(R.id.timeRangeSpinner)
+        btnFullscreen = findViewById(R.id.btnFullscreen)
+        btnFullscreenOverlay = findViewById(R.id.btnFullscreenOverlay)
+        yMinInput = findViewById(R.id.yMinInput)
+        yMaxInput = findViewById(R.id.yMaxInput)
+        controlsRow = findViewById(R.id.controlsRow)
+        yAxisRow = findViewById(R.id.yAxisRow)
+        chartFrame = findViewById(R.id.chartFrame)
+        dragIndicatorContainer = findViewById(R.id.dragIndicatorContainer)
+        progressBarContainer = findViewById(R.id.progressBarContainer)
+        progressBarThumb = findViewById(R.id.progressBarThumb)
+        dragIndicator = findViewById(R.id.dragIndicator)
+        dragArrowLeft = findViewById(R.id.dragArrowLeft)
+        dragArrowRight = findViewById(R.id.dragArrowRight)
+        legendLayout = findViewById(R.id.legendLayout)
+
+        initChartTypeSpinner()
+        initTimeRangeSpinner()
+        initFullscreenButtons()
+        initYAxisInputs()
+        initDragIndicator()
+        setupTimeline()
+    }
+
+    fun setSeries(series: List<ChartSeries>, unitLabel: String) {
+        this.seriesList = series
+        this.unitLabel = unitLabel
+        chartCanvas.series = series
+        chartCanvas.unitLabel = unitLabel
+        val allPoints = series.flatMap { it.points }
+        if (allPoints.isEmpty()) {
+            chartCanvas.invalidate()
+            return
+        }
+        val totalSpan = allPoints.maxOf { it.timestamp } - allPoints.minOf { it.timestamp }
+        chartCanvas.visibleRangeMs = totalSpan
+        chartCanvas.windowStartMs = allPoints.minOf { it.timestamp }
+        applyYAxisRange()
+        rebuildTimeRangeSpinner()
+        updateDragIndicator()
+        updateLegend()
+        chartCanvas.invalidate()
+    }
+
+    fun setLineStyle(style: LineStyle) {
+        lineStyle = style
+        seriesList = seriesList.map { it.copy(lineStyle = style) }
+        chartCanvas.series = seriesList
+        chartCanvas.invalidate()
+    }
+
+    fun getLineStyle(): LineStyle = lineStyle
+
+    fun setVisibleRange(millis: Long) {
+        val allPoints = seriesList.flatMap { it.points }
+        if (allPoints.isEmpty()) return
+        val latestTs = allPoints.maxOf { it.timestamp }
+        chartCanvas.visibleRangeMs = millis
+        chartCanvas.windowStartMs = (latestTs - millis).coerceAtLeast(allPoints.minOf { it.timestamp })
+        chartCanvas.invalidate()
+        updateDragIndicator()
+        updateDragArrows()
+        updateTimelineBar()
+    }
+
+    fun getVisibleRange(): Long = chartCanvas.visibleRangeMs
+
+    fun setLabelInterval(millis: Long) {
+        chartCanvas.labelIntervalMs = millis
+        chartCanvas.invalidate()
+    }
+
+    fun getLabelInterval(): Long = chartCanvas.labelIntervalMs
+
+    fun setYAxisRange(minPct: Float, maxPct: Float) {
+        chartCanvas.yMinPct = minPct
+        chartCanvas.yMaxPct = maxPct
+        yMinInput.setText("%.0f".format(minPct))
+        yMaxInput.setText("%.0f".format(maxPct))
+        chartCanvas.invalidate()
+    }
+
+    fun getYAxisMinPct(): Float = chartCanvas.yMinPct
+    fun getYAxisMaxPct(): Float = chartCanvas.yMaxPct
+
+    fun toggleFullscreen() {
+        isFullscreen = !isFullscreen
+        updateFullscreenButton()
+        onFullscreenListener?.invoke(isFullscreen)
+        if (isFullscreen) {
+            controlsRow.visibility = View.GONE
+            yAxisRow.visibility = View.GONE
+            legendLayout.visibility = View.GONE
+            btnFullscreen.visibility = View.GONE
+            btnFullscreenOverlay.visibility = View.VISIBLE
+            dragIndicatorContainer.visibility = View.GONE
+            progressBarContainer.visibility = View.GONE
+            isTimelineVisible = false
+            val lp = chartFrame.layoutParams as LinearLayout.LayoutParams
+            lp.weight = 1f; lp.height = 0
+            chartFrame.layoutParams = lp
+        } else {
+            controlsRow.visibility = View.VISIBLE
+            yAxisRow.visibility = View.VISIBLE
+            legendLayout.visibility = if (legendLayout.childCount > 0) View.VISIBLE else View.GONE
+            btnFullscreen.visibility = View.VISIBLE
+            btnFullscreenOverlay.visibility = View.GONE
+            updateDragIndicator()
+            val lp = chartFrame.layoutParams as LinearLayout.LayoutParams
+            lp.weight = 0f
+            lp.height = (resources.displayMetrics.heightPixels * 0.45).toInt()
+            chartFrame.layoutParams = lp
+        }
+        chartCanvas.invalidate()
+    }
+
+    fun isFullscreen(): Boolean = isFullscreen
+    fun setOnFullscreenListener(listener: ((Boolean) -> Unit)?) { onFullscreenListener = listener }
+
+    private fun initChartTypeSpinner() {
+        val adapter = ArrayAdapter.createFromResource(context, R.array.chart_type_options, android.R.layout.simple_spinner_item)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        chartTypeSpinner.adapter = adapter
+        chartTypeSpinner.setSelection(0)
+        chartTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (!chartTypeReady) return
+                lineStyle = LineStyle.fromSpinnerPosition(position)
+                seriesList = seriesList.map { it.copy(lineStyle = lineStyle) }
+                chartCanvas.series = seriesList
+                chartCanvas.invalidate()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        chartTypeReady = true
+    }
+
+    private data class TimeRangeOption(val label: String, val millis: Long)
+
+    private fun getTimeRangeOptions(): List<TimeRangeOption> {
+        val allPoints = seriesList.flatMap { it.points }
+        val allOptions = listOf(
+            TimeRangeOption("全部", Long.MAX_VALUE),
+            TimeRangeOption("1天", 24 * 60 * 60 * 1000L),
+            TimeRangeOption("1周", 7 * 24 * 60 * 60 * 1000L),
+            TimeRangeOption("1个月", 30 * 24 * 60 * 60 * 1000L),
+            TimeRangeOption("3个月", 90 * 24 * 60 * 60 * 1000L),
+            TimeRangeOption("6个月", 180 * 24 * 60 * 60 * 1000L),
+            TimeRangeOption("1年", 365 * 24 * 60 * 60 * 1000L)
+        )
+        if (allPoints.isEmpty()) return allOptions.take(1)
+        val totalSpan = allPoints.maxOf { it.timestamp } - allPoints.minOf { it.timestamp }
+        val minInterval = if (allPoints.size >= 2) {
+            allPoints.zipWithNext { a, b -> b.timestamp - a.timestamp }.minOrNull() ?: 0L
+        } else 0L
+        val withinSpan = allOptions.filter { opt ->
+            opt.millis != Long.MAX_VALUE && opt.millis <= totalSpan && opt.millis >= minInterval
+        }
+        val nextAbove = allOptions.filter { it.millis != Long.MAX_VALUE && it.millis > totalSpan }
+            .minByOrNull { it.millis }
+        val result = withinSpan.toMutableList()
+        if (nextAbove != null && nextAbove !in result) result.add(nextAbove)
+        result.add(TimeRangeOption("全部", Long.MAX_VALUE))
+        return result
+    }
+
+    private fun rebuildTimeRangeSpinner() {
+        val opts = getTimeRangeOptions()
+        val labels = opts.map { it.label }.toTypedArray()
+        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, labels)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        timeRangeSpinner.adapter = adapter
+        timeRangeReady = false
+        timeRangeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (!timeRangeReady || position >= opts.size) return
+                val rangeMs = opts[position].millis
+                val allPoints = seriesList.flatMap { it.points }
+                if (allPoints.isEmpty()) return
+                if (rangeMs == Long.MAX_VALUE) {
+                    chartCanvas.visibleRangeMs = allPoints.maxOf { it.timestamp } - allPoints.minOf { it.timestamp }
+                    chartCanvas.windowStartMs = allPoints.minOf { it.timestamp }
+                } else {
+                    val latestTs = allPoints.maxOf { it.timestamp }
+                    chartCanvas.visibleRangeMs = rangeMs
+                    chartCanvas.windowStartMs = (latestTs - rangeMs).coerceAtLeast(allPoints.minOf { it.timestamp })
+                }
+                chartCanvas.clearCrosshair()
+                chartCanvas.invalidate()
+                updateDragIndicator()
+                showTimeline()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        timeRangeReady = true
+    }
+
+    private fun initTimeRangeSpinner() {
+        rebuildTimeRangeSpinner()
+        timeRangeReady = true
+    }
+
+    private fun initFullscreenButtons() {
+        val listener = View.OnClickListener { toggleFullscreen() }
+        btnFullscreen.setOnClickListener(listener)
+        btnFullscreenOverlay.setOnClickListener(listener)
+    }
+
+    private fun updateFullscreenButton() {
+        val inFs = isFullscreen
+        btnFullscreen.text = if (inFs) "缩放" else "全屏"
+        btnFullscreen.setIconResource(if (inFs) R.drawable.ic_fullscreen_exit else R.drawable.ic_fullscreen)
+        btnFullscreenOverlay.text = if (inFs) "缩放" else "全屏"
+        btnFullscreenOverlay.setIconResource(if (inFs) R.drawable.ic_fullscreen_exit else R.drawable.ic_fullscreen)
+    }
+
+    private fun initYAxisInputs() {
+        val watcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) { applyYAxisRange() }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+        yMinInput.addTextChangedListener(watcher)
+        yMaxInput.addTextChangedListener(watcher)
+        yAxisReady = true
+    }
+
+    private fun applyYAxisRange() {
+        if (!yAxisReady) return
+        val minPct = yMinInput.text.toString().trim().toFloatOrNull() ?: return
+        val maxPct = yMaxInput.text.toString().trim().toFloatOrNull() ?: return
+        chartCanvas.yMinPct = minPct
+        chartCanvas.yMaxPct = maxPct
+        chartCanvas.invalidate()
+    }
+
+    private fun initDragIndicator() {
+        dragIndicator.setOnTouchListener { _, event ->
+            val allPoints = seriesList.flatMap { it.points }
+            if (allPoints.size < 2) return@setOnTouchListener false
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    lastDragX = event.x
+                    showTimeline()
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val deltaX = event.x - lastDragX
+                    lastDragX = event.x
+                    val visibleRange = chartCanvas.visibleRangeMs.toFloat()
+                    if (visibleRange <= 0f) return@setOnTouchListener true
+                    val stripWidth = dragIndicatorContainer.width.toFloat()
+                    if (stripWidth <= 0f) return@setOnTouchListener true
+                    val dataMin = allPoints.minOf { it.timestamp }
+                    val dataMax = allPoints.maxOf { it.timestamp }
+                    val maxStart = ((dataMax - visibleRange.toLong()) - dataMin).toFloat().coerceAtLeast(0f)
+                    val pxPerMs = stripWidth / visibleRange
+                    if (pxPerMs == 0f) return@setOnTouchListener true
+                    val deltaMs = -(deltaX / pxPerMs)
+                    val newStart = ((chartCanvas.windowStartMs - dataMin).toFloat() + deltaMs).coerceIn(0f, maxStart)
+                    chartCanvas.windowStartMs = dataMin + newStart.toLong()
+                    chartCanvas.clearCrosshair()
+                    chartCanvas.invalidate()
+                    post { updateDragArrows(); updateTimelineBar() }
+                    true
+                }
+                MotionEvent.ACTION_UP -> { showTimeline(); true }
+                else -> false
+            }
+        }
+        dragArrowLeft.setOnClickListener {
+            showTimeline()
+            val allPoints = seriesList.flatMap { it.points }
+            if (allPoints.isEmpty()) return@setOnClickListener
+            val dataMin = allPoints.minOf { it.timestamp }
+            val step = (chartCanvas.visibleRangeMs * 0.3f).toLong()
+            chartCanvas.windowStartMs = (chartCanvas.windowStartMs - step).coerceAtLeast(dataMin)
+            chartCanvas.clearCrosshair()
+            chartCanvas.invalidate()
+            post { updateDragArrows(); updateTimelineBar() }
+        }
+        dragArrowRight.setOnClickListener {
+            showTimeline()
+            val allPoints = seriesList.flatMap { it.points }
+            if (allPoints.isEmpty()) return@setOnClickListener
+            val dataMax = allPoints.maxOf { it.timestamp }
+            val step = (chartCanvas.visibleRangeMs * 0.3f).toLong()
+            val maxStart = (dataMax - chartCanvas.visibleRangeMs).coerceAtLeast(allPoints.minOf { it.timestamp })
+            chartCanvas.windowStartMs = (chartCanvas.windowStartMs + step).coerceAtMost(maxStart)
+            chartCanvas.clearCrosshair()
+            chartCanvas.invalidate()
+            post { updateDragArrows(); updateTimelineBar() }
+        }
+    }
+
+    private fun updateDragIndicator() {
+        val allPoints = seriesList.flatMap { it.points }
+        val dragEnabled = chartCanvas.visibleRangeMs != Long.MAX_VALUE && allPoints.size >= 2
+        dragIndicatorContainer.visibility = if (dragEnabled && !isFullscreen) View.VISIBLE else View.GONE
+        progressBarContainer.visibility = View.GONE
+        isTimelineVisible = false
+        if (dragEnabled) {
+            val color = resolveColor(com.google.android.material.R.attr.colorSecondaryContainer)
+            dragIndicator.setBackgroundColor(Color.argb(100, Color.red(color), Color.green(color), Color.blue(color)))
+            post { updateDragArrows() }
+        }
+    }
+
+    private fun updateDragArrows() {
+        val allPoints = seriesList.flatMap { it.points }
+        if (allPoints.size < 2) {
+            setArrowEnabled(dragArrowLeft, false)
+            setArrowEnabled(dragArrowRight, false)
+            return
+        }
+        val dataMin = allPoints.minOf { it.timestamp }
+        val dataMax = allPoints.maxOf { it.timestamp }
+        val tolerance = (chartCanvas.visibleRangeMs * 0.01f).toLong()
+        val canScrollLeft = chartCanvas.windowStartMs > dataMin + tolerance
+        val canScrollRight = chartCanvas.windowStartMs + chartCanvas.visibleRangeMs < dataMax - tolerance
+        setArrowEnabled(dragArrowLeft, canScrollLeft)
+        setArrowEnabled(dragArrowRight, canScrollRight)
+    }
+
+    private fun resolveColor(attrRes: Int): Int {
+        val ta = context.theme.obtainStyledAttributes(intArrayOf(attrRes))
+        val color = ta.getColor(0, 0xFF000000.toInt())
+        ta.recycle()
+        return color
+    }
+
+    private fun setArrowEnabled(btn: View, enabled: Boolean) {
+        btn.isEnabled = enabled
+        btn.alpha = if (enabled) 1f else 0.3f
+    }
+
+    private fun setupTimeline() {
+        progressBarContainer.visibility = View.GONE
+        isTimelineVisible = false
+    }
+
+    private fun showTimeline() {
+        val allPoints = seriesList.flatMap { it.points }
+        val dragEnabled = chartCanvas.visibleRangeMs != Long.MAX_VALUE && allPoints.size >= 2
+        if (!dragEnabled) return
+        timelineHandler.removeCallbacks(timelineHideRunnable)
+        if (!isTimelineVisible) {
+            isTimelineVisible = true
+            progressBarContainer.visibility = View.VISIBLE
+            val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 200 }
+            progressBarContainer.startAnimation(fadeIn)
+        }
+        timelineHandler.postDelayed(timelineHideRunnable, timelineShowDurationMs)
+        post { updateTimelineBar() }
+    }
+
+    private fun hideTimeline() {
+        isTimelineVisible = false
+        val fadeOut = AlphaAnimation(1f, 0f).apply {
+            duration = 300
+            setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(a: Animation) {}
+                override fun onAnimationEnd(a: Animation) { progressBarContainer.visibility = View.GONE }
+                override fun onAnimationRepeat(a: Animation) {}
+            })
+        }
+        progressBarContainer.startAnimation(fadeOut)
+    }
+
+    private fun updateTimelineBar() {
+        val allPoints = seriesList.flatMap { it.points }
+        if (allPoints.size < 2) return
+        val dataMin = allPoints.minOf { it.timestamp }
+        val totalSpan = allPoints.maxOf { it.timestamp } - dataMin
+        if (totalSpan <= 0L) return
+        val barWidth = dragIndicatorContainer.width - dragIndicatorContainer.paddingLeft - dragIndicatorContainer.paddingRight
+        if (barWidth <= 0) return
+        val thumbWidthFraction = (chartCanvas.visibleRangeMs.toFloat() / totalSpan.toFloat()).coerceIn(0.05f, 1f)
+        val thumbWidth = (barWidth * thumbWidthFraction).coerceAtLeast(20f)
+        val windowCenter = (chartCanvas.windowStartMs + chartCanvas.visibleRangeMs / 2)
+        val relCenter = (windowCenter - dataMin).toFloat().coerceAtLeast(0f)
+        val centerFraction = (relCenter / totalSpan.toFloat()).coerceIn(0f, 1f)
+        val left = (barWidth * centerFraction - thumbWidth / 2f).coerceIn(0f, (barWidth - thumbWidth).coerceAtLeast(0f))
+        progressBarThumb.layoutParams = (progressBarThumb.layoutParams as FrameLayout.LayoutParams).also {
+            it.width = thumbWidth.toInt()
+            it.leftMargin = (left + dragIndicatorContainer.paddingLeft).toInt()
+            it.rightMargin = 0
+        }
+        progressBarThumb.requestLayout()
+    }
+
+    private fun updateLegend() {
+        legendLayout.removeAllViews()
+        for (s in seriesList) {
+            legendLayout.addView(createLegendItem(s))
+        }
+        legendLayout.visibility = if (legendLayout.childCount > 0 && !isFullscreen) View.VISIBLE else View.GONE
+    }
+
+    private fun createLegendItem(s: ChartSeries): LinearLayout {
+        val lineView = LegendLineView(context, s.color, s.lineType)
+        val lp = LinearLayout.LayoutParams(
+            (32 * resources.displayMetrics.density).toInt(),
+            (8 * resources.displayMetrics.density).toInt()
+        )
+        lp.setMargins(0, 0, 4, 0)
+        lp.gravity = Gravity.CENTER_VERTICAL
+        lineView.layoutParams = lp
+        val tv = TextView(context).apply {
+            text = s.label; textSize = 12f
+            setTextColor(ContextCompat.getColor(context, R.color.on_surface))
+        }
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            val containerLp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            containerLp.setMargins(8, 0, 8, 0)
+            layoutParams = containerLp
+            addView(lineView)
+            addView(tv)
+        }
+    }
+}
+
+private class LegendLineView(
+    context: Context, lineColor: Int, lineType: LineType
+) : View(context) {
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = lineColor; strokeWidth = 3f
+        style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND
+        pathEffect = when (lineType) {
+            LineType.SOLID -> null
+            LineType.DASHED -> DashPathEffect(floatArrayOf(8f, 5f), 0f)
+            LineType.DOTTED -> DashPathEffect(floatArrayOf(3f, 5f), 0f)
+        }
+    }
+    override fun onDraw(canvas: Canvas) {
+        val midY = height / 2f; val pad = 2f * resources.displayMetrics.density
+        canvas.drawLine(pad, midY, width - pad, midY, paint)
+    }
+}
