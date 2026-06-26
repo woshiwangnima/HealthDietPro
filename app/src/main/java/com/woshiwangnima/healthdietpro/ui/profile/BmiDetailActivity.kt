@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.config.NavConfig
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
@@ -19,13 +20,19 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.profile.chart.YAxisBand
-import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class BmiDetailActivity : BaseBackActivity() {
 
     private var currentTab = 0
     private var chartView: ChartView? = null
+    private lateinit var content: LinearLayout
+    private lateinit var tabChart: TextView
+    private lateinit var tabData: TextView
+    private val bmiData: List<com.woshiwangnima.healthdietpro.model.profile.DataPoint> by lazy {
+        val profile = ProfilePrefs.load(this)
+        BmiUtil.buildBmiDataPoints(profile.weightRecords, profile.heightRecords)
+    }
 
     override fun getTitleText(): String = "BMI历史"
 
@@ -37,15 +44,18 @@ class BmiDetailActivity : BaseBackActivity() {
             applySystemBarInsets()
         }
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(android.R.id.content) ?: run {
-            val t = androidx.appcompat.widget.Toolbar(this)
-            t.id = View.generateViewId()
-            t
+        val toolbar = androidx.appcompat.widget.Toolbar(this).apply {
+            id = R.id.toolbar
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(com.google.android.material.R.dimen.abc_action_bar_default_height_material))
+            setBackgroundColor(resolveColor(com.google.android.material.R.attr.colorSurface))
+            elevation = 2f
+            setTitleTextColor(resolveColor(com.google.android.material.R.attr.colorOnSurface))
         }
-        root.addView(toolbar, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-            resources.getDimensionPixelSize(com.google.android.material.R.dimen.abc_action_bar_default_height_material)))
+        setupToolbar(toolbar)
+        root.addView(toolbar)
 
-        val content = LinearLayout(this).apply {
+        content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
         }
@@ -56,39 +66,27 @@ class BmiDetailActivity : BaseBackActivity() {
             gravity = android.view.Gravity.CENTER
             setBackgroundColor(resolveColor(com.google.android.material.R.attr.colorSurface))
         }
-        val tabChart = TextView(this).apply {
-            text = "图表"; gravity = android.view.Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
-        }
-        val tabData = TextView(this).apply {
-            text = "数据"; gravity = android.view.Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
-        }
-        bottomBar.addView(tabChart); bottomBar.addView(tabData)
 
         val screenHeight = resources.displayMetrics.heightPixels
         val barHeight = NavConfig.calculateBarHeightPx(screenHeight.toInt(), resources.displayMetrics.density)
         bottomBar.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, barHeight)
+
+        tabChart = TextView(this).apply {
+            text = "图表"; gravity = android.view.Gravity.CENTER
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
+            setOnClickListener { switchTab(0) }
+        }
+        tabData = TextView(this).apply {
+            text = "数据"; gravity = android.view.Gravity.CENTER
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
+            setOnClickListener { switchTab(1) }
+        }
+        bottomBar.addView(tabChart)
+        bottomBar.addView(tabData)
         root.addView(bottomBar)
 
-        val bmiData = BmiUtil.buildBmiDataPoints(ProfilePrefs.load(this).weightRecords, ProfilePrefs.load(this).heightRecords)
-
-        fun switchTab(idx: Int) {
-            currentTab = idx
-            val bgSelected = ContextCompat.getDrawable(this, R.drawable.tab_selected_bg)
-            val bgDefault = ContextCompat.getDrawable(this, R.drawable.tab_default_bg)
-            tabChart.background = if (idx == 0) bgSelected else bgDefault
-            tabData.background = if (idx == 1) bgSelected else bgDefault
-            content.removeAllViews()
-            when (idx) {
-                0 -> showChart(content, bmiData)
-                1 -> showData(content, bmiData)
-            }
-        }
-        tabChart.setOnClickListener { switchTab(0) }; tabData.setOnClickListener { switchTab(1) }
-        switchTab(AppPrefs.getBmiChartTab(this))
-
         setContentView(root)
+        switchTab(AppPrefs.getBmiChartTab(this))
     }
 
     private fun resolveColor(attrRes: Int): Int {
@@ -96,13 +94,28 @@ class BmiDetailActivity : BaseBackActivity() {
         val c = ta.getColor(0, 0xFF000000.toInt()); ta.recycle(); return c
     }
 
-    private fun showChart(parent: LinearLayout, bmiData: List<com.woshiwangnima.healthdietpro.model.profile.DataPoint>) {
+    private fun switchTab(idx: Int) {
+        currentTab = idx
+        val bgSelected = ContextCompat.getDrawable(this, R.drawable.tab_selected_bg)
+        val bgDefault = ContextCompat.getDrawable(this, R.drawable.tab_default_bg)
+        tabChart.background = if (idx == 0) bgSelected else bgDefault
+        tabData.background = if (idx == 1) bgSelected else bgDefault
+        content.removeAllViews()
+        when (idx) {
+            0 -> showChart()
+            1 -> showData()
+        }
+    }
+
+    private fun showChart() {
         val cv = ChartView(this).also { chartView = it }
         cv.setChartTitle("BMI 历史")
         cv.setChartStateKey("bmi_history")
         cv.setYAxisBands(BmiUtil.loadBmiBands().map { YAxisBand(it.min.coerceAtLeast(0f), it.max, it.color) })
-        val series = ChartSeries(points = bmiData, label = "BMI", color = resources.getColor(R.color.primary, null),
-            lineStyle = LineStyle.LINEAR, lineType = LineType.SOLID, pointShape = PointShape.CIRCLE, pointFill = PointFill.FILLED)
+        val series = ChartSeries(points = bmiData, label = "BMI",
+            color = resources.getColor(R.color.primary, null),
+            lineStyle = LineStyle.LINEAR, lineType = LineType.SOLID,
+            pointShape = PointShape.CIRCLE, pointFill = PointFill.FILLED)
         cv.setSeries(listOf(series), "kg/m²")
         cv.setOnFullscreenListener { isFs ->
             if (isFs) {
@@ -113,10 +126,10 @@ class BmiDetailActivity : BaseBackActivity() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
         }
-        parent.addView(cv)
+        content.addView(cv)
     }
 
-    private fun showData(parent: LinearLayout, bmiData: List<com.woshiwangnima.healthdietpro.model.profile.DataPoint>) {
+    private fun showData() {
         chartView = null
         val scroll = android.widget.ScrollView(this)
         val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(16, 8, 16, 8) }
@@ -131,8 +144,7 @@ class BmiDetailActivity : BaseBackActivity() {
         val bands = BmiUtil.loadBmiBands()
         for (dp in bmiData.sortedByDescending { it.timestamp }) {
             val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                setPadding(0, 12, 0, 12)
+                orientation = LinearLayout.HORIZONTAL; setPadding(0, 12, 0, 12)
             }
             val dateTv = TextView(this).apply {
                 text = dp.dateLabel; textSize = 14f
@@ -150,7 +162,7 @@ class BmiDetailActivity : BaseBackActivity() {
             })
         }
         scroll.addView(list)
-        parent.addView(scroll)
+        content.addView(scroll)
     }
 
     override fun onDestroy() {
