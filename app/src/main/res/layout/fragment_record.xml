@@ -27,13 +27,14 @@
                 android:textSize="16sp"
                 android:textColor="?attr/colorOnSurface"
                 android:textStyle="bold"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="4dp" />
 
             <LinearLayout
                 android:id="@+id/baselineContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="horizontal"
+                android:gravity="center" />
         </LinearLayout>
 
         <!-- Card 2: 每日记录 -->
@@ -53,13 +54,14 @@
                 android:textSize="16sp"
                 android:textColor="?attr/colorOnSurface"
                 android:textStyle="bold"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="4dp" />
 
             <LinearLayout
                 android:id="@+id/dailyContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="horizontal"
+                android:gravity="center" />
         </LinearLayout>
 
         <!-- Card 3: 状态记录 -->
@@ -78,13 +80,14 @@
                 android:textSize="16sp"
                 android:textColor="?attr/colorOnSurface"
                 android:textStyle="bold"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="4dp" />
 
             <LinearLayout
                 android:id="@+id/statusContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="horizontal"
+                android:gravity="center" />
         </LinearLayout>
 
     </LinearLayout>
