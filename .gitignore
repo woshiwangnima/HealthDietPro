@@ -76,3 +76,7 @@ Thumbs.db
 
 # Opencode
 docs/
+
+# Hidden directories
+.*/
+!.gitignore
