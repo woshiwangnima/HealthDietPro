@@ -210,6 +210,8 @@ class ChartView @JvmOverloads constructor(
     fun setOnFullscreenListener(listener: ((Boolean) -> Unit)?) { onFullscreenListener = listener }
 
     private var chartStateKey: String = ""
+    private var timeRangeOptions: List<TimeRangeOption> = emptyList()
+    private val labelIntervalValues = longArrayOf(0L, 60_000L, 5 * 60_000L, 30 * 60_000L, 3_600_000L, 2 * 3_600_000L, 6 * 3_600_000L, 86_400_000L, 3 * 86_400_000L)
 
     fun setChartStateKey(key: String) {
         chartStateKey = key
@@ -223,33 +225,14 @@ class ChartView @JvmOverloads constructor(
         val stylePos = AppPrefs.getChartStyle(ctx, chartStateKey)
         chartTypeSpinner.setSelection(stylePos.coerceIn(0, chartTypeSpinner.adapter.count - 1))
 
-        // Time range spinner: find option matching current visibleRangeMs
+        // Time range spinner: find option matching saved millis
         val savedRange = AppPrefs.getChartTimeRange(ctx, chartStateKey)
-        val trAdapter = timeRangeSpinner.adapter
-        if (trAdapter != null) {
-            for (i in 0 until trAdapter.count) {
-                val label = trAdapter.getItem(i).toString()
-                val optMillis = when (label) {
-                    "全部" -> Long.MAX_VALUE
-                    "1天" -> 24 * 60 * 60 * 1000L
-                    "1周" -> 7 * 24 * 60 * 60 * 1000L
-                    "1个月" -> 30 * 24 * 60 * 60 * 1000L
-                    "3个月" -> 90 * 24 * 60 * 60 * 1000L
-                    "6个月" -> 180 * 24 * 60 * 60 * 1000L
-                    "1年" -> 365 * 24 * 60 * 60 * 1000L
-                    else -> -1L
-                }
-                if (optMillis == savedRange) {
-                    timeRangeSpinner.setSelection(i)
-                    break
-                }
-            }
-        }
+        val trIdx = timeRangeOptions.indexOfFirst { it.millis == savedRange }
+        if (trIdx >= 0) timeRangeSpinner.setSelection(trIdx)
 
-        // Label interval spinner
+        // Label interval spinner: find option matching saved millis
         val savedInterval = AppPrefs.getChartLabelInterval(ctx, chartStateKey)
-        val liValues = longArrayOf(0L, 60_000L, 5 * 60_000L, 30 * 60_000L, 3_600_000L, 2 * 3_600_000L, 6 * 3_600_000L, 86_400_000L, 3 * 86_400_000L)
-        val liIdx = liValues.indexOfFirst { it == savedInterval }
+        val liIdx = labelIntervalValues.indexOfFirst { it == savedInterval }
         if (liIdx >= 0) labelIntervalSpinner.setSelection(liIdx)
         if (savedInterval > 0L) chartCanvas.labelIntervalMs = savedInterval
 
@@ -314,6 +297,7 @@ class ChartView @JvmOverloads constructor(
         val result = withinSpan.toMutableList()
         if (nextAbove != null && nextAbove !in result) result.add(nextAbove)
         result.add(TimeRangeOption("全部", Long.MAX_VALUE))
+        timeRangeOptions = result
         return result
     }
 
