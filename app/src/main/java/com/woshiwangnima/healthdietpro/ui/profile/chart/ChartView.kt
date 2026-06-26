@@ -119,9 +119,9 @@ class ChartView @JvmOverloads constructor(
             chartCanvas.visibleRangeMs = totalSpan
             chartCanvas.windowStartMs = allPoints.minOf { it.timestamp }
         }
+        rebuildTimeRangeSpinner()
         restoreChartState()
         applyYAxisRange()
-        rebuildTimeRangeSpinner()
         updateDragIndicator()
         updateLegend()
         chartCanvas.invalidate()
@@ -218,13 +218,40 @@ class ChartView @JvmOverloads constructor(
     private fun restoreChartState() {
         if (chartStateKey.isEmpty()) return
         val ctx = context
+
+        // Chart style spinner
         val stylePos = AppPrefs.getChartStyle(ctx, chartStateKey)
         chartTypeSpinner.setSelection(stylePos.coerceIn(0, chartTypeSpinner.adapter.count - 1))
 
-        val intervalMs = AppPrefs.getChartLabelInterval(ctx, chartStateKey)
-        if (intervalMs > 0L) {
-            chartCanvas.labelIntervalMs = intervalMs
+        // Time range spinner: find option matching current visibleRangeMs
+        val savedRange = AppPrefs.getChartTimeRange(ctx, chartStateKey)
+        val trAdapter = timeRangeSpinner.adapter
+        if (trAdapter != null) {
+            for (i in 0 until trAdapter.count) {
+                val label = trAdapter.getItem(i).toString()
+                val optMillis = when (label) {
+                    "全部" -> Long.MAX_VALUE
+                    "1天" -> 24 * 60 * 60 * 1000L
+                    "1周" -> 7 * 24 * 60 * 60 * 1000L
+                    "1个月" -> 30 * 24 * 60 * 60 * 1000L
+                    "3个月" -> 90 * 24 * 60 * 60 * 1000L
+                    "6个月" -> 180 * 24 * 60 * 60 * 1000L
+                    "1年" -> 365 * 24 * 60 * 60 * 1000L
+                    else -> -1L
+                }
+                if (optMillis == savedRange) {
+                    timeRangeSpinner.setSelection(i)
+                    break
+                }
+            }
         }
+
+        // Label interval spinner
+        val savedInterval = AppPrefs.getChartLabelInterval(ctx, chartStateKey)
+        val liValues = longArrayOf(0L, 60_000L, 5 * 60_000L, 30 * 60_000L, 3_600_000L, 2 * 3_600_000L, 6 * 3_600_000L, 86_400_000L, 3 * 86_400_000L)
+        val liIdx = liValues.indexOfFirst { it == savedInterval }
+        if (liIdx >= 0) labelIntervalSpinner.setSelection(liIdx)
+        if (savedInterval > 0L) chartCanvas.labelIntervalMs = savedInterval
 
         val yMin = AppPrefs.getChartYMin(ctx, chartStateKey)
         val yMax = AppPrefs.getChartYMax(ctx, chartStateKey)

@@ -27,6 +27,7 @@ class DataListFragment : Fragment() {
     private var isHeight: Boolean = true
     private lateinit var adapter: BodyRecordAdapter
     private var isDialogShowing = false
+    private var rootView: View? = null
 
     companion object {
         private const val ARG_RECORDS = "records"
@@ -65,6 +66,7 @@ class DataListFragment : Fragment() {
         adapter = BodyRecordAdapter(unitId)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
+        rootView = view
         refreshList()
 
         adapter.onDelete = { pos ->
@@ -82,7 +84,7 @@ class DataListFragment : Fragment() {
     private fun refreshList() {
         records.sortByDescending { it.date }
         adapter.records = records
-        view?.findViewById<TextView>(R.id.totalCount)?.text = "共 ${records.size} 条记录"
+        rootView?.findViewById<TextView>(R.id.totalCount)?.text = "共 ${records.size} 条记录"
     }
 
     private fun showAddDialog() {

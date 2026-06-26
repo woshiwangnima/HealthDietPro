@@ -12,6 +12,8 @@ import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.config.NavConfig
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiCalculatorView
+import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiReferenceView
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartView
@@ -108,6 +110,9 @@ class BmiDetailActivity : BaseBackActivity() {
     }
 
     private fun showChart() {
+        val scroll = android.widget.ScrollView(this)
+        val wrapper = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+
         val cv = ChartView(this).also { chartView = it }
         cv.setChartTitle("BMI 历史")
         cv.setChartStateKey("bmi_history")
@@ -126,7 +131,13 @@ class BmiDetailActivity : BaseBackActivity() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
         }
-        content.addView(cv)
+        val chartLp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+            (resources.displayMetrics.heightPixels * 0.45).toInt())
+        wrapper.addView(cv, chartLp)
+        wrapper.addView(BmiReferenceView(this))
+        wrapper.addView(BmiCalculatorView(this))
+        scroll.addView(wrapper)
+        content.addView(scroll)
     }
 
     private fun showData() {
