@@ -92,7 +92,25 @@ class WeightDetailActivity : BaseBackActivity() {
     }
 
     private fun showChartTab() {
-        val cv = ChartView(this).also { chartView = it }
+        val cv = chartView ?: run {
+            val newCv = ChartView(this)
+            newCv.setOnFullscreenListener { isFs ->
+                if (isFs) {
+                    binding.toolbar.visibility = View.GONE
+                    binding.bottomBar.visibility = View.GONE
+                    window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                } else {
+                    binding.toolbar.visibility = View.VISIBLE
+                    binding.bottomBar.visibility = View.VISIBLE
+                    window.decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+            chartView = newCv
+            newCv
+        }
+        // Always refresh data
         val dataPoints = if (records.isEmpty()) emptyList() else {
             val sorted = records.sortedBy { it.date }
             sorted.map { record ->
@@ -109,21 +127,10 @@ class WeightDetailActivity : BaseBackActivity() {
             pointShape = PointShape.CIRCLE, pointFill = PointFill.FILLED
         )
         cv.setSeries(listOf(series), unit)
-        cv.setOnFullscreenListener { isFs ->
-            if (isFs) {
-                binding.toolbar.visibility = View.GONE
-                binding.bottomBar.visibility = View.GONE
-                window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            } else {
-                binding.toolbar.visibility = View.VISIBLE
-                binding.bottomBar.visibility = View.VISIBLE
-                window.decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
+        if (cv.parent == null) {
+            binding.contentFrame.removeAllViews()
+            binding.contentFrame.addView(cv)
         }
-        binding.contentFrame.removeAllViews()
-        binding.contentFrame.addView(cv)
     }
 
     private fun showDataTab() {
