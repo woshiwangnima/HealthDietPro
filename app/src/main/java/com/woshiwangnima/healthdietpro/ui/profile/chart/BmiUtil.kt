@@ -2,7 +2,7 @@ package com.woshiwangnima.healthdietpro.ui.profile.chart
 
 import android.graphics.Color
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
-import org.json.JSONArray
+import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -31,28 +31,36 @@ object BmiUtil {
         }?.label ?: "未知"
     }
 
-    fun buildBmiDataPoints(weightRecords: List<BodyRecord>, heightRecords: List<BodyRecord>): List<com.woshiwangnima.healthdietpro.model.profile.DataPoint> {
+    fun buildBmiDataPoints(weightRecords: List<BodyRecord>, heightRecords: List<BodyRecord>): List<DataPoint> {
         if (weightRecords.isEmpty() || heightRecords.isEmpty()) return emptyList()
 
-        val heightByDate = heightRecords.sortedBy { it.date }.associateBy { it.date }
-        val sortedWeights = weightRecords.sortedBy { it.date }
+        val sortedW = weightRecords.sortedBy { it.date }
+        val sortedH = heightRecords.sortedBy { it.date }
 
-        val result = mutableListOf<com.woshiwangnima.healthdietpro.model.profile.DataPoint>()
-        val heightDates = heightByDate.keys.sorted()
+        // Collect all unique dates from both records
+        val allDates = sortedSetOf<String>()
+        for (w in sortedW) allDates.add(w.date)
+        for (h in sortedH) allDates.add(h.date)
 
-        for (w in sortedWeights) {
-            // Find the nearest height record on or before this weight date
-            val hDate = heightDates.lastOrNull { it <= w.date } ?: heightDates.first()
-            val h = heightByDate[hDate] ?: continue
-            val bmi = computeBmi(w.value, h.value)
-            if (bmi > 0f) {
-                val localDate = LocalDate.parse(w.date)
-                val ts = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                result.add(com.woshiwangnima.healthdietpro.model.profile.DataPoint(
-                    timestamp = ts,
-                    value = bmi,
-                    dateLabel = w.date.takeLast(5)
-                ))
+        val result = mutableListOf<DataPoint>()
+        var wi = 0; var hi = 0
+
+        for (date in allDates) {
+            // Advance weight pointer to the latest record at or before this date
+            while (wi < sortedW.size && sortedW[wi].date <= date) wi++
+            // Advance height pointer to the latest record at or before this date
+            while (hi < sortedH.size && sortedH[hi].date <= date) hi++
+
+            val w = if (wi > 0) sortedW[wi - 1] else null
+            val h = if (hi > 0) sortedH[hi - 1] else null
+
+            if (w != null && h != null) {
+                val bmi = computeBmi(w.value, h.value)
+                if (bmi > 0f) {
+                    val localDate = LocalDate.parse(date)
+                    val ts = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    result.add(DataPoint(timestamp = ts, value = bmi, dateLabel = date.takeLast(5)))
+                }
             }
         }
         return result
