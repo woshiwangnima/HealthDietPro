@@ -65,9 +65,6 @@ class ReminderSettingsActivity : BaseBackActivity() {
     }
 
     private fun updateDetailState(detail: LinearLayout, arrow: TextView, enabled: Boolean) {
-        detail.isEnabled = enabled
-        detail.isClickable = enabled
-        detail.isFocusable = enabled
         arrow.alpha = if (enabled) 1f else 0.3f
     }
 }

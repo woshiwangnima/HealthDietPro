@@ -29,6 +29,12 @@
             android:background="?attr/selectableItemBackground"
             android:layout_marginTop="8dp">
 
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_notification"
+                android:layout_marginEnd="12dp" />
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -54,6 +60,12 @@
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_bell"
+                android:layout_marginEnd="12dp" />
 
             <TextView
                 android:layout_width="0dp"
@@ -81,6 +93,12 @@
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_preferences"
+                android:layout_marginEnd="12dp" />
 
             <TextView
                 android:layout_width="0dp"

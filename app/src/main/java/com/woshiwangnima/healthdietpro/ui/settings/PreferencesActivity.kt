@@ -31,6 +31,7 @@ class PreferencesActivity : BaseBackActivity() {
         buildUnitRows()
         refreshDisplay()
         setupClickListeners()
+        setupFontScaleBar()
     }
 
     private fun buildUnitRows() {
@@ -96,6 +97,26 @@ class PreferencesActivity : BaseBackActivity() {
                 AppCompatDelegate.setDefaultNightMode(nightMode)
             }
         }
+    }
+
+    private fun setupFontScaleBar() {
+        val currentScale = AppPrefs.getFontScale(this)
+        val progress = ((currentScale - 0.8f) / 0.7f * 70f).toInt().coerceIn(0, 70)
+        binding.fontScaleSeekBar.progress = progress
+        binding.fontScaleValue.text = "${(currentScale * 100).toInt()}%"
+
+        binding.fontScaleSeekBar.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, p: Int, fromUser: Boolean) {
+                val scale = 0.8f + p / 70f * 0.7f
+                binding.fontScaleValue.text = "${(scale * 100).toInt()}%"
+            }
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {
+                val p = seekBar?.progress ?: 22
+                val scale = 0.8f + p / 70f * 0.7f
+                AppPrefs.setFontScale(this@PreferencesActivity, scale)
+            }
+        })
     }
 
     private fun showPicker(title: String, items: Array<String>, checkedIndex: Int, onSelected: (Int) -> Unit) {

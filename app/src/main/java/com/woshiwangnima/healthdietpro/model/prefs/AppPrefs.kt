@@ -60,4 +60,9 @@ object AppPrefs {
         prefs(context).getInt("tab_height_chart", 0)
     fun setHeightChartTab(context: Context, tab: Int) =
         prefs(context).edit().putInt("tab_height_chart", tab).apply()
+
+    fun getFontScale(context: Context): Float =
+        prefs(context).getFloat("pref_font_scale", 1.0f)
+    fun setFontScale(context: Context, scale: Float) =
+        prefs(context).edit().putFloat("pref_font_scale", scale).apply()
 }

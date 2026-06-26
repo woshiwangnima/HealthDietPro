@@ -26,9 +26,11 @@
             android:exported="false" />
         <activity
             android:name=".ui.profile.HeightDetailActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="false" />
         <activity
             android:name=".ui.profile.WeightDetailActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="false" />
         <activity
             android:name=".ui.settings.AppSettingsActivity"
