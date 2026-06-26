@@ -26,9 +26,10 @@ class BmiCalculatorView @JvmOverloads constructor(
 
         val title = TextView(context).apply {
             text = "BMI 计算器"
-            textSize = 16f
+            textSize = 14f
             setTypeface(typeface, Typeface.BOLD)
-            setPadding(0, 8, 0, 12)
+            setTextColor(0xFF333333.toInt())
+            setPadding(0, 16, 0, 8)
         }
         addView(title)
 

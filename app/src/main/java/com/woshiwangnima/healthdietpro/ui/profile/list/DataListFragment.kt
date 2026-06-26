@@ -16,6 +16,7 @@ import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.ui.profile.BodyRecordAdapter
 import com.woshiwangnima.healthdietpro.util.UnitConverter
+import com.woshiwangnima.healthdietpro.util.showConfirmDialog
 import java.util.Calendar
 
 class DataListFragment : Fragment() {
@@ -70,9 +71,11 @@ class DataListFragment : Fragment() {
         refreshList()
 
         adapter.onDelete = { pos ->
-            records.removeAt(pos)
-            refreshList()
-            onRecordsChanged?.invoke()
+            requireContext().showConfirmDialog("确认删除", "确定要删除这条记录吗？") {
+                records.removeAt(pos)
+                refreshList()
+                onRecordsChanged?.invoke()
+            }
         }
 
         adapter.onClick = { pos -> showEditDialog(pos) }

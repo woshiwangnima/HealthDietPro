@@ -26,25 +26,23 @@
 
         <Spinner
             android:id="@+id/chartTypeSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:spinnerMode="dropdown" />
-
-        <Space
             android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:spinnerMode="dropdown" />
 
         <Spinner
             android:id="@+id/timeRangeSpinner"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:spinnerMode="dropdown" />
 
         <Spinner
             android:id="@+id/labelIntervalSpinner"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:spinnerMode="dropdown" />
 
         <com.google.android.material.button.MaterialButton

@@ -20,9 +20,10 @@ class BmiReferenceView @JvmOverloads constructor(
 
         val title = TextView(context).apply {
             text = "BMI 中国标准划分对照表"
-            textSize = 16f
+            textSize = 14f
             setTypeface(typeface, Typeface.BOLD)
-            setPadding(0, 8, 0, 12)
+            setTextColor(0xFF333333.toInt())
+            setPadding(0, 16, 0, 8)
         }
         addView(title)
 

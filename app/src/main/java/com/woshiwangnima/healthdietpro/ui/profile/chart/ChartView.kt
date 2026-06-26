@@ -211,7 +211,7 @@ class ChartView @JvmOverloads constructor(
 
     private var chartStateKey: String = ""
     private var timeRangeOptions: List<TimeRangeOption> = emptyList()
-    private val labelIntervalValues = longArrayOf(0L, 60_000L, 5 * 60_000L, 30 * 60_000L, 3_600_000L, 2 * 3_600_000L, 6 * 3_600_000L, 86_400_000L, 3 * 86_400_000L)
+    private val labelIntervalValues = mutableListOf(0L)
 
     fun setChartStateKey(key: String) {
         chartStateKey = key
@@ -245,7 +245,10 @@ class ChartView @JvmOverloads constructor(
         if (chartStateKey.isEmpty()) return
         val ctx = context
         AppPrefs.setChartStyle(ctx, chartStateKey, chartTypeSpinner.selectedItemPosition)
-        AppPrefs.setChartTimeRange(ctx, chartStateKey, chartCanvas.visibleRangeMs)
+        // Save the selected option's millis, not the actual visibleRangeMs (for "全部" use Long.MAX_VALUE)
+        val trSelIdx = timeRangeSpinner.selectedItemPosition
+        val trMillis = if (trSelIdx in timeRangeOptions.indices) timeRangeOptions[trSelIdx].millis else Long.MAX_VALUE
+        AppPrefs.setChartTimeRange(ctx, chartStateKey, trMillis)
         AppPrefs.setChartLabelInterval(ctx, chartStateKey, chartCanvas.labelIntervalMs)
         AppPrefs.setChartYMin(ctx, chartStateKey, chartCanvas.yMinPct)
         AppPrefs.setChartYMax(ctx, chartStateKey, chartCanvas.yMaxPct)
@@ -339,15 +342,33 @@ class ChartView @JvmOverloads constructor(
     }
 
     private fun initLabelIntervalSpinner() {
-        val items = arrayOf("自动", "1分钟", "5分钟", "30分钟", "1小时", "2小时", "6小时", "1天", "3天")
-        val values = longArrayOf(0L, 60_000L, 5 * 60_000L, 30 * 60_000L, 3_600_000L, 2 * 3_600_000L, 6 * 3_600_000L, 86_400_000L, 3 * 86_400_000L)
-        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, items.toList())
+        val baseOpts = listOf(
+            "自动" to 0L,
+            "1分钟" to 60_000L,
+            "5分钟" to 5 * 60_000L,
+            "30分钟" to 30 * 60_000L,
+            "1小时" to 3_600_000L,
+            "2小时" to 2 * 3_600_000L,
+            "6小时" to 6 * 3_600_000L,
+            "1天" to 86_400_000L,
+            "3天" to 3 * 86_400_000L,
+            "1周" to 7 * 86_400_000L,
+            "1月" to 30 * 86_400_000L
+        )
+        val filtered = baseOpts.filter { it.second == 0L || it.second * 2 <= chartCanvas.visibleRangeMs } + baseOpts.filter { it.second >= chartCanvas.visibleRangeMs }.take(1)
+        labelIntervalValues.clear()
+        val labels = mutableListOf<String>()
+        for ((label, millis) in filtered.distinctBy { it.second }) {
+            labels.add(label)
+            labelIntervalValues.add(millis)
+        }
+        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, labels)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         labelIntervalSpinner.adapter = adapter
         labelIntervalSpinner.setSelection(0)
         labelIntervalSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                chartCanvas.labelIntervalMs = values[position.coerceIn(0, values.size - 1)]
+                chartCanvas.labelIntervalMs = labelIntervalValues[position.coerceIn(0, labelIntervalValues.size - 1)]
                 saveChartState()
                 chartCanvas.invalidate()
             }

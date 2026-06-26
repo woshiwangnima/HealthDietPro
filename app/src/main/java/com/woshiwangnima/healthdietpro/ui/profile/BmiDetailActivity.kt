@@ -134,7 +134,16 @@ class BmiDetailActivity : BaseBackActivity() {
         val chartLp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
             (resources.displayMetrics.heightPixels * 0.45).toInt())
         wrapper.addView(cv, chartLp)
+        wrapper.addView(View(this).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (16 * resources.displayMetrics.density).toInt())
+        })
         wrapper.addView(BmiReferenceView(this))
+        wrapper.addView(View(this).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
+            setBackgroundColor(resolveColor(com.google.android.material.R.attr.colorOutlineVariant))
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
+            lp.setMargins(16, 0, 16, 0); layoutParams = lp
+        })
         wrapper.addView(BmiCalculatorView(this))
         scroll.addView(wrapper)
         content.addView(scroll)
