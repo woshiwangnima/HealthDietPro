@@ -370,13 +370,18 @@ class ChartView @JvmOverloads constructor(
     }
 
     private fun initFullscreenButtons() {
+        btnFullscreen.setBackgroundColor(0xFFFF0000.toInt()) // red - verify button is visible
+        btnFullscreen.minimumWidth = 100
         btnFullscreen.setOnClickListener {
-            val data = buildFullscreenData(chartTitle.text.toString())
-            ChartFullscreenHolder.data = data
+            chartTitle.text = "点击了全屏"
+            chartTitle.visibility = View.VISIBLE
             try {
+                val data = buildFullscreenData(chartTitle.text.toString())
+                ChartFullscreenHolder.data = data
                 context.startActivity(Intent(context, ChartFullscreenActivity::class.java))
             } catch (e: Exception) {
-                android.widget.Toast.makeText(context, "全屏启动失败: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                chartTitle.text = "错误: ${e.message}"
+                chartTitle.visibility = View.VISIBLE
             }
         }
     }
