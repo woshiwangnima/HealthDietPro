@@ -128,6 +128,7 @@ class HeightDetailActivity : BaseBackActivity() {
 
     private fun showDataTab() {
         chartView = null
+        binding.contentFrame.removeAllViews()
         val fragment = DataListFragment.newInstance(ArrayList(records), unit, category, isHeight = true).also {
             it.onRecordsChanged = { this.records = it.records }
         }
