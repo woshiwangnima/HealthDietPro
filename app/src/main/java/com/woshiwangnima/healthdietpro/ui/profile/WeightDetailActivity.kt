@@ -56,8 +56,8 @@ class WeightDetailActivity : BaseBackActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val cv = chartView
-                if (cv != null && cv.isFullscreen()) {
-                    cv.toggleFullscreen()
+                if (cv != null) {
+                    supportFinishAfterTransition()
                 } else {
                     saveAndFinish()
                 }
@@ -94,19 +94,6 @@ class WeightDetailActivity : BaseBackActivity() {
     private fun showChartTab() {
         val cv = chartView ?: run {
             val newCv = ChartView(this)
-            newCv.setOnFullscreenListener { isFs ->
-                if (isFs) {
-                    binding.toolbar.visibility = View.GONE
-                    binding.bottomBar.visibility = View.GONE
-                    window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
-                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                } else {
-                    binding.toolbar.visibility = View.VISIBLE
-                    binding.bottomBar.visibility = View.VISIBLE
-                    window.decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
-                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
-            }
             chartView = newCv
             newCv
         }

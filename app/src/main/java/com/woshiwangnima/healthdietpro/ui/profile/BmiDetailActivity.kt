@@ -122,15 +122,6 @@ class BmiDetailActivity : BaseBackActivity() {
             lineStyle = LineStyle.LINEAR, lineType = LineType.SOLID,
             pointShape = PointShape.CIRCLE, pointFill = PointFill.FILLED)
         cv.setSeries(listOf(series), "kg/m²")
-        cv.setOnFullscreenListener { isFs ->
-            if (isFs) {
-                window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            } else {
-                window.decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
-        }
         val chartLp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
             (resources.displayMetrics.heightPixels * 0.45).toInt())
         wrapper.addView(cv, chartLp)

@@ -1,6 +1,7 @@
 package com.woshiwangnima.healthdietpro.ui.profile.chart
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
@@ -31,11 +32,9 @@ class ChartView @JvmOverloads constructor(
     private val timeRangeSpinner: Spinner
     private val labelIntervalSpinner: Spinner
     private val btnFullscreen: MaterialButton
-    private val btnFullscreenOverlay: MaterialButton
     private val yMinInput: EditText
     private val yMaxInput: EditText
     private val controlsRow: LinearLayout
-    private val yAxisRow: LinearLayout
     private val chartFrame: FrameLayout
     private val dragIndicatorContainer: FrameLayout
     private val progressBarContainer: FrameLayout
@@ -49,9 +48,7 @@ class ChartView @JvmOverloads constructor(
 
     private var seriesList: List<ChartSeries> = emptyList()
     private var unitLabel: String = ""
-    private var isFullscreen = false
     private var lineStyle: LineStyle = LineStyle.LINEAR
-    private var onFullscreenListener: ((Boolean) -> Unit)? = null
     private var chartTypeReady = false
     private var timeRangeReady = false
     private var yAxisReady = false
@@ -71,11 +68,9 @@ class ChartView @JvmOverloads constructor(
         chartTypeSpinner = findViewById(R.id.chartTypeSpinner)
         timeRangeSpinner = findViewById(R.id.timeRangeSpinner)
         btnFullscreen = findViewById(R.id.btnFullscreen)
-        btnFullscreenOverlay = findViewById(R.id.btnFullscreenOverlay)
         yMinInput = findViewById(R.id.yMinInput)
         yMaxInput = findViewById(R.id.yMaxInput)
         controlsRow = findViewById(R.id.controlsRow)
-        yAxisRow = findViewById(R.id.yAxisRow)
         chartFrame = findViewById(R.id.chartFrame)
         dragIndicatorContainer = findViewById(R.id.dragIndicatorContainer)
         progressBarContainer = findViewById(R.id.progressBarContainer)
@@ -178,36 +173,30 @@ class ChartView @JvmOverloads constructor(
         chartTitle.visibility = View.VISIBLE
     }
 
-    fun toggleFullscreen() {
-        isFullscreen = !isFullscreen
-        onFullscreenListener?.invoke(isFullscreen) // call BEFORE visual changes for atomic transition
-        updateFullscreenButton()
-        if (isFullscreen) {
+    fun setFullscreenMode(enabled: Boolean) {
+        if (enabled) {
             controlsRow.visibility = View.GONE
-            yAxisRow.visibility = View.GONE
             legendScrollView.visibility = View.GONE
             btnFullscreen.visibility = View.GONE
-            btnFullscreenOverlay.visibility = View.VISIBLE
             val lp = chartFrame.layoutParams as LinearLayout.LayoutParams
             lp.weight = 1f; lp.height = 0
             chartFrame.layoutParams = lp
-        } else {
-            controlsRow.visibility = View.VISIBLE
-            yAxisRow.visibility = View.VISIBLE
-            legendScrollView.visibility = if (legendLayout.childCount > 0) View.VISIBLE else View.GONE
-            btnFullscreen.visibility = View.VISIBLE
-            btnFullscreenOverlay.visibility = View.GONE
-            updateDragIndicator()
-            val lp = chartFrame.layoutParams as LinearLayout.LayoutParams
-            lp.weight = 0f
-            lp.height = (resources.displayMetrics.heightPixels * 0.45).toInt()
-            chartFrame.layoutParams = lp
         }
-        chartCanvas.invalidate()
     }
 
-    fun isFullscreen(): Boolean = isFullscreen
-    fun setOnFullscreenListener(listener: ((Boolean) -> Unit)?) { onFullscreenListener = listener }
+    fun buildFullscreenData(title: String): ChartFullscreenData {
+        return ChartFullscreenData(
+            series = seriesList, unitLabel = unitLabel,
+            visibleRangeMs = chartCanvas.visibleRangeMs,
+            windowStartMs = chartCanvas.windowStartMs,
+            yMinPct = chartCanvas.yMinPct, yMaxPct = chartCanvas.yMaxPct,
+            labelIntervalMs = chartCanvas.labelIntervalMs,
+            yAxisBands = chartCanvas.yAxisBands,
+            chartTitle = title, chartStateKey = chartStateKey
+        )
+    }
+
+    fun invalidateChart() { chartCanvas.invalidate() }
 
     private var chartStateKey: String = ""
     private var timeRangeOptions: List<TimeRangeOption> = emptyList()
@@ -382,17 +371,11 @@ class ChartView @JvmOverloads constructor(
     }
 
     private fun initFullscreenButtons() {
-        val listener = View.OnClickListener { toggleFullscreen() }
-        btnFullscreen.setOnClickListener(listener)
-        btnFullscreenOverlay.setOnClickListener(listener)
-    }
-
-    private fun updateFullscreenButton() {
-        val inFs = isFullscreen
-        btnFullscreen.text = if (inFs) "缩放" else "全屏"
-        btnFullscreen.setIconResource(if (inFs) R.drawable.ic_fullscreen_exit else R.drawable.ic_fullscreen)
-        btnFullscreenOverlay.text = if (inFs) "缩放" else "全屏"
-        btnFullscreenOverlay.setIconResource(if (inFs) R.drawable.ic_fullscreen_exit else R.drawable.ic_fullscreen)
+        btnFullscreen.setOnClickListener {
+            val data = buildFullscreenData(chartTitle.text.toString())
+            ChartFullscreenHolder.data = data
+            context.startActivity(Intent(context, ChartFullscreenActivity::class.java))
+        }
     }
 
     private fun initYAxisInputs() {
@@ -518,7 +501,7 @@ class ChartView @JvmOverloads constructor(
         val allPoints = seriesList.flatMap { it.points }
         val totalSpan = allPoints.maxOfOrNull { it.timestamp }?.let { it - (allPoints.minOfOrNull { it.timestamp } ?: it) } ?: 0L
         val dragEnabled = totalSpan > 0L && allPoints.size >= 2 && chartCanvas.visibleRangeMs < totalSpan
-        dragIndicatorContainer.visibility = if (dragEnabled && !isFullscreen) View.VISIBLE else View.GONE
+        dragIndicatorContainer.visibility = if (dragEnabled) View.VISIBLE else View.GONE
         progressBarContainer.visibility = View.GONE
         isTimelineVisible = false
         if (dragEnabled) {
@@ -619,7 +602,7 @@ class ChartView @JvmOverloads constructor(
         for (s in seriesList) {
             legendLayout.addView(createLegendItem(s))
         }
-        legendScrollView.visibility = if (legendLayout.childCount > 0 && !isFullscreen) View.VISIBLE else View.GONE
+        legendScrollView.visibility = if (legendLayout.childCount > 0) View.VISIBLE else View.GONE
     }
 
     private fun createLegendItem(s: ChartSeries): LinearLayout {

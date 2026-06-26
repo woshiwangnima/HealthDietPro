@@ -1,8 +1,6 @@
 package com.woshiwangnima.healthdietpro.ui.profile.chart
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.view.WindowInsets
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
@@ -28,27 +26,12 @@ class WeightChartActivity : BaseBackActivity() {
         val unit = intent.getStringExtra(EXTRA_UNIT) ?: UnitCategory.DEFAULT_UNIT_WEIGHT
         val dataPoints = parseRecords(records, UnitCategory.ID_WEIGHT, unit)
         val series = ChartSeries(
-            points = dataPoints,
-            label = "测量值",
+            points = dataPoints, label = "测量值",
             color = resources.getColor(R.color.primary, null),
-            lineStyle = LineStyle.LINEAR,
-            lineType = LineType.SOLID,
-            pointShape = PointShape.CIRCLE,
-            pointFill = PointFill.FILLED
+            lineStyle = LineStyle.LINEAR, lineType = LineType.SOLID,
+            pointShape = PointShape.CIRCLE, pointFill = PointFill.FILLED
         )
         chartView.setSeries(listOf(series), unit)
-
-        chartView.setOnFullscreenListener { isFs ->
-            if (isFs) {
-                window.decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                supportActionBar?.hide()
-            } else {
-                window.decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                supportActionBar?.show()
-            }
-        }
     }
 
     private fun parseRecords(records: List<BodyRecord>, category: String, unitId: String): List<DataPoint> {

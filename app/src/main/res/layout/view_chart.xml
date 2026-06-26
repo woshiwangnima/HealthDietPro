@@ -8,120 +8,169 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textColor="?attr/colorOnSurface"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="2dp"
         android:visibility="gone"
         tools:visibility="visible" />
 
+    <!-- Row 1: 图表样式 -->
     <LinearLayout
         android:id="@+id/controlsRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp">
-
-        <Spinner
-            android:id="@+id/chartTypeSpinner"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:spinnerMode="dropdown" />
-
-        <Spinner
-            android:id="@+id/timeRangeSpinner"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:spinnerMode="dropdown" />
-
-        <Spinner
-            android:id="@+id/labelIntervalSpinner"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:spinnerMode="dropdown" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnFullscreen"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:text="全屏"
-            android:paddingHorizontal="8dp"
-            android:contentDescription="全屏"
-            app:icon="@drawable/ic_fullscreen"
-            app:iconGravity="textStart"
-            app:iconSize="20dp"
-            style="@style/Widget.Material3.Button.TextButton" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/yAxisRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="16dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
         android:paddingVertical="2dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Y轴:"
-            android:textSize="13sp"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/yMinInput"
-            android:layout_width="56dp"
-            android:layout_height="32dp"
-            android:hint="-10"
-            android:text="-10"
-            android:textSize="13sp"
-            android:gravity="center"
-            android:inputType="numberDecimal|numberSigned"
-            android:background="@drawable/input_bg"
-            android:paddingHorizontal="4dp"
-            android:layout_marginStart="4dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="图表样式"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginEnd="8dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="%"
-            android:textSize="13sp"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            <Spinner
+                android:id="@+id/chartTypeSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="~"
-            android:textSize="13sp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:layout_marginHorizontal="4dp" />
+        <!-- Row 2: 显示时间 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/yMaxInput"
-            android:layout_width="56dp"
-            android:layout_height="32dp"
-            android:hint="110"
-            android:text="110"
-            android:textSize="13sp"
-            android:gravity="center"
-            android:inputType="numberDecimal|numberSigned"
-            android:background="@drawable/input_bg"
-            android:paddingHorizontal="4dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="显示时间"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginEnd="8dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="%"
-            android:textSize="13sp"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            <Spinner
+                android:id="@+id/timeRangeSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
 
+        <!-- Row 3: X轴间隔 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="X轴间隔"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginEnd="8dp" />
+
+            <Spinner
+                android:id="@+id/labelIntervalSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
+        <!-- Row 4: Y轴 + 全屏按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Y轴"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginEnd="4dp" />
+
+            <EditText
+                android:id="@+id/yMinInput"
+                android:layout_width="44dp"
+                android:layout_height="28dp"
+                android:hint="-10"
+                android:text="-10"
+                android:textSize="11sp"
+                android:gravity="center"
+                android:inputType="numberDecimal|numberSigned"
+                android:background="@drawable/input_bg"
+                android:paddingHorizontal="2dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="%"
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" ~ "
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <EditText
+                android:id="@+id/yMaxInput"
+                android:layout_width="44dp"
+                android:layout_height="28dp"
+                android:hint="110"
+                android:text="110"
+                android:textSize="11sp"
+                android:gravity="center"
+                android:inputType="numberDecimal|numberSigned"
+                android:background="@drawable/input_bg"
+                android:paddingHorizontal="2dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="%"
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFullscreen"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="全屏"
+                android:textSize="11sp"
+                android:paddingHorizontal="8dp"
+                android:contentDescription="全屏"
+                app:icon="@drawable/ic_fullscreen"
+                app:iconGravity="textStart"
+                app:iconSize="16dp"
+                app:iconPadding="2dp"
+                style="@style/Widget.Material3.Button.TextButton" />
+        </LinearLayout>
     </LinearLayout>
 
     <FrameLayout
@@ -134,21 +183,6 @@
             android:id="@+id/chartCanvas"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnFullscreenOverlay"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="top|end"
-            android:layout_margin="8dp"
-            android:text="缩放"
-            android:paddingHorizontal="8dp"
-            android:contentDescription="退出全屏"
-            android:visibility="gone"
-            app:icon="@drawable/ic_fullscreen_exit"
-            app:iconGravity="textStart"
-            app:iconSize="20dp"
-            style="@style/Widget.Material3.Button.TextButton" />
 
     </FrameLayout>
 

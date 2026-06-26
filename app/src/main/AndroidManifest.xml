@@ -48,6 +48,9 @@
             android:name=".ui.profile.chart.WeightChartActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.profile.chart.ChartFullscreenActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.profile.BmiDetailActivity"
             android:configChanges="orientation|screenSize|uiMode"
             android:exported="false" />
