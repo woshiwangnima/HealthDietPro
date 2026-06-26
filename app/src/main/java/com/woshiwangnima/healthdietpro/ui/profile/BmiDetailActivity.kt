@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsets
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -111,8 +112,19 @@ class BmiDetailActivity : BaseBackActivity() {
 
     private fun showChart() {
         val scroll = android.widget.ScrollView(this)
-        val wrapper = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        val wrapper = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(12, 12, 12, 12)
+        }
 
+        // Card 1: BMI chart
+        val chartCard = FrameLayout(this).apply {
+            setBackgroundResource(R.drawable.card_bg)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                bottomMargin = (12 * resources.displayMetrics.density).toInt()
+            }
+            elevation = 1f
+        }
         val cv = ChartView(this).also { chartView = it }
         cv.setChartTitle("BMI 历史", android.view.Gravity.START)
         cv.setChartStateKey("bmi_history")
@@ -122,20 +134,26 @@ class BmiDetailActivity : BaseBackActivity() {
             lineStyle = LineStyle.LINEAR, lineType = LineType.SOLID,
             pointShape = PointShape.CIRCLE, pointFill = PointFill.FILLED)
         cv.setSeries(listOf(series), "kg/m²")
-        val chartLp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-            (resources.displayMetrics.heightPixels * 0.45).toInt())
-        wrapper.addView(cv, chartLp)
-        wrapper.addView(View(this).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (16 * resources.displayMetrics.density).toInt())
-        })
-        wrapper.addView(BmiReferenceView(this))
-        wrapper.addView(View(this).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
-            setBackgroundColor(resolveColor(com.google.android.material.R.attr.colorOutlineVariant))
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
-            lp.setMargins(16, 0, 16, 0); layoutParams = lp
-        })
-        wrapper.addView(BmiCalculatorView(this))
+        chartCard.addView(cv)
+        wrapper.addView(chartCard, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+            (resources.displayMetrics.heightPixels * 0.45).toInt()))
+
+        // Card 2: BMI reference table
+        BmiReferenceView(this).apply {
+            setBackgroundResource(R.drawable.card_bg)
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            lp.bottomMargin = (12 * resources.displayMetrics.density).toInt()
+            layoutParams = lp
+            elevation = 1f
+        }.also { wrapper.addView(it) }
+
+        // Card 3: BMI calculator
+        BmiCalculatorView(this).apply {
+            setBackgroundResource(R.drawable.card_bg)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            elevation = 1f
+        }.also { wrapper.addView(it) }
+
         scroll.addView(wrapper)
         content.addView(scroll)
     }
