@@ -20,7 +20,6 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.woshiwangnima.healthdietpro.R
-import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 
 class ChartView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -42,6 +41,7 @@ class ChartView @JvmOverloads constructor(
     private val dragIndicator: View
     private val dragArrowLeft: ImageButton
     private val dragArrowRight: ImageButton
+    private val legendScrollView: HorizontalScrollView
     private val legendLayout: LinearLayout
 
     private var seriesList: List<ChartSeries> = emptyList()
@@ -80,6 +80,7 @@ class ChartView @JvmOverloads constructor(
         dragIndicator = findViewById(R.id.dragIndicator)
         dragArrowLeft = findViewById(R.id.dragArrowLeft)
         dragArrowRight = findViewById(R.id.dragArrowRight)
+        legendScrollView = findViewById(R.id.legendScrollView)
         legendLayout = findViewById(R.id.legendLayout)
 
         initChartTypeSpinner()
@@ -95,6 +96,7 @@ class ChartView @JvmOverloads constructor(
         this.unitLabel = unitLabel
         chartCanvas.series = series
         chartCanvas.unitLabel = unitLabel
+        chartCanvas.clearCrosshair()
         val allPoints = series.flatMap { it.points }
         if (allPoints.isEmpty()) {
             chartCanvas.invalidate()
@@ -158,19 +160,16 @@ class ChartView @JvmOverloads constructor(
         if (isFullscreen) {
             controlsRow.visibility = View.GONE
             yAxisRow.visibility = View.GONE
-            legendLayout.visibility = View.GONE
+            legendScrollView.visibility = View.GONE
             btnFullscreen.visibility = View.GONE
             btnFullscreenOverlay.visibility = View.VISIBLE
-            dragIndicatorContainer.visibility = View.GONE
-            progressBarContainer.visibility = View.GONE
-            isTimelineVisible = false
             val lp = chartFrame.layoutParams as LinearLayout.LayoutParams
             lp.weight = 1f; lp.height = 0
             chartFrame.layoutParams = lp
         } else {
             controlsRow.visibility = View.VISIBLE
             yAxisRow.visibility = View.VISIBLE
-            legendLayout.visibility = if (legendLayout.childCount > 0) View.VISIBLE else View.GONE
+            legendScrollView.visibility = if (legendLayout.childCount > 0) View.VISIBLE else View.GONE
             btnFullscreen.visibility = View.VISIBLE
             btnFullscreenOverlay.visibility = View.GONE
             updateDragIndicator()
@@ -193,6 +192,7 @@ class ChartView @JvmOverloads constructor(
         chartTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (!chartTypeReady) return
+                chartCanvas.clearCrosshair()
                 lineStyle = LineStyle.fromSpinnerPosition(position)
                 seriesList = seriesList.map { it.copy(lineStyle = lineStyle) }
                 chartCanvas.series = seriesList
@@ -242,6 +242,7 @@ class ChartView @JvmOverloads constructor(
         timeRangeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (!timeRangeReady || position >= opts.size) return
+                chartCanvas.clearCrosshair()
                 val rangeMs = opts[position].millis
                 val allPoints = seriesList.flatMap { it.points }
                 if (allPoints.isEmpty()) return
@@ -253,7 +254,6 @@ class ChartView @JvmOverloads constructor(
                     chartCanvas.visibleRangeMs = rangeMs
                     chartCanvas.windowStartMs = (latestTs - rangeMs).coerceAtLeast(allPoints.minOf { it.timestamp })
                 }
-                chartCanvas.clearCrosshair()
                 chartCanvas.invalidate()
                 updateDragIndicator()
                 showTimeline()
@@ -284,7 +284,10 @@ class ChartView @JvmOverloads constructor(
 
     private fun initYAxisInputs() {
         val watcher = object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) { applyYAxisRange() }
+            override fun afterTextChanged(s: Editable?) {
+                chartCanvas.clearCrosshair()
+                applyYAxisRange()
+            }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         }
@@ -321,13 +324,12 @@ class ChartView @JvmOverloads constructor(
                     if (stripWidth <= 0f) return@setOnTouchListener true
                     val dataMin = allPoints.minOf { it.timestamp }
                     val dataMax = allPoints.maxOf { it.timestamp }
-                    val maxStart = ((dataMax - visibleRange.toLong()) - dataMin).toFloat().coerceAtLeast(0f)
+                    val maxDragRange = (dataMax - dataMin - visibleRange.toLong()).toFloat().coerceAtLeast(0f)
                     val pxPerMs = stripWidth / visibleRange
                     if (pxPerMs == 0f) return@setOnTouchListener true
                     val deltaMs = -(deltaX / pxPerMs)
-                    val newStart = ((chartCanvas.windowStartMs - dataMin).toFloat() + deltaMs).coerceIn(0f, maxStart)
-                    chartCanvas.windowStartMs = dataMin + newStart.toLong()
-                    chartCanvas.clearCrosshair()
+                    val newOffset = ((chartCanvas.windowStartMs - dataMin).toFloat() + deltaMs).coerceIn(0f, maxDragRange)
+                    chartCanvas.windowStartMs = dataMin + newOffset.toLong()
                     chartCanvas.invalidate()
                     post { updateDragArrows(); updateTimelineBar() }
                     true
@@ -343,7 +345,6 @@ class ChartView @JvmOverloads constructor(
             val dataMin = allPoints.minOf { it.timestamp }
             val step = (chartCanvas.visibleRangeMs * 0.3f).toLong()
             chartCanvas.windowStartMs = (chartCanvas.windowStartMs - step).coerceAtLeast(dataMin)
-            chartCanvas.clearCrosshair()
             chartCanvas.invalidate()
             post { updateDragArrows(); updateTimelineBar() }
         }
@@ -355,7 +356,6 @@ class ChartView @JvmOverloads constructor(
             val step = (chartCanvas.visibleRangeMs * 0.3f).toLong()
             val maxStart = (dataMax - chartCanvas.visibleRangeMs).coerceAtLeast(allPoints.minOf { it.timestamp })
             chartCanvas.windowStartMs = (chartCanvas.windowStartMs + step).coerceAtMost(maxStart)
-            chartCanvas.clearCrosshair()
             chartCanvas.invalidate()
             post { updateDragArrows(); updateTimelineBar() }
         }
@@ -363,7 +363,8 @@ class ChartView @JvmOverloads constructor(
 
     private fun updateDragIndicator() {
         val allPoints = seriesList.flatMap { it.points }
-        val dragEnabled = chartCanvas.visibleRangeMs != Long.MAX_VALUE && allPoints.size >= 2
+        val totalSpan = allPoints.maxOfOrNull { it.timestamp }?.let { it - (allPoints.minOfOrNull { it.timestamp } ?: it) } ?: 0L
+        val dragEnabled = totalSpan > 0L && allPoints.size >= 2 && chartCanvas.visibleRangeMs < totalSpan
         dragIndicatorContainer.visibility = if (dragEnabled && !isFullscreen) View.VISIBLE else View.GONE
         progressBarContainer.visibility = View.GONE
         isTimelineVisible = false
@@ -409,7 +410,8 @@ class ChartView @JvmOverloads constructor(
 
     private fun showTimeline() {
         val allPoints = seriesList.flatMap { it.points }
-        val dragEnabled = chartCanvas.visibleRangeMs != Long.MAX_VALUE && allPoints.size >= 2
+        val totalSpan = allPoints.maxOfOrNull { it.timestamp }?.let { it - (allPoints.minOfOrNull { it.timestamp } ?: it) } ?: 0L
+        val dragEnabled = totalSpan > 0L && allPoints.size >= 2 && chartCanvas.visibleRangeMs < totalSpan
         if (!dragEnabled) return
         timelineHandler.removeCallbacks(timelineHideRunnable)
         if (!isTimelineVisible) {
@@ -445,13 +447,15 @@ class ChartView @JvmOverloads constructor(
         if (barWidth <= 0) return
         val thumbWidthFraction = (chartCanvas.visibleRangeMs.toFloat() / totalSpan.toFloat()).coerceIn(0.05f, 1f)
         val thumbWidth = (barWidth * thumbWidthFraction).coerceAtLeast(20f)
-        val windowCenter = (chartCanvas.windowStartMs + chartCanvas.visibleRangeMs / 2)
-        val relCenter = (windowCenter - dataMin).toFloat().coerceAtLeast(0f)
-        val centerFraction = (relCenter / totalSpan.toFloat()).coerceIn(0f, 1f)
-        val left = (barWidth * centerFraction - thumbWidth / 2f).coerceIn(0f, (barWidth - thumbWidth).coerceAtLeast(0f))
+        // Use left-edge mapping: thumb left = (windowStart - dataMin) / (totalSpan - visibleRange) * (barWidth - thumbWidth)
+        val dragRange = totalSpan - chartCanvas.visibleRangeMs
+        val thumbLeft = if (dragRange > 0L) {
+            val offset = chartCanvas.windowStartMs - dataMin
+            (offset.toFloat() / dragRange.toFloat() * (barWidth - thumbWidth)).coerceIn(0f, (barWidth - thumbWidth).coerceAtLeast(0f))
+        } else 0f
         progressBarThumb.layoutParams = (progressBarThumb.layoutParams as FrameLayout.LayoutParams).also {
             it.width = thumbWidth.toInt()
-            it.leftMargin = (left + dragIndicatorContainer.paddingLeft).toInt()
+            it.leftMargin = (thumbLeft + dragIndicatorContainer.paddingLeft).toInt()
             it.rightMargin = 0
         }
         progressBarThumb.requestLayout()
@@ -462,22 +466,66 @@ class ChartView @JvmOverloads constructor(
         for (s in seriesList) {
             legendLayout.addView(createLegendItem(s))
         }
-        legendLayout.visibility = if (legendLayout.childCount > 0 && !isFullscreen) View.VISIBLE else View.GONE
+        legendScrollView.visibility = if (legendLayout.childCount > 0 && !isFullscreen) View.VISIBLE else View.GONE
     }
 
     private fun createLegendItem(s: ChartSeries): LinearLayout {
+        val density = resources.displayMetrics.density
+
+        // Point shape indicator
+        val shapeView = object : View(context) {
+            override fun onDraw(canvas: Canvas) {
+                super.onDraw(canvas)
+                val cx = width / 2f; val cy = height / 2f; val r = 3f * density
+                val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = s.color
+                    style = if (s.pointFill == PointFill.FILLED) Paint.Style.FILL else Paint.Style.STROKE
+                    strokeWidth = 1.5f
+                }
+                when (s.pointShape) {
+                    PointShape.CIRCLE -> canvas.drawCircle(cx, cy, r, paint)
+                    PointShape.TRIANGLE -> {
+                        val path = android.graphics.Path()
+                        path.moveTo(cx, cy - r); path.lineTo(cx - r * 0.866f, cy + r * 0.5f)
+                        path.lineTo(cx + r * 0.866f, cy + r * 0.5f); path.close()
+                        canvas.drawPath(path, paint)
+                    }
+                    PointShape.SQUARE -> canvas.drawRect(cx - r, cy - r, cx + r, cy + r, paint)
+                    PointShape.DIAMOND -> {
+                        val path = android.graphics.Path()
+                        path.moveTo(cx, cy - r); path.lineTo(cx + r, cy)
+                        path.lineTo(cx, cy + r); path.lineTo(cx - r, cy); path.close()
+                        canvas.drawPath(path, paint)
+                    }
+                    PointShape.CROSS -> {
+                        canvas.drawLine(cx - r, cy - r, cx + r, cy + r, paint)
+                        canvas.drawLine(cx + r, cy - r, cx - r, cy + r, paint)
+                    }
+                }
+            }
+        }
+        shapeView.layoutParams = LinearLayout.LayoutParams(
+            (14 * density).toInt(), (14 * density).toInt()
+        ).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            setMargins(0, 0, (2 * density).toInt(), 0)
+        }
+
+        // Line segment
         val lineView = LegendLineView(context, s.color, s.lineType)
-        val lp = LinearLayout.LayoutParams(
-            (32 * resources.displayMetrics.density).toInt(),
-            (8 * resources.displayMetrics.density).toInt()
-        )
-        lp.setMargins(0, 0, 4, 0)
-        lp.gravity = Gravity.CENTER_VERTICAL
-        lineView.layoutParams = lp
+        lineView.layoutParams = LinearLayout.LayoutParams(
+            (20 * density).toInt(), (8 * density).toInt()
+        ).apply {
+            setMargins(0, 0, (4 * density).toInt(), 0)
+            gravity = Gravity.CENTER_VERTICAL
+        }
+
+        // Label text
         val tv = TextView(context).apply {
             text = s.label; textSize = 12f
             setTextColor(ContextCompat.getColor(context, R.color.on_surface))
         }
+
         return LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
@@ -485,8 +533,9 @@ class ChartView @JvmOverloads constructor(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            containerLp.setMargins(8, 0, 8, 0)
+            containerLp.setMargins((8 * density).toInt(), 0, (12 * density).toInt(), 0)
             layoutParams = containerLp
+            addView(shapeView)
             addView(lineView)
             addView(tv)
         }

@@ -26,6 +26,11 @@ class ChartCanvas @JvmOverloads constructor(
     private var touchX: Float = -1f
     private var touchY: Float = -1f
     private var hasTouch = false
+    private var persistedCrossX: Float = -1f
+    private var persistedCrossY: Float = -1f
+    private var persistedCrossDate: String = ""
+    private var persistedCrossValue: String = ""
+    private var persistedCrossVisible: Boolean = false
 
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0x33000000
@@ -40,7 +45,7 @@ class ChartCanvas @JvmOverloads constructor(
     }
     private val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val axisTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = 28f; color = 0xFF666666.toInt()
+        textSize = 28f; color = 0xFF666666.toInt(); textAlign = Paint.Align.RIGHT
     }
     private val xAxisTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textSize = 30f; color = 0xFF666666.toInt(); textAlign = Paint.Align.CENTER
@@ -82,8 +87,9 @@ class ChartCanvas @JvmOverloads constructor(
             return dMin + yMaxPct / 100f * range
         }
 
-    private val paddingLeft = 60f
-    private val paddingRight = 20f
+    private val density: Float get() = resources.displayMetrics.density
+    private val paddingLeft = 16f
+    private val paddingRight = 72f
     private val paddingTop = 20f
     private val paddingBottom = 50f
 
@@ -109,24 +115,33 @@ class ChartCanvas @JvmOverloads constructor(
 
     fun clearCrosshair() {
         hasTouch = false
+        persistedCrossVisible = false
         invalidate()
     }
+
+    fun crosshairActive(): Boolean = persistedCrossVisible
 
     private fun updateCrosshair() {
         val chartW = width - paddingLeft - paddingRight
         if (chartW <= 0) return
-        val relLeft = paddingLeft
-        val xFraction = ((touchX - relLeft) / chartW).coerceIn(0f, 1f)
+        val xFraction = ((touchX - paddingLeft) / chartW).coerceIn(0f, 1f)
         val touchTs = windowStartMs + (xFraction * visibleRangeMs).toLong()
         val primarySeries = series.firstOrNull() ?: return
         val entries = ChartMath.toChartEntries(primarySeries.points, windowStartMs)
         if (entries.size < 2) return
         val x = (touchTs - windowStartMs).toFloat().coerceIn(entries.first().x, entries.last().x)
         val y = ChartMath.interpolateY(entries, x, primarySeries.lineStyle)
+
+        persistedCrossX = touchX
+        persistedCrossY = touchY
+        persistedCrossVisible = true
+
         val instant = Instant.ofEpochMilli(touchTs)
         val localDt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         val dateText = localDt.format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))
         val valueText = "%.1f %s".format(y, unitLabel)
+        persistedCrossDate = dateText
+        persistedCrossValue = valueText
         onCrosshairUpdate?.invoke(dateText, valueText)
     }
 
@@ -146,7 +161,7 @@ class ChartCanvas @JvmOverloads constructor(
         val yMax = chartYMax
         val yRange = if (yMax > yMin) yMax - yMin else 1f
 
-        // 1. Grid lines
+        // 1. Grid lines + Y-axis labels on right
         val (niceMin, niceMax) = ChartMath.niceScale(yMin, yMax, 5)
         val niceRange = if (niceMax > niceMin) niceMax - niceMin else 1f
         val step = niceRange / 4f
@@ -154,7 +169,7 @@ class ChartCanvas @JvmOverloads constructor(
             val yVal = niceMin + step * i
             val py = chartB - ((yVal - niceMin) / niceRange) * chartH
             canvas.drawLine(chartL, py, chartR, py, gridPaint)
-            canvas.drawText("%.0f".format(yVal), 4f, py + 8f, axisTextPaint)
+            canvas.drawText("%.0f".format(yVal), w - 4f, py + 8f, axisTextPaint)
         }
 
         // 2. Data series
@@ -165,8 +180,8 @@ class ChartCanvas @JvmOverloads constructor(
         // 3. X axis labels
         drawXAxis(canvas, chartL, chartB, chartR, chartW)
 
-        // 4. Crosshair
-        if (hasTouch && allDataPoints.size >= 2) {
+        // 4. Crosshair (persistent)
+        if (allDataPoints.size >= 2) {
             drawCrosshairOverlay(canvas, chartL, chartT, chartR, chartB, chartW, chartH, yMin, yRange)
         }
     }
@@ -177,9 +192,7 @@ class ChartCanvas @JvmOverloads constructor(
         cw: Float, ch: Float, yMin: Float, yRange: Float
     ) {
         val entries = ChartMath.toChartEntries(s.points, windowStartMs)
-        if (entries.size < 2) return
-        val filtered = entries.filter { it.x >= 0f && it.x <= visibleRangeMs.toFloat() }
-        if (filtered.isEmpty()) return
+        if (entries.isEmpty()) return
 
         val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = s.color
@@ -197,39 +210,47 @@ class ChartCanvas @JvmOverloads constructor(
         fun screenX(xVal: Float) = l + (xVal / visibleRangeMs.toFloat()) * cw
         fun screenY(yVal: Float) = b - ((yVal - yMin) / yRange) * ch
 
-        if (filtered.size == 1) {
-            val px = screenX(filtered[0].x)
-            val py = screenY(filtered[0].y)
-            drawPointShape(canvas, px, py, s.pointShape, s.pointFill, s.color)
-            return
-        }
+        val visibleMin = 0f
+        val visibleMax = visibleRangeMs.toFloat()
+
+        // Find the range of entries to include: one point before and after visible window for edge lines
+        val firstVisibleIdx = entries.indexOfLast { it.x <= visibleMin }.coerceAtLeast(0)
+        val lastVisibleIdx = entries.indexOfFirst { it.x >= visibleMax }.let { if (it == -1) entries.size - 1 else it }
+        val drawEntries = entries.subList(
+            (firstVisibleIdx - 1).coerceAtLeast(0),
+            (lastVisibleIdx + 2).coerceAtMost(entries.size)
+        )
+        if (drawEntries.size < 2) return
+
+        val visibleData = drawEntries.filter { it.x in visibleMin..visibleMax }
+        val hasVisiblePoints = visibleData.isNotEmpty()
 
         val path = Path()
-        val firstPx = screenX(filtered.first().x)
-        path.moveTo(firstPx, screenY(filtered.first().y))
+        val firstPx = screenX(drawEntries.first().x)
+        path.moveTo(firstPx, screenY(drawEntries.first().y))
 
         when (s.lineStyle) {
             LineStyle.LINEAR -> {
-                for (entry in filtered.drop(1)) path.lineTo(screenX(entry.x), screenY(entry.y))
+                for (entry in drawEntries.drop(1)) path.lineTo(screenX(entry.x), screenY(entry.y))
             }
             LineStyle.STEPPED_FRONT -> {
-                for (i in 0 until filtered.size - 1) {
-                    val e0 = filtered[i]; val e1 = filtered[i + 1]
+                for (i in 0 until drawEntries.size - 1) {
+                    val e0 = drawEntries[i]; val e1 = drawEntries[i + 1]
                     path.lineTo(screenX(e1.x), screenY(e0.y))
                     path.lineTo(screenX(e1.x), screenY(e1.y))
                 }
             }
             LineStyle.STEPPED_BACK -> {
-                for (i in 0 until filtered.size - 1) {
-                    val e0 = filtered[i]; val e1 = filtered[i + 1]
+                for (i in 0 until drawEntries.size - 1) {
+                    val e0 = drawEntries[i]; val e1 = drawEntries[i + 1]
                     path.lineTo(screenX(e0.x), screenY(e1.y))
                     path.lineTo(screenX(e1.x), screenY(e1.y))
                 }
             }
             else -> {
                 val samples = 200
-                val minX = filtered.first().x
-                val maxX = filtered.last().x
+                val minX = drawEntries.first().x
+                val maxX = drawEntries.last().x
                 val allEntries = ChartMath.toChartEntries(s.points, windowStartMs)
                 for (k in 1..samples) {
                     val frac = k.toFloat() / samples
@@ -242,13 +263,19 @@ class ChartCanvas @JvmOverloads constructor(
                 }
             }
         }
-        canvas.drawPath(path, linePaint)
 
-        val rds = 5f * resources.displayMetrics.density
-        for (entry in filtered) {
+        // Clip to visible chart area so off-screen line segments don't bleed out
+        canvas.save()
+        canvas.clipRect(l, t, r, b)
+        canvas.drawPath(path, linePaint)
+        canvas.restore()
+
+        // Data point markers (only visible ones)
+        for (entry in drawEntries) {
+            if (entry.x < visibleMin || entry.x > visibleMax) continue
             val px = screenX(entry.x)
             val py = screenY(entry.y)
-            if (px in l..r && py in t..b) {
+            if (py in t..b) {
                 drawPointShape(canvas, px, py, s.pointShape, s.pointFill, s.color)
             }
         }
@@ -260,7 +287,7 @@ class ChartCanvas @JvmOverloads constructor(
             style = if (fill == PointFill.FILLED) Paint.Style.FILL else Paint.Style.STROKE
             strokeWidth = 2f
         }
-        val r = 5f * resources.displayMetrics.density
+        val r = 5f * density
         when (shape) {
             PointShape.CIRCLE -> canvas.drawCircle(cx, cy, r, paint)
             PointShape.TRIANGLE -> {
@@ -316,10 +343,16 @@ class ChartCanvas @JvmOverloads constructor(
         canvas: Canvas, l: Float, t: Float, r: Float, b: Float,
         cw: Float, ch: Float, yMin: Float, yRange: Float
     ) {
+        if (!persistedCrossVisible) return
         val primarySeries = series.firstOrNull() ?: return
         val entries = ChartMath.toChartEntries(primarySeries.points, windowStartMs)
         if (entries.size < 2) return
-        val xFraction = ((touchX - l) / cw).coerceIn(0f, 1f)
+
+        val xFraction = if (hasTouch) {
+            ((touchX - l) / cw).coerceIn(0f, 1f)
+        } else {
+            ((persistedCrossX - l) / cw).coerceIn(0f, 1f)
+        }
         val xVal = xFraction * visibleRangeMs.toFloat()
         val yVal = ChartMath.interpolateY(entries, xVal, primarySeries.lineStyle)
 
@@ -328,7 +361,12 @@ class ChartCanvas @JvmOverloads constructor(
 
         val px = screenX(xVal)
         val py = screenY(yVal)
-        if (px < l || px > r || py < t || py > b) return
+
+        // Don't show if the crossing point is outside chart area
+        if (px < l || px > r || py < t || py > b) {
+            persistedCrossVisible = false
+            return
+        }
 
         canvas.drawLine(px, t, px, b, crosshairLinePaint)
         canvas.drawLine(l, py, r, py, crosshairLinePaint)
@@ -339,6 +377,12 @@ class ChartCanvas @JvmOverloads constructor(
         val localDt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         val dateText = localDt.format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))
         val valueText = "%.1f %s".format(yVal, unitLabel)
+
+        // Update persisted values
+        if (!hasTouch) {
+            persistedCrossDate = dateText; persistedCrossValue = valueText
+        }
+
         drawInfoBubble(canvas, px, py, dateText, valueText, l, t, r, b)
     }
 
@@ -347,7 +391,6 @@ class ChartCanvas @JvmOverloads constructor(
         dateText: String, valueText: String,
         cl: Float, ct: Float, cr: Float, cb: Float
     ) {
-        val density = resources.displayMetrics.density
         val pad = 12f * density
         val tw1 = bubbleTextPaint.measureText(dateText)
         val tw2 = bubbleTextPaint.measureText(valueText)
