@@ -1,12 +1,15 @@
 package com.woshiwangnima.healthdietpro.ui.settings
 
 import android.os.Bundle
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityReminderSettingsBinding
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
+import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class ReminderSettingsActivity : BaseBackActivity() {
@@ -22,49 +25,61 @@ class ReminderSettingsActivity : BaseBackActivity() {
         binding.root.applySystemBarInsets()
         setupToolbar(binding.toolbar)
 
+        applyFontStyles()
+        setupSwitches()
+    }
+
+    private fun applyFontStyles() {
+        applyLabel(binding.drinkReminderRow, FontStyle.SUBTITLE)
+        applyLabel(binding.medReminderRow, FontStyle.SUBTITLE)
+        applyLabel(binding.periodReminderRow, FontStyle.SUBTITLE)
+        applyLabel(binding.fastingReminderRow, FontStyle.SUBTITLE)
+    }
+
+    private fun applyLabel(row: ViewGroup, style: FontStyle) {
+        for (i in 0 until row.childCount) {
+            val child = row.getChildAt(i)
+            if (child is ViewGroup) {
+                for (j in 0 until child.childCount) {
+                    val gc = child.getChildAt(j)
+                    if (gc is TextView && gc.id != ViewGroup.generateViewId()) {
+                        gc.applyFontStyle(style)
+                        return
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupSwitches() {
         initSwitch(binding.drinkReminderSwitch, binding.drinkReminderDetail, binding.drinkReminderArrow,
             { AppPrefs.getReminderDrinkWater(this) },
-            { v -> AppPrefs.setReminderDrinkWater(this, v) },
-            { /* TODO: 喝水提醒详细设置 */ })
-
+            { v -> AppPrefs.setReminderDrinkWater(this, v) })
         initSwitch(binding.medReminderSwitch, binding.medReminderDetail, binding.medReminderArrow,
             { AppPrefs.getReminderMedication(this) },
-            { v -> AppPrefs.setReminderMedication(this, v) },
-            { /* TODO: 服药提醒详细设置 */ })
-
+            { v -> AppPrefs.setReminderMedication(this, v) })
         initSwitch(binding.periodReminderSwitch, binding.periodReminderDetail, binding.periodReminderArrow,
             { AppPrefs.getReminderPeriod(this) },
-            { v -> AppPrefs.setReminderPeriod(this, v) },
-            { /* TODO: 经期提醒详细设置 */ })
-
+            { v -> AppPrefs.setReminderPeriod(this, v) })
         initSwitch(binding.fastingReminderSwitch, binding.fastingReminderDetail, binding.fastingReminderArrow,
             { AppPrefs.getReminderFasting(this) },
-            { v -> AppPrefs.setReminderFasting(this, v) },
-            { /* TODO: 轻断食提醒详细设置 */ })
+            { v -> AppPrefs.setReminderFasting(this, v) })
     }
 
     private fun initSwitch(
-        switch: MaterialSwitch,
-        detail: LinearLayout,
-        arrow: TextView,
-        getter: () -> Boolean,
-        setter: (Boolean) -> Unit,
-        onDetailClick: () -> Unit
+        switch: MaterialSwitch, detail: LinearLayout, arrow: TextView,
+        getter: () -> Boolean, setter: (Boolean) -> Unit
     ) {
         switch.isChecked = getter()
-        updateDetailState(detail, arrow, getter())
-
+        updateDetailState(arrow, getter())
         switch.setOnCheckedChangeListener { _, isChecked ->
             setter(isChecked)
-            updateDetailState(detail, arrow, isChecked)
+            updateDetailState(arrow, isChecked)
         }
-
-        detail.setOnClickListener {
-            if (getter()) onDetailClick()
-        }
+        detail.setOnClickListener { /* TODO */ }
     }
 
-    private fun updateDetailState(detail: LinearLayout, arrow: TextView, enabled: Boolean) {
+    private fun updateDetailState(arrow: TextView, enabled: Boolean) {
         arrow.alpha = if (enabled) 1f else 0.3f
     }
 }

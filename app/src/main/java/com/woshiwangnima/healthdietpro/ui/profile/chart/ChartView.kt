@@ -21,6 +21,8 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
+import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
 
 class ChartView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -167,8 +169,10 @@ class ChartView @JvmOverloads constructor(
         chartCanvas.invalidate()
     }
 
-    fun setChartTitle(title: String) {
+    fun setChartTitle(title: String, gravity: Int = android.view.Gravity.CENTER) {
         chartTitle.text = title
+        chartTitle.gravity = gravity
+        chartTitle.applyFontStyle(com.woshiwangnima.healthdietpro.ui.theme.FontStyle.SUBTITLE)
         chartTitle.visibility = View.VISIBLE
     }
 

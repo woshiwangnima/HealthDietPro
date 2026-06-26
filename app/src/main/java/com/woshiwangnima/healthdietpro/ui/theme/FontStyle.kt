@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.ui.theme
 
 import android.content.Context
 import android.util.TypedValue
+import android.widget.TextView
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 
 enum class FontStyle(val label: String, val cnName: String, val sizeMultiplier: Float) {
@@ -30,3 +31,10 @@ enum class FontStyle(val label: String, val cnName: String, val sizeMultiplier: 
         }
     }
 }
+
+fun TextView.applyFontStyle(style: FontStyle) {
+    textSize = sp(context, style)
+}
+
+private fun sp(context: Context, style: FontStyle): Float = FontStyle.sp(context, style)
+

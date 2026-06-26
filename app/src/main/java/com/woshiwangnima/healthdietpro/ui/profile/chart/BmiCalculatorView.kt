@@ -10,6 +10,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
+import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
 
 class BmiCalculatorView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -26,10 +28,11 @@ class BmiCalculatorView @JvmOverloads constructor(
 
         val title = TextView(context).apply {
             text = "BMI 计算器"
-            textSize = 14f
             setTypeface(typeface, Typeface.BOLD)
             setTextColor(0xFF333333.toInt())
             setPadding(0, 16, 0, 8)
+            gravity = Gravity.START
+            applyFontStyle(FontStyle.SUBTITLE)
         }
         addView(title)
 

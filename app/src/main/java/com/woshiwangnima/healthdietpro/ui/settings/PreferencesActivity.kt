@@ -3,6 +3,7 @@ package com.woshiwangnima.healthdietpro.ui.settings
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
@@ -10,7 +11,8 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityPreferencesBinding
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
+import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
@@ -28,10 +30,67 @@ class PreferencesActivity : BaseBackActivity() {
         setupToolbar(binding.toolbar)
 
         UnitConverter.init(this)
+        applyFontStyles()
         buildUnitRows()
         refreshDisplay()
         setupClickListeners()
         setupFontScaleBar()
+        addSectionDividers()
+    }
+
+    private fun addSectionDividers() {
+        val divider1 = View(this).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1).apply {
+                setMargins(16, 0, 16, 0)
+            }
+            setBackgroundColor(0x33000000)
+        }
+        val divider2 = View(this).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1).apply {
+                setMargins(16, 0, 16, 0)
+            }
+            setBackgroundColor(0x33000000)
+        }
+        val main = binding.root as LinearLayout
+        // Find unitSettingsContainer index and insert divider before/after
+        val unitIdx = main.indexOfChild(binding.unitSettingsContainer)
+        if (unitIdx >= 0) {
+            // Insert divider before 默认单位偏好 section
+            val fontHeaderIdx = unitIdx - 1 // The "默认字体大小" header is just before
+            if (fontHeaderIdx >= 0) main.addView(divider1, fontHeaderIdx)
+            // Insert divider after unit container
+            main.addView(divider2, unitIdx + 2)
+        }
+    }
+
+    private fun applyFontStyles() {
+        // Section headers: find TextViews with specific text
+        findSectionHeader("默认字体大小")?.applyFontStyle(FontStyle.SUBTITLE)
+        findSectionHeader("默认单位偏好")?.applyFontStyle(FontStyle.SUBTITLE)
+
+        binding.firstDayRow?.let { row ->
+            findLabelInRow(row)?.applyFontStyle(FontStyle.BODY)
+        }
+        binding.darkModeRow?.let { row ->
+            findLabelInRow(row)?.applyFontStyle(FontStyle.BODY)
+        }
+    }
+
+    private fun findSectionHeader(text: String): TextView? {
+        val main = binding.root as LinearLayout
+        for (i in 0 until main.childCount) {
+            val child = main.getChildAt(i)
+            if (child is TextView && child.text == text) return child
+        }
+        return null
+    }
+
+    private fun findLabelInRow(row: android.view.ViewGroup): TextView? {
+        for (i in 0 until row.childCount) {
+            val child = row.getChildAt(i)
+            if (child is TextView && child.id != R.id.firstDayValue && child.id != R.id.darkModeValue && child.id != R.id.rowValue) return child
+        }
+        return null
     }
 
     private fun buildUnitRows() {
@@ -44,6 +103,7 @@ class PreferencesActivity : BaseBackActivity() {
             val label = row.findViewById<TextView>(R.id.rowLabel)
             val value = row.findViewById<TextView>(R.id.rowValue)
 
+            label.applyFontStyle(FontStyle.BODY)
             label.text = category.categoryCn
             val currentId = AppPrefs.getUnit(this, category.id, category.baseUnit)
             val currentUnit = category.units.find { it.id == currentId }
