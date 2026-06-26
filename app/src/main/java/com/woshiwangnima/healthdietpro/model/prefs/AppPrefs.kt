@@ -95,4 +95,14 @@ object AppPrefs {
         prefs(context).getInt("tab_bmi_chart", 0)
     fun setBmiChartTab(context: Context, tab: Int) =
         prefs(context).edit().putInt("tab_bmi_chart", tab).apply()
+
+    fun getTextOverflowMode(context: Context): String =
+        prefs(context).getString("pref_text_overflow", "shrink") ?: "shrink"
+    fun setTextOverflowMode(context: Context, mode: String) =
+        prefs(context).edit().putString("pref_text_overflow", mode).apply()
+
+    fun getMarqueeSpeed(context: Context): Int =
+        prefs(context).getInt("pref_marquee_speed", 200)
+    fun setMarqueeSpeed(context: Context, speed: Int) =
+        prefs(context).edit().putInt("pref_marquee_speed", speed).apply()
 }

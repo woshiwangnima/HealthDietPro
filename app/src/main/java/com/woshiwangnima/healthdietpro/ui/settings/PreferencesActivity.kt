@@ -2,7 +2,7 @@ package com.woshiwangnima.healthdietpro.ui.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -31,66 +31,67 @@ class PreferencesActivity : BaseBackActivity() {
 
         UnitConverter.init(this)
         applyFontStyles()
+        buildFontPreviews()
         buildUnitRows()
         refreshDisplay()
         setupClickListeners()
         setupFontScaleBar()
-        addSectionDividers()
-    }
-
-    private fun addSectionDividers() {
-        val divider1 = View(this).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1).apply {
-                setMargins(16, 0, 16, 0)
-            }
-            setBackgroundColor(0x33000000)
-        }
-        val divider2 = View(this).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1).apply {
-                setMargins(16, 0, 16, 0)
-            }
-            setBackgroundColor(0x33000000)
-        }
-        val main = binding.root as LinearLayout
-        // Find unitSettingsContainer index and insert divider before/after
-        val unitIdx = main.indexOfChild(binding.unitSettingsContainer)
-        if (unitIdx >= 0) {
-            // Insert divider before 默认单位偏好 section
-            val fontHeaderIdx = unitIdx - 1 // The "默认字体大小" header is just before
-            if (fontHeaderIdx >= 0) main.addView(divider1, fontHeaderIdx)
-            // Insert divider after unit container
-            main.addView(divider2, unitIdx + 2)
-        }
     }
 
     private fun applyFontStyles() {
-        // Section headers: find TextViews with specific text
-        findSectionHeader("默认字体大小")?.applyFontStyle(FontStyle.SUBTITLE)
-        findSectionHeader("默认单位偏好")?.applyFontStyle(FontStyle.SUBTITLE)
+        binding.fontSizeHeader.applyFontStyle(FontStyle.SUBTITLE)
+        binding.unitHeader.applyFontStyle(FontStyle.SUBTITLE)
+        binding.otherHeader.applyFontStyle(FontStyle.SUBTITLE)
+        binding.fontScaleValue.applyFontStyle(FontStyle.CAPTION)
 
-        binding.firstDayRow?.let { row ->
-            findLabelInRow(row)?.applyFontStyle(FontStyle.BODY)
-        }
-        binding.darkModeRow?.let { row ->
-            findLabelInRow(row)?.applyFontStyle(FontStyle.BODY)
-        }
-    }
-
-    private fun findSectionHeader(text: String): TextView? {
-        val main = binding.root as LinearLayout
-        for (i in 0 until main.childCount) {
-            val child = main.getChildAt(i)
-            if (child is TextView && child.text == text) return child
-        }
-        return null
+        findLabelInRow(binding.firstDayRow)?.applyFontStyle(FontStyle.BODY)
+        findLabelInRow(binding.darkModeRow)?.applyFontStyle(FontStyle.BODY)
+        findLabelInRow(binding.textOverflowRow)?.applyFontStyle(FontStyle.BODY)
+        findLabelInRow(binding.marqueeSpeedRow)?.applyFontStyle(FontStyle.BODY)
     }
 
     private fun findLabelInRow(row: android.view.ViewGroup): TextView? {
         for (i in 0 until row.childCount) {
             val child = row.getChildAt(i)
-            if (child is TextView && child.id != R.id.firstDayValue && child.id != R.id.darkModeValue && child.id != R.id.rowValue) return child
+            if (child is TextView && child.id != R.id.firstDayValue &&
+                child.id != R.id.darkModeValue && child.id != R.id.textOverflowValue &&
+                child.id != R.id.marqueeSpeedValue && child.id != R.id.rowValue
+            ) return child
         }
         return null
+    }
+
+    private fun buildFontPreviews() {
+        val container = binding.fontPreviewContainer
+        container.removeAllViews()
+        val styles = listOf(FontStyle.CAPTION, FontStyle.LABEL, FontStyle.BODY,
+            FontStyle.SUBTITLE, FontStyle.TITLE, FontStyle.HEADLINE, FontStyle.DISPLAY)
+        for (style in styles) {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 4, 0, 4)
+                gravity = android.view.Gravity.CENTER_VERTICAL
+            }
+            val label = TextView(this).apply {
+                text = "${style.cnName}"
+                applyFontStyle(FontStyle.CAPTION)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.2f)
+            }
+            val sizeInfo = TextView(this).apply {
+                text = "%.0fsp".format(FontStyle.sp(this@PreferencesActivity, style))
+                applyFontStyle(FontStyle.CAPTION)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.15f)
+            }
+            val preview = TextView(this).apply {
+                text = "预览ABcd123"
+                applyFontStyle(style)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.65f)
+            }
+            row.addView(label)
+            row.addView(sizeInfo)
+            row.addView(preview)
+            container.addView(row)
+        }
     }
 
     private fun buildUnitRows() {
@@ -111,7 +112,9 @@ class PreferencesActivity : BaseBackActivity() {
 
             row.setOnClickListener {
                 val items = category.units.map { "${it.symbolCn}  ${it.symbolEn}" }.toTypedArray()
-                val checkedIndex = category.units.indexOfFirst { u -> u.id == AppPrefs.getUnit(this@PreferencesActivity, category.id, category.baseUnit) }.coerceAtLeast(0)
+                val checkedIndex = category.units.indexOfFirst { u ->
+                    u.id == AppPrefs.getUnit(this@PreferencesActivity, category.id, category.baseUnit)
+                }.coerceAtLeast(0)
                 showPicker(category.categoryCn, items, checkedIndex) { which ->
                     AppPrefs.setUnit(this@PreferencesActivity, category.id, category.units[which].id)
                     buildUnitRows()
@@ -129,6 +132,14 @@ class PreferencesActivity : BaseBackActivity() {
             "YES" -> "深色模式"
             else -> "浅色模式"
         }
+        refreshOverflowDisplay()
+    }
+
+    private fun refreshOverflowDisplay() {
+        val mode = AppPrefs.getTextOverflowMode(this)
+        binding.textOverflowValue.text = if (mode == "marquee") "左右轮播" else "自适应缩小"
+        binding.marqueeSpeedRow.visibility = if (mode == "marquee") android.view.View.VISIBLE else android.view.View.GONE
+        binding.marqueeSpeedValue.text = "${AppPrefs.getMarqueeSpeed(this)}"
     }
 
     private fun setupClickListeners() {
@@ -149,13 +160,39 @@ class PreferencesActivity : BaseBackActivity() {
             showPicker("深色模式", items, checkedIndex) { which ->
                 AppPrefs.setDarkMode(this, modes[which])
                 refreshDisplay()
-                val nightMode = when (modes[which]) {
+                AppCompatDelegate.setDefaultNightMode(when (modes[which]) {
                     "YES" -> AppCompatDelegate.MODE_NIGHT_YES
                     "NO" -> AppCompatDelegate.MODE_NIGHT_NO
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                }
-                AppCompatDelegate.setDefaultNightMode(nightMode)
+                })
             }
+        }
+
+        binding.textOverflowRow.setOnClickListener {
+            val items = arrayOf("自适应缩小", "左右轮播")
+            val modes = arrayOf("shrink", "marquee")
+            val checkedIndex = modes.indexOf(AppPrefs.getTextOverflowMode(this)).coerceAtLeast(0)
+            showPicker("文字溢出处理", items, checkedIndex) { which ->
+                AppPrefs.setTextOverflowMode(this, modes[which])
+                refreshOverflowDisplay()
+            }
+        }
+
+        binding.marqueeSpeedRow.setOnClickListener {
+            val input = EditText(this).apply {
+                setText("${AppPrefs.getMarqueeSpeed(this@PreferencesActivity)}")
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            }
+            AlertDialog.Builder(this)
+                .setTitle("轮播速度 (ms/字)")
+                .setView(input)
+                .setPositiveButton("确定") { _, _ ->
+                    val speed = input.text.toString().toIntOrNull()?.coerceIn(50, 2000) ?: 200
+                    AppPrefs.setMarqueeSpeed(this@PreferencesActivity, speed)
+                    refreshOverflowDisplay()
+                }
+                .setNegativeButton("取消", null)
+                .show()
         }
     }
 
@@ -175,6 +212,8 @@ class PreferencesActivity : BaseBackActivity() {
                 val p = seekBar?.progress ?: 22
                 val scale = 0.8f + p / 70f * 0.7f
                 AppPrefs.setFontScale(this@PreferencesActivity, scale)
+                buildFontPreviews()
+                applyFontStyles()
             }
         })
     }
