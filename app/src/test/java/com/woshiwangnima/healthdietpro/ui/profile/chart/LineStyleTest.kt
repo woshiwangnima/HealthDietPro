@@ -6,12 +6,14 @@ import org.junit.Test
 class LineStyleTest {
 
     @Test
-    fun fromSpinnerPosition_mapsAllFiveSlots() {
+    fun fromSpinnerPosition_mapsAllSlots() {
         assertEquals(LineStyle.LINEAR, LineStyle.fromSpinnerPosition(0))
         assertEquals(LineStyle.BEZIER, LineStyle.fromSpinnerPosition(1))
         assertEquals(LineStyle.SPLINE, LineStyle.fromSpinnerPosition(2))
-        assertEquals(LineStyle.STEPPED_FRONT, LineStyle.fromSpinnerPosition(3))
-        assertEquals(LineStyle.STEPPED_BACK, LineStyle.fromSpinnerPosition(4))
+        assertEquals(LineStyle.CATMULL_ROM, LineStyle.fromSpinnerPosition(3))
+        assertEquals(LineStyle.MONOTONE, LineStyle.fromSpinnerPosition(4))
+        assertEquals(LineStyle.STEPPED_FRONT, LineStyle.fromSpinnerPosition(5))
+        assertEquals(LineStyle.STEPPED_BACK, LineStyle.fromSpinnerPosition(6))
     }
 
     @Test

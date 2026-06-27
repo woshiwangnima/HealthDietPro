@@ -5,6 +5,7 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
+import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
@@ -19,6 +20,7 @@ class WeightChartActivity : BaseBackActivity() {
         super.onCreate(savedInstanceState)
         val chartView = ChartView(this)
         chartView.applySystemBarInsets()
+        chartView.setChartStateKey(ProfilePrefs.makeChartStateKey(this, "weight_chart"))
         setContentView(chartView)
 
         @Suppress("UNCHECKED_CAST")

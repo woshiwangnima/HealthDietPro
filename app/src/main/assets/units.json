@@ -62,7 +62,9 @@
       { "id": "d",    "symbolCn": "天(日)",          "symbolEn": "d",   "toBase": 86400 },
       { "id": "week", "symbolCn": "周(星期)",       "symbolEn": "wk",  "toBase": 604800 },
       { "id": "xun",  "symbolCn": "旬(10天)",       "symbolEn": "xun", "toBase": 864000 },
-      { "id": "month","symbolCn": "月(月份)",       "symbolEn": "mo",  "toBase": 2592000 }
+      { "id": "month", "symbolCn": "月(月份)",       "symbolEn": "mo",   "toBase": 2592000 },
+      { "id": "quarter","symbolCn":"季(季度)",        "symbolEn": "qtr",  "toBase": 7776000 },
+      { "id": "year",   "symbolCn": "年",             "symbolEn": "yr",   "toBase": 31536000 }
     ]
   },
   {

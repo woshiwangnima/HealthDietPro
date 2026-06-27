@@ -12,10 +12,10 @@ object BmiUtil {
 
     fun loadBmiBands(): List<BmiBand> {
         return listOf(
-            BmiBand(-1f, 18.5f, "体重过低", Color.parseColor("#4D9E9E9E")),
-            BmiBand(18.5f, 24f, "体重正常", Color.parseColor("#4D4CAF50")),
-            BmiBand(24f, 28f, "超重", Color.parseColor("#4DFFEB3B")),
-            BmiBand(28f, Float.MAX_VALUE, "肥胖", Color.parseColor("#4DFF5722"))
+            BmiBand(-1f, 18.5f, "体重过低", Color.parseColor("#269E9E9E")),
+            BmiBand(18.5f, 24f, "体重正常", Color.parseColor("#264CAF50")),
+            BmiBand(24f, 28f, "超重", Color.parseColor("#26FFEB3B")),
+            BmiBand(28f, Float.MAX_VALUE, "肥胖", Color.parseColor("#26FF5722"))
         )
     }
 

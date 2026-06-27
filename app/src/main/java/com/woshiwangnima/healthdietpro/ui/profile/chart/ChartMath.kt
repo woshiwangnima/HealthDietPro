@@ -57,6 +57,71 @@ object ChartMath {
         return ti * ti * ti * p0.y + 3f * ti * ti * t * cp1y + 3f * ti * t * t * cp2y + t * t * t * p3.y
     }
 
+    fun interpolateCatmullRom(entries: List<ChartEntry>, x: Float): Float {
+        val n = entries.size
+        if (n < 2) return entries.firstOrNull()?.y ?: 0f
+        val i = findSegmentIndex(entries, x)
+        if (i < 0 || i + 1 >= n) return interpolateLinear(entries, x)
+
+        val p0 = if (i > 0) entries[i - 1] else entries[i]
+        val p1 = entries[i]
+        val p2 = entries[i + 1]
+        val p3 = if (i + 2 < n) entries[i + 2] else entries[i + 1]
+
+        val span = p2.x - p1.x
+        val t = if (span == 0f) 0f else ((x - p1.x) / span).coerceIn(0f, 1f)
+        val t2 = t * t
+        val t3 = t2 * t
+        return 0.5f * (
+            (2f * p1.y) +
+            (-p0.y + p2.y) * t +
+            (2f * p0.y - 5f * p1.y + 4f * p2.y - p3.y) * t2 +
+            (-p0.y + 3f * p1.y - 3f * p2.y + p3.y) * t3
+        )
+    }
+
+    fun interpolateMonotone(entries: List<ChartEntry>, x: Float): Float {
+        val n = entries.size
+        if (n < 2) return entries.firstOrNull()?.y ?: 0f
+        val i = findSegmentIndex(entries, x)
+        if (i < 0 || i + 1 >= n) return interpolateLinear(entries, x)
+
+        val d = FloatArray(n - 1)
+        for (k in 0 until n - 1) {
+            val dx = entries[k + 1].x - entries[k].x
+            d[k] = if (dx == 0f) 0f else (entries[k + 1].y - entries[k].y) / dx
+        }
+
+        val m = FloatArray(n)
+        for (k in 1 until n - 1) {
+            val dk = d[k - 1]
+            val dk1 = d[k]
+            if (dk * dk1 <= 0f) {
+                m[k] = 0f
+            } else {
+                val h0 = entries[k].x - entries[k - 1].x
+                val h1 = entries[k + 1].x - entries[k].x
+                val w1 = 2f * h1 + h0
+                val w2 = h1 + 2f * h0
+                val raw = (w1 + w2) / (w1 / dk + w2 / dk1)
+                m[k] = min(abs(raw), 3f * min(abs(dk), abs(dk1))) * sign(raw)
+            }
+        }
+        m[0] = d[0]
+        m[n - 1] = d[n - 2]
+
+        val h = entries[i + 1].x - entries[i].x
+        if (h == 0f) return entries[i].y
+        val t = ((x - entries[i].x) / h).coerceIn(0f, 1f)
+        val t2 = t * t
+        val t3 = t2 * t
+        val h00 = 2f * t3 - 3f * t2 + 1f
+        val h10 = (t3 - 2f * t2 + t) * h
+        val h01 = -2f * t3 + 3f * t2
+        val h11 = (t3 - t2) * h
+        return h00 * entries[i].y + h10 * m[i] + h01 * entries[i + 1].y + h11 * m[i + 1]
+    }
+
     fun interpolateSpline(entries: List<ChartEntry>, x: Float): Float {
         val i = findSegmentIndex(entries, x)
         if (i < 0 || i + 1 >= entries.size) return interpolateLinear(entries, x)
@@ -107,6 +172,8 @@ object ChartMath {
         LineStyle.LINEAR -> interpolateLinear(entries, x)
         LineStyle.BEZIER -> interpolateBezier(entries, x)
         LineStyle.SPLINE -> interpolateSpline(entries, x)
+        LineStyle.CATMULL_ROM -> interpolateCatmullRom(entries, x)
+        LineStyle.MONOTONE -> interpolateMonotone(entries, x)
         LineStyle.STEPPED_FRONT -> interpolateSteppedFront(entries, x)
         LineStyle.STEPPED_BACK -> interpolateSteppedBack(entries, x)
     }

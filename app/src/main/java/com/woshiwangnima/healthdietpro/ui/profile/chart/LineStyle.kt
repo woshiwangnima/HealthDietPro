@@ -4,6 +4,8 @@ enum class LineStyle {
     LINEAR,
     BEZIER,
     SPLINE,
+    CATMULL_ROM,
+    MONOTONE,
     STEPPED_FRONT,
     STEPPED_BACK;
 
@@ -12,8 +14,10 @@ enum class LineStyle {
             0 -> LINEAR
             1 -> BEZIER
             2 -> SPLINE
-            3 -> STEPPED_FRONT
-            4 -> STEPPED_BACK
+            3 -> CATMULL_ROM
+            4 -> MONOTONE
+            5 -> STEPPED_FRONT
+            6 -> STEPPED_BACK
             else -> LINEAR
         }
 
@@ -21,8 +25,10 @@ enum class LineStyle {
             LINEAR -> 0
             BEZIER -> 1
             SPLINE -> 2
-            STEPPED_FRONT -> 3
-            STEPPED_BACK -> 4
+            CATMULL_ROM -> 3
+            MONOTONE -> 4
+            STEPPED_FRONT -> 5
+            STEPPED_BACK -> 6
         }
     }
 }

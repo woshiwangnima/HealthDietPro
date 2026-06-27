@@ -2,38 +2,138 @@ package com.woshiwangnima.healthdietpro.model.profile
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import java.io.File
 
 object ProfilePrefs {
-    private const val KEY_PROFILE = "user_profile"
     private const val PREFS_NAME = "health_diet_prefs"
+    private const val KEY_LEGACY_PROFILE = "user_profile"
+    private const val KEY_ALL_USERS = "all_users"
+    private const val KEY_CURRENT_USER_ID = "current_user_id"
+
+    private fun prefs(context: Context) =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    private fun ensureMigrated(context: Context) {
+        val p = prefs(context)
+        if (p.contains(KEY_ALL_USERS)) return
+        val legacyJson = p.getString(KEY_LEGACY_PROFILE, null) ?: return
+        try {
+            val legacy: UserProfile = Gson().fromJson(legacyJson, UserProfile::class.java)
+            val migrated = legacy.copy(id = "default")
+            saveUserMap(context, listOf(migrated))
+            setCurrentUserId(context, "default")
+            p.edit().remove(KEY_LEGACY_PROFILE).apply()
+        } catch (_: Exception) {}
+    }
+
+    private fun loadUserMap(context: Context): List<UserProfile> {
+        ensureMigrated(context)
+        val json = prefs(context).getString(KEY_ALL_USERS, null) ?: return emptyList()
+        return try {
+            val type = object : TypeToken<List<UserProfile>>() {}.type
+            Gson().fromJson(json, type) ?: emptyList()
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    private fun saveUserMap(context: Context, users: List<UserProfile>) {
+        prefs(context).edit().putString(KEY_ALL_USERS, Gson().toJson(users)).apply()
+    }
+
+    fun getAllUsers(context: Context): List<UserProfile> = loadUserMap(context)
+
+    fun getCurrentUserId(context: Context): String {
+        ensureMigrated(context)
+        val id = prefs(context).getString(KEY_CURRENT_USER_ID, null)
+        if (!id.isNullOrEmpty()) return id
+        val users = loadUserMap(context)
+        if (users.isNotEmpty()) {
+            setCurrentUserId(context, users.first().id)
+            return users.first().id
+        }
+        return ""
+    }
+
+    fun makeChartStateKey(context: Context, baseKey: String): String {
+        val uid = getCurrentUserId(context)
+        return if (uid.isNotEmpty()) "${baseKey}_${uid}" else baseKey
+    }
+
+    fun setCurrentUserId(context: Context, id: String) {
+        prefs(context).edit().putString(KEY_CURRENT_USER_ID, id).apply()
+    }
+
+    fun getProfile(context: Context, userId: String): UserProfile? {
+        return loadUserMap(context).find { it.id == userId }
+    }
 
     fun save(context: Context, profile: UserProfile) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_PROFILE, Gson().toJson(profile)).apply()
+        val withId = if (profile.id.isEmpty()) profile.copy(id = genId()) else profile
+        val users = loadUserMap(context).toMutableList()
+        val idx = users.indexOfFirst { it.id == withId.id }
+        if (idx >= 0) users[idx] = withId else users.add(withId)
+        saveUserMap(context, users)
+        setCurrentUserId(context, withId.id)
     }
 
     fun load(context: Context): UserProfile {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val json = prefs.getString(KEY_PROFILE, null)
-        val savedProfile = if (json != null) {
-            try {
-                Gson().fromJson(json, UserProfile::class.java)
-            } catch (_: Exception) {
-                null
-            }
-        } else null
+        val current = getProfile(context, getCurrentUserId(context))
         val seed = createSeedProfile()
         return UserProfile(
-            name = savedProfile?.name ?: seed.name,
-            gender = savedProfile?.gender ?: seed.gender,
-            birthday = savedProfile?.birthday ?: seed.birthday,
-            province = savedProfile?.province ?: seed.province,
-            diseaseIds = savedProfile?.diseaseIds ?: seed.diseaseIds,
-            heightRecords = joinRecords(savedProfile?.heightRecords.orEmpty(), seed.heightRecords, false),
-            weightRecords = joinRecords(savedProfile?.weightRecords.orEmpty(), seed.weightRecords, true)
+            id = current?.id ?: "",
+            name = current?.name ?: seed.name,
+            gender = current?.gender ?: seed.gender,
+            birthday = current?.birthday ?: seed.birthday,
+            province = current?.province ?: seed.province,
+            diseaseIds = current?.diseaseIds ?: seed.diseaseIds,
+            heightRecords = joinRecords(current?.heightRecords.orEmpty(), seed.heightRecords, false),
+            weightRecords = joinRecords(current?.weightRecords.orEmpty(), seed.weightRecords, true)
         )
     }
+
+    fun deleteUser(context: Context, id: String) {
+        // Clean up per-user data before removing from list
+        val user = getProfile(context, id)
+        val users = loadUserMap(context).filter { it.id != id }
+        saveUserMap(context, users)
+        if (getCurrentUserId(context) == id) {
+            val next = users.firstOrNull()
+            setCurrentUserId(context, next?.id ?: "")
+        }
+        if (user != null) {
+            cleanupPerUserData(context, user)
+        }
+    }
+
+    fun cleanupPerUserData(context: Context, user: UserProfile) {
+        // Delete avatar file
+        if (user.avatarFileName.isNotEmpty()) {
+            File(context.filesDir, "avatars/${user.avatarFileName}").delete()
+        }
+        // Delete per-user chart preferences (keys ending with _${userId})
+        val appPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val editor = appPrefs.edit()
+        val suffix = "_${user.id}"
+        for (key in appPrefs.all.keys) {
+            if (key.endsWith(suffix)) {
+                editor.remove(key)
+            }
+        }
+        editor.apply()
+    }
+
+    fun createDefaultIfEmpty(context: Context): UserProfile {
+        val users = loadUserMap(context)
+        if (users.isNotEmpty()) return users.first()
+        val profile = load(context).copy(id = genId())
+        save(context, profile)
+        return profile
+    }
+
+    private fun genId(): String = (System.currentTimeMillis() xor Math.random().toLong().and(0xFFFF)).toString()
 
     private fun joinRecords(saved: List<BodyRecord>, seed: List<BodyRecord>, isWeight: Boolean): List<BodyRecord> {
         val fixedSaved = saved.map { fixUnit(it, isWeight) }
@@ -83,5 +183,4 @@ object ProfilePrefs {
             heightRecords = heightRecords.sortedBy { it.date }
         )
     }
-
 }

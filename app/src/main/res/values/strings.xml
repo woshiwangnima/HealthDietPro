@@ -8,4 +8,6 @@
     <string name="tab_record_title">记录</string>
     <string name="tab_profile_title">我的</string>
     <string name="no_record">暂无数据</string>
+    <string name="chart_time_range_all">全部</string>
+    <string name="chart_interval_auto">自动</string>
 </resources>

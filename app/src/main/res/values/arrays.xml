@@ -4,6 +4,8 @@
         <item>折线图</item>
         <item>贝塞尔曲线</item>
         <item>自然样条曲线</item>
+        <item>Catmull-Rom曲线</item>
+        <item>单调平滑曲线</item>
         <item>前置阶梯线</item>
         <item>后置阶梯线</item>
     </string-array>

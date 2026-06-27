@@ -20,7 +20,9 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.model.chart.ChartTimeConfigRepository
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.model.unit.UnitRepository
 import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
 import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
 
@@ -61,11 +63,24 @@ class ChartView @JvmOverloads constructor(
     private val timelineHideRunnable = Runnable { hideTimeline() }
     private val timelineShowDurationMs = 4000L
 
+    private val timeConfigRepo: ChartTimeConfigRepository by lazy {
+        ChartTimeConfigRepository(context, UnitRepository(context))
+    }
+
+    var gridLineStyles: List<LineType> = listOf(LineType.DOTTED)
+        set(value) {
+            field = value
+            chartCanvas.gridLineStyles = value
+        }
+
     init {
         orientation = VERTICAL
         LayoutInflater.from(context).inflate(R.layout.view_chart, this, true)
 
         chartCanvas = findViewById(R.id.chartCanvas)
+        chartCanvas.autoIntervalResolver = { rangeMs -> timeConfigRepo.computeAutoIntervalMs(rangeMs) }
+        chartCanvas.dateFormatResolver = { ms -> timeConfigRepo.getFormatForIntervalMs(ms) }
+        chartCanvas.gridLineStyles = gridLineStyles
         chartTypeSpinner = findViewById(R.id.chartTypeSpinner)
         timeRangeSpinner = findViewById(R.id.timeRangeSpinner)
         btnFullscreen = findViewById(R.id.btnFullscreen)
@@ -116,6 +131,7 @@ class ChartView @JvmOverloads constructor(
             chartCanvas.windowStartMs = allPoints.minOf { it.timestamp }
         }
         rebuildTimeRangeSpinner()
+        rebuildLabelIntervalSpinner()
         restoreChartState()
         applyYAxisRange()
         updateDragIndicator()
@@ -138,6 +154,7 @@ class ChartView @JvmOverloads constructor(
         val latestTs = allPoints.maxOf { it.timestamp }
         chartCanvas.visibleRangeMs = millis
         chartCanvas.windowStartMs = (latestTs - millis).coerceAtLeast(allPoints.minOf { it.timestamp })
+        rebuildLabelIntervalSpinner()
         chartCanvas.invalidate()
         updateDragIndicator()
         updateDragArrows()
@@ -204,6 +221,7 @@ class ChartView @JvmOverloads constructor(
     private var chartStateKey: String = ""
     private var timeRangeOptions: List<TimeRangeOption> = emptyList()
     private var labelIntervalValues: MutableList<Long>? = mutableListOf(0L)
+    private var restoringState = false
 
     fun setChartStateKey(key: String) {
         chartStateKey = key
@@ -212,6 +230,8 @@ class ChartView @JvmOverloads constructor(
     private fun restoreChartState() {
         if (chartStateKey.isEmpty()) return
         val ctx = context
+        restoringState = true
+        try {
 
         // Chart style spinner
         val stylePos = AppPrefs.getChartStyle(ctx, chartStateKey)
@@ -227,17 +247,23 @@ class ChartView @JvmOverloads constructor(
         val liVals = labelIntervalValues
         if (liVals != null) {
             val liIdx = liVals.indexOfFirst { it == savedInterval }
-            if (liIdx >= 0) labelIntervalSpinner.setSelection(liIdx)
+            if (liIdx >= 0) {
+                labelIntervalSpinner.setSelection(liIdx)
+                chartCanvas.labelIntervalMs = savedInterval
+            }
         }
-        if (savedInterval > 0L) chartCanvas.labelIntervalMs = savedInterval
 
         val yMin = AppPrefs.getChartYMin(ctx, chartStateKey)
         val yMax = AppPrefs.getChartYMax(ctx, chartStateKey)
         setYAxisRange(yMin, yMax)
+
+        } finally {
+            restoringState = false
+        }
     }
 
     private fun saveChartState() {
-        if (chartStateKey.isEmpty()) return
+        if (chartStateKey.isEmpty() || restoringState) return
         val ctx = context
         AppPrefs.setChartStyle(ctx, chartStateKey, chartTypeSpinner.selectedItemPosition)
         // Save the selected option's millis, not the actual visibleRangeMs (for "全部" use Long.MAX_VALUE)
@@ -273,15 +299,14 @@ class ChartView @JvmOverloads constructor(
 
     private fun getTimeRangeOptions(): List<TimeRangeOption> {
         val allPoints = seriesList.flatMap { it.points }
-        val allOptions = listOf(
-            TimeRangeOption("全部", Long.MAX_VALUE),
-            TimeRangeOption("1天", 24 * 60 * 60 * 1000L),
-            TimeRangeOption("1周", 7 * 24 * 60 * 60 * 1000L),
-            TimeRangeOption("1个月", 30 * 24 * 60 * 60 * 1000L),
-            TimeRangeOption("3个月", 90 * 24 * 60 * 60 * 1000L),
-            TimeRangeOption("6个月", 180 * 24 * 60 * 60 * 1000L),
-            TimeRangeOption("1年", 365 * 24 * 60 * 60 * 1000L)
-        )
+        val repo = timeConfigRepo
+        val allOptions = repo.load().timeRangeOptions.map { def ->
+            if (def.id == "all") {
+                TimeRangeOption(repo.getDisplayName(def), Long.MAX_VALUE)
+            } else {
+                TimeRangeOption(repo.getDisplayName(def), repo.resolveMs(def.quantity) ?: Long.MAX_VALUE)
+            }
+        }
         if (allPoints.isEmpty()) return allOptions.take(1)
         val totalSpan = allPoints.maxOf { it.timestamp } - allPoints.minOf { it.timestamp }
         val minInterval = if (allPoints.size >= 2) {
@@ -294,7 +319,10 @@ class ChartView @JvmOverloads constructor(
             .minByOrNull { it.millis }
         val result = withinSpan.toMutableList()
         if (nextAbove != null && nextAbove !in result) result.add(nextAbove)
-        result.add(TimeRangeOption("全部", Long.MAX_VALUE))
+        val allDef = repo.load().timeRangeOptions.find { it.id == "all" }
+        if (allDef != null) {
+            result.add(TimeRangeOption(repo.getDisplayName(allDef), Long.MAX_VALUE))
+        }
         timeRangeOptions = result
         return result
     }
@@ -324,6 +352,7 @@ class ChartView @JvmOverloads constructor(
                 chartCanvas.invalidate()
                 saveChartState()
                 updateDragIndicator()
+                rebuildLabelIntervalSpinner()
                 showTimeline()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -337,31 +366,6 @@ class ChartView @JvmOverloads constructor(
     }
 
     private fun initLabelIntervalSpinner() {
-        val baseOpts = listOf(
-            "自动" to 0L,
-            "1分钟" to 60_000L,
-            "5分钟" to 5 * 60_000L,
-            "30分钟" to 30 * 60_000L,
-            "1小时" to 3_600_000L,
-            "2小时" to 2 * 3_600_000L,
-            "6小时" to 6 * 3_600_000L,
-            "1天" to 86_400_000L,
-            "3天" to 3 * 86_400_000L,
-            "1周" to 7 * 86_400_000L,
-            "1月" to 30 * 86_400_000L
-        )
-        val filtered = baseOpts.filter { it.second == 0L || it.second * 2 <= chartCanvas.visibleRangeMs } + baseOpts.filter { it.second >= chartCanvas.visibleRangeMs }.take(1)
-        val liVals = mutableListOf<Long>()
-        labelIntervalValues = liVals
-        val labels = mutableListOf<String>()
-        for ((label, millis) in filtered.distinctBy { it.second }) {
-            labels.add(label)
-            liVals.add(millis)
-        }
-        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, labels)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        labelIntervalSpinner.adapter = adapter
-        labelIntervalSpinner.setSelection(0)
         labelIntervalSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val vals = labelIntervalValues ?: return
@@ -371,6 +375,25 @@ class ChartView @JvmOverloads constructor(
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+        rebuildLabelIntervalSpinner()
+    }
+
+    private fun rebuildLabelIntervalSpinner() {
+        val repo = timeConfigRepo
+        val filteredDefs = repo.getAvailableIntervalOptions(chartCanvas.visibleRangeMs)
+        val liVals = mutableListOf<Long>()
+        val labels = mutableListOf<String>()
+        for (def in filteredDefs) {
+            labels.add(repo.getDisplayName(def))
+            liVals.add(repo.resolveMs(def.quantity))
+        }
+        val prevInterval = chartCanvas.labelIntervalMs
+        labelIntervalValues = liVals
+        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, labels)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        labelIntervalSpinner.adapter = adapter
+        val restoreIdx = liVals.indexOfFirst { it == prevInterval }
+        labelIntervalSpinner.setSelection(if (restoreIdx >= 0) restoreIdx else 0)
     }
 
     private fun initFullscreenButtons() {

@@ -1,0 +1,67 @@
+{
+  "timeRangeOptions": [
+    { "id": "all", "quantity": null },
+    { "id": "1d",  "quantity": { "value": 1, "unit": "d" } },
+    { "id": "1w",  "quantity": { "value": 1, "unit": "week" } },
+    { "id": "1m",  "quantity": { "value": 1, "unit": "month" } },
+    { "id": "3m",  "quantity": { "value": 3, "unit": "month" } },
+    { "id": "6m",  "quantity": { "value": 6, "unit": "month" } },
+    { "id": "1y",  "quantity": { "value": 1, "unit": "year" } }
+  ],
+  "intervalOptions": [
+    { "id": "auto",  "quantity": null,                        "format": null },
+    { "id": "1min",  "quantity": { "value": 1,  "unit": "min" },   "format": "mm:ss" },
+    { "id": "5min",  "quantity": { "value": 5,  "unit": "min" },   "format": "mm:ss" },
+    { "id": "10min", "quantity": { "value": 10, "unit": "min" },   "format": "mm:ss" },
+    { "id": "15min", "quantity": { "value": 15, "unit": "min" },   "format": "HH:mm" },
+    { "id": "30min", "quantity": { "value": 30, "unit": "min" },   "format": "HH:mm" },
+    { "id": "1h",    "quantity": { "value": 1,  "unit": "h" },     "format": "HH:mm" },
+    { "id": "2h",    "quantity": { "value": 2,  "unit": "h" },     "format": "MM-dd HH:mm" },
+    { "id": "6h",    "quantity": { "value": 6,  "unit": "h" },     "format": "MM-dd HH:mm" },
+    { "id": "12h",   "quantity": { "value": 12, "unit": "h" },     "format": "MM-dd HH:mm" },
+    { "id": "1d",    "quantity": { "value": 1,  "unit": "d" },     "format": "MM-dd" },
+    { "id": "2d",    "quantity": { "value": 2,  "unit": "d" },     "format": "MM-dd" },
+    { "id": "3d",    "quantity": { "value": 3,  "unit": "d" },     "format": "MM-dd" },
+    { "id": "1w",    "quantity": { "value": 1,  "unit": "week" },  "format": "MM-dd" },
+    { "id": "1m",    "quantity": { "value": 1,  "unit": "month" }, "format": "MM-dd" },
+    { "id": "3m",    "quantity": { "value": 3,  "unit": "month" }, "format": "MM-dd" },
+    { "id": "1y",    "quantity": { "value": 1, "unit": "year" },    "format": "yyyy-MM" }
+  ],
+  "autoIntervalRules": [
+    {
+      "maxVisible": { "value": 1, "unit": "h" },
+      "autoIntervalId": "5min",
+      "availableIntervalIds": ["auto", "1min", "5min", "10min", "15min"]
+    },
+    {
+      "maxVisible": { "value": 6, "unit": "h" },
+      "autoIntervalId": "30min",
+      "availableIntervalIds": ["auto", "1min", "5min", "10min", "15min", "30min", "1h"]
+    },
+    {
+      "maxVisible": { "value": 1, "unit": "d" },
+      "autoIntervalId": "2h",
+      "availableIntervalIds": ["auto", "5min", "10min", "15min", "30min", "1h", "2h", "6h", "12h"]
+    },
+    {
+      "maxVisible": { "value": 1, "unit": "week" },
+      "autoIntervalId": "1d",
+      "availableIntervalIds": ["auto", "1h", "2h", "6h", "12h", "1d", "2d"]
+    },
+    {
+      "maxVisible": { "value": 1, "unit": "month" },
+      "autoIntervalId": "3d",
+      "availableIntervalIds": ["auto", "6h", "12h", "1d", "2d", "3d", "1w"]
+    },
+    {
+      "maxVisible": { "value": 6, "unit": "month" },
+      "autoIntervalId": "1w",
+      "availableIntervalIds": ["auto", "1d", "2d", "3d", "1w", "1m"]
+    },
+    {
+      "maxVisible": { "value": 1, "unit": "year" },
+      "autoIntervalId": "1m",
+      "availableIntervalIds": ["auto", "2d", "3d", "1w", "1m", "3m", "1y"]
+    }
+  ]
+}

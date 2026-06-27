@@ -1,19 +1,34 @@
 package com.woshiwangnima.healthdietpro.ui.profile
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
 import com.woshiwangnima.healthdietpro.databinding.FragmentProfileBinding
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import com.woshiwangnima.healthdietpro.model.profile.UserProfile
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsActivity
 import com.woshiwangnima.healthdietpro.util.UnitConverter
+import java.io.File
+import kotlin.math.abs
 
 class ProfileFragment : Fragment() {
 
@@ -23,19 +38,21 @@ class ProfileFragment : Fragment() {
     private lateinit var editLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
     private lateinit var settingsLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
 
+    private val avatarColors = intArrayOf(
+        0xFF1976D2.toInt(), 0xFF388E3C.toInt(), 0xFFF57C00.toInt(),
+        0xFF7B1FA2.toInt(), 0xFFC2185B.toInt(), 0xFF0097A7.toInt(),
+        0xFF689F38.toInt(), 0xFF455A64.toInt()
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         UnitConverter.init(requireContext())
         editLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
-        ) {
-            refreshProfile()
-        }
+        ) { refreshProfile() }
         settingsLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
-        ) {
-            refreshProfile()
-        }
+        ) { refreshProfile() }
     }
 
     override fun onCreateView(
@@ -61,37 +78,228 @@ class ProfileFragment : Fragment() {
             editLauncher.launch(intent)
         }
 
+        binding.switchUserBtn.setOnClickListener {
+            showUserSwitchSheet()
+        }
+
         refreshProfile()
     }
 
     private fun refreshProfile() {
-        val profile = ProfilePrefs.load(requireContext())
-        binding.profileName.text = profile.name.ifEmpty { "未设置" }
-        val genderStr = if (profile.gender.name == "MALE") "男" else "女"
-        val birthdayStr = profile.birthday?.date ?: "未设置"
-        binding.profileGender.text = "$genderStr | $birthdayStr"
+        val ctx = requireContext()
+        val profile = ProfilePrefs.load(ctx)
+        val displayName = profile.name.ifEmpty { "未设置" }
+        binding.profileName.text = displayName
+
+        val initial = displayName.first().toString()
+        val colorIdx = abs(profile.id.hashCode()) % avatarColors.size
+
+        val avatarLoaded = if (profile.avatarFileName.isNotEmpty()) {
+            val file = File(ctx.filesDir, "avatars/${profile.avatarFileName}")
+            if (file.exists()) {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                if (bitmap != null) {
+                    binding.avatarText.text = ""
+                    val d = androidx.core.graphics.drawable.RoundedBitmapDrawableFactory.create(resources, bitmap)
+                    d.isCircular = true
+                    binding.avatarText.background = d
+                    true
+                } else false
+            } else false
+        } else false
+
+        if (!avatarLoaded) {
+            binding.avatarText.text = initial
+            binding.avatarText.background?.mutate()?.setTint(avatarColors[colorIdx])
+        }
+
+        if (profile.gender.name == "MALE") {
+            binding.profileGenderIcon.text = "\u2642"
+            binding.profileGenderIcon.setTextColor(Color.parseColor("#2196F3"))
+        } else {
+            binding.profileGenderIcon.text = "\u2640"
+            binding.profileGenderIcon.setTextColor(Color.parseColor("#E91E63"))
+        }
+
+        val age = profile.age
+        if (age != null) {
+            binding.profileAge.text = age.toString() + "\u5C81"
+        } else {
+            binding.profileAge.text = ""
+        }
+
+        binding.profileBirthday.text = profile.birthday?.date ?: "未设置"
 
         binding.profileProvince.text = profile.province.ifEmpty { "未设置" }
 
         if (profile.diseaseIds.isEmpty()) {
-            binding.profileDiseases.text = "无"
+            binding.profileDiseases.text = "\u65E0"
         } else {
             val diseases = diseaseRepo.loadAll()
             val names = profile.diseaseIds.map { id ->
                 diseases.find { it.id == id }?.name ?: id
             }
-            binding.profileDiseases.text = names.joinToString("、")
+            binding.profileDiseases.text = names.joinToString("\u3001")
         }
 
-        val heightUnit = AppPrefs.getUnit(requireContext(), UnitCategory.ID_LENGTH, UnitCategory.DEFAULT_UNIT_LENGTH)
-        val weightUnit = AppPrefs.getUnit(requireContext(), UnitCategory.ID_WEIGHT, UnitCategory.DEFAULT_UNIT_WEIGHT)
-        val latestHeight = profile.latestHeight
-        binding.profileHeight.text = if (latestHeight != null)
-            UnitConverter.formatWithUnit(UnitCategory.ID_LENGTH, latestHeight.value, heightUnit) else "无记录"
+        val heightUnit = AppPrefs.getUnit(ctx, UnitCategory.ID_LENGTH, UnitCategory.DEFAULT_UNIT_LENGTH)
+        val weightUnit = AppPrefs.getUnit(ctx, UnitCategory.ID_WEIGHT, UnitCategory.DEFAULT_UNIT_WEIGHT)
+        binding.profileHeight.text = profile.latestHeight?.let {
+            UnitConverter.formatWithUnit(UnitCategory.ID_LENGTH, it.value, heightUnit)
+        } ?: "\u65E0\u8BB0\u5F55"
+        binding.profileWeight.text = profile.latestWeight?.let {
+            UnitConverter.formatWithUnit(UnitCategory.ID_WEIGHT, it.value, weightUnit)
+        } ?: "\u65E0\u8BB0\u5F55"
+    }
 
-        val latestWeight = profile.latestWeight
-        binding.profileWeight.text = if (latestWeight != null)
-            UnitConverter.formatWithUnit(UnitCategory.ID_WEIGHT, latestWeight.value, weightUnit) else "无记录"
+    private fun showUserSwitchSheet() {
+        val ctx = requireContext()
+        val users = ProfilePrefs.getAllUsers(ctx)
+        val currentId = ProfilePrefs.getCurrentUserId(ctx)
+
+        val sheet = BottomSheetDialog(ctx)
+        val root = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 24, 0, 16)
+        }
+
+        root.addView(TextView(ctx).apply {
+            text = "\u5207\u6362\u7528\u6237"
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
+            setPadding(24, 0, 24, 16)
+        })
+
+        root.addView(MaterialButton(ctx).apply {
+            text = "+ \u65B0\u589E\u7528\u6237"
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(24, 0, 24, 12) }
+            setOnClickListener {
+                val intent = Intent(ctx, ProfileEditActivity::class.java)
+                intent.putExtra("create_new", true)
+                editLauncher.launch(intent)
+                sheet.dismiss()
+            }
+        })
+
+        val scroll = ScrollView(ctx)
+        val listContainer = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        for (user in users) {
+            val isCurrent = user.id == currentId
+            listContainer.addView(buildUserRow(ctx, user, isCurrent,
+                onSelect = { selected ->
+                    ProfilePrefs.setCurrentUserId(ctx, selected.id)
+                    refreshProfile()
+                    sheet.dismiss()
+                },
+                onDelete = { deleted ->
+                    AlertDialog.Builder(ctx)
+                        .setTitle("\u5220\u9664\u7528\u6237")
+                        .setMessage("\u786E\u5B9A\u5220\u9664\u201C${deleted.name.ifEmpty { "\u672A\u8BBE\u7F6E" }}\u201D\u5417\uFF1F\u8BE5\u7528\u6237\u7684\u6240\u6709\u6570\u636E\u5C06\u88AB\u6E05\u9664\u3002")
+                        .setPositiveButton("\u5220\u9664") { _, _ ->
+                            ProfilePrefs.deleteUser(ctx, deleted.id)
+                            sheet.dismiss()
+                            refreshProfile()
+                        }
+                        .setNegativeButton("\u53D6\u6D88", null)
+                        .show()
+                }
+            ))
+        }
+
+        if (users.isEmpty()) {
+            listContainer.addView(TextView(ctx).apply {
+                text = "\u6682\u65E0\u7528\u6237"
+                setPadding(24, 16, 24, 16)
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+                setTextColor(0xFF888888.toInt())
+            })
+        }
+
+        scroll.addView(listContainer)
+        root.addView(scroll)
+        sheet.setContentView(root)
+        sheet.show()
+    }
+
+    private fun buildUserRow(
+        ctx: Context,
+        user: UserProfile,
+        isCurrent: Boolean,
+        onSelect: (UserProfile) -> Unit,
+        onDelete: (UserProfile) -> Unit
+    ): View {
+        val bd = user.birthday?.date
+        val genderText = if (user.gender.name == "MALE") "\u2642" else "\u2640"
+        return LinearLayout(ctx).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(24, 12, 24, 12)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setOnClickListener { onSelect(user) }
+            if (isCurrent) {
+                setBackgroundColor(0x26000000.toInt())
+            }
+
+            // Avatar
+            addView(TextView(ctx).apply {
+                val dn = user.name.ifEmpty { "?" }
+                text = dn.first().toString()
+                textSize = 22f
+                gravity = Gravity.CENTER
+                setTextColor(Color.WHITE)
+                layoutParams = LinearLayout.LayoutParams(56, 56)
+                val ci = abs(user.id.hashCode()) % avatarColors.size
+                val bg = GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(avatarColors[ci])
+                }
+                background = bg
+            })
+
+            // Name + gender
+            addView(TextView(ctx).apply {
+                val dn = user.name.ifEmpty { "\u672A\u8BBE\u7F6E" }
+                text = dn + "  " + genderText
+                textSize = 16f
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    setMargins(16, 0, 8, 0)
+                }
+            })
+
+            // Checkmark
+            if (isCurrent) {
+                addView(TextView(ctx).apply {
+                    text = "\u2713"
+                    textSize = 18f
+                    setTextColor(0xFF4CAF50.toInt())
+                    gravity = Gravity.CENTER
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { setMargins(0, 0, 16, 0) }
+                })
+            }
+
+            // Delete
+            addView(ImageButton(ctx).apply {
+                setImageResource(android.R.drawable.ic_delete)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                background = null
+                setColorFilter(0xFF888888.toInt())
+                setOnClickListener { onDelete(user) }
+            })
+        }
     }
 
     override fun onDestroyView() {

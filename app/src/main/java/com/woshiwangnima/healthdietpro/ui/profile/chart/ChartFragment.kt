@@ -19,20 +19,26 @@ class ChartFragment : Fragment() {
     private var unitId: String = UnitCategory.DEFAULT_UNIT_LENGTH
     private var category: String = UnitCategory.ID_LENGTH
     private var isHeight: Boolean = true
+    private var chartStateKey: String = ""
 
     companion object {
         private const val ARG_RECORDS = "records"
         private const val ARG_UNIT = "unit"
         private const val ARG_CATEGORY = "category"
         private const val ARG_IS_HEIGHT = "is_height"
+        private const val ARG_CHART_STATE_KEY = "chart_state_key"
 
-        fun newInstance(records: ArrayList<BodyRecord>, unit: String, category: String, isHeight: Boolean): ChartFragment {
+        fun newInstance(
+            records: ArrayList<BodyRecord>, unit: String, category: String,
+            isHeight: Boolean, chartStateKey: String = ""
+        ): ChartFragment {
             val fragment = ChartFragment()
             val args = Bundle()
             args.putSerializable(ARG_RECORDS, records)
             args.putString(ARG_UNIT, unit)
             args.putString(ARG_CATEGORY, category)
             args.putBoolean(ARG_IS_HEIGHT, isHeight)
+            args.putString(ARG_CHART_STATE_KEY, chartStateKey)
             fragment.arguments = args
             return fragment
         }
@@ -46,12 +52,15 @@ class ChartFragment : Fragment() {
             unitId = it.getString(ARG_UNIT, UnitCategory.DEFAULT_UNIT_LENGTH) ?: UnitCategory.DEFAULT_UNIT_LENGTH
             category = it.getString(ARG_CATEGORY, UnitCategory.ID_LENGTH) ?: UnitCategory.ID_LENGTH
             isHeight = it.getBoolean(ARG_IS_HEIGHT, true)
+            chartStateKey = it.getString(ARG_CHART_STATE_KEY) ?: ""
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val chartView = ChartView(requireContext())
         chartView.id = View.generateViewId()
+
+        if (chartStateKey.isNotEmpty()) chartView.setChartStateKey(chartStateKey)
 
         val dataPoints = if (records.isEmpty()) emptyList() else {
             val sorted = records.sortedBy { it.date }

@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.ui.profile
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.TextView
@@ -22,6 +25,8 @@ import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Calendar
 
 class ProfileEditActivity : BaseBackActivity() {
@@ -37,6 +42,15 @@ class ProfileEditActivity : BaseBackActivity() {
     private var heightRecords: MutableList<BodyRecord> = mutableListOf()
     private var weightRecords: MutableList<BodyRecord> = mutableListOf()
     private var originalProfile: UserProfile? = null
+    private var editingUserId: String = ""
+    private var isNewUser: Boolean = false
+    private var avatarFileName: String = ""
+
+    private val avatarPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { handleAvatarSelected(it) }
+    }
 
     private val heightDetailLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -84,13 +98,15 @@ class ProfileEditActivity : BaseBackActivity() {
                 val name = binding.nameInput.text.toString().trim()
                 val gender = if (binding.genderMale.isChecked) Gender.MALE else Gender.FEMALE
                 val profile = UserProfile(
+                    id = editingUserId,
                     name = name,
                     gender = gender,
                     birthday = selectedBirthday,
                     province = selectedProvince,
                     diseaseIds = selectedDiseaseIds.toList(),
                     heightRecords = heightRecords.toList(),
-                    weightRecords = weightRecords.toList()
+                    weightRecords = weightRecords.toList(),
+                    avatarFileName = avatarFileName
                 )
                 ProfilePrefs.save(this@ProfileEditActivity, profile)
                 setResult(RESULT_OK)
@@ -100,7 +116,9 @@ class ProfileEditActivity : BaseBackActivity() {
     }
 
     private fun loadProfile() {
-        val profile = ProfilePrefs.load(this)
+        isNewUser = intent.getBooleanExtra("create_new", false)
+        val profile = if (isNewUser) UserProfile(id = "") else ProfilePrefs.load(this)
+        editingUserId = profile.id
         binding.nameInput.setText(profile.name)
         selectedGender = profile.gender
         if (profile.gender == Gender.MALE) binding.genderMale.isChecked = true
@@ -122,11 +140,15 @@ class ProfileEditActivity : BaseBackActivity() {
         weightRecords = profile.weightRecords.toMutableList()
         updateWeightDisplay()
 
+        avatarFileName = profile.avatarFileName
+        refreshAvatarDisplay()
+
         originalProfile = profile
         checkSaveEnabled()
     }
 
     private fun setupClickListeners() {
+        binding.avatarEditText.setOnClickListener { avatarPickerLauncher.launch("image/*") }
         binding.birthdayDisplay.setOnClickListener { showDatePicker() }
         binding.provinceDisplay.setOnClickListener { showProvincePicker() }
         binding.diseaseDisplay.setOnClickListener { showDiseasePicker() }
@@ -176,7 +198,8 @@ class ProfileEditActivity : BaseBackActivity() {
             selectedProvince != orig.province ||
             selectedDiseaseIds.toList() != orig.diseaseIds ||
             heightRecords.toList() != orig.heightRecords ||
-            weightRecords.toList() != orig.weightRecords
+            weightRecords.toList() != orig.weightRecords ||
+            avatarFileName != orig.avatarFileName
         binding.saveBtn.isEnabled = changed
     }
 
@@ -304,6 +327,56 @@ class ProfileEditActivity : BaseBackActivity() {
         }
     }
 
+    private fun handleAvatarSelected(uri: Uri) {
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+            if (bitmap == null) return
+            val cropped = cropToSquare(bitmap, 200)
+            val dir = File(filesDir, "avatars")
+            if (!dir.exists()) dir.mkdirs()
+            avatarFileName = "${System.currentTimeMillis()}.jpg"
+            val file = File(dir, avatarFileName)
+            FileOutputStream(file).use { out ->
+                cropped.compress(Bitmap.CompressFormat.JPEG, 85, out)
+            }
+            refreshAvatarDisplay()
+            checkSaveEnabled()
+        } catch (_: Exception) {
+            Toast.makeText(this, "\u65E0\u6CD5\u52A0\u8F7D\u56FE\u7247", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun cropToSquare(bitmap: Bitmap, maxSize: Int): Bitmap {
+        val w = bitmap.width
+        val h = bitmap.height
+        val side = minOf(w, h)
+        val x = (w - side) / 2
+        val y = (h - side) / 2
+        val square = Bitmap.createBitmap(bitmap, x, y, side, side)
+        if (side <= maxSize) return square
+        return Bitmap.createScaledBitmap(square, maxSize, maxSize, true)
+    }
+
+    private fun refreshAvatarDisplay() {
+        if (avatarFileName.isNotEmpty()) {
+            val file = File(filesDir, "avatars/$avatarFileName")
+            if (file.exists()) {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                binding.avatarEditText.text = ""
+                val d = androidx.core.graphics.drawable.RoundedBitmapDrawableFactory.create(resources, bitmap)
+                d.isCircular = true
+                binding.avatarEditText.background = d
+                return
+            }
+        }
+        val profile = ProfilePrefs.load(this)
+        val initial = if (profile.name.isNotEmpty()) profile.name.first().toString() else "?"
+        binding.avatarEditText.text = initial
+        binding.avatarEditText.background = getDrawable(R.drawable.avatar_circle)
+    }
+
     private fun saveProfile() {
         val name = binding.nameInput.text.toString().trim()
         if (name.isBlank()) {
@@ -312,13 +385,15 @@ class ProfileEditActivity : BaseBackActivity() {
         }
         val gender = if (binding.genderMale.isChecked) Gender.MALE else Gender.FEMALE
         val profile = UserProfile(
+            id = editingUserId,
             name = name,
             gender = gender,
             birthday = selectedBirthday,
             province = selectedProvince,
             diseaseIds = selectedDiseaseIds.toList(),
             heightRecords = heightRecords.toList(),
-            weightRecords = weightRecords.toList()
+            weightRecords = weightRecords.toList(),
+            avatarFileName = avatarFileName
         )
         ProfilePrefs.save(this, profile)
         setResult(RESULT_OK)

@@ -127,7 +127,7 @@ class BmiDetailActivity : BaseBackActivity() {
         }
         val cv = ChartView(this).also { chartView = it }
         cv.setChartTitle("BMI 历史", android.view.Gravity.START)
-        cv.setChartStateKey("bmi_history")
+        cv.setChartStateKey(ProfilePrefs.makeChartStateKey(this, "bmi_history"))
         cv.setYAxisBands(BmiUtil.loadBmiBands().map { YAxisBand(it.min.coerceAtLeast(0f), it.max, it.color) })
         val series = ChartSeries(points = bmiData, label = "BMI",
             color = resources.getColor(R.color.primary, null),

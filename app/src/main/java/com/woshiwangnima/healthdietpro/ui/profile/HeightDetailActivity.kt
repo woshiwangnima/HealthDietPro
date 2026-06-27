@@ -13,6 +13,7 @@ import com.woshiwangnima.healthdietpro.databinding.ActivityHeightDetailBinding
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
+import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartView
@@ -97,7 +98,7 @@ class HeightDetailActivity : BaseBackActivity() {
             chartView = newCv
             newCv
         }
-        cv.setChartStateKey("height_history")
+        cv.setChartStateKey(ProfilePrefs.makeChartStateKey(this, "height_history"))
         cv.setChartTitle("身高 历史")
         val dataPoints = if (records.isEmpty()) emptyList() else {
             val sorted = records.sortedBy { it.date }

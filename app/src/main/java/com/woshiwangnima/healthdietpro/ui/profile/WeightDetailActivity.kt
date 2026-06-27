@@ -13,6 +13,7 @@ import com.woshiwangnima.healthdietpro.databinding.ActivityWeightDetailBinding
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
+import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartView
@@ -97,7 +98,7 @@ class WeightDetailActivity : BaseBackActivity() {
             chartView = newCv
             newCv
         }
-        cv.setChartStateKey("weight_history")
+        cv.setChartStateKey(ProfilePrefs.makeChartStateKey(this, "weight_history"))
         cv.setChartTitle("体重 历史")
         // Always refresh data
         val dataPoints = if (records.isEmpty()) emptyList() else {
