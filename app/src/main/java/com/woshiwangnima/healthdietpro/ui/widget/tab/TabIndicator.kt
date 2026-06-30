@@ -33,7 +33,9 @@ class SlidingIndicator : TabIndicator {
     }
 
     override fun onSelectionChanged(indicatorView: View, tabBar: TabBar, selectedIndex: Int) {
-        if (selectedIndex == -1 || tabBar.isCenter(selectedIndex)) {
+        // The capsule is the same for every tab (including the center "醒目" tab), so we
+        // only hide it when there is genuinely no selection.
+        if (selectedIndex == -1) {
             if (visible) {
                 indicatorView.animate().cancel()
                 indicatorView.animate().alpha(0f).setDuration(120).start()
@@ -62,8 +64,8 @@ class SlidingIndicator : TabIndicator {
             indicatorView.layoutParams = lp
         }
         if (!visible) {
-            // Appear: if coming from the center, start at the center and flow out;
-            // otherwise fade in at the target.
+            // Appear: slide in from the previously selected tab if any, else fade in
+            // at the target.
             val startX = if (previous >= 0) previous * tabWidth else targetX
             indicatorView.translationX = startX
             indicatorView.alpha = 0f

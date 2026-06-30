@@ -69,12 +69,15 @@ class BmiDetailActivity : BaseBackActivity() {
 
         val tabBar = ToggleBar(this).apply {
             displayMode = com.woshiwangnima.healthdietpro.ui.widget.tab.TabBar.DisplayMode.NORMAL
-            setTabs(listOf(TabItem(label = "图表"), TabItem(label = "数据")))
+            setTabs(listOf(TabItem(com.woshiwangnima.healthdietpro.R.drawable.ic_chart, "图表"),
+                TabItem(com.woshiwangnima.healthdietpro.R.drawable.ic_list, "数据")))
             restore("tab_bmi_chart", 0)
             listener = { idx, _ -> switchTab(idx) }
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(48))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT)
         }
         bottomBar.addView(tabBar)
+        tabBar.applyEnlargedTabHeight(hasIcon = true)
 
         setContentView(root)
         switchTab(tabBar.selectedIndex)

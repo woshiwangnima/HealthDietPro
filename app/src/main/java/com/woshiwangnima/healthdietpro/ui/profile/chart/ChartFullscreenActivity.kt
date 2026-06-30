@@ -41,7 +41,8 @@ class ChartFullscreenActivity : BaseBackActivity() {
 
         val chartView = ChartView(this).apply {
             setFullscreenMode(true)
-            setChartTitle(data.chartTitle)
+            // Fullscreen hides the title row; skip setChartTitle entirely so the chart
+            // fills the full landscape viewport.
             setChartStateKey(data.chartStateKey)
             if (data.yAxisBands.isNotEmpty()) setYAxisBands(data.yAxisBands)
             setSeries(data.series, data.unitLabel)

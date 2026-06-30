@@ -11,9 +11,10 @@ interface TabBinder {
 object DefaultTabBinder : TabBinder {
 
     override fun bind(item: TabItem, view: TabItemView, selected: Boolean, isCenter: Boolean) {
-        // Label
+        // Label base is "脚注" (caption) size — the unselected rest size. The selected
+        // enlargement appears via TabAnimator's scale (selected visual size ≈ "标注"/label).
         view.labelView.text = item.label
-        val labelPx = view.resources.getDimension(R.dimen.text_size_label)
+        val labelPx = view.resources.getDimension(R.dimen.text_size_caption)
         view.labelView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, labelPx)
         view.labelView.setTypeface(null, if (selected) Typeface.BOLD else Typeface.NORMAL)
 
@@ -25,14 +26,15 @@ object DefaultTabBinder : TabBinder {
             view.iconView.setColorFilter(ContextCompat.getColor(view.context, tintColor))
         }
 
-        // Background + label color
+        // Label color
         val ctx = view.context
         val labelColor = if (selected) R.color.primary else R.color.on_surface_variant
         view.labelView.setTextColor(ContextCompat.getColor(ctx, labelColor))
-        view.background = when {
-            isCenter -> ContextCompat.getDrawable(ctx, R.drawable.tab_center_capsule)
-            selected -> ContextCompat.getDrawable(ctx, R.drawable.tab_pill_selected)
-            else -> null
-        }
+
+        // Background: the indicator hosts the capsule highlight. The per-tab pill is only
+        // a fallback (when no overlay indicator is in use). matches the surface color / no
+        // highlight in the unselected state (so it merges with the bar's colorSurface bg).
+        view.background = if (selected)
+            ContextCompat.getDrawable(ctx, R.drawable.tab_pill_selected) else null
     }
 }

@@ -192,14 +192,41 @@ abstract class TabBar @JvmOverloads constructor(
             val view = itemViews[i]
             binder.bind(items[i], view, isSelected(i), isCenter(i))
             // The indicator is the sole selected highlight; clear the per-tab background so
-            // the pill doesn't draw twice on top of the indicator.
-            if (indicatorView != null && !isCenter(i)) {
+            // the pill doesn't draw twice on top of the indicator. Applies to the center
+            // tab too — every selected tab now uses the same sliding capsule style.
+            if (indicatorView != null) {
                 view.background = null
             }
             animator?.animate(view, isSelected(i), isCenter(i))
         }
         val current = items.indices.firstOrNull { isSelected(it) } ?: -1
         indicatorView?.let { ind -> indicator?.onSelectionChanged(ind, this, current) }
+    }
+
+    /**
+     * Size the bar's height so the enlarged (selected) item — icon + caption→label-scaled
+     * label — fits fully inside the strip/capsule, even at large user 默认字体大小.
+     * [hasIcon] should be true for bars whose tabs carry an icon. Both the label dimen
+     * (`sp`) and the icon size scale to the font-preference / system font scale where
+     * applicable, so the resulting bar height tracks 设置 → 偏好设置 → 默认字体大小
+     * automatically. Call after [setTabs] once the bar has been laid out in its parent.
+     */
+    fun applyEnlargedTabHeight(hasIcon: Boolean) {
+        val dm = resources.displayMetrics
+        val density = dm.density
+        // Visible "selected" target sizes: caption(12sp)×scale → label(14sp) glyph.
+        val labelTextPx = resources.getDimension(R.dimen.text_size_label)
+        val labelLinePx = labelTextPx * 1.5f
+        // item_tab.xml ships a 24dp icon base; the animator scales it by ~1.17× when
+        // selected, so budget for a ~28dp glyph.
+        val iconEnlarged = if (hasIcon) 28f * density else 0f
+        val gap = 4f * density
+        val verticalPadding = 12f * density * 2f
+        val h = (iconEnlarged + gap + labelLinePx + verticalPadding)
+            .toInt().coerceAtLeast((56f * density).toInt())
+        val lp = layoutParams ?: return
+        lp.height = h
+        layoutParams = lp
     }
 
     fun isCenter(index: Int): Boolean =

@@ -47,9 +47,10 @@ class HeightDetailActivity : BaseBackActivity() {
         category = UnitCategory.ID_LENGTH
 
         binding.tabBar.setTabs(listOf(
-            TabItem(label = "图表"),
-            TabItem(label = "数据")
+            TabItem(R.drawable.ic_chart, "图表"),
+            TabItem(R.drawable.ic_list, "数据")
         ))
+        binding.tabBar.applyEnlargedTabHeight(hasIcon = true)
         binding.tabBar.restore("tab_height_chart", 0)
         binding.tabBar.listener = { idx, _ -> switchTab(idx) }
         switchTab(binding.tabBar.selectedIndex)

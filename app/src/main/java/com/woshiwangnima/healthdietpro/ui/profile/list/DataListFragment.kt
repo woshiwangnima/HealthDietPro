@@ -2,15 +2,19 @@ package com.woshiwangnima.healthdietpro.ui.profile.list
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
@@ -78,9 +82,9 @@ class DataListFragment : Fragment() {
             }
         }
 
-        adapter.onClick = { pos -> showEditDialog(pos) }
+        adapter.onClick = { pos -> showRecordSheet(editPosition = pos) }
 
-        addBtn.setOnClickListener { showAddDialog() }
+        addBtn.setOnClickListener { showRecordSheet(editPosition = -1) }
         return view
     }
 
@@ -90,101 +94,169 @@ class DataListFragment : Fragment() {
         rootView?.findViewById<TextView>(R.id.totalCount)?.text = "共 ${records.size} 条记录"
     }
 
-    private fun showAddDialog() {
+    /**
+     * "添加/编辑 记录" 弹层改用与「切换用户」一致的 BottomSheetDialog 风格：
+     * 从底部弹出、同一套标题外观 (TextAppearance.Material3.TitleLarge) + 内容卡片，
+     * 再加一个明确的「保存/添加」MaterialButton 收尾。editPosition=-1 表示新增。
+     */
+    private fun showRecordSheet(editPosition: Int) {
         if (isDialogShowing) return
         isDialogShowing = true
-        val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_body_record, null)
-        val dateInput = view.findViewById<TextView>(R.id.dialogRecordDate)
-        val valueInput = view.findViewById<TextInputEditText>(R.id.dialogRecordValue)
-        val unitText = view.findViewById<TextView>(R.id.dialogRecordUnit)
-        unitText.text = unitId
+        val ctx = requireContext()
+        val isEdit = editPosition >= 0
+        val editing = if (isEdit) records[editPosition] else null
 
+        val sheet = BottomSheetDialog(ctx)
+        val density = ctx.resources.displayMetrics.density
+        val padHorizontal = (24 * density).toInt()
+        val padVertical = (16 * density).toInt()
+
+        val root = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(padHorizontal, (20 * density).toInt(), padHorizontal, (20 * density).toInt())
+        }
+
+        root.addView(TextView(ctx).apply {
+            text = if (isEdit)
+                (if (isHeight) "编辑身高记录" else "编辑体重记录")
+            else
+                (if (isHeight) "添加身高记录" else "添加体重记录")
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
+        })
+
+        root.addView(TextView(ctx).apply {
+            text = if (isHeight)
+                "请选择测量日期并填写身高数值，单位为「${unitId}」"
+            else
+                "请选择测量日期并填写体重数值，单位为「${unitId}」"
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+            setTextColor(0xFF888888.toInt())
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (8 * density).toInt() }
+        })
+
+        // 日期行 (可点击)
+        val dateRow = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (16 * density).toInt() }
+        }
+        val dateLabel = TextView(ctx).apply {
+            text = "日期"
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
+        }
+        dateRow.addView(dateLabel)
+        val dateInput = TextView(ctx).apply {
+            isClickable = true
+            isFocusable = true
+            setBackgroundResource(R.drawable.edit_text_bg)
+            setPadding((12 * density).toInt(), (12 * density).toInt(),
+                (12 * density).toInt(), (12 * density).toInt())
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (6 * density).toInt() }
+        }
+        dateRow.addView(dateInput)
+        root.addView(dateRow)
+
+        // 数值输入框：直接复用 dialog_add_body_record.xml 中的 TextInputLayout
+        // (已用 outlined-box 样式定义)，省得在这里手动重建 Material 样式。
+        val valueRow = LayoutInflater.from(ctx).inflate(R.layout.dialog_add_body_record, root, false)
+        val valueInput = valueRow.findViewById<TextInputEditText>(R.id.dialogRecordValue)
+        val unitText = valueRow.findViewById<TextView>(R.id.dialogRecordUnit)
+        unitText.text = "单位：$unitId"
+        // 原布局第一个子项是"日期"显示行 —— 上面已经重做日期行，移除它以免重复
+        (valueRow as? ViewGroup)?.let { vg ->
+            val first = vg.getChildAt(0)
+            if (first?.id == R.id.dialogRecordDate) vg.removeView(first)
+        }
+        root.addView(valueRow)
+
+        // 按钮行
+        val btnRow = LinearLayout(ctx).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.END
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (20 * density).toInt() }
+        }
+        val cancelBtn = MaterialButton(ctx).apply {
+            text = "取消"
+            setOnClickListener { sheet.dismiss() }
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(0, 0, (8 * density).toInt(), 0) }
+        }
+        val confirmBtn = MaterialButton(ctx).apply {
+            text = if (isEdit) "保存" else "添加"
+        }
+        btnRow.addView(cancelBtn)
+        btnRow.addView(confirmBtn)
+        root.addView(btnRow)
+
+        // 初始化值
         val cal = Calendar.getInstance()
-        val today = "%04d-%02d-%02d".format(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH))
-        dateInput.text = today
-        dateInput.setOnClickListener {
-            DatePickerDialog(requireContext(), { _, year, month, day ->
-                dateInput.text = "%04d-%02d-%02d".format(year, month + 1, day)
-            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        if (isEdit && editing != null) {
+            dateInput.text = editing.date
+            val displayValue = UnitConverter.fromBase(category, editing.value, unitId)
+            valueInput.setText(String.format("%.1f", displayValue))
+            try {
+                val parts = editing.date.split("-")
+                if (parts.size == 3) {
+                    cal.set(Calendar.YEAR, parts[0].toInt())
+                    cal.set(Calendar.MONTH, parts[1].toInt() - 1)
+                    cal.set(Calendar.DAY_OF_MONTH, parts[2].toInt())
+                }
+            } catch (_: Exception) {}
+            dateInput.setOnClickListener {
+                DatePickerDialog(ctx, { _, year, month, day ->
+                    dateInput.text = "%04d-%02d-%02d".format(year, month + 1, day)
+                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+            }
+        } else {
+            val today = "%04d-%02d-%02d".format(
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH))
+            dateInput.text = today
+            dateInput.setOnClickListener {
+                DatePickerDialog(ctx, { _, year, month, day ->
+                    dateInput.text = "%04d-%02d-%02d".format(year, month + 1, day)
+                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+            }
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle(if (isHeight) "添加身高记录" else "添加体重记录")
-            .setView(view)
-            .setPositiveButton("添加") { _, _ ->
-                val dateStr = dateInput.text.toString()
-                val valueStr = valueInput.text.toString()
-                if (valueStr.isBlank()) {
-                    Toast.makeText(requireContext(), "请输入数值", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-                val value = valueStr.toFloatOrNull()
-                if (value == null || value <= 0) {
-                    Toast.makeText(requireContext(), "请输入有效数值", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-                val baseValue = UnitConverter.toBase(category, value, unitId)
+        confirmBtn.setOnClickListener {
+            val dateStr = dateInput.text.toString()
+            val valueStr = valueInput.text.toString()
+            if (valueStr.isBlank()) {
+                Toast.makeText(ctx, "请输入数值", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val value = valueStr.toFloatOrNull()
+            if (value == null || value <= 0) {
+                Toast.makeText(ctx, "请输入有效数值", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val baseValue = UnitConverter.toBase(category, value, unitId)
+            if (isEdit && editing != null) {
+                records[editPosition] = BodyRecord(date = dateStr, value = baseValue, unit = unitId)
+            } else {
                 records.add(BodyRecord(date = dateStr, value = baseValue, unit = unitId))
-                records.sortByDescending { it.date }
-                refreshList()
-                onRecordsChanged?.invoke()
             }
-            .setNegativeButton("取消", null)
-            .setOnDismissListener { isDialogShowing = false }
-            .show()
-        dialog.setOnDismissListener { isDialogShowing = false }
-    }
-
-    private fun showEditDialog(position: Int) {
-        if (isDialogShowing) return
-        isDialogShowing = true
-        val record = records[position]
-        val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_body_record, null)
-        val dateInput = view.findViewById<TextView>(R.id.dialogRecordDate)
-        val valueInput = view.findViewById<TextInputEditText>(R.id.dialogRecordValue)
-        val unitText = view.findViewById<TextView>(R.id.dialogRecordUnit)
-        unitText.text = unitId
-
-        val displayValue = UnitConverter.fromBase(category, record.value, unitId)
-        dateInput.text = record.date
-        valueInput.setText(String.format("%.1f", displayValue))
-
-        dateInput.setOnClickListener {
-            val parts = record.date.split("-")
-            val cal = Calendar.getInstance()
-            if (parts.size == 3) {
-                cal.set(Calendar.YEAR, parts[0].toIntOrNull() ?: cal.get(Calendar.YEAR))
-                cal.set(Calendar.MONTH, (parts[1].toIntOrNull() ?: 1) - 1)
-                cal.set(Calendar.DAY_OF_MONTH, parts[2].toIntOrNull() ?: 1)
-            }
-            DatePickerDialog(requireContext(), { _, year, month, day ->
-                dateInput.text = "%04d-%02d-%02d".format(year, month + 1, day)
-            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+            refreshList()
+            onRecordsChanged?.invoke()
+            sheet.dismiss()
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle(if (isHeight) "编辑身高记录" else "编辑体重记录")
-            .setView(view)
-            .setPositiveButton("保存") { _, _ ->
-                val dateStr = dateInput.text.toString()
-                val valueStr = valueInput.text.toString()
-                if (valueStr.isBlank()) {
-                    Toast.makeText(requireContext(), "请输入数值", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-                val value = valueStr.toFloatOrNull()
-                if (value == null || value <= 0) {
-                    Toast.makeText(requireContext(), "请输入有效数值", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-                val baseValue = UnitConverter.toBase(category, value, unitId)
-                records[position] = BodyRecord(date = dateStr, value = baseValue, unit = unitId)
-                records.sortByDescending { it.date }
-                refreshList()
-                onRecordsChanged?.invoke()
-            }
-            .setNegativeButton("取消", null)
-            .setOnDismissListener { isDialogShowing = false }
-            .show()
+        sheet.setOnDismissListener { isDialogShowing = false }
+        sheet.setContentView(root)
+        sheet.show()
     }
 }

@@ -199,6 +199,9 @@ class ChartView @JvmOverloads constructor(
             controlsRow.visibility = View.GONE
             legendScrollView.visibility = View.GONE
             btnFullscreen.visibility = View.GONE
+            // Drop the title row in fullscreen — the user already tapped the chart
+            // fullscreen button, so the title bar is wasted vertical space.
+            chartTitle.visibility = View.GONE
             val lp = chartFrame.layoutParams as LinearLayout.LayoutParams
             lp.weight = 1f; lp.height = 0
             chartFrame.layoutParams = lp

@@ -90,7 +90,11 @@ object ProfilePrefs {
             province = current?.province ?: seed.province,
             diseaseIds = current?.diseaseIds ?: seed.diseaseIds,
             heightRecords = joinRecords(current?.heightRecords.orEmpty(), seed.heightRecords, false),
-            weightRecords = joinRecords(current?.weightRecords.orEmpty(), seed.weightRecords, true)
+            weightRecords = joinRecords(current?.weightRecords.orEmpty(), seed.weightRecords, true),
+            // avatarFileName lives on the persisted user record; surface it here so
+            // ProfileFragment / ProfileEditActivity can read the saved avatar back after
+            // restart (otherwise it always came back empty).
+            avatarFileName = current?.avatarFileName ?: ""
         )
     }
 
