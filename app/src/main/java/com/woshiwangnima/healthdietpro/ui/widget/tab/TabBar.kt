@@ -30,6 +30,12 @@ abstract class TabBar @JvmOverloads constructor(
             renderSelection()
         }
 
+    var animator: TabAnimator? = DefaultTabAnimator
+        set(value) {
+            field = value
+            renderSelection()
+        }
+
     var displayMode: DisplayMode = DisplayMode.NORMAL
         set(value) {
             field = value
@@ -132,23 +138,10 @@ abstract class TabBar @JvmOverloads constructor(
     }
 
     protected fun renderSelection() {
-        val density = resources.displayMetrics.density
         for (i in items.indices) {
             val view = itemViews[i]
             binder.bind(items[i], view, isSelected(i), isCenter(i))
-            if (isCenter(i)) {
-                view.elevation = 4f * density
-                view.scaleX = 1.2f
-                view.scaleY = 1.2f
-                // Lift the center tab up. For vertical orientation translationX would be more
-                // appropriate, but translationY is fine for the common bottom-bar case.
-                view.translationY = -6f * density
-            } else {
-                view.elevation = 0f
-                view.scaleX = 1f
-                view.scaleY = 1f
-                view.translationY = 0f
-            }
+            animator?.animate(view, isSelected(i), isCenter(i))
         }
     }
 

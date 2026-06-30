@@ -1,6 +1,5 @@
 package com.woshiwangnima.healthdietpro.ui.widget.tab
 
-import android.content.Context
 import android.graphics.Typeface
 import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
@@ -35,10 +34,8 @@ object DefaultTabBinder : TabBinder {
             )
             view.labelView.setTextColor(ContextCompat.getColor(ctx, R.color.primary))
         } else {
-            view.background = ContextCompat.getDrawable(
-                ctx,
-                if (selected) R.drawable.tab_selected_bg else R.drawable.tab_default_bg
-            )
+            view.background = if (selected)
+                ContextCompat.getDrawable(ctx, R.drawable.tab_pill_selected) else null
             val labelColor = if (selected) R.color.primary else R.color.on_surface_variant
             view.labelView.setTextColor(ContextCompat.getColor(ctx, labelColor))
         }
