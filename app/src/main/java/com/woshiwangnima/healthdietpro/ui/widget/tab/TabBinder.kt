@@ -27,17 +27,12 @@ object DefaultTabBinder : TabBinder {
 
         // Background + label color
         val ctx = view.context
-        if (isCenter) {
-            view.background = ContextCompat.getDrawable(
-                ctx,
-                if (selected) R.drawable.bg_nav_center_selected else R.drawable.bg_nav_center
-            )
-            view.labelView.setTextColor(ContextCompat.getColor(ctx, R.color.primary))
-        } else {
-            view.background = if (selected)
-                ContextCompat.getDrawable(ctx, R.drawable.tab_pill_selected) else null
-            val labelColor = if (selected) R.color.primary else R.color.on_surface_variant
-            view.labelView.setTextColor(ContextCompat.getColor(ctx, labelColor))
+        val labelColor = if (selected) R.color.primary else R.color.on_surface_variant
+        view.labelView.setTextColor(ContextCompat.getColor(ctx, labelColor))
+        view.background = when {
+            isCenter -> ContextCompat.getDrawable(ctx, R.drawable.tab_center_capsule)
+            selected -> ContextCompat.getDrawable(ctx, R.drawable.tab_pill_selected)
+            else -> null
         }
     }
 }

@@ -11,14 +11,14 @@ object DefaultTabAnimator : TabAnimator {
         val density = view.resources.displayMetrics.density
         view.animate().cancel()
         val targetScale = when {
-            isCenter -> 1.2f
+            isCenter -> 1.1f
             selected -> 1.05f
             else -> 1f
         }
         val targetAlpha = if (selected) 1f else 0.7f
         if (isCenter) {
             view.elevation = 4f * density
-            view.translationY = -6f * density
+            view.translationY = -8f * density
         } else {
             view.elevation = 0f
             view.translationY = 0f
