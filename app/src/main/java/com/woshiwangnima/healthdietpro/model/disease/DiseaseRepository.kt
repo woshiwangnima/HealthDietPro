@@ -18,12 +18,16 @@ class DiseaseRepository(private val context: Context) {
         return diseases
     }
 
-    fun getSorted(province: String?): List<Disease> {
+    /**
+     * 按地区排序疾病。参数 [provinceCode] 为 GB/T 2260 二位代码（如 "11"）。
+     * 与 diseases.json prevalence map key 口径一致。
+     */
+    fun getSorted(provinceCode: String?): List<Disease> {
         val all = loadAll()
-        if (province.isNullOrEmpty()) {
+        if (provinceCode.isNullOrEmpty()) {
             return all.sortedByDescending { avgPrevalence(it) }
         }
-        return all.sortedByDescending { it.prevalence[province] ?: avgPrevalence(it) }
+        return all.sortedByDescending { it.prevalence[provinceCode] ?: avgPrevalence(it) }
     }
 
     private fun avgPrevalence(disease: Disease): Float {

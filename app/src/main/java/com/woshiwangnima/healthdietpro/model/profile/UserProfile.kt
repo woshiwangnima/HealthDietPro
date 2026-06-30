@@ -5,7 +5,13 @@ data class UserProfile(
     val name: String = "",
     val gender: Gender = Gender.MALE,
     val birthday: AppDate? = null,
-    val province: String = "",
+    /**
+     * 完整地区信息：经纬度 + 省/市/县三级代码与名称。
+     * 旧版本曾用 `province: String` 存 2 位省代码；迁移逻辑放在
+     * [com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs.load]，
+     * 应用层统一通过本字段读写，不再单独存 province。
+     */
+    val region: com.woshiwangnima.healthdietpro.model.region.RegionSnapshot = com.woshiwangnima.healthdietpro.model.region.RegionSnapshot(),
     val diseaseIds: List<String> = emptyList(),
     val heightRecords: List<BodyRecord> = emptyList(),
     val weightRecords: List<BodyRecord> = emptyList(),

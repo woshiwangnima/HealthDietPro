@@ -1,16 +1,22 @@
-package com.woshiwangnima.healthdietpro.ui.profile
+﻿package com.woshiwangnima.healthdietpro.ui.profile
 
+import android.Manifest
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
@@ -23,8 +29,12 @@ import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
+import com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
+import com.woshiwangnima.healthdietpro.model.region.RegionRepository
+import com.woshiwangnima.healthdietpro.model.region.RegionSnapshot
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
+import com.woshiwangnima.healthdietpro.util.location.CurrentLocationProvider
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
@@ -35,7 +45,7 @@ class ProfileEditActivity : BaseBackActivity() {
     private lateinit var diseaseRepo: DiseaseRepository
 
     private var selectedBirthday: AppDate? = null
-    private var selectedProvince: String = ""
+    private var selectedRegion: RegionSnapshot = RegionSnapshot()
     private var selectedDiseaseIds: MutableList<String> = mutableListOf()
     private var selectedGender: Gender = Gender.MALE
 
@@ -51,6 +61,17 @@ class ProfileEditActivity : BaseBackActivity() {
     ) { uri: Uri? ->
         uri?.let { handleAvatarSelected(it) }
     }
+
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) startLocationLookup()
+        else showManualProvinceSheet()
+    }
+
+    private lateinit var provinceRepo: ProvinceRepository
+    private lateinit var regionRepo: RegionRepository
+    private lateinit var locationProvider: CurrentLocationProvider
 
     private val heightDetailLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -90,6 +111,9 @@ class ProfileEditActivity : BaseBackActivity() {
         setupToolbar(binding.toolbar)
 
         diseaseRepo = DiseaseRepository(this)
+        provinceRepo = ProvinceRepository.fromContext(this)
+        regionRepo = RegionRepository.fromContext(this)
+        locationProvider = CurrentLocationProvider(this)
 
         loadProfile()
         setupClickListeners()
@@ -102,7 +126,7 @@ class ProfileEditActivity : BaseBackActivity() {
                     name = name,
                     gender = gender,
                     birthday = selectedBirthday,
-                    province = selectedProvince,
+                    region = selectedRegion,
                     diseaseIds = selectedDiseaseIds.toList(),
                     heightRecords = heightRecords.toList(),
                     weightRecords = weightRecords.toList(),
@@ -128,12 +152,12 @@ class ProfileEditActivity : BaseBackActivity() {
             selectedBirthday = it
             binding.birthdayDisplay.text = it.date
         }
-        if (profile.province.isNotEmpty()) {
-            selectedProvince = profile.province
-            binding.provinceDisplay.text = profile.province
-        }
+
         selectedDiseaseIds = profile.diseaseIds.toMutableList()
         updateDiseaseDisplay()
+
+        selectedRegion = profile.region
+        updateProvinceDisplay()
 
         heightRecords = profile.heightRecords.toMutableList()
         updateHeightDisplay()
@@ -147,10 +171,19 @@ class ProfileEditActivity : BaseBackActivity() {
         checkSaveEnabled()
     }
 
+    private fun updateProvinceDisplay() {
+        // 兜底：若新 region 仅有省代码但无省名，从 ProvinceRepository 补。
+        val display = if (selectedRegion.provinceName.isEmpty() && selectedRegion.provinceCode.isNotEmpty()) {
+            val p = provinceRepo.findByCode(selectedRegion.provinceCode)
+            selectedRegion.copy(provinceName = p?.name ?: selectedRegion.provinceCode)
+        } else selectedRegion
+        binding.provinceDisplay.text = display.display()
+    }
+
     private fun setupClickListeners() {
         binding.avatarEditText.setOnClickListener { avatarPickerLauncher.launch("image/*") }
         binding.birthdayDisplay.setOnClickListener { showDatePicker() }
-        binding.provinceDisplay.setOnClickListener { showProvincePicker() }
+        binding.provinceDisplay.setOnClickListener { showRegionChoiceSheet() }
         binding.diseaseDisplay.setOnClickListener { showDiseasePicker() }
 
         binding.genderGroup.setOnCheckedChangeListener { _, checkedId ->
@@ -195,7 +228,7 @@ class ProfileEditActivity : BaseBackActivity() {
         val changed = currentName != orig.name ||
             currentGender != orig.gender ||
             selectedBirthday != orig.birthday ||
-            selectedProvince != orig.province ||
+            selectedRegion != orig.region ||
             selectedDiseaseIds.toList() != orig.diseaseIds ||
             heightRecords.toList() != orig.heightRecords ||
             weightRecords.toList() != orig.weightRecords ||
@@ -229,28 +262,239 @@ class ProfileEditActivity : BaseBackActivity() {
         ).show()
     }
 
-    private fun showProvincePicker() {
-        val provinces = arrayOf(
-            "北京", "天津", "河北省", "山西省", "内蒙古",
-            "辽宁省", "吉林省", "黑龙江省", "上海", "江苏省",
-            "浙江省", "安徽省", "福建省", "江西省", "山东省",
-            "河南省", "湖北省", "湖南省", "广东省", "广西",
-            "海南省", "重庆", "四川省", "贵州省", "云南省",
-            "西藏", "陕西省", "甘肃省", "青海省", "宁夏",
-            "新疆", "台湾省", "香港", "澳门"
-        )
-        AlertDialog.Builder(this)
-            .setTitle("选择地区")
-            .setItems(provinces) { _, which ->
-                selectedProvince = provinces[which]
-                binding.provinceDisplay.text = selectedProvince
-                checkSaveEnabled()
+    /** 「选择地区」入口：弹底部 sheet 让用户选「使用当前位置」或「手动选择三级地区」。 */
+    private fun showRegionChoiceSheet() {
+        val sheet = BottomSheetDialog(this)
+        val density = resources.displayMetrics.density
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((24 * density).toInt(), (20 * density).toInt(),
+                (24 * density).toInt(), (16 * density).toInt())
+        }
+        root.addView(TextView(this).apply {
+            text = "选择地区"
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
+        })
+
+        val useLocation = MaterialButton(this).apply {
+            text = "使用当前位置"
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (12 * density).toInt() }
+            setOnClickListener {
+                sheet.dismiss()
+                if (locationProvider.hasPermission()) startLocationLookup()
+                else locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
+        }
+        root.addView(useLocation)
+
+        val manual = MaterialButton(this).apply {
+            text = "手动选择省/市/县"
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (8 * density).toInt() }
+            setOnClickListener {
+                sheet.dismiss()
+                showManualProvinceSheet()
+            }
+        }
+        root.addView(manual)
+
+        sheet.setContentView(root)
+        sheet.show()
+    }
+
+    private var locationDialog: AlertDialog? = null
+
+    private fun startLocationLookup() {
+        locationDialog = AlertDialog.Builder(this)
+            .setTitle("正在定位")
+            .setMessage("请稍候，正在获取当前位置…")
+            .setCancelable(true)
+            .setOnCancelListener { showManualProvinceSheet() }
             .show()
+
+        locationProvider.getCurrentLocation { result ->
+            runOnUiThread {
+                locationDialog?.dismiss()
+                locationDialog = null
+                when (result) {
+                    is CurrentLocationProvider.Result.Ok -> {
+                        // 省级走射线法、市/县级走质心最近法——一次反查得到三级完整 snapshot。
+                        val snapshot = regionRepo.resolve(result.lng, result.lat, provinceRepo)
+                        if (snapshot.provinceCode.isNotEmpty()) {
+                            selectedRegion = snapshot
+                            updateProvinceDisplay()
+                            checkSaveEnabled()
+                            Toast.makeText(this,
+                                "已识别：${snapshot.display()}", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // 坐标落到包外多边形外，省都没中——保留坐标，回退到手选省
+                            selectedRegion = snapshot
+                            updateProvinceDisplay()
+                            Toast.makeText(this, "未能识别当前位置所属省份",
+                                Toast.LENGTH_SHORT).show()
+                            showManualProvinceSheet()
+                        }
+                    }
+                    is CurrentLocationProvider.Result.Err -> {
+                        Toast.makeText(this, "定位失败 (${result.reason})",
+                            Toast.LENGTH_SHORT).show()
+                        showManualProvinceSheet()
+                    }
+                }
+            }
+        }
+    }
+
+    /** 手选三级地区：先用底部 sheet 选省 → 选市 → 选县。每选一层进入下一层。 */
+    private fun showManualProvinceSheet() {
+        val sheet = BottomSheetDialog(this)
+        val density = resources.displayMetrics.density
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((24 * density).toInt(), (20 * density).toInt(),
+                (24 * density).toInt(), (16 * density).toInt())
+        }
+        root.addView(TextView(this).apply {
+            text = "选择省份"
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
+        })
+        val scroll = android.widget.ScrollView(this)
+        val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        for (p in provinceRepo.all().sortedBy { it.code }) {
+            list.addView(TextView(this).apply {
+                text = "  ${p.name}"
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+                setPadding(0, (14 * density).toInt(), 0, (14 * density).toInt())
+                setOnClickListener {
+                    sheet.dismiss()
+                    selectedRegion = RegionSnapshot(
+                        provinceCode = p.code, provinceName = p.name
+                    )
+                    updateProvinceDisplay()
+                    checkSaveEnabled()
+                    showManualCitySheet(p.code, p.name)
+                }
+            })
+            list.addView(android.view.View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1
+                ).apply { setPadding(0, 0, 0, 0) }
+                setBackgroundColor(0xFFEEEEEE.toInt())
+            })
+        }
+        scroll.addView(list)
+        root.addView(scroll)
+        sheet.setContentView(root)
+        sheet.show()
+    }
+
+    private fun showManualCitySheet(provinceCode: String, provinceName: String) {
+        val cities = regionRepo.citiesOf(provinceCode)
+        if (cities.isEmpty()) {
+            // 该省没有市级质心数据（assets/regions.json 还没补全）
+            Toast.makeText(this, "暂无 $provinceName 市级数据", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val sheet = BottomSheetDialog(this)
+        val density = resources.displayMetrics.density
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((24 * density).toInt(), (20 * density).toInt(),
+                (24 * density).toInt(), (16 * density).toInt())
+        }
+        root.addView(TextView(this).apply {
+            text = "$provinceName／选择市"
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
+        })
+        val scroll = android.widget.ScrollView(this)
+        val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        for (c in cities) {
+            list.addView(TextView(this).apply {
+                text = "  ${c.name}"
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+                setPadding(0, (14 * density).toInt(), 0, (14 * density).toInt())
+                setOnClickListener {
+                    sheet.dismiss()
+                    selectedRegion = selectedRegion.copy(
+                        provinceCode = provinceCode, provinceName = provinceName,
+                        cityCode = c.code, cityName = c.name,
+                        lng = c.lng, lat = c.lat,
+                        districtCode = "", districtName = ""
+                    )
+                    updateProvinceDisplay()
+                    checkSaveEnabled()
+                    showManualDistrictSheet(provinceCode, provinceName, c)
+                }
+            })
+            list.addView(android.view.View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1
+                ).apply { setPadding(0, 0, 0, 0) }
+                setBackgroundColor(0xFFEEEEEE.toInt())
+            })
+        }
+        scroll.addView(list)
+        root.addView(scroll)
+        sheet.setContentView(root)
+        sheet.show()
+    }
+
+    private fun showManualDistrictSheet(provinceCode: String, provinceName: String, city: com.woshiwangnima.healthdietpro.model.region.Region) {
+        val districts = regionRepo.districtsOf(city.code)
+        if (districts.isEmpty()) {
+            // 该市没有县级质心数据，保留市一级
+            return
+        }
+        val sheet = BottomSheetDialog(this)
+        val density = resources.displayMetrics.density
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((24 * density).toInt(), (20 * density).toInt(),
+                (24 * density).toInt(), (16 * density).toInt())
+        }
+        root.addView(TextView(this).apply {
+            text = "${city.name}／选择县/区"
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
+        })
+        val scroll = android.widget.ScrollView(this)
+        val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        for (d in districts) {
+            list.addView(TextView(this).apply {
+                text = "  ${d.name}"
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+                setPadding(0, (14 * density).toInt(), 0, (14 * density).toInt())
+                setOnClickListener {
+                    selectedRegion = selectedRegion.copy(
+                        provinceCode = provinceCode, provinceName = provinceName,
+                        cityCode = city.code, cityName = city.name,
+                        districtCode = d.code, districtName = d.name,
+                        lng = d.lng, lat = d.lat
+                    )
+                    updateProvinceDisplay()
+                    checkSaveEnabled()
+                    sheet.dismiss()
+                }
+            })
+            list.addView(android.view.View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1
+                ).apply { setPadding(0, 0, 0, 0) }
+                setBackgroundColor(0xFFEEEEEE.toInt())
+            })
+        }
+        scroll.addView(list)
+        root.addView(scroll)
+        sheet.setContentView(root)
+        sheet.show()
     }
 
     private fun showDiseasePicker() {
-        val diseases = diseaseRepo.getSorted(selectedProvince.ifEmpty { null })
+        val diseases = diseaseRepo.getSorted(selectedRegion.provinceCode.ifEmpty { null })
         val enabled = BooleanArray(diseases.size) { i ->
             diseases[i].gender?.contains(selectedGender.name) ?: true
         }
@@ -389,7 +633,7 @@ class ProfileEditActivity : BaseBackActivity() {
             name = name,
             gender = gender,
             birthday = selectedBirthday,
-            province = selectedProvince,
+            region = selectedRegion,
             diseaseIds = selectedDiseaseIds.toList(),
             heightRecords = heightRecords.toList(),
             weightRecords = weightRecords.toList(),

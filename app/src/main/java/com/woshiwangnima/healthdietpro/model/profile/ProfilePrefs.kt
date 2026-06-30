@@ -17,7 +17,13 @@ object ProfilePrefs {
 
     private fun ensureMigrated(context: Context) {
         val p = prefs(context)
-        if (p.contains(KEY_ALL_USERS)) return
+        if (p.contains(KEY_ALL_USERS)) {
+            // 二次迁移：把老版本里仅存的 `province: String`（省名或 2 位代码）
+            // 在 load 时封装成 RegionSnapshot。这里只触发一次：探测首条用户
+            // 数据中是否还有遗留的 'province' 字段。
+            migrateLegacyProvinceField(context)
+            return
+        }
         val legacyJson = p.getString(KEY_LEGACY_PROFILE, null) ?: return
         try {
             val legacy: UserProfile = Gson().fromJson(legacyJson, UserProfile::class.java)
@@ -26,6 +32,57 @@ object ProfilePrefs {
             setCurrentUserId(context, "default")
             p.edit().remove(KEY_LEGACY_PROFILE).apply()
         } catch (_: Exception) {}
+    }
+
+    /**
+     * 二次：旧版本 UserProfile 在 SharedPreferences 里以 `province: String`
+     * 存储省名/省代码；新版本直接用 RegionSnapshot。这里是迁移的进入点：
+     * 读原始 JSON 把 `province` 字段抽出，构造 RegionSnapshot，再写回。
+     */
+    private var legacyMigrationDone = false
+    private fun migrateLegacyProvinceField(context: Context) {
+        if (legacyMigrationDone) return
+        val raw = prefs(context).getString(KEY_ALL_USERS, null) ?: run {
+            legacyMigrationDone = true; return
+        }
+        if (!raw.contains("\"province\"")) {
+            legacyMigrationDone = true; return
+        }
+        try {
+            // 把每条 user JSON 中的 province 字段拼到 region.provinceCode 上，
+            // 同时移除老旧 province 顶层键。
+            val arr = com.google.gson.JsonParser.parseString(raw).asJsonArray
+            for (i in 0 until arr.size()) {
+                val obj = arr[i].asJsonObject
+                if (obj.has("province")) {
+                    val prov = obj.get("province").asString ?: ""
+                    obj.remove("province")
+                    val region = obj.getAsJsonObject("region") ?: com.google.gson.JsonObject().also { obj.add("region", it) }
+                    val code = normalizeProvinceCode(prov)
+                    if (code.isNotEmpty()) {
+                        region.addProperty("provinceCode", code)
+                    }
+                }
+            }
+            prefs(context).edit().putString(KEY_ALL_USERS, arr.toString()).apply()
+        } catch (_: Exception) {}
+        legacyMigrationDone = true
+    }
+
+    /** 把任意旧 province 值（中文省名 / 2 位码 / 空）统一成 2 位码。 */
+    private fun normalizeProvinceCode(stored: String?): String {
+        if (stored.isNullOrEmpty()) return ""
+        if (stored.length == 2 && stored.all { it.isDigit() }) return stored
+        val map = mapOf(
+            "北京" to "11", "天津" to "12", "河北省" to "13", "山西省" to "14", "内蒙古" to "15",
+            "辽宁省" to "21", "吉林省" to "22", "黑龙江省" to "23", "上海" to "31", "江苏省" to "32",
+            "浙江省" to "33", "安徽省" to "34", "福建省" to "35", "江西省" to "36", "山东省" to "37",
+            "河南省" to "41", "湖北省" to "42", "湖南省" to "43", "广东省" to "44", "广西" to "45",
+            "海南省" to "46", "重庆" to "50", "四川省" to "51", "贵州省" to "52", "云南省" to "53",
+            "西藏" to "54", "陕西省" to "61", "甘肃省" to "62", "青海省" to "63", "宁夏" to "64",
+            "新疆" to "65", "台湾省" to "71", "香港" to "81", "澳门" to "82"
+        )
+        return map[stored] ?: ""
     }
 
     private fun loadUserMap(context: Context): List<UserProfile> {
@@ -79,7 +136,7 @@ object ProfilePrefs {
         setCurrentUserId(context, withId.id)
     }
 
-    fun load(context: Context): UserProfile {
+fun load(context: Context): UserProfile {
         val current = getProfile(context, getCurrentUserId(context))
         val seed = createSeedProfile()
         return UserProfile(
@@ -87,13 +144,10 @@ object ProfilePrefs {
             name = current?.name ?: seed.name,
             gender = current?.gender ?: seed.gender,
             birthday = current?.birthday ?: seed.birthday,
-            province = current?.province ?: seed.province,
+            region = current?.region ?: seed.region,
             diseaseIds = current?.diseaseIds ?: seed.diseaseIds,
             heightRecords = joinRecords(current?.heightRecords.orEmpty(), seed.heightRecords, false),
             weightRecords = joinRecords(current?.weightRecords.orEmpty(), seed.weightRecords, true),
-            // avatarFileName lives on the persisted user record; surface it here so
-            // ProfileFragment / ProfileEditActivity can read the saved avatar back after
-            // restart (otherwise it always came back empty).
             avatarFileName = current?.avatarFileName ?: ""
         )
     }

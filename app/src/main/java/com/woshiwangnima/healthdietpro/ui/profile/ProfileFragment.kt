@@ -110,7 +110,11 @@ class ProfileFragment : Fragment() {
 
         if (!avatarLoaded) {
             binding.avatarText.text = initial
-            binding.avatarText.background?.mutate()?.setTint(avatarColors[colorIdx])
+            val bg = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(avatarColors[colorIdx])
+            }
+            binding.avatarText.background = bg
         }
 
         if (profile.gender.name == "MALE") {
@@ -130,7 +134,16 @@ class ProfileFragment : Fragment() {
 
         binding.profileBirthday.text = profile.birthday?.date ?: "未设置"
 
-        binding.profileProvince.text = profile.province.ifEmpty { "未设置" }
+        binding.profileProvince.text = profile.region.display()
+        // 兜底：若新 region 仅省代码无省名（迁移后的数据），补一下显示
+        if (profile.region.provinceCode.isNotEmpty() && profile.region.provinceName.isEmpty()) {
+            runCatching {
+                com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
+                    .fromContext(ctx).findByCode(profile.region.provinceCode)?.name
+            }.getOrNull()?.let { name ->
+                binding.profileProvince.text = profile.region.copy(provinceName = name).display()
+            }
+        }
 
         if (profile.diseaseIds.isEmpty()) {
             binding.profileDiseases.text = "\u65E0"
