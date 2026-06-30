@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TabBar">
+        <attr name="displayMode" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="centerHighlight" value="1" />
+        </attr>
+        <attr name="maxVisible" format="integer" />
+    </declare-styleable>
+</resources>
