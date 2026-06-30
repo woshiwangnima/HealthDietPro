@@ -10,7 +10,7 @@
         android:id="@+id/totalCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:textSize="@dimen/text_size_label"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:text="共 0 条记录"
         android:paddingBottom="8dp" />

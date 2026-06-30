@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textSize="14sp"
+        android:textSize="@dimen/text_size_label"
         android:textColor="?attr/colorOnSurface"
         android:paddingTop="4dp"
         android:paddingBottom="2dp"
@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="图表样式"
-                android:textSize="12sp"
+                android:textSize="@dimen/text_size_caption"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:layout_marginEnd="8dp" />
 
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="显示时间"
-                android:textSize="12sp"
+                android:textSize="@dimen/text_size_caption"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:layout_marginEnd="8dp" />
 
@@ -80,7 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="X轴间隔"
-                android:textSize="12sp"
+                android:textSize="@dimen/text_size_caption"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:layout_marginEnd="8dp" />
 
@@ -103,7 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Y轴"
-                android:textSize="12sp"
+                android:textSize="@dimen/text_size_caption"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:layout_marginEnd="4dp" />
 
@@ -113,7 +113,7 @@
                 android:layout_height="28dp"
                 android:hint="-10"
                 android:text="-10"
-                android:textSize="11sp"
+                android:textSize="@dimen/text_size_micro"
                 android:gravity="center"
                 android:inputType="numberDecimal|numberSigned"
                 android:background="@drawable/input_bg"
@@ -123,14 +123,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="%"
-                android:textSize="11sp"
+                android:textSize="@dimen/text_size_micro"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=" ~ "
-                android:textSize="11sp"
+                android:textSize="@dimen/text_size_micro"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
             <EditText
@@ -139,7 +139,7 @@
                 android:layout_height="28dp"
                 android:hint="110"
                 android:text="110"
-                android:textSize="11sp"
+                android:textSize="@dimen/text_size_micro"
                 android:gravity="center"
                 android:inputType="numberDecimal|numberSigned"
                 android:background="@drawable/input_bg"
@@ -149,7 +149,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="%"
-                android:textSize="11sp"
+                android:textSize="@dimen/text_size_micro"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
             <Space
@@ -162,7 +162,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:text="全屏"
-                android:textSize="11sp"
+                android:textSize="@dimen/text_size_micro"
                 android:paddingHorizontal="8dp"
                 app:icon="@drawable/ic_fullscreen"
                 app:iconGravity="textStart"
