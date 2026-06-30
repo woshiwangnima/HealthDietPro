@@ -117,6 +117,17 @@ abstract class TabBar @JvmOverloads constructor(
             LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         )
 
+        // Let the center-highlight tab's elevation + scale + translation render
+        // outside the strip's bounds instead of being clipped at the edges.
+        strip.clipChildren = false
+        strip.clipToPadding = false
+        scrollView?.clipChildren = false
+        scrollView?.clipToPadding = false
+        if (displayMode == DisplayMode.CENTER_HIGHLIGHT) {
+            clipChildren = false
+            clipToPadding = false
+        }
+
         renderSelection()
     }
 
