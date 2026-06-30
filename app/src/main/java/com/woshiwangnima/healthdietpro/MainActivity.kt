@@ -141,8 +141,10 @@ class MainActivity : BaseActivity() {
         labels.forEachIndexed { i, label ->
             label.setTextColor(if (i == selectedIndex) selectedColor else defaultColor)
             label.setTypeface(null, if (i == selectedIndex) Typeface.BOLD else Typeface.NORMAL)
-            label.textSize = if (i == selectedIndex)
-                NavConfig.SELECTED_TEXT_SIZE_SP else NavConfig.DEFAULT_TEXT_SIZE_SP
+            label.setTextSize(
+                android.util.TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(R.dimen.text_size_micro)
+            )
         }
 
         updateCenterIconBackground(selectedIndex)
