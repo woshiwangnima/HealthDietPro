@@ -1,15 +1,12 @@
 package com.woshiwangnima.healthdietpro.ui.settings
 
 import android.os.Bundle
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityReminderSettingsBinding
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
-import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
-import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class ReminderSettingsActivity : BaseBackActivity() {
@@ -25,30 +22,7 @@ class ReminderSettingsActivity : BaseBackActivity() {
         binding.root.applySystemBarInsets()
         setupToolbar(binding.toolbar)
 
-        applyFontStyles()
         setupSwitches()
-    }
-
-    private fun applyFontStyles() {
-        applyLabel(binding.drinkReminderRow, FontStyle.SUBTITLE)
-        applyLabel(binding.medReminderRow, FontStyle.SUBTITLE)
-        applyLabel(binding.periodReminderRow, FontStyle.SUBTITLE)
-        applyLabel(binding.fastingReminderRow, FontStyle.SUBTITLE)
-    }
-
-    private fun applyLabel(row: ViewGroup, style: FontStyle) {
-        for (i in 0 until row.childCount) {
-            val child = row.getChildAt(i)
-            if (child is ViewGroup) {
-                for (j in 0 until child.childCount) {
-                    val gc = child.getChildAt(j)
-                    if (gc is TextView && gc.id != ViewGroup.generateViewId()) {
-                        gc.applyFontStyle(style)
-                        return
-                    }
-                }
-            }
-        }
     }
 
     private fun setupSwitches() {
