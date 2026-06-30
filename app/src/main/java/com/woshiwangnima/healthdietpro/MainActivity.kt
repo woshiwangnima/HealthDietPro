@@ -40,6 +40,14 @@ class MainActivity : BaseActivity() {
 
         binding.main.applySystemBarInsets()
 
+        // Font-aware bottom-nav height: auto-size to icon + scaled label + padding so the
+        // icon is never clipped at large font scales (设置 → 偏好设置 → 默认字体大小).
+        val dm = resources.displayMetrics
+        val labelLinePx = resources.getDimension(R.dimen.text_size_label) * 1.4f
+        val iconPadPx = (24f + 10f + 8f) * dm.density  // icon 24dp + padding 10dp + a little extra
+        binding.navBar.layoutParams.height =
+            (iconPadPx + labelLinePx).toInt().coerceAtLeast((56f * dm.density).toInt())
+
         val tabs = listOf(
             TabItem(R.drawable.ic_nav_nutrition, getString(R.string.nav_nutrition)),
             TabItem(R.drawable.ic_nav_record, getString(R.string.nav_record)),
