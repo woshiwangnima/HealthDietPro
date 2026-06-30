@@ -11,8 +11,6 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityPreferencesBinding
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
-import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
-import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
@@ -30,7 +28,6 @@ class PreferencesActivity : BaseBackActivity() {
         setupToolbar(binding.toolbar)
 
         UnitConverter.init(this)
-        applyFontStyles()
         buildFontPreviews()
         buildUnitRows()
         refreshDisplay()
@@ -38,53 +35,43 @@ class PreferencesActivity : BaseBackActivity() {
         setupFontScaleBar()
     }
 
-    private fun applyFontStyles() {
-        binding.fontSizeHeader.applyFontStyle(FontStyle.SUBTITLE)
-        binding.unitHeader.applyFontStyle(FontStyle.SUBTITLE)
-        binding.otherHeader.applyFontStyle(FontStyle.SUBTITLE)
-        binding.fontScaleValue.applyFontStyle(FontStyle.CAPTION)
+    private data class FontPreviewItem(val cnName: String, val dimenRes: Int)
 
-        findLabelInRow(binding.firstDayRow)?.applyFontStyle(FontStyle.BODY)
-        findLabelInRow(binding.darkModeRow)?.applyFontStyle(FontStyle.BODY)
-        findLabelInRow(binding.textOverflowRow)?.applyFontStyle(FontStyle.BODY)
-        findLabelInRow(binding.marqueeSpeedRow)?.applyFontStyle(FontStyle.BODY)
-    }
-
-    private fun findLabelInRow(row: android.view.ViewGroup): TextView? {
-        for (i in 0 until row.childCount) {
-            val child = row.getChildAt(i)
-            if (child is TextView && child.id != R.id.firstDayValue &&
-                child.id != R.id.darkModeValue && child.id != R.id.textOverflowValue &&
-                child.id != R.id.marqueeSpeedValue && child.id != R.id.rowValue
-            ) return child
-        }
-        return null
-    }
+    private val fontPreviewItems = listOf(
+        FontPreviewItem("脚注", R.dimen.text_size_caption),
+        FontPreviewItem("标注", R.dimen.text_size_label),
+        FontPreviewItem("正文", R.dimen.text_size_body),
+        FontPreviewItem("副标题", R.dimen.text_size_subtitle),
+        FontPreviewItem("标题", R.dimen.text_size_title),
+        FontPreviewItem("大标题", R.dimen.text_size_headline),
+        FontPreviewItem("巨标", R.dimen.text_size_display)
+    )
 
     private fun buildFontPreviews() {
         val container = binding.fontPreviewContainer
         container.removeAllViews()
-        val styles = listOf(FontStyle.CAPTION, FontStyle.LABEL, FontStyle.BODY,
-            FontStyle.SUBTITLE, FontStyle.TITLE, FontStyle.HEADLINE, FontStyle.DISPLAY)
-        for (style in styles) {
+        val scaledDensity = resources.displayMetrics.scaledDensity
+        val captionPx = resources.getDimension(R.dimen.text_size_caption)
+        for (item in fontPreviewItems) {
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 setPadding(0, 4, 0, 4)
                 gravity = android.view.Gravity.CENTER_VERTICAL
             }
+            val px = resources.getDimension(item.dimenRes)
             val label = TextView(this).apply {
-                text = "${style.cnName}"
-                applyFontStyle(FontStyle.CAPTION)
+                text = item.cnName
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, captionPx)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.2f)
             }
             val sizeInfo = TextView(this).apply {
-                text = "%.0fsp".format(FontStyle.sp(this@PreferencesActivity, style))
-                applyFontStyle(FontStyle.CAPTION)
+                text = "%.0fsp".format(px / scaledDensity)
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, captionPx)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.15f)
             }
             val preview = TextView(this).apply {
                 text = "预览ABcd123"
-                applyFontStyle(style)
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, px)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.65f)
             }
             row.addView(label)
@@ -104,7 +91,6 @@ class PreferencesActivity : BaseBackActivity() {
             val label = row.findViewById<TextView>(R.id.rowLabel)
             val value = row.findViewById<TextView>(R.id.rowValue)
 
-            label.applyFontStyle(FontStyle.BODY)
             label.text = category.categoryCn
             val currentId = AppPrefs.getUnit(this, category.id, category.baseUnit)
             val currentUnit = category.units.find { it.id == currentId }
@@ -212,8 +198,7 @@ class PreferencesActivity : BaseBackActivity() {
                 val p = seekBar?.progress ?: 22
                 val scale = 0.8f + p / 70f * 0.7f
                 AppPrefs.setFontScale(this@PreferencesActivity, scale)
-                buildFontPreviews()
-                applyFontStyles()
+                recreate()
             }
         })
     }

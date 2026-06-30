@@ -38,6 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="默认字体大小"
+                    android:textSize="@dimen/text_size_subtitle"
                     android:paddingBottom="8dp" />
 
                 <LinearLayout
@@ -51,7 +52,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="A"
-                        android:textSize="14sp"
+                        android:textSize="@dimen/text_size_label"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginEnd="8dp" />
 
@@ -66,7 +67,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="A"
-                        android:textSize="24sp"
+                        android:textSize="@dimen/text_size_subtitle"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginStart="8dp" />
                 </LinearLayout>
@@ -76,6 +77,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="100%"
+                    android:textSize="@dimen/text_size_caption"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:paddingBottom="4dp" />
 
@@ -101,6 +103,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="默认单位偏好"
+                    android:textSize="@dimen/text_size_subtitle"
                     android:paddingBottom="8dp" />
 
                 <LinearLayout
@@ -125,6 +128,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="其他偏好"
+                    android:textSize="@dimen/text_size_subtitle"
                     android:paddingBottom="8dp" />
 
                 <LinearLayout
@@ -141,12 +145,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="每周第一天" />
+                        android:text="每周第一天"
+                        android:textSize="@dimen/text_size_body" />
 
                     <TextView
                         android:id="@+id/firstDayValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_label"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         tools:text="周一" />
 
@@ -155,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:text=">"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="20sp"
+                        android:textSize="@dimen/text_size_subtitle"
                         android:layout_marginStart="8dp" />
                 </LinearLayout>
 
@@ -173,12 +179,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="深色模式" />
+                        android:text="深色模式"
+                        android:textSize="@dimen/text_size_body" />
 
                     <TextView
                         android:id="@+id/darkModeValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_label"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         tools:text="跟随系统" />
 
@@ -187,7 +195,7 @@
                         android:layout_height="wrap_content"
                         android:text=">"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="20sp"
+                        android:textSize="@dimen/text_size_subtitle"
                         android:layout_marginStart="8dp" />
                 </LinearLayout>
 
@@ -205,12 +213,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="文字溢出处理" />
+                        android:text="文字溢出处理"
+                        android:textSize="@dimen/text_size_body" />
 
                     <TextView
                         android:id="@+id/textOverflowValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_label"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         tools:text="自适应缩小" />
 
@@ -219,7 +229,7 @@
                         android:layout_height="wrap_content"
                         android:text=">"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="20sp"
+                        android:textSize="@dimen/text_size_subtitle"
                         android:layout_marginStart="8dp" />
                 </LinearLayout>
 
@@ -239,12 +249,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="轮播速度(ms/字)" />
+                        android:text="轮播速度(ms/字)"
+                        android:textSize="@dimen/text_size_body" />
 
                     <TextView
                         android:id="@+id/marqueeSpeedValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_label"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         tools:text="200" />
 
@@ -253,7 +265,7 @@
                         android:layout_height="wrap_content"
                         android:text=">"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="20sp"
+                        android:textSize="@dimen/text_size_subtitle"
                         android:layout_marginStart="8dp" />
                 </LinearLayout>
             </LinearLayout>
