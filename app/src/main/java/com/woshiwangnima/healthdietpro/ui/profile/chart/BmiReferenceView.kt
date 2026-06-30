@@ -7,8 +7,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
-import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
+import com.woshiwangnima.healthdietpro.R
 
 class BmiReferenceView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -26,7 +25,10 @@ class BmiReferenceView @JvmOverloads constructor(
             setTextColor(0xFF333333.toInt())
             setPadding(0, 16, 0, 8)
             gravity = Gravity.START
-            applyFontStyle(FontStyle.SUBTITLE)
+            setTextSize(
+                android.util.TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(R.dimen.text_size_subtitle)
+            )
         }
         addView(title)
 

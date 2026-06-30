@@ -23,8 +23,6 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.chart.ChartTimeConfigRepository
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitRepository
-import com.woshiwangnima.healthdietpro.ui.theme.FontStyle
-import com.woshiwangnima.healthdietpro.ui.theme.applyFontStyle
 
 class ChartView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -189,7 +187,10 @@ class ChartView @JvmOverloads constructor(
     fun setChartTitle(title: String, gravity: Int = android.view.Gravity.CENTER) {
         chartTitle.text = title
         chartTitle.gravity = gravity
-        chartTitle.applyFontStyle(com.woshiwangnima.healthdietpro.ui.theme.FontStyle.SUBTITLE)
+        chartTitle.setTextSize(
+            android.util.TypedValue.COMPLEX_UNIT_PX,
+            resources.getDimension(R.dimen.text_size_subtitle)
+        )
         chartTitle.visibility = View.VISIBLE
     }
 
