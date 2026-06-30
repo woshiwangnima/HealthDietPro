@@ -5,8 +5,8 @@ import android.graphics.Typeface
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.config.NavConfig
 import com.woshiwangnima.healthdietpro.databinding.ActivityMainBinding
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
@@ -16,7 +16,7 @@ import com.woshiwangnima.healthdietpro.ui.profile.ProfileFragment
 import com.woshiwangnima.healthdietpro.ui.record.RecordFragment
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 

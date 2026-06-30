@@ -2,11 +2,10 @@ package com.woshiwangnima.healthdietpro.base
 
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.woshiwangnima.healthdietpro.R
 
-abstract class BaseBackActivity : AppCompatActivity() {
+abstract class BaseBackActivity : BaseActivity() {
 
     abstract fun getTitleText(): String
 
