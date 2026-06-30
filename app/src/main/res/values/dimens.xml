@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_size_display">56sp</dimen>
+    <dimen name="text_size_headline">36sp</dimen>
+    <dimen name="text_size_title">28sp</dimen>
+    <dimen name="text_size_subtitle">22sp</dimen>
+    <dimen name="text_size_body">16sp</dimen>
+    <dimen name="text_size_label">14sp</dimen>
+    <dimen name="text_size_caption">12sp</dimen>
+    <dimen name="text_size_micro">11sp</dimen>
+</resources>
