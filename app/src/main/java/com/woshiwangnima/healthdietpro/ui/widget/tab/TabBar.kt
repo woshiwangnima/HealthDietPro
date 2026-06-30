@@ -104,6 +104,15 @@ abstract class TabBar @JvmOverloads constructor(
 
         val horizontal = orientation == LinearLayout.HORIZONTAL
         val scroll = scrollable()
+        // Cross-axis child size: when the bar itself wraps on the cross axis, children must
+        // also wrap — otherwise MATCH_PARENT children in a wrap_content bar create a sizing
+        // cycle that expands the bar to fill its parent. When the bar is fixed-size on the
+        // cross axis, children fill (MATCH_PARENT) for full-height tap targets.
+        val barWrapCross = layoutParams?.let { if (horizontal) it.height else it.width } ==
+            LayoutParams.WRAP_CONTENT
+        val crossAxis = if (barWrapCross)
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        else LinearLayout.LayoutParams.MATCH_PARENT
 
         for ((index, item) in items.withIndex()) {
             val view = TabItemView(context)
@@ -112,8 +121,8 @@ abstract class TabBar @JvmOverloads constructor(
             val lp = LinearLayout.LayoutParams(
                 if (horizontal) {
                     if (scroll) LinearLayout.LayoutParams.WRAP_CONTENT else 0
-                } else LinearLayout.LayoutParams.MATCH_PARENT,
-                if (horizontal) LinearLayout.LayoutParams.MATCH_PARENT
+                } else crossAxis,
+                if (horizontal) crossAxis
                 else {
                     if (scroll) LinearLayout.LayoutParams.WRAP_CONTENT else 0
                 }
@@ -149,15 +158,18 @@ abstract class TabBar @JvmOverloads constructor(
             }
         } else null
 
-        // Strip/scrollView: fill the primary axis, wrap on the cross axis, center within the bar.
+        // Strip/scrollView: fill the primary axis, cross-axis per `crossAxis`, centered.
         val rootLp = LayoutParams(
-            if (horizontal) LayoutParams.MATCH_PARENT else LayoutParams.WRAP_CONTENT,
-            if (horizontal) LayoutParams.WRAP_CONTENT else LayoutParams.MATCH_PARENT
+            if (horizontal) LayoutParams.MATCH_PARENT else crossAxis,
+            if (horizontal) crossAxis else LayoutParams.MATCH_PARENT
         )
         rootLp.gravity = if (horizontal) Gravity.CENTER_VERTICAL else Gravity.CENTER_HORIZONTAL
 
         if (indicatorView != null) {
-            addView(indicatorView!!, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+            // Height 0 at measure: a plain View with WRAP_CONTENT returns the parent's AT_MOST
+            // max via getDefaultSize (would expand a wrap_content bar). Use a concrete 0 so it
+            // can't expand; SlidingIndicator pins it to the strip's real height once laid out.
+            addView(indicatorView!!, LayoutParams(LayoutParams.MATCH_PARENT, 0))
         }
         addView(scrollView ?: strip, rootLp)
 

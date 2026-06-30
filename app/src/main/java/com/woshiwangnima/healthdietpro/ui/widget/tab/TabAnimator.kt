@@ -16,7 +16,8 @@ object DefaultTabAnimator : TabAnimator {
             else -> 1f
         }
         val targetAlpha = if (selected) 1f else 0.7f
-        if (isCenter) {
+        // "center" (eye-catching) → just scale up, no lift. "selected" → lift the tab.
+        if (selected && !isCenter) {
             view.elevation = 4f * density
             view.translationY = -8f * density
         } else {

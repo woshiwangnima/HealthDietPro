@@ -42,18 +42,23 @@ class SlidingIndicator : TabIndicator {
             previous = selectedIndex
             return
         }
-        if (tabBar.strip.width == 0) {
+        if (tabBar.strip.width == 0 || tabBar.strip.height == 0) {
             // Not laid out yet; retry once layout completes.
             tabBar.post { onSelectionChanged(indicatorView, tabBar, selectedIndex) }
             return
         }
+        // Pin the indicator's size to the strip's measured size: it was sized 0×MATCH_PARENT
+        // at measure to avoid expanding a wrap_content bar, so it can't be visible until we
+        // resize it to the strip's real height here.
         val count = tabBar.items.size
         if (count == 0) return
         val tabWidth = tabBar.strip.width.toFloat() / count
+        val stripH = tabBar.strip.height
         val targetX = selectedIndex * tabWidth
         val lp = indicatorView.layoutParams
-        if (lp.width != tabWidth.toInt()) {
+        if (lp.width != tabWidth.toInt() || lp.height != stripH) {
             lp.width = tabWidth.toInt()
+            lp.height = stripH
             indicatorView.layoutParams = lp
         }
         if (!visible) {
