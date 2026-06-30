@@ -23,31 +23,10 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <LinearLayout
-            android:id="@+id/bottomBar"
+        <com.woshiwangnima.healthdietpro.ui.widget.tab.ToggleBar
+            android:id="@+id/tabBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:background="?attr/colorSurface">
-
-            <TextView
-                android:id="@+id/tabChart"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="图表"
-                android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
-
-            <TextView
-                android:id="@+id/tabData"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="数据"
-                android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
-        </LinearLayout>
+            android:layout_height="48dp"
+            app:displayMode="normal" />
     </LinearLayout>
 </layout>

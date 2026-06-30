@@ -1,16 +1,10 @@
 package com.woshiwangnima.healthdietpro.ui.profile
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsets
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
-import com.woshiwangnima.healthdietpro.config.NavConfig
 import com.woshiwangnima.healthdietpro.databinding.ActivityWeightDetailBinding
-import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -22,6 +16,8 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.profile.list.DataListFragment
+import com.woshiwangnima.healthdietpro.ui.widget.tab.TabItem
+import com.woshiwangnima.healthdietpro.ui.widget.tab.ToggleBar
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 import java.time.LocalDate
@@ -50,10 +46,13 @@ class WeightDetailActivity : BaseBackActivity() {
         unit = intent.getStringExtra("unit") ?: UnitCategory.DEFAULT_UNIT_WEIGHT
         category = UnitCategory.ID_WEIGHT
 
-        setupBottomBar()
-        val savedTab = AppPrefs.getWeightChartTab(this)
-        switchTab(savedTab)
-        setupTabListeners()
+        binding.tabBar.setTabs(listOf(
+            TabItem(label = "图表"),
+            TabItem(label = "数据")
+        ))
+        binding.tabBar.restore("tab_weight_chart", 0)
+        binding.tabBar.listener = { idx, _ -> switchTab(idx) }
+        switchTab(binding.tabBar.selectedIndex)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val cv = chartView
@@ -72,20 +71,9 @@ class WeightDetailActivity : BaseBackActivity() {
         finish()
     }
 
-    private fun setupBottomBar() {
-        val screenHeight = resources.displayMetrics.heightPixels
-        val density = resources.displayMetrics.density
-        val barHeight = NavConfig.calculateBarHeightPx(screenHeight.toInt(), density)
-        val params = binding.bottomBar.layoutParams
-        params.height = barHeight
-        binding.bottomBar.layoutParams = params
-    }
-
     private fun switchTab(index: Int) {
         if (index == currentTab) return
         currentTab = index
-        AppPrefs.setWeightChartTab(this, index)
-        updateTabSelection()
         when (index) {
             0 -> showChartTab()
             1 -> showDataTab()
@@ -132,19 +120,5 @@ class WeightDetailActivity : BaseBackActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.contentFrame, fragment)
             .commit()
-    }
-
-    private fun updateTabSelection() {
-        val bgSelected = ContextCompat.getDrawable(this, R.drawable.tab_selected_bg)
-        val bgDefault = ContextCompat.getDrawable(this, R.drawable.tab_default_bg)
-        binding.tabChart.background = if (currentTab == 0) bgSelected else bgDefault
-        binding.tabData.background = if (currentTab == 1) bgSelected else bgDefault
-        binding.tabChart.isSelected = currentTab == 0
-        binding.tabData.isSelected = currentTab == 1
-    }
-
-    private fun setupTabListeners() {
-        binding.tabChart.setOnClickListener { switchTab(0) }
-        binding.tabData.setOnClickListener { switchTab(1) }
     }
 }

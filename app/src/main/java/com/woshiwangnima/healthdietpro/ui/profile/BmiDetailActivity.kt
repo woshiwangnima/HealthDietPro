@@ -1,17 +1,12 @@
 package com.woshiwangnima.healthdietpro.ui.profile
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
-import android.view.WindowInsets
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
-import com.woshiwangnima.healthdietpro.config.NavConfig
-import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiCalculatorView
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiReferenceView
@@ -23,15 +18,15 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.profile.chart.YAxisBand
+import com.woshiwangnima.healthdietpro.ui.widget.tab.TabItem
+import com.woshiwangnima.healthdietpro.ui.widget.tab.ToggleBar
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class BmiDetailActivity : BaseBackActivity() {
 
-    private var currentTab = 0
+    private var currentTab = -1
     private var chartView: ChartView? = null
     private lateinit var content: LinearLayout
-    private lateinit var tabChart: TextView
-    private lateinit var tabData: TextView
     private val bmiData: List<com.woshiwangnima.healthdietpro.model.profile.DataPoint> by lazy {
         val profile = ProfilePrefs.load(this)
         BmiUtil.buildBmiDataPoints(profile.weightRecords, profile.heightRecords)
@@ -68,29 +63,24 @@ class BmiDetailActivity : BaseBackActivity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = android.view.Gravity.CENTER
             setBackgroundColor(resolveColor(com.google.android.material.R.attr.colorSurface))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         }
-
-        val screenHeight = resources.displayMetrics.heightPixels
-        val barHeight = NavConfig.calculateBarHeightPx(screenHeight.toInt(), resources.displayMetrics.density)
-        bottomBar.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, barHeight)
-
-        tabChart = TextView(this).apply {
-            text = "图表"; gravity = android.view.Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
-            setOnClickListener { switchTab(0) }
-        }
-        tabData = TextView(this).apply {
-            text = "数据"; gravity = android.view.Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
-            setOnClickListener { switchTab(1) }
-        }
-        bottomBar.addView(tabChart)
-        bottomBar.addView(tabData)
         root.addView(bottomBar)
 
+        val tabBar = ToggleBar(this).apply {
+            displayMode = com.woshiwangnima.healthdietpro.ui.widget.tab.TabBar.DisplayMode.NORMAL
+            setTabs(listOf(TabItem(label = "图表"), TabItem(label = "数据")))
+            restore("tab_bmi_chart", 0)
+            listener = { idx, _ -> switchTab(idx) }
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(48))
+        }
+        bottomBar.addView(tabBar)
+
         setContentView(root)
-        switchTab(AppPrefs.getBmiChartTab(this))
+        switchTab(tabBar.selectedIndex)
     }
+
+    private fun dp(n: Int): Int = (n * resources.displayMetrics.density).toInt()
 
     private fun resolveColor(attrRes: Int): Int {
         val ta = theme.obtainStyledAttributes(intArrayOf(attrRes))
@@ -98,11 +88,8 @@ class BmiDetailActivity : BaseBackActivity() {
     }
 
     private fun switchTab(idx: Int) {
+        if (idx == currentTab) return
         currentTab = idx
-        val bgSelected = ContextCompat.getDrawable(this, R.drawable.tab_selected_bg)
-        val bgDefault = ContextCompat.getDrawable(this, R.drawable.tab_default_bg)
-        tabChart.background = if (idx == 0) bgSelected else bgDefault
-        tabData.background = if (idx == 1) bgSelected else bgDefault
         content.removeAllViews()
         when (idx) {
             0 -> showChart()
@@ -192,10 +179,5 @@ class BmiDetailActivity : BaseBackActivity() {
         }
         scroll.addView(list)
         content.addView(scroll)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        AppPrefs.setBmiChartTab(this, currentTab)
     }
 }
