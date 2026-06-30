@@ -55,6 +55,9 @@
             android:name=".ui.profile.BmiDetailActivity"
             android:configChanges="orientation|screenSize|uiMode"
             android:exported="false" />
+        <activity
+            android:name=".ui.widget.tab.demo.DemoTabsActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
