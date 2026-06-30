@@ -2,9 +2,9 @@ package com.woshiwangnima.healthdietpro.ui.widget.tab
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
@@ -57,15 +57,16 @@ abstract class TabBar @JvmOverloads constructor(
             rebuild()
         }
 
-    var useSlidingIndicator: Boolean = false
+    /** Pluggable selection indicator (e.g. [SlidingIndicator]). When non-null and the bar is
+     *  horizontal + non-scrollable, an indicator view is hosted behind the strip and this
+     *  object drives its animation. null = no overlay indicator (per-tab animator only). */
+    var indicator: TabIndicator? = null
         set(value) {
             field = value
             rebuild()
         }
 
     private var indicatorView: View? = null
-    private var previousSelectedIndex: Int = -1
-    private var indicatorVisible: Boolean = false
 
     init {
         strip = LinearLayout(context)
@@ -92,6 +93,12 @@ abstract class TabBar @JvmOverloads constructor(
     private fun scrollable(): Boolean = items.size > maxVisible
 
     private fun rebuild() {
+        // Detach reusable children from any prior parent before re-parenting (a previous
+        // rebuild may have placed the strip inside a ScrollView that we're about to discard).
+        strip.parent?.let { (it as ViewGroup).removeView(strip) }
+        indicatorView?.parent?.let { (it as ViewGroup).removeView(indicatorView!!) }
+        removeAllViews()
+
         strip.removeAllViews()
         itemViews.clear()
 
@@ -104,13 +111,11 @@ abstract class TabBar @JvmOverloads constructor(
             view.setOnClickListener { toggle(index) }
             val lp = LinearLayout.LayoutParams(
                 if (horizontal) {
-                    if (scroll) LinearLayout.LayoutParams.WRAP_CONTENT
-                    else 0
+                    if (scroll) LinearLayout.LayoutParams.WRAP_CONTENT else 0
                 } else LinearLayout.LayoutParams.MATCH_PARENT,
                 if (horizontal) LinearLayout.LayoutParams.MATCH_PARENT
                 else {
-                    if (scroll) LinearLayout.LayoutParams.WRAP_CONTENT
-                    else 0
+                    if (scroll) LinearLayout.LayoutParams.WRAP_CONTENT else 0
                 }
             )
             if (!scroll) lp.weight = 1f
@@ -121,36 +126,43 @@ abstract class TabBar @JvmOverloads constructor(
 
         if (scroll) {
             scrollView = if (horizontal) HorizontalScrollView(context) else ScrollView(context)
-            scrollView!!.removeAllViews()
-            scrollView!!.addView(
-                strip,
-                LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-            )
+            // The strip must wrap on the scroll axis so it can exceed the viewport and scroll.
+            val stripLp = if (horizontal) {
+                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
+            } else {
+                LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            }
+            scrollView!!.addView(strip, stripLp)
         } else {
             scrollView = null
         }
 
-        // Sliding indicator lives behind the strip; only for horizontal non-scrollable bars.
-        indicatorView = if (useSlidingIndicator && horizontal && !scroll && items.isNotEmpty()) {
+        // Host an indicator view behind the strip when an indicator is set and the layout
+        // is horizontal + non-scrollable (the sliding-pill math relies on equal-weight tabs).
+        indicatorView = if (indicator != null && horizontal && !scroll && items.isNotEmpty()) {
             (indicatorView ?: View(context).apply {
                 background = ContextCompat.getDrawable(context, R.drawable.tab_pill_selected)
             }).also {
                 it.alpha = 0f
                 it.visibility = VISIBLE
+                indicator?.onReset()
             }
         } else null
 
-        removeAllViews()
+        // Strip/scrollView: fill the primary axis, wrap on the cross axis, center within the bar.
+        val rootLp = LayoutParams(
+            if (horizontal) LayoutParams.MATCH_PARENT else LayoutParams.WRAP_CONTENT,
+            if (horizontal) LayoutParams.WRAP_CONTENT else LayoutParams.MATCH_PARENT
+        )
+        rootLp.gravity = if (horizontal) Gravity.CENTER_VERTICAL else Gravity.CENTER_HORIZONTAL
+
         if (indicatorView != null) {
             addView(indicatorView!!, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         }
-        addView(
-            scrollView ?: strip,
-            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-        )
+        addView(scrollView ?: strip, rootLp)
 
-        // Let the center-highlight tab's elevation + scale + translation render
-        // outside the strip's bounds instead of being clipped at the edges.
+        // Let the center-highlight tab's elevation + scale + translation render outside the
+        // strip's bounds instead of being clipped at the edges.
         strip.clipChildren = false
         strip.clipToPadding = false
         scrollView?.clipChildren = false
@@ -160,8 +172,6 @@ abstract class TabBar @JvmOverloads constructor(
             clipToPadding = false
         }
 
-        previousSelectedIndex = -1
-        indicatorVisible = false
         renderSelection()
     }
 
@@ -169,68 +179,18 @@ abstract class TabBar @JvmOverloads constructor(
         for (i in items.indices) {
             val view = itemViews[i]
             binder.bind(items[i], view, isSelected(i), isCenter(i))
-            // The sliding indicator is the sole selected highlight; clear the per-tab
-            // background so the pill doesn't draw twice on top of the indicator.
+            // The indicator is the sole selected highlight; clear the per-tab background so
+            // the pill doesn't draw twice on top of the indicator.
             if (indicatorView != null && !isCenter(i)) {
                 view.background = null
             }
             animator?.animate(view, isSelected(i), isCenter(i))
         }
-        positionIndicator()
-    }
-
-    private fun positionIndicator() {
-        val indicator = indicatorView ?: return
         val current = items.indices.firstOrNull { isSelected(it) } ?: -1
-        // No selection, or the center tab is selected: hide the indicator (the center
-        // circle from the binder is the highlight there).
-        if (current == -1 || isCenter(current)) {
-            if (indicatorVisible) {
-                indicator.animate().cancel()
-                indicator.animate().alpha(0f).setDuration(120).start()
-                indicatorVisible = false
-            }
-            previousSelectedIndex = current
-            return
-        }
-        if (strip.width == 0) {
-            // Not laid out yet; retry once layout completes.
-            post { positionIndicator() }
-            return
-        }
-        val tabWidth = strip.width.toFloat() / items.size
-        val targetX = current * tabWidth
-        val lp = indicator.layoutParams
-        if (lp.width != tabWidth.toInt()) {
-            lp.width = tabWidth.toInt()
-            indicator.layoutParams = lp
-        }
-        if (!indicatorVisible) {
-            // Appear: if coming from the center, start at the center position and flow out;
-            // otherwise just fade in at the target.
-            val startX = if (previousSelectedIndex >= 0) previousSelectedIndex * tabWidth else targetX
-            indicator.translationX = startX
-            indicator.alpha = 0f
-            indicator.animate()
-                .alpha(1f)
-                .translationX(targetX)
-                .setInterpolator(OvershootInterpolator(1.5f))
-                .setDuration(280)
-                .start()
-            indicatorVisible = true
-        } else if (current != previousSelectedIndex) {
-            // Slide fluidly to the new tab with an overshoot snap.
-            indicator.animate().cancel()
-            indicator.animate()
-                .translationX(targetX)
-                .setInterpolator(OvershootInterpolator(1.5f))
-                .setDuration(280)
-                .start()
-        }
-        previousSelectedIndex = current
+        indicatorView?.let { ind -> indicator?.onSelectionChanged(ind, this, current) }
     }
 
-    protected fun isCenter(index: Int): Boolean =
+    fun isCenter(index: Int): Boolean =
         displayMode == DisplayMode.CENTER_HIGHLIGHT &&
             items.size % 2 == 1 &&
             index == items.size / 2

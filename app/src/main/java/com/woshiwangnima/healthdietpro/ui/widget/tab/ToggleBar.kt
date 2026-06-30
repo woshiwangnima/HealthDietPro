@@ -20,7 +20,7 @@ class ToggleBar @JvmOverloads constructor(
         // Fluid sliding indicator is the default selection animation for toggle bars.
         // It only activates for horizontal + non-scrollable bars (see TabBar.rebuild);
         // vertical / scrollable bars fall back to the per-tab animator.
-        useSlidingIndicator = true
+        indicator = SlidingIndicator()
     }
 
     fun select(index: Int) {
