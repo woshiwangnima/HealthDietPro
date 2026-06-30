@@ -18,6 +18,7 @@ abstract class BaseBackActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.title = getTitleText()
+        toolbar.setTitleTextAppearance(this, R.style.TextAppearance_App_ToolbarTitle)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
