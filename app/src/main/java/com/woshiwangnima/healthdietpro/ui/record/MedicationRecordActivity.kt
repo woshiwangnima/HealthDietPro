@@ -166,6 +166,7 @@ class MedicationRecordActivity : BaseBackActivity() {
         if (catIdx >= 0) {
             binding.specCategorySpinner.setSelection(catIdx + 1)
             populateUnitSpinner(specCategories[catIdx])
+            // +1 补占位偏移；specUnitId 找不到（旧 bug 错位 / 脏数据）则留空不选，不崩
             val unitIdx = specCategories[catIdx].units.indexOfFirst { it.id == record.specUnitId }
             if (unitIdx >= 0) binding.specUnitSpinner.setSelection(unitIdx + 1)
         }
@@ -253,6 +254,7 @@ class MedicationRecordActivity : BaseBackActivity() {
             binding.specCategorySpinner.setSelection(catIdx + 1)
             // spinners 已 setAdapter，再触发 onItemSelected 来填充 unit spinner
             populateUnitSpinner(specCategories[catIdx])
+            // +1 补占位偏移；找不到则留空不崩
             val unitIdx = specCategories[catIdx].units.indexOfFirst { it.id == defaults.specUnitId }
             if (unitIdx >= 0) binding.specUnitSpinner.setSelection(unitIdx + 1)
         }
@@ -297,8 +299,9 @@ class MedicationRecordActivity : BaseBackActivity() {
                     parent: AdapterView<*>?, v: View?, pos: Int, id: Long
                 ) {
                     val cat = selectedSpecCategory
-                    if (cat == null || pos < 0 || pos >= cat.units.size) selectedSpecUnitId = ""
-                    else selectedSpecUnitId = cat.units[pos].id
+                    // adapter 在 index 0 插入了"选择单位"占位项，真实单位在 pos-1
+                    if (cat == null || pos <= 0 || pos > cat.units.size) selectedSpecUnitId = ""
+                    else selectedSpecUnitId = cat.units[pos - 1].id
                 }
 
                 override fun onNothingSelected(p: AdapterView<*>?) {

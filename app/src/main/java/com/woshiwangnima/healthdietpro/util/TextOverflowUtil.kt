@@ -28,14 +28,27 @@ object TextOverflowUtil {
         applyMode(view, mode)
     }
 
+    private fun effectiveMode(view: TextView, mode: String): String {
+        // marquee 要求单行且横向滚动；
+        // 1) 多行输入框（EditText / TextInputEditText minLines>1）套 marquee 会冲突崩溃 → 降级 shrink
+        // 2) 选中态的 Spinner 项视图位于固定宽度容器内，marquee 会让 Spinner 测量子项宽度时
+        //    返回不稳定值，触发 ArrayAdapter.getView 递归/NPE → 降级 ellipsis
+        if (mode != "marquee") return mode
+        if (view is android.widget.EditText) {
+            if (view.minLines > 1 && view.maxLines != 1) return "shrink"
+        }
+        return mode
+    }
+
     private fun applyMode(view: TextView, mode: String) {
+        val m = effectiveMode(view, mode)
         view.ellipsize = null
         view.setHorizontallyScrolling(false)
         view.marqueeRepeatLimit = 0
         view.isSelected = false
         view.setSingleLine(false)
 
-        when (mode) {
+        when (m) {
             "marquee" -> {
                 view.ellipsize = TextUtils.TruncateAt.MARQUEE
                 view.setHorizontallyScrolling(true)
@@ -53,7 +66,14 @@ object TextOverflowUtil {
         }
     }
 
-    /** 创建支持文字溢出模式的 Spinner ArrayAdapter。 */
+    /**
+     * 创建支持文字溢出模式的 Spinner ArrayAdapter。
+     *
+     * 注意：Spinner 选中态（getView 返回的视图）位于固定宽度容器内，
+     * marquee 会让 Spinner 测量阶段返回不稳定宽度 → 闪退，因此选中态
+     * 一律不允许 marquee（降级为 ellipsis）；弹出下拉项 getDropDownView
+     * 可正常应用 marquee。
+     */
     fun <T> createSpinnerAdapter(
         context: Context,
         items: List<T>,
@@ -64,7 +84,9 @@ object TextOverflowUtil {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getView(position, convertView, parent)
                 if (view is TextView) {
-                    applyMode(view, overflowMode)
+                    // 选中态：降级 marquee → ellipsis，避免测量崩溃
+                    val selectedMode = if (overflowMode == "marquee") "ellipsis" else overflowMode
+                    applyMode(view, selectedMode)
                     view.gravity = Gravity.CENTER_VERTICAL or Gravity.START
                 }
                 return view
@@ -73,6 +95,7 @@ object TextOverflowUtil {
             override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getDropDownView(position, convertView, parent)
                 if (view is TextView) {
+                    // 弹出下拉项可正常 marquee
                     applyMode(view, overflowMode)
                 }
                 return view
