@@ -171,16 +171,18 @@ fun load(context: Context): UserProfile {
         if (user.avatarFileName.isNotEmpty()) {
             File(context.filesDir, "avatars/${user.avatarFileName}").delete()
         }
-        // Delete per-user chart preferences (keys ending with _${userId})
-        val appPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val editor = appPrefs.edit()
+        // Delete per-user settings file (user_prefs_<uid>)
+        com.woshiwangnima.healthdietpro.model.prefs.UserPrefs.deleteUserFile(context, user.id)
+        // Delete per-user chart/medication prefs (keys ending _${userId}) in both legacy files
         val suffix = "_${user.id}"
-        for (key in appPrefs.all.keys) {
-            if (key.endsWith(suffix)) {
-                editor.remove(key)
+        for (file in listOf("health_diet_prefs", "app_prefs")) {
+            val sp = context.getSharedPreferences(file, Context.MODE_PRIVATE)
+            val editor = sp.edit()
+            for (key in sp.all.keys) {
+                if (key.endsWith(suffix)) editor.remove(key)
             }
+            editor.apply()
         }
-        editor.apply()
     }
 
     fun createDefaultIfEmpty(context: Context): UserProfile {
