@@ -28,7 +28,9 @@ class PreferencesActivity : BaseBackActivity() {
         setupToolbar(binding.toolbar)
 
         UnitConverter.init(this)
+        com.woshiwangnima.healthdietpro.model.prefs.AppPrefs.ensureFontStyleTokenDefaults(this)
         buildFontPreviews()
+        buildFontStylePreviews()
         buildUnitRows()
         refreshDisplay()
         setupClickListeners()
@@ -43,8 +45,7 @@ class PreferencesActivity : BaseBackActivity() {
         FontPreviewItem("正文", R.dimen.text_size_body),
         FontPreviewItem("副标题", R.dimen.text_size_subtitle),
         FontPreviewItem("标题", R.dimen.text_size_title),
-        FontPreviewItem("大标题", R.dimen.text_size_headline),
-        FontPreviewItem("巨标", R.dimen.text_size_display)
+        FontPreviewItem("大标题", R.dimen.text_size_headline)
     )
 
     private fun buildFontPreviews() {
@@ -79,6 +80,83 @@ class PreferencesActivity : BaseBackActivity() {
             row.addView(preview)
             container.addView(row)
         }
+    }
+
+    /** "默认字体风格"静态展示行（仅开发演示，不持久化用户修改；令牌存 app 级）。 */
+    private fun buildFontStylePreviews() {
+        val container = binding.fontStylePreviewContainer
+        container.removeAllViews()
+        val sample = "示例文字 Aa"
+
+        val alphaRows = listOf(
+            "低透明（70%）" to AppPrefs.getFontStyleTokenAlphaLow(this),
+            "中透明（50%）" to AppPrefs.getFontStyleTokenAlphaMid(this),
+            "高透明（30%）" to AppPrefs.getFontStyleTokenAlphaHigh(this)
+        )
+        for ((label, alpha) in alphaRows) {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 4, 0, 4)
+                gravity = android.view.Gravity.CENTER_VERTICAL
+            }
+            val tv = TextView(this).apply {
+                text = label
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                    resources.getDimension(R.dimen.text_size_body))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.4f)
+            }
+            val preview = TextView(this).apply {
+                text = sample
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                    resources.getDimension(R.dimen.text_size_body))
+                val a = (0xFF * alpha).toInt().coerceIn(0, 255)
+                setTextColor((textColors.defaultColor and 0x00FFFFFF) or (a shl 24))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f)
+            }
+            row.addView(tv); row.addView(preview)
+            container.addView(row)
+        }
+
+        if (AppPrefs.getFontStyleTokenUnderline(this)) {
+            val span = android.text.SpannableString(sample)
+            span.setSpan(android.text.style.UnderlineSpan(), 0, span.length, 0)
+            container.addView(styleRow("链接", span))
+        }
+        if (AppPrefs.getFontStyleTokenStrike(this)) {
+            val span = android.text.SpannableString(sample)
+            span.setSpan(android.text.style.StrikethroughSpan(), 0, span.length, 0)
+            container.addView(styleRow("删除线", span))
+        }
+        if (AppPrefs.getFontStyleTokenItalic(this)) {
+            container.addView(styleRow("斜体", sample) {
+                it.typeface = android.graphics.Typeface.create(it.typeface, android.graphics.Typeface.ITALIC)
+            })
+        }
+    }
+
+    private fun styleRow(
+        label: String, content: CharSequence, applyStyle: (TextView) -> Unit = {}
+    ): LinearLayout {
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, 4, 0, 4)
+            gravity = android.view.Gravity.CENTER_VERTICAL
+        }
+        val tv = TextView(this).apply {
+            text = label
+            setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(R.dimen.text_size_body))
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.4f)
+        }
+        val preview = TextView(this).apply {
+            text = content
+            setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(R.dimen.text_size_body))
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f)
+        }
+        applyStyle(preview)
+        row.addView(tv); row.addView(preview)
+        return row
     }
 
     private fun buildUnitRows() {
@@ -196,6 +274,7 @@ class PreferencesActivity : BaseBackActivity() {
             override fun onProgressChanged(seekBar: android.widget.SeekBar?, p: Int, fromUser: Boolean) {
                 val scale = 0.8f + p / 70f * 0.7f
                 binding.fontScaleValue.text = "${(scale * 100).toInt()}%"
+                positionFontScaleValue(seekBar ?: return)
             }
             override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {
@@ -205,6 +284,21 @@ class PreferencesActivity : BaseBackActivity() {
                 recreate()
             }
         })
+        binding.fontScaleSeekBar.post { positionFontScaleValue(binding.fontScaleSeekBar) }
+    }
+
+    /** 把 fontScaleValue 水平移动到 SeekBar 拇指正上方居中。 */
+    private fun positionFontScaleValue(seekBar: android.widget.SeekBar) {
+        val track = seekBar.width - seekBar.paddingLeft - seekBar.paddingRight
+        if (track <= 0) return
+        val thumbX = seekBar.paddingLeft + track.toFloat() * seekBar.progress / seekBar.max
+        val value = binding.fontScaleValue
+        if (value.width == 0) value.measure(
+            android.view.View.MeasureSpec.UNSPECIFIED,
+            android.view.View.MeasureSpec.UNSPECIFIED
+        )
+        val halfW = (value.width.takeIf { it > 0 } ?: value.measuredWidth) / 2f
+        value.translationX = thumbX - halfW
     }
 
     private fun showPicker(title: String, items: Array<String>, checkedIndex: Int, onSelected: (Int) -> Unit) {

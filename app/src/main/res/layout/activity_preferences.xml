@@ -45,44 +45,103 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="4dp">
+                    android:gravity="center_vertical">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="A"
-                        android:textSize="@dimen/text_size_label"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginEnd="8dp" />
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_marginEnd="8dp">
 
-                    <SeekBar
-                        android:id="@+id/fontScaleSeekBar"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="A"
+                            android:textSize="@dimen/text_size_label"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/fontScaleMinLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="80%"
+                            android:textSize="@dimen/text_size_micro"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+
+                    <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:max="70" />
+                        android:layout_weight="1">
 
-                    <TextView
+                        <SeekBar
+                            android:id="@+id/fontScaleSeekBar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="70" />
+
+                        <TextView
+                            android:id="@+id/fontScaleValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="100%"
+                            android:textSize="@dimen/text_size_micro"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_gravity="top|center_horizontal"
+                            android:translationX="0dp" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="A"
-                        android:textSize="@dimen/text_size_subtitle"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginStart="8dp" />
-                </LinearLayout>
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_marginStart="8dp">
 
-                <TextView
-                    android:id="@+id/fontScaleValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="100%"
-                    android:textSize="@dimen/text_size_caption"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:paddingBottom="4dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="A"
+                            android:textSize="@dimen/text_size_subtitle"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/fontScaleMaxLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="150%"
+                            android:textSize="@dimen/text_size_micro"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/fontPreviewContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <!-- Block 1.5: 默认字体风格（静态展示） -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_bg"
+                android:padding="12dp"
+                android:layout_marginTop="12dp"
+                android:elevation="1dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="默认字体风格"
+                    android:textSize="@dimen/text_size_subtitle"
+                    android:paddingBottom="8dp" />
+
+                <LinearLayout
+                    android:id="@+id/fontStylePreviewContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
