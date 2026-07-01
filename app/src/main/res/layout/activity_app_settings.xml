@@ -51,5 +51,71 @@
                 android:textSize="@dimen/text_size_subtitle" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/permissionSettingsRow"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_settings"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="系统权限管理"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                android:textSize="@dimen/text_size_subtitle" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=">"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="@dimen/text_size_subtitle" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/clearCacheRow"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_preferences"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="清除缓存"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                android:textSize="@dimen/text_size_subtitle" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=">"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="@dimen/text_size_subtitle" />
+        </LinearLayout>
+
+    </LinearLayout>
 </layout>

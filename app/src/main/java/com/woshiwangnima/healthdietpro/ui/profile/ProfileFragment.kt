@@ -21,11 +21,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.woshiwangnima.healthdietpro.databinding.FragmentProfileBinding
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
-import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsActivity
+import com.woshiwangnima.healthdietpro.util.TextOverflowUtil
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.io.File
 import kotlin.math.abs
@@ -122,52 +121,64 @@ class ProfileFragment : Fragment() {
             binding.avatarText.background = bg
         }
 
+        val genderIcon: String
+        val genderText: String
+        val genderColor: Int
         if (profile.gender.name == "MALE") {
-            binding.profileGenderIcon.text = "\u2642"
-            binding.profileGenderIcon.setTextColor(Color.parseColor("#2196F3"))
+            genderIcon = "\u2642"
+            genderText = "男"
+            genderColor = Color.parseColor("#2196F3")
         } else {
-            binding.profileGenderIcon.text = "\u2640"
-            binding.profileGenderIcon.setTextColor(Color.parseColor("#E91E63"))
+            genderIcon = "\u2640"
+            genderText = "女"
+            genderColor = Color.parseColor("#E91E63")
         }
+        binding.profileGenderIcon.text = genderIcon
+        binding.profileGenderIcon.setTextColor(genderColor)
+        binding.profileGenderText.text = genderText
+        binding.profileGenderText.setTextColor(genderColor)
 
         val age = profile.age
         if (age != null) {
-            binding.profileAge.text = age.toString() + "\u5C81"
+            binding.profileAge.text = age.toString() + "岁"
         } else {
             binding.profileAge.text = ""
         }
 
         binding.profileBirthday.text = profile.birthday?.date ?: "未设置"
 
-        binding.profileProvince.text = profile.region.display()
+        // 第三行：地区
+        var regionDisplay = profile.region.display()
         // 兜底：若新 region 仅省代码无省名（迁移后的数据），补一下显示
         if (profile.region.provinceCode.isNotEmpty() && profile.region.provinceName.isEmpty()) {
             runCatching {
                 com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
                     .fromContext(ctx).findByCode(profile.region.provinceCode)?.name
             }.getOrNull()?.let { name ->
-                binding.profileProvince.text = profile.region.copy(provinceName = name).display()
+                regionDisplay = profile.region.copy(provinceName = name).display()
             }
         }
+        binding.profileRegionLine.text = regionDisplay
 
-        if (profile.diseaseIds.isEmpty()) {
-            binding.profileDiseases.text = "\u65E0"
+        // 第三行：病史 —— 为"无"时隐藏
+        val diseaseText = if (profile.diseaseIds.isEmpty()) {
+            ""
         } else {
             val diseases = diseaseRepo.loadAll()
             val names = profile.diseaseIds.map { id ->
                 diseases.find { it.id == id }?.name ?: id
             }
-            binding.profileDiseases.text = names.joinToString("\u3001")
+            names.joinToString("、")
         }
-
-        val heightUnit = AppPrefs.getUnit(ctx, UnitCategory.ID_LENGTH, UnitCategory.DEFAULT_UNIT_LENGTH)
-        val weightUnit = AppPrefs.getUnit(ctx, UnitCategory.ID_WEIGHT, UnitCategory.DEFAULT_UNIT_WEIGHT)
-        binding.profileHeight.text = profile.latestHeight?.let {
-            UnitConverter.formatWithUnit(UnitCategory.ID_LENGTH, it.value, heightUnit)
-        } ?: "\u65E0\u8BB0\u5F55"
-        binding.profileWeight.text = profile.latestWeight?.let {
-            UnitConverter.formatWithUnit(UnitCategory.ID_WEIGHT, it.value, weightUnit)
-        } ?: "\u65E0\u8BB0\u5F55"
+        if (diseaseText.isEmpty()) {
+            binding.profileDiseaseLine.visibility = View.GONE
+            binding.profileDiseaseSeparator.visibility = View.GONE
+        } else {
+            binding.profileDiseaseLine.text = diseaseText
+            binding.profileDiseaseLine.visibility = View.VISIBLE
+            binding.profileDiseaseSeparator.visibility = View.VISIBLE
+            TextOverflowUtil.apply(binding.profileDiseaseLine, ctx)
+        }
     }
 
     private fun showUserSwitchSheet() {
