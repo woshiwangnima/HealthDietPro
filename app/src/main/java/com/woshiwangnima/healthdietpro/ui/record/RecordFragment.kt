@@ -55,7 +55,9 @@ class RecordFragment : Fragment() {
         addPlaceholder(daily, "运动")
         addPlaceholder(daily, "睡眠")
         addPlaceholder(daily, "排便")
-        addPlaceholder(daily, "用药")
+        addRecordButton(daily, "用药", R.drawable.ic_medication) {
+            startActivity(Intent(requireContext(), MedicationListActivity::class.java))
+        }
         addPlaceholder(daily, "习惯")
 
         // 状态记录

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -61,6 +62,25 @@
         <activity
             android:name=".ui.widget.tab.demo.DemoTabsActivity"
             android:exported="true" />
+
+        <activity
+            android:name=".ui.record.MedicationRecordActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|uiMode" />
+        <activity
+            android:name=".ui.record.MedicationListActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|uiMode" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

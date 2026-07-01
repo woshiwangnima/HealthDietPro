@@ -50,7 +50,7 @@ class PreferencesActivity : BaseBackActivity() {
     private fun buildFontPreviews() {
         val container = binding.fontPreviewContainer
         container.removeAllViews()
-        val scaledDensity = resources.displayMetrics.scaledDensity
+        val scaledDensity = resources.displayMetrics.density * resources.configuration.fontScale
         val captionPx = resources.getDimension(R.dimen.text_size_caption)
         for (item in fontPreviewItems) {
             val row = LinearLayout(this).apply {
@@ -123,7 +123,11 @@ class PreferencesActivity : BaseBackActivity() {
 
     private fun refreshOverflowDisplay() {
         val mode = AppPrefs.getTextOverflowMode(this)
-        binding.textOverflowValue.text = if (mode == "marquee") "左右轮播" else "自适应缩小"
+        binding.textOverflowValue.text = when (mode) {
+            "marquee" -> "左右轮播"
+            "ellipsis" -> "超出省略"
+            else -> "自适应缩小"
+        }
         binding.marqueeSpeedRow.visibility = if (mode == "marquee") android.view.View.VISIBLE else android.view.View.GONE
         binding.marqueeSpeedValue.text = "${AppPrefs.getMarqueeSpeed(this)}"
     }
@@ -155,8 +159,8 @@ class PreferencesActivity : BaseBackActivity() {
         }
 
         binding.textOverflowRow.setOnClickListener {
-            val items = arrayOf("自适应缩小", "左右轮播")
-            val modes = arrayOf("shrink", "marquee")
+            val items = arrayOf("自适应缩小", "左右轮播", "超出省略")
+            val modes = arrayOf("shrink", "marquee", "ellipsis")
             val checkedIndex = modes.indexOf(AppPrefs.getTextOverflowMode(this)).coerceAtLeast(0)
             showPicker("文字溢出处理", items, checkedIndex) { which ->
                 AppPrefs.setTextOverflowMode(this, modes[which])

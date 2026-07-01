@@ -27,6 +27,11 @@ object DefaultTabAnimator : TabAnimator {
     override fun animate(view: TabItemView, selected: Boolean, isCenter: Boolean) {
         val density = view.resources.displayMetrics.density
         view.animate().cancel()
+        // 重置所有属性到默认值，避免取消的动画留下中间状态
+        view.scaleX = 1f
+        view.scaleY = 1f
+        view.translationY = 0f
+        view.alpha = 1f
 
         val targetScale = if (selected) SELECTED_SCALE else 1f
         val targetAlpha = if (selected) 1f else 0.85f

@@ -5,11 +5,23 @@
     "categoryEn": "Length",
     "baseUnit": "cm",
     "units": [
-      { "id": "mm", "symbolCn": "毫米(公厘)",     "symbolEn": "mm",  "toBase": 0.1 },
-      { "id": "cm", "symbolCn": "厘米(公分)",     "symbolEn": "cm",  "toBase": 1.0 },
-      { "id": "m",  "symbolCn": "米(公尺)",       "symbolEn": "m",   "toBase": 100.0 },
-      { "id": "in", "symbolCn": "英寸(吋)",       "symbolEn": "in",  "toBase": 2.54 },
-      { "id": "ft", "symbolCn": "英尺(呎)",       "symbolEn": "ft",  "toBase": 30.48 }
+      { "id": "nm",    "symbolCn": "纳米(奈米)",          "symbolEn": "nm",   "toBase": 1e-7 },
+      { "id": "μm",    "symbolCn": "微米(µm)",            "symbolEn": "µm",   "toBase": 0.0001 },
+      { "id": "mm",    "symbolCn": "毫米(公厘)",           "symbolEn": "mm",    "toBase": 0.1 },
+      { "id": "cm",    "symbolCn": "厘米(公分)",           "symbolEn": "cm",    "toBase": 1.0 },
+      { "id": "dm",    "symbolCn": "分米(公寸)",           "symbolEn": "dm",    "toBase": 10.0 },
+      { "id": "m",     "symbolCn": "米(公尺)",             "symbolEn": "m",     "toBase": 100.0 },
+      { "id": "km",    "symbolCn": "千米(公里)",           "symbolEn": "km",    "toBase": 100000.0 },
+      { "id": "li",    "symbolCn": "里(华里)",             "symbolEn": "li",    "toBase": 50000.0 },
+      { "id": "zhang", "symbolCn": "丈",                   "symbolEn": "zhang", "toBase": 333.333 },
+      { "id": "chi",   "symbolCn": "尺(市尺)",             "symbolEn": "chi",   "toBase": 33.3333 },
+      { "id": "cun",   "symbolCn": "寸(市寸)",             "symbolEn": "cun",   "toBase": 3.33333 },
+      { "id": "fen",   "symbolCn": "分(市分)",             "symbolEn": "fen",   "toBase": 0.333333 },
+      { "id": "in",    "symbolCn": "英寸(吋)",             "symbolEn": "in",    "toBase": 2.54 },
+      { "id": "ft",    "symbolCn": "英尺(呎)",             "symbolEn": "ft",    "toBase": 30.48 },
+      { "id": "yd",    "symbolCn": "码",                   "symbolEn": "yd",    "toBase": 91.44 },
+      { "id": "mi",    "symbolCn": "英里(哩)",             "symbolEn": "mi",    "toBase": 160934.4 },
+      { "id": "nmi",   "symbolCn": "海里(海哩)",           "symbolEn": "nmi",   "toBase": 185200.0 }
     ]
   },
   {
@@ -18,11 +30,22 @@
     "categoryEn": "Weight",
     "baseUnit": "kg",
     "units": [
-      { "id": "liang", "symbolCn": "两",             "symbolEn": "liang", "toBase": 0.05 },
-      { "id": "jin",   "symbolCn": "斤",             "symbolEn": "jin",   "toBase": 0.5 },
-      { "id": "g",     "symbolCn": "克(公克)",       "symbolEn": "g",     "toBase": 0.001 },
-      { "id": "kg",    "symbolCn": "千克(公斤)",     "symbolEn": "kg",    "toBase": 1.0 },
-      { "id": "lb",    "symbolCn": "磅(英磅)",       "symbolEn": "lb",    "toBase": 0.453592 }
+      { "id": "mcg",   "symbolCn": "微克(µg)",             "symbolEn": "µg",      "toBase": 1e-9 },
+      { "id": "mg",    "symbolCn": "毫克(公丝)",           "symbolEn": "mg",      "toBase": 1e-6 },
+      { "id": "ct",    "symbolCn": "克拉",                 "symbolEn": "ct",      "toBase": 0.0002 },
+      { "id": "g",     "symbolCn": "克(公克)",             "symbolEn": "g",       "toBase": 0.001 },
+      { "id": "kg",    "symbolCn": "千克(公斤)",           "symbolEn": "kg",      "toBase": 1.0 },
+      { "id": "t",     "symbolCn": "吨(公吨)",             "symbolEn": "t",       "toBase": 1000.0 },
+      { "id": "qian",  "symbolCn": "钱(市钱)",             "symbolEn": "qian",    "toBase": 0.005 },
+      { "id": "liang", "symbolCn": "两(市两)",             "symbolEn": "liang",   "toBase": 0.05 },
+      { "id": "jin",   "symbolCn": "斤(市斤)",             "symbolEn": "jin",     "toBase": 0.5 },
+      { "id": "dan",   "symbolCn": "担(市担)",             "symbolEn": "dan",     "toBase": 50.0 },
+      { "id": "oz",    "symbolCn": "盎司(安士)",           "symbolEn": "oz",      "toBase": 0.0283495 },
+      { "id": "lb",    "symbolCn": "磅(英磅)",             "symbolEn": "lb",      "toBase": 0.453592 },
+      { "id": "st",    "symbolCn": "英石",                 "symbolEn": "st",      "toBase": 6.35029 },
+      { "id": "qr",    "symbolCn": "夸特(英夸)",           "symbolEn": "qr",      "toBase": 12.7006 },
+      { "id": "cwt",   "symbolCn": "英担",                 "symbolEn": "cwt",     "toBase": 50.8023 },
+      { "id": "slug",  "symbolCn": "斯勒格",               "symbolEn": "slug",    "toBase": 14.5939 }
     ]
   },
   {
@@ -31,11 +54,24 @@
     "categoryEn": "Volume",
     "baseUnit": "l",
     "units": [
-      { "id": "ml",   "symbolCn": "毫升(毫公升)",    "symbolEn": "mL",    "toBase": 0.001 },
-      { "id": "l",    "symbolCn": "升(公升)",        "symbolEn": "L",     "toBase": 1.0 },
-      { "id": "floz", "symbolCn": "液量盎司(盎司)",  "symbolEn": "fl oz", "toBase": 0.0295735 },
-      { "id": "cup",  "symbolCn": "杯(量杯)",        "symbolEn": "cup",   "toBase": 0.236588 },
-      { "id": "gal",  "symbolCn": "加仑(美制加仑)",  "symbolEn": "gal",   "toBase": 3.78541 }
+      { "id": "ml",    "symbolCn": "毫升(毫公升)",         "symbolEn": "mL",      "toBase": 0.001 },
+      { "id": "cl",    "symbolCn": "厘升(公勺)",           "symbolEn": "cL",      "toBase": 0.01 },
+      { "id": "dl",    "symbolCn": "分升(公合)",           "symbolEn": "dL",      "toBase": 0.1 },
+      { "id": "l",     "symbolCn": "升(公升)",             "symbolEn": "L",       "toBase": 1.0 },
+      { "id": "dal",   "symbolCn": "十升(公斗)",           "symbolEn": "daL",     "toBase": 10.0 },
+      { "id": "hl",    "symbolCn": "百升(公石)",           "symbolEn": "hL",      "toBase": 100.0 },
+      { "id": "kl",    "symbolCn": "千升(公秉)",           "symbolEn": "kL",      "toBase": 1000.0 },
+      { "id": "dou",   "symbolCn": "斗",                   "symbolEn": "dou",     "toBase": 10.0 },
+      { "id": "sheng", "symbolCn": "市升",                 "symbolEn": "sheng",   "toBase": 1.0 },
+      { "id": "he",    "symbolCn": "合",                   "symbolEn": "he",      "toBase": 0.1 },
+      { "id": "tsp",   "symbolCn": "茶匙(小匙)",           "symbolEn": "tsp",     "toBase": 0.00492892 },
+      { "id": "tbsp",  "symbolCn": "汤匙(大匙)",           "symbolEn": "tbsp",    "toBase": 0.0147868 },
+      { "id": "floz",  "symbolCn": "液量盎司(盎司)",       "symbolEn": "fl oz",   "toBase": 0.0295735 },
+      { "id": "cup",   "symbolCn": "杯(量杯)",             "symbolEn": "cup",     "toBase": 0.236588 },
+      { "id": "pt",    "symbolCn": "品脱",                 "symbolEn": "pt",      "toBase": 0.473176 },
+      { "id": "qt",    "symbolCn": "夸脱(夸)",             "symbolEn": "qt",      "toBase": 0.946353 },
+      { "id": "gal",   "symbolCn": "加仑(美制加仑)",       "symbolEn": "gal",     "toBase": 3.78541 },
+      { "id": "bbl",   "symbolCn": "桶(美制桶)",           "symbolEn": "bbl",     "toBase": 158.987 }
     ]
   },
   {
@@ -55,16 +91,16 @@
     "categoryEn": "Time",
     "baseUnit": "s",
     "units": [
-      { "id": "ms",  "symbolCn": "毫秒",       "symbolEn": "ms",  "toBase": 0.001 },
-      { "id": "s",   "symbolCn": "秒",         "symbolEn": "s",   "toBase": 1.0 },
-      { "id": "min", "symbolCn": "分钟",       "symbolEn": "min", "toBase": 60 },
-      { "id": "h",   "symbolCn": "小时",       "symbolEn": "h",   "toBase": 3600 },
-      { "id": "d",    "symbolCn": "天(日)",          "symbolEn": "d",   "toBase": 86400 },
-      { "id": "week", "symbolCn": "周(星期)",       "symbolEn": "wk",  "toBase": 604800 },
-      { "id": "xun",  "symbolCn": "旬(10天)",       "symbolEn": "xun", "toBase": 864000 },
-      { "id": "month", "symbolCn": "月(月份)",       "symbolEn": "mo",   "toBase": 2592000 },
-      { "id": "quarter","symbolCn":"季(季度)",        "symbolEn": "qtr",  "toBase": 7776000 },
-      { "id": "year",   "symbolCn": "年",             "symbolEn": "yr",   "toBase": 31536000 }
+      { "id": "ms",     "symbolCn": "毫秒",            "symbolEn": "ms",   "toBase": 0.001 },
+      { "id": "s",      "symbolCn": "秒",              "symbolEn": "s",    "toBase": 1.0 },
+      { "id": "min",    "symbolCn": "分钟",            "symbolEn": "min",  "toBase": 60 },
+      { "id": "h",      "symbolCn": "小时",            "symbolEn": "h",    "toBase": 3600 },
+      { "id": "d",      "symbolCn": "天(日)",          "symbolEn": "d",    "toBase": 86400 },
+      { "id": "week",   "symbolCn": "周(星期)",        "symbolEn": "wk",   "toBase": 604800 },
+      { "id": "xun",    "symbolCn": "旬(10天)",        "symbolEn": "xun",  "toBase": 864000 },
+      { "id": "month",  "symbolCn": "月(月份)",        "symbolEn": "mo",   "toBase": 2592000 },
+      { "id": "quarter","symbolCn": "季(季度)",        "symbolEn": "qtr",  "toBase": 7776000 },
+      { "id": "year",   "symbolCn": "年",              "symbolEn": "yr",   "toBase": 31536000 }
     ]
   },
   {
@@ -73,8 +109,10 @@
     "categoryEn": "Energy",
     "baseUnit": "kcal",
     "units": [
-      { "id": "kj",   "symbolCn": "千焦(千焦耳)",  "symbolEn": "kJ",   "toBase": 0.239006 },
-      { "id": "kcal", "symbolCn": "千卡(大卡)",    "symbolEn": "kcal", "toBase": 1.0 }
+      { "id": "j",     "symbolCn": "焦耳",            "symbolEn": "J",     "toBase": 0.000239006 },
+      { "id": "kj",    "symbolCn": "千焦(千焦耳)",    "symbolEn": "kJ",    "toBase": 0.239006 },
+      { "id": "kcal",  "symbolCn": "千卡(大卡)",      "symbolEn": "kcal",  "toBase": 1.0 },
+      { "id": "cal",   "symbolCn": "卡路里(卡)",      "symbolEn": "cal",   "toBase": 0.001 }
     ]
   }
 ]
