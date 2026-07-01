@@ -73,7 +73,7 @@ class ProfileFragment : Fragment() {
             settingsLauncher.launch(intent)
         }
 
-        binding.editProfileBtn.setOnClickListener {
+        binding.profileDetailBtn.setOnClickListener {
             val intent = Intent(requireContext(), ProfileEditActivity::class.java)
             editLauncher.launch(intent)
         }

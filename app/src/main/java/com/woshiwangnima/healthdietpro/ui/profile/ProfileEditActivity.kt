@@ -54,6 +54,7 @@ class ProfileEditActivity : BaseBackActivity() {
     private var originalProfile: UserProfile? = null
     private var editingUserId: String = ""
     private var isNewUser: Boolean = false
+    private val genderOptions = listOf("男", "女")
     private var avatarFileName: String = ""
 
     private val avatarPickerLauncher = registerForActivityResult(
@@ -101,7 +102,7 @@ class ProfileEditActivity : BaseBackActivity() {
         }
     }
 
-    override fun getTitleText(): String = "编辑个人信息"
+    override fun getTitleText(): String = "个人信息"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +121,7 @@ class ProfileEditActivity : BaseBackActivity() {
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val name = binding.nameInput.text.toString().trim()
-                val gender = if (binding.genderMale.isChecked) Gender.MALE else Gender.FEMALE
+                val gender = selectedGender
                 val profile = UserProfile(
                     id = editingUserId,
                     name = name,
@@ -145,8 +146,7 @@ class ProfileEditActivity : BaseBackActivity() {
         editingUserId = profile.id
         binding.nameInput.setText(profile.name)
         selectedGender = profile.gender
-        if (profile.gender == Gender.MALE) binding.genderMale.isChecked = true
-        else binding.genderFemale.isChecked = true
+        setupGenderDropdown()
 
         profile.birthday?.let {
             selectedBirthday = it
@@ -171,6 +171,15 @@ class ProfileEditActivity : BaseBackActivity() {
         checkSaveEnabled()
     }
 
+    private fun setupGenderDropdown() {
+        val adapter = android.widget.ArrayAdapter(this,
+            android.R.layout.simple_spinner_dropdown_item, genderOptions)
+        binding.genderInput.setAdapter(adapter)
+        binding.genderInput.setText(
+            if (selectedGender == Gender.MALE) "男" else "女", false
+        )
+    }
+
     private fun updateProvinceDisplay() {
         // 兜底：若新 region 仅有省代码但无省名，从 ProvinceRepository 补。
         val display = if (selectedRegion.provinceName.isEmpty() && selectedRegion.provinceCode.isNotEmpty()) {
@@ -186,8 +195,8 @@ class ProfileEditActivity : BaseBackActivity() {
         binding.provinceDisplay.setOnClickListener { showRegionChoiceSheet() }
         binding.diseaseDisplay.setOnClickListener { showDiseasePicker() }
 
-        binding.genderGroup.setOnCheckedChangeListener { _, checkedId ->
-            selectedGender = if (checkedId == R.id.genderMale) Gender.MALE else Gender.FEMALE
+        binding.genderInput.setOnItemClickListener { parent, _, pos, _ ->
+            selectedGender = if (pos == 0) Gender.MALE else Gender.FEMALE
             checkSaveEnabled()
         }
 
@@ -224,7 +233,7 @@ class ProfileEditActivity : BaseBackActivity() {
     private fun checkSaveEnabled() {
         val orig = originalProfile ?: return
         val currentName = binding.nameInput.text.toString().trim()
-        val currentGender = if (binding.genderMale.isChecked) Gender.MALE else Gender.FEMALE
+        val currentGender = selectedGender
         val changed = currentName != orig.name ||
             currentGender != orig.gender ||
             selectedBirthday != orig.birthday ||
@@ -627,7 +636,7 @@ class ProfileEditActivity : BaseBackActivity() {
             Toast.makeText(this, "请输入姓名", Toast.LENGTH_SHORT).show()
             return
         }
-        val gender = if (binding.genderMale.isChecked) Gender.MALE else Gender.FEMALE
+        val gender = selectedGender
         val profile = UserProfile(
             id = editingUserId,
             name = name,

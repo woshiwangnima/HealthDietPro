@@ -86,27 +86,21 @@
                     android:text="性别"
                     android:layout_marginTop="16dp" />
 
-                <RadioGroup
-                    android:id="@+id/genderGroup"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/genderLayout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_marginTop="4dp">
 
-                    <RadioButton
-                        android:id="@+id/genderMale"
-                        android:layout_width="0dp"
+                    <AutoCompleteTextView
+                        android:id="@+id/genderInput"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="男" />
-
-                    <RadioButton
-                        android:id="@+id/genderFemale"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="女" />
-                </RadioGroup>
+                        android:inputType="none"
+                        android:hint="选择性别"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView style="@style/TextAppearance.Material3.TitleSmall"
                     android:layout_width="wrap_content"
@@ -114,18 +108,33 @@
                     android:text="生日"
                     android:layout_marginTop="16dp" />
 
-                <TextView
-                    android:id="@+id/birthdayDisplay"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="12dp"
                     android:background="@drawable/edit_text_bg"
                     android:clickable="true"
                     android:focusable="true"
-                    android:text="点击选择"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginTop="4dp" />
+                    android:layout_marginTop="4dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:id="@+id/birthdayDisplay"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="点击选择"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=">"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/text_size_subtitle" />
+                </LinearLayout>
 
                 <TextView style="@style/TextAppearance.Material3.TitleSmall"
                     android:layout_width="wrap_content"
@@ -133,18 +142,33 @@
                     android:text="地区"
                     android:layout_marginTop="16dp" />
 
-                <TextView
-                    android:id="@+id/provinceDisplay"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="12dp"
                     android:background="@drawable/edit_text_bg"
                     android:clickable="true"
                     android:focusable="true"
-                    android:text="点击选择"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginTop="4dp" />
+                    android:layout_marginTop="4dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:id="@+id/provinceDisplay"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="点击选择"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=">"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/text_size_subtitle" />
+                </LinearLayout>
 
                 <TextView style="@style/TextAppearance.Material3.TitleSmall"
                     android:layout_width="wrap_content"
@@ -152,18 +176,33 @@
                     android:text="特殊病史"
                     android:layout_marginTop="16dp" />
 
-                <TextView
-                    android:id="@+id/diseaseDisplay"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="12dp"
                     android:background="@drawable/edit_text_bg"
                     android:clickable="true"
                     android:focusable="true"
-                    android:text="点击选择"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginTop="4dp" />
+                    android:layout_marginTop="4dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:id="@+id/diseaseDisplay"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="点击选择"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=">"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/text_size_subtitle" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/heightRow"

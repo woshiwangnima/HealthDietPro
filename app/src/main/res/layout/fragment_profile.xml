@@ -47,17 +47,35 @@
                         android:padding="16dp"
                         android:gravity="center_vertical">
 
-                        <!-- Avatar -->
-                        <TextView
-                            android:id="@+id/avatarText"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:gravity="center"
-                            android:textSize="@dimen/text_size_subtitle"
-                            android:textColor="@android:color/white"
-                            android:textStyle="bold"
-                            android:background="@drawable/avatar_circle"
-                            tools:text="张" />
+                        <!-- Avatar + 切换用户图标 -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <TextView
+                                android:id="@+id/avatarText"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:gravity="center"
+                                android:textSize="@dimen/text_size_subtitle"
+                                android:textColor="@android:color/white"
+                                android:textStyle="bold"
+                                android:background="@drawable/avatar_circle"
+                                tools:text="张" />
+
+                            <ImageView
+                                android:id="@+id/switchUserBtn"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginTop="4dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:src="@drawable/ic_switch_user"
+                                android:contentDescription="切换用户" />
+                        </LinearLayout>
 
                         <!-- Name + info -->
                         <LinearLayout
@@ -109,15 +127,15 @@
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- Switch user button -->
+                        <!-- 进入个人信息 -->
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/switchUserBtn"
+                            android:id="@+id/profileDetailBtn"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:minWidth="0dp"
                             android:insetTop="0dp"
                             android:insetBottom="0dp"
-                            android:contentDescription="切换用户"
+                            android:contentDescription="个人信息"
                             style="@style/Widget.Material3.Button.TextButton"
                             app:icon="@drawable/ic_arrow_right"
                             app:iconTint="?attr/colorOnSurfaceVariant" />
@@ -226,21 +244,13 @@
                         tools:text="70 kg" />
                 </LinearLayout>
 
-                <!-- Feature: Edit profile -->
+                <!-- Feature: User settings -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/userSettingsBtn"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginTop="24dp"
                     android:text="用户设置"
-                    style="@style/Widget.Material3.Button.OutlinedButton" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editProfileBtn"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="8dp"
-                    android:text="编辑个人信息"
                     style="@style/Widget.Material3.Button.OutlinedButton" />
 
             </LinearLayout>
