@@ -11,7 +11,7 @@ class AppSettingsActivity : BaseBackActivity() {
 
     private lateinit var binding: ActivityAppSettingsBinding
 
-    override fun getTitleText(): String = "设置"
+    override fun getTitleText(): String = "软件设置"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +28,6 @@ class AppSettingsActivity : BaseBackActivity() {
             startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                 putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
             })
-        }
-        binding.reminderSettingsRow.setOnClickListener {
-            startActivity(Intent(this, ReminderSettingsActivity::class.java))
-        }
-        binding.prefSettingsBtn.setOnClickListener {
-            startActivity(Intent(this, PreferencesActivity::class.java))
         }
     }
 }

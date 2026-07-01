@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.settings.AppSettingsActivity">
+        tools:context=".ui.settings.UserSettingsActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -18,7 +18,7 @@
             app:titleTextColor="?attr/colorOnSurface" />
 
         <LinearLayout
-            android:id="@+id/messageSettingsRow"
+            android:id="@+id/reminderSettingsRow"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:gravity="center_vertical"
@@ -32,14 +32,48 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_notification"
+                android:src="@drawable/ic_bell"
                 android:layout_marginEnd="12dp" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="消息通知"
+                android:text="提醒设置"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                android:textSize="@dimen/text_size_subtitle" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=">"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="@dimen/text_size_subtitle"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/prefSettingsRow"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_preferences"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="偏好设置"
                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                 android:textSize="@dimen/text_size_subtitle" />
 
@@ -50,6 +84,5 @@
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="@dimen/text_size_subtitle" />
         </LinearLayout>
-
-        </LinearLayout>
+    </LinearLayout>
 </layout>

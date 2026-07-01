@@ -40,6 +40,9 @@
             android:name=".ui.settings.AppSettingsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.settings.UserSettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.settings.PreferencesActivity"
             android:exported="false" />
         <activity

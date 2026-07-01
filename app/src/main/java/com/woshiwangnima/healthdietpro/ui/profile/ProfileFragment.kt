@@ -78,6 +78,11 @@ class ProfileFragment : Fragment() {
             editLauncher.launch(intent)
         }
 
+        binding.userSettingsBtn.setOnClickListener {
+            startActivity(Intent(requireContext(),
+                com.woshiwangnima.healthdietpro.ui.settings.UserSettingsActivity::class.java))
+        }
+
         binding.switchUserBtn.setOnClickListener {
             showUserSwitchSheet()
         }

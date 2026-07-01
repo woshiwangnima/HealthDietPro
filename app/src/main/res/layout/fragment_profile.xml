@@ -228,10 +228,18 @@
 
                 <!-- Feature: Edit profile -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editProfileBtn"
+                    android:id="@+id/userSettingsBtn"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginTop="24dp"
+                    android:text="用户设置"
+                    style="@style/Widget.Material3.Button.OutlinedButton" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/editProfileBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
                     android:text="编辑个人信息"
                     style="@style/Widget.Material3.Button.OutlinedButton" />
 
