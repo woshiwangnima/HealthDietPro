@@ -24,7 +24,7 @@ import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityProfileEditBinding
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.model.profile.AppDate
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.Gender
@@ -207,7 +207,7 @@ class ProfileEditActivity : BaseBackActivity() {
             val context = this@ProfileEditActivity
             val intent = Intent(context, HeightDetailActivity::class.java).apply {
                 putExtra("records", ArrayList(heightRecords))
-                putExtra("unit", AppPrefs.getUnit(context, UnitCategory.ID_LENGTH, UnitCategory.DEFAULT_UNIT_LENGTH))
+                putExtra("unit", AppPrefs.getUnit(context, UnitCategoryType.Length.id, UnitCategoryType.Length.defaultUnitId))
             }
             heightDetailLauncher.launch(intent)
         }
@@ -215,7 +215,7 @@ class ProfileEditActivity : BaseBackActivity() {
             val context = this@ProfileEditActivity
             val intent = Intent(context, WeightDetailActivity::class.java).apply {
                 putExtra("records", ArrayList(weightRecords))
-                putExtra("unit", AppPrefs.getUnit(context, UnitCategory.ID_WEIGHT, UnitCategory.DEFAULT_UNIT_WEIGHT))
+                putExtra("unit", AppPrefs.getUnit(context, UnitCategoryType.Weight.id, UnitCategoryType.Weight.defaultUnitId))
             }
             weightDetailLauncher.launch(intent)
         }

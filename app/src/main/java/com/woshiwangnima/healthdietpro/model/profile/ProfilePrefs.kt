@@ -3,7 +3,7 @@ package com.woshiwangnima.healthdietpro.model.profile
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import java.io.File
 
 object ProfilePrefs {
@@ -204,7 +204,7 @@ fun load(context: Context): UserProfile {
     private fun fixUnit(record: BodyRecord, isWeight: Boolean): BodyRecord {
         val u = record.unit
         if (u != null && u.isNotEmpty()) return record
-        return record.copy(unit = if (isWeight) UnitCategory.DEFAULT_UNIT_WEIGHT else UnitCategory.DEFAULT_UNIT_LENGTH)
+        return record.copy(unit = if (isWeight) UnitCategoryType.Weight.defaultUnitId else UnitCategoryType.Length.defaultUnitId)
     }
 
     private fun createSeedProfile(): UserProfile {

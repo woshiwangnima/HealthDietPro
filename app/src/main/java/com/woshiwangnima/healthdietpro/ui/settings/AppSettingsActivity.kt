@@ -7,7 +7,7 @@ import android.provider.Settings
 import android.widget.Toast
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityAppSettingsBinding
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 import java.io.File
@@ -79,10 +79,10 @@ class AppSettingsActivity : BaseBackActivity() {
 
     private fun formatStorageSize(bytes: Long): String {
         val repo = UnitConverter.getRepository() ?: return formatLegacy(bytes)
-        val storage = repo.getCategory(UnitCategory.ID_STORAGE) ?: return formatLegacy(bytes)
+        val storage = repo.getCategory(UnitCategoryType.Storage.id) ?: return formatLegacy(bytes)
         val best = storage.units.lastOrNull { bytes >= it.toBase } ?: storage.units.firstOrNull() ?: return formatLegacy(bytes)
         val converter = UnitConverter
-        val converted = converter.fromBase(UnitCategory.ID_STORAGE, bytes.toFloat(), best.id)
+        val converted = converter.fromBase(UnitCategoryType.Storage.id, bytes.toFloat(), best.id)
         val symbol = best.symbolCn
         return if (best.id == "b" || best.id == "kb") {
             "%.0f %s".format(converted, symbol)

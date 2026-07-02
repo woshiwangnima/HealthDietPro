@@ -1,5 +1,8 @@
 package com.woshiwangnima.healthdietpro.model.unit
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UnitDef(
     val id: String,
     val symbolCn: String,

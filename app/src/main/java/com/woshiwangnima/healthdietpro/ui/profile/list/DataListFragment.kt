@@ -17,7 +17,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.ui.profile.BodyRecordAdapter
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.showConfirmDialog
@@ -27,8 +27,8 @@ class DataListFragment : Fragment() {
 
     var onRecordsChanged: (() -> Unit)? = null
     var records: MutableList<BodyRecord> = mutableListOf()
-    private var unitId: String = UnitCategory.DEFAULT_UNIT_LENGTH
-    private var category: String = UnitCategory.ID_LENGTH
+    private var unitId: String = UnitCategoryType.Length.defaultUnitId
+    private var category: String = UnitCategoryType.Length.id
     private var isHeight: Boolean = true
     private lateinit var adapter: BodyRecordAdapter
     private var isDialogShowing = false
@@ -57,8 +57,8 @@ class DataListFragment : Fragment() {
         arguments?.let {
             @Suppress("UNCHECKED_CAST")
             records = (it.getSerializable(ARG_RECORDS, ArrayList::class.java) as? ArrayList<BodyRecord>)?.toMutableList() ?: mutableListOf()
-            unitId = it.getString(ARG_UNIT, UnitCategory.DEFAULT_UNIT_LENGTH) ?: UnitCategory.DEFAULT_UNIT_LENGTH
-            category = it.getString(ARG_CATEGORY, UnitCategory.ID_LENGTH) ?: UnitCategory.ID_LENGTH
+            unitId = it.getString(ARG_UNIT, UnitCategoryType.Length.defaultUnitId) ?: UnitCategoryType.Length.defaultUnitId
+            category = it.getString(ARG_CATEGORY, UnitCategoryType.Length.id) ?: UnitCategoryType.Length.id
             isHeight = it.getBoolean(ARG_IS_HEIGHT, true)
         }
     }

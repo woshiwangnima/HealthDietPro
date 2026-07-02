@@ -24,6 +24,7 @@ import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.ui.widget.tab.FilterBar
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabItem
 import com.woshiwangnima.healthdietpro.util.TextOverflowUtil
@@ -61,10 +62,13 @@ class MedicationRecordActivity : BaseBackActivity() {
     private var selectedSpecCategory: UnitCategory? = null
     private var selectedSpecUnitId: String = ""
 
+    // 预填名称规格时抑制 spinners listener 误覆盖
+    private var isApplyingNameDefaults = false
+
     // 单位分类下拉所用 unit categories（药品规格常用质量/体积/时间）
     private val specCategories: List<UnitCategory> by lazy {
         val ids = listOf(
-            UnitCategory.ID_WEIGHT, UnitCategory.ID_VOLUME, UnitCategory.ID_TIME
+            UnitCategoryType.Weight.id, UnitCategoryType.Volume.id
         )
         UnitConverter.getRepository()?.getCategories()
             ?.filter { it.id in ids }
@@ -114,14 +118,15 @@ class MedicationRecordActivity : BaseBackActivity() {
         locationProvider = CurrentLocationProvider(this)
         provinceRepo = ProvinceRepository.fromContext(this)
 
-        // 检查是否为编辑模式
+        // 1. 先设适配器（无 listener），2. 再加载数据（listener 不会误触发），3. 最后注册 listener
+        setupSpecSpinnersAdapters()
         editingRecordId = intent.getStringExtra(EXTRA_RECORD_ID)
         if (editingRecordId != null) {
             loadRecordForEdit(editingRecordId!!)
         } else {
-            // 时间默认显示当前时间
             binding.timeRow.text = DateTimePicker.format(selectedTimestamp)
         }
+        setupSpecSpinnersListeners()
         binding.timeRow.setOnClickListener {
             DateTimePicker.show(this, selectedTimestamp) { ts ->
                 selectedTimestamp = ts
@@ -130,7 +135,6 @@ class MedicationRecordActivity : BaseBackActivity() {
         }
 
         setupMedNameInput()
-        setupSpecSpinners()
         setupMethodInput()
         setupFeelingsBar()
         setupPhotoButtons()
@@ -161,14 +165,19 @@ class MedicationRecordActivity : BaseBackActivity() {
         )
         binding.methodInput.setText(record.method)
 
-        // 规格分类和单位
+        // 规格分类和单位（此时 listener 尚未注册，不会误触发）
         val catIdx = specCategories.indexOfFirst { it.id == record.specUnitCategory }
         if (catIdx >= 0) {
             binding.specCategorySpinner.setSelection(catIdx + 1)
-            populateUnitSpinner(specCategories[catIdx])
-            // +1 补占位偏移；specUnitId 找不到（旧 bug 错位 / 脏数据）则留空不选，不崩
-            val unitIdx = specCategories[catIdx].units.indexOfFirst { it.id == record.specUnitId }
-            if (unitIdx >= 0) binding.specUnitSpinner.setSelection(unitIdx + 1)
+            val cat = specCategories[catIdx]
+            populateUnitSpinner(cat)
+            selectedSpecCategory = cat
+
+            val unitIdx = cat.units.indexOfFirst { it.id == record.specUnitId }
+            if (unitIdx >= 0) {
+                binding.specUnitSpinner.setSelection(unitIdx + 1)
+                selectedSpecUnitId = cat.units[unitIdx].id
+            }
         }
 
         // 感受
@@ -249,22 +258,28 @@ class MedicationRecordActivity : BaseBackActivity() {
 
         // 规格要从 spinners 中先选到对应 category 再选 unit
         // 注意：spinner adapter 在 index 0 处插入了 "选择分类"/"选择单位" 占位项
+        isApplyingNameDefaults = true
         val catIdx = specCategories.indexOfFirst { it.id == defaults.specUnitCategory }
         if (catIdx >= 0) {
             binding.specCategorySpinner.setSelection(catIdx + 1)
-            // spinners 已 setAdapter，再触发 onItemSelected 来填充 unit spinner
-            populateUnitSpinner(specCategories[catIdx])
-            // +1 补占位偏移；找不到则留空不崩
-            val unitIdx = specCategories[catIdx].units.indexOfFirst { it.id == defaults.specUnitId }
-            if (unitIdx >= 0) binding.specUnitSpinner.setSelection(unitIdx + 1)
+            val cat = specCategories[catIdx]
+            populateUnitSpinner(cat)
+            selectedSpecCategory = cat
+
+            val unitIdx = cat.units.indexOfFirst { it.id == defaults.specUnitId }
+            if (unitIdx >= 0) {
+                binding.specUnitSpinner.setSelection(unitIdx + 1)
+                selectedSpecUnitId = cat.units[unitIdx].id
+            }
         }
+        isApplyingNameDefaults = false
         binding.specValueInput.setText(defaults.specValue.toString())
 
         binding.methodInput.setText(defaults.method)
     }
 
-    /** 用药规格：先选单位分类下拉，再选具体单位下拉。 */
-    private fun setupSpecSpinners() {
+    /** 用药规格：第 1 步，只设适配器（不得注册 listener）。 */
+    private fun setupSpecSpinnersAdapters() {
         val categoryNames = specCategories.map { it.categoryCn }.toMutableList().apply {
             add(0, "选择分类")
         }
@@ -273,11 +288,18 @@ class MedicationRecordActivity : BaseBackActivity() {
         ).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
+
+        populateUnitSpinner(null)
+    }
+
+    /** 用药规格：第 2 步，注册 listener（等数据加载完毕后再设，防止 init 阶段误触发）。 */
+    private fun setupSpecSpinnersListeners() {
         binding.specCategorySpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>?, v: View?, pos: Int, id: Long
                 ) {
+                    if (isApplyingNameDefaults) return
                     if (pos == 0) { selectedSpecCategory = null; populateUnitSpinner(null) }
                     else {
                         val cat = specCategories[pos - 1]
@@ -287,17 +309,18 @@ class MedicationRecordActivity : BaseBackActivity() {
                 }
 
                 override fun onNothingSelected(p: AdapterView<*>?) {
+                    if (isApplyingNameDefaults) return
                     selectedSpecCategory = null
                     populateUnitSpinner(null)
                 }
             }
 
-        populateUnitSpinner(null)
         binding.specUnitSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>?, v: View?, pos: Int, id: Long
                 ) {
+                    if (isApplyingNameDefaults) return
                     val cat = selectedSpecCategory
                     // adapter 在 index 0 插入了"选择单位"占位项，真实单位在 pos-1
                     if (cat == null || pos <= 0 || pos > cat.units.size) selectedSpecUnitId = ""
@@ -305,9 +328,19 @@ class MedicationRecordActivity : BaseBackActivity() {
                 }
 
                 override fun onNothingSelected(p: AdapterView<*>?) {
+                    if (isApplyingNameDefaults) return
                     selectedSpecUnitId = ""
                 }
             }
+
+        // 防御性重选：某些 Android 版本注册 listener 时可能触发 selectionNotifier 重置 spinner
+        val cat = selectedSpecCategory
+        if (cat != null && selectedSpecUnitId.isNotEmpty()) {
+            val pos = cat.units.indexOfFirst { it.id == selectedSpecUnitId }
+            if (pos >= 0) {
+                binding.specUnitSpinner.setSelection(pos + 1)
+            }
+        }
     }
 
     private fun populateUnitSpinner(cat: UnitCategory?) {

@@ -6,7 +6,7 @@ import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 import java.time.LocalDate
@@ -25,8 +25,8 @@ class WeightChartActivity : BaseBackActivity() {
 
         @Suppress("UNCHECKED_CAST")
         val records = (intent.getSerializableExtra(EXTRA_RECORDS, ArrayList::class.java) as? ArrayList<BodyRecord>) ?: emptyList()
-        val unit = intent.getStringExtra(EXTRA_UNIT) ?: UnitCategory.DEFAULT_UNIT_WEIGHT
-        val dataPoints = parseRecords(records, UnitCategory.ID_WEIGHT, unit)
+        val unit = intent.getStringExtra(EXTRA_UNIT) ?: UnitCategoryType.Weight.defaultUnitId
+        val dataPoints = parseRecords(records, UnitCategoryType.Weight.id, unit)
         val series = ChartSeries(
             points = dataPoints, label = "测量值",
             color = resources.getColor(R.color.primary, null),

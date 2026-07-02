@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.ui.profile.HeightDetailActivity
 import com.woshiwangnima.healthdietpro.ui.profile.WeightDetailActivity
 
@@ -35,7 +35,7 @@ class RecordFragment : Fragment() {
             val records = ArrayList(profile.heightRecords)
             startActivity(Intent(requireContext(), HeightDetailActivity::class.java).apply {
                 putExtra("records", records)
-                putExtra("unit", UnitCategory.DEFAULT_UNIT_LENGTH)
+                putExtra("unit", UnitCategoryType.Length.defaultUnitId)
             })
         }
         addRecordButton(baseline, "体重", R.drawable.ic_weight) {
@@ -43,7 +43,7 @@ class RecordFragment : Fragment() {
             val records = ArrayList(profile.weightRecords)
             startActivity(Intent(requireContext(), WeightDetailActivity::class.java).apply {
                 putExtra("records", records)
-                putExtra("unit", UnitCategory.DEFAULT_UNIT_WEIGHT)
+                putExtra("unit", UnitCategoryType.Weight.defaultUnitId)
             })
         }
         addPlaceholder(baseline, "腰围")

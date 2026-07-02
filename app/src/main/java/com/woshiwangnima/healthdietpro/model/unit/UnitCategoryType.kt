@@ -1,13 +1,17 @@
 package com.woshiwangnima.healthdietpro.model.unit
 
-sealed class UnitCategoryType(
-    val id: String
-) {
-    object Weight : UnitCategoryType("weight")
-    object Length : UnitCategoryType("length")
-    object Volume : UnitCategoryType("volume")
-    object Density : UnitCategoryType("density")
-    object Time : UnitCategoryType("time")
-    object Energy : UnitCategoryType("energy")
-    object Storage : UnitCategoryType("storage")
+enum class UnitCategoryType(val id: String, val defaultUnitId: String) {
+    Weight("weight", "kg"),
+    Length("length", "cm"),
+    Volume("volume", "l"),
+    Density("density", "g_ml"),
+    Time("time", "s"),
+    Energy("energy", "kcal"),
+    Storage("storage", "b");
+
+    companion object {
+        private val byId by lazy { entries.associateBy { it.id } }
+        fun fromId(id: String): UnitCategoryType =
+            byId[id] ?: throw IllegalArgumentException("Unknown UnitCategoryType: $id")
+    }
 }

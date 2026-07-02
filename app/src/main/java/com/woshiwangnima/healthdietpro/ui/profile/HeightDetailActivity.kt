@@ -8,7 +8,7 @@ import com.woshiwangnima.healthdietpro.databinding.ActivityHeightDetailBinding
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartView
 import com.woshiwangnima.healthdietpro.ui.profile.chart.LineStyle
@@ -27,8 +27,8 @@ class HeightDetailActivity : BaseBackActivity() {
 
     private lateinit var binding: ActivityHeightDetailBinding
     private var records: MutableList<BodyRecord> = mutableListOf()
-    private var unit: String = UnitCategory.DEFAULT_UNIT_LENGTH
-    private var category: String = UnitCategory.ID_LENGTH
+    private var unit: String = UnitCategoryType.Length.defaultUnitId
+    private var category: String = UnitCategoryType.Length.id
     private var currentTab = -1
     private var chartView: ChartView? = null
 
@@ -43,8 +43,8 @@ class HeightDetailActivity : BaseBackActivity() {
 
         @Suppress("UNCHECKED_CAST")
         records = (intent.getSerializableExtra("records", ArrayList::class.java) as? ArrayList<BodyRecord>)?.toMutableList() ?: mutableListOf()
-        unit = intent.getStringExtra("unit") ?: UnitCategory.DEFAULT_UNIT_LENGTH
-        category = UnitCategory.ID_LENGTH
+        unit = intent.getStringExtra("unit") ?: UnitCategoryType.Length.defaultUnitId
+        category = UnitCategoryType.Length.id
 
         binding.tabBar.setTabs(listOf(
             TabItem(R.drawable.ic_chart, "图表"),

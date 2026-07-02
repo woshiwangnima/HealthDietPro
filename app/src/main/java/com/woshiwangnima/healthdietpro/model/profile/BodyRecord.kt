@@ -1,6 +1,6 @@
 package com.woshiwangnima.healthdietpro.model.profile
 
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import java.io.Serializable
 
 data class BodyRecord(
@@ -9,5 +9,5 @@ data class BodyRecord(
     val unit: String? = null
 ) : Serializable {
     fun getUnit(isWeight: Boolean): String =
-        unit?.takeIf { it.isNotEmpty() } ?: if (isWeight) UnitCategory.DEFAULT_UNIT_WEIGHT else UnitCategory.DEFAULT_UNIT_LENGTH
+        unit?.takeIf { it.isNotEmpty() } ?: if (isWeight) UnitCategoryType.Weight.defaultUnitId else UnitCategoryType.Length.defaultUnitId
 }

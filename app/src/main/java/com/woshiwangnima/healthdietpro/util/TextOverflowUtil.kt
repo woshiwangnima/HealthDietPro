@@ -84,9 +84,7 @@ object TextOverflowUtil {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getView(position, convertView, parent)
                 if (view is TextView) {
-                    // 选中态：降级 marquee → ellipsis，避免测量崩溃
-                    val selectedMode = if (overflowMode == "marquee") "ellipsis" else overflowMode
-                    applyMode(view, selectedMode)
+                    applyMode(view, overflowMode)
                     view.gravity = Gravity.CENTER_VERTICAL or Gravity.START
                 }
                 return view
@@ -95,7 +93,6 @@ object TextOverflowUtil {
             override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getDropDownView(position, convertView, parent)
                 if (view is TextView) {
-                    // 弹出下拉项可正常 marquee
                     applyMode(view, overflowMode)
                 }
                 return view
