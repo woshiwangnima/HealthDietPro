@@ -14,6 +14,7 @@ data class UnitCategory(
         const val ID_DENSITY = "density"
         const val ID_TIME = "time"
         const val ID_ENERGY = "energy"
+        const val ID_STORAGE = "storage"
 
         const val DEFAULT_UNIT_LENGTH = "cm"
         const val DEFAULT_UNIT_WEIGHT = "kg"

@@ -2,6 +2,7 @@
 
 import android.Manifest
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -56,6 +57,7 @@ class ProfileEditActivity : BaseBackActivity() {
     private var isNewUser: Boolean = false
     private val genderOptions = listOf("男", "女")
     private var avatarFileName: String = ""
+    private var currentDialog: Dialog? = null
 
     private val avatarPickerLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -112,6 +114,7 @@ class ProfileEditActivity : BaseBackActivity() {
         setupToolbar(binding.toolbar)
 
         diseaseRepo = DiseaseRepository(this)
+        diseaseRepo.loadAll()
         provinceRepo = ProvinceRepository.fromContext(this)
         regionRepo = RegionRepository.fromContext(this)
         locationProvider = CurrentLocationProvider(this)
@@ -245,7 +248,13 @@ class ProfileEditActivity : BaseBackActivity() {
         binding.saveBtn.isEnabled = changed
     }
 
+    private fun dismissCurrentDialog() {
+        currentDialog?.dismiss()
+        currentDialog = null
+    }
+
     private fun showDatePicker() {
+        dismissCurrentDialog()
         val cal = Calendar.getInstance()
         selectedBirthday?.let {
             try {
@@ -257,7 +266,7 @@ class ProfileEditActivity : BaseBackActivity() {
                 }
             } catch (_: Exception) {}
         }
-        DatePickerDialog(
+        currentDialog = DatePickerDialog(
             this,
             { _, year, month, day ->
                 val dateStr = "%04d-%02d-%02d".format(year, month + 1, day)
@@ -268,12 +277,13 @@ class ProfileEditActivity : BaseBackActivity() {
             cal.get(Calendar.YEAR),
             cal.get(Calendar.MONTH),
             cal.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        ).apply { show() }
     }
 
     /** 「选择地区」入口：弹底部 sheet 让用户选「使用当前位置」或「手动选择三级地区」。 */
     private fun showRegionChoiceSheet() {
-        val sheet = BottomSheetDialog(this)
+        dismissCurrentDialog()
+        val sheet = BottomSheetDialog(this).also { currentDialog = it }
         val density = resources.displayMetrics.density
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -316,10 +326,9 @@ class ProfileEditActivity : BaseBackActivity() {
         sheet.show()
     }
 
-    private var locationDialog: AlertDialog? = null
-
     private fun startLocationLookup() {
-        locationDialog = AlertDialog.Builder(this)
+        dismissCurrentDialog()
+        currentDialog = AlertDialog.Builder(this)
             .setTitle("正在定位")
             .setMessage("请稍候，正在获取当前位置…")
             .setCancelable(true)
@@ -328,8 +337,8 @@ class ProfileEditActivity : BaseBackActivity() {
 
         locationProvider.getCurrentLocation { result ->
             runOnUiThread {
-                locationDialog?.dismiss()
-                locationDialog = null
+                currentDialog?.dismiss()
+                currentDialog = null
                 when (result) {
                     is CurrentLocationProvider.Result.Ok -> {
                         // 省级走射线法、市/县级走质心最近法——一次反查得到三级完整 snapshot。
@@ -361,7 +370,8 @@ class ProfileEditActivity : BaseBackActivity() {
 
     /** 手选三级地区：先用底部 sheet 选省 → 选市 → 选县。每选一层进入下一层。 */
     private fun showManualProvinceSheet() {
-        val sheet = BottomSheetDialog(this)
+        dismissCurrentDialog()
+        val sheet = BottomSheetDialog(this).also { currentDialog = it }
         val density = resources.displayMetrics.density
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -409,7 +419,8 @@ class ProfileEditActivity : BaseBackActivity() {
             Toast.makeText(this, "暂无 $provinceName 市级数据", Toast.LENGTH_SHORT).show()
             return
         }
-        val sheet = BottomSheetDialog(this)
+        dismissCurrentDialog()
+        val sheet = BottomSheetDialog(this).also { currentDialog = it }
         val density = resources.displayMetrics.density
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -459,7 +470,8 @@ class ProfileEditActivity : BaseBackActivity() {
             // 该市没有县级质心数据，保留市一级
             return
         }
-        val sheet = BottomSheetDialog(this)
+        dismissCurrentDialog()
+        val sheet = BottomSheetDialog(this).also { currentDialog = it }
         val density = resources.displayMetrics.density
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -503,6 +515,7 @@ class ProfileEditActivity : BaseBackActivity() {
     }
 
     private fun showDiseasePicker() {
+        dismissCurrentDialog()
         val diseases = diseaseRepo.getSorted(selectedRegion.provinceCode.ifEmpty { null })
         val enabled = BooleanArray(diseases.size) { i ->
             diseases[i].gender?.contains(selectedGender.name) ?: true
@@ -515,7 +528,7 @@ class ProfileEditActivity : BaseBackActivity() {
             diseases[i].id in selectedDiseaseIds
         }
 
-        AlertDialog.Builder(this)
+        currentDialog = AlertDialog.Builder(this)
             .setTitle("选择特殊病史")
             .setMultiChoiceItems(names, checked) { _, which, isChecked ->
                 if (!enabled[which]) return@setMultiChoiceItems
@@ -526,9 +539,11 @@ class ProfileEditActivity : BaseBackActivity() {
                 }
             }
             .setPositiveButton("确定") { _, _ ->
+                currentDialog = null
                 updateDiseaseDisplay()
                 checkSaveEnabled()
             }
+            .setOnDismissListener { currentDialog = null }
             .show()
             .also { dialog ->
                 dialog.listView.post {

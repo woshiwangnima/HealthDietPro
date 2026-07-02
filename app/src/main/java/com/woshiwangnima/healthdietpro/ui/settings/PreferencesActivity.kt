@@ -165,22 +165,24 @@ class PreferencesActivity : BaseBackActivity() {
         container.removeAllViews()
 
         for (category in repo.getCategories()) {
+            val visibleUnits = category.units.filter { !it.hidden }
+            if (visibleUnits.isEmpty()) continue
             val row = LayoutInflater.from(this).inflate(R.layout.item_preference_row, null)
             val label = row.findViewById<TextView>(R.id.rowLabel)
             val value = row.findViewById<TextView>(R.id.rowValue)
 
             label.text = category.categoryCn
             val currentId = AppPrefs.getUnit(this, category.id, category.baseUnit)
-            val currentUnit = category.units.find { it.id == currentId }
+            val currentUnit = visibleUnits.find { it.id == currentId }
             value.text = currentUnit?.let { "${it.symbolCn} ${it.symbolEn}" } ?: currentId
 
             row.setOnClickListener {
-                val items = category.units.map { "${it.symbolCn}  ${it.symbolEn}" }.toTypedArray()
-                val checkedIndex = category.units.indexOfFirst { u ->
+                val items = visibleUnits.map { "${it.symbolCn}  ${it.symbolEn}" }.toTypedArray()
+                val checkedIndex = visibleUnits.indexOfFirst { u ->
                     u.id == AppPrefs.getUnit(this@PreferencesActivity, category.id, category.baseUnit)
                 }.coerceAtLeast(0)
                 showPicker(category.categoryCn, items, checkedIndex) { which ->
-                    AppPrefs.setUnit(this@PreferencesActivity, category.id, category.units[which].id)
+                    AppPrefs.setUnit(this@PreferencesActivity, category.id, visibleUnits[which].id)
                     buildUnitRows()
                 }
             }

@@ -4,5 +4,6 @@ data class UnitDef(
     val id: String,
     val symbolCn: String,
     val symbolEn: String,
-    val toBase: Float
+    val toBase: Float,
+    val hidden: Boolean = false
 )

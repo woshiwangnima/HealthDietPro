@@ -7,6 +7,8 @@ import android.provider.Settings
 import android.widget.Toast
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.databinding.ActivityAppSettingsBinding
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 import java.io.File
 
@@ -23,7 +25,9 @@ class AppSettingsActivity : BaseBackActivity() {
         binding.root.applySystemBarInsets()
         setupToolbar(binding.toolbar)
 
+        UnitConverter.init(this)
         setupListeners()
+        refreshCacheSize()
     }
 
     private fun setupListeners() {
@@ -59,7 +63,37 @@ class AppSettingsActivity : BaseBackActivity() {
             } else {
                 Toast.makeText(this, "已清理 $kb KB", Toast.LENGTH_SHORT).show()
             }
+            refreshCacheSize()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshCacheSize()
+    }
+
+    private fun refreshCacheSize() {
+        val totalBytes = cacheTotalSize()
+        binding.cacheSizeText.text = formatStorageSize(totalBytes)
+    }
+
+    private fun formatStorageSize(bytes: Long): String {
+        val repo = UnitConverter.getRepository() ?: return formatLegacy(bytes)
+        val storage = repo.getCategory(UnitCategory.ID_STORAGE) ?: return formatLegacy(bytes)
+        val best = storage.units.lastOrNull { bytes >= it.toBase } ?: storage.units.firstOrNull() ?: return formatLegacy(bytes)
+        val converter = UnitConverter
+        val converted = converter.fromBase(UnitCategory.ID_STORAGE, bytes.toFloat(), best.id)
+        val symbol = best.symbolCn
+        return if (best.id == "b" || best.id == "kb") {
+            "%.0f %s".format(converted, symbol)
+        } else {
+            "%.1f %s".format(converted, symbol)
+        }
+    }
+
+    private fun formatLegacy(bytes: Long): String {
+        val kb = bytes / 1024
+        return if (kb >= 1024) "%.1f MB".format(kb / 1024f) else "$kb KB"
     }
 
     private fun cacheTotalSize(): Long {
