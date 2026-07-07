@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -37,8 +39,9 @@
             android:configChanges="orientation|screenSize|uiMode"
             android:exported="false" />
         <activity
-            android:name=".ui.settings.AppSettingsActivity"
-            android:exported="false" />
+            android:name=".ui.settings.AppSettingsComposeActivity"
+            android:exported="false"
+            android:label="@string/settings_app_title" />
         <activity
             android:name=".ui.settings.UserSettingsActivity"
             android:exported="false" />
@@ -65,6 +68,11 @@
         <activity
             android:name=".ui.widget.tab.demo.DemoTabsActivity"
             android:exported="true" />
+
+        <activity
+            android:name=".common.ui.ComposePreviewActivity"
+            android:exported="true"
+            android:label="Compose 主题预览" />
 
         <activity
             android:name=".ui.record.MedicationRecordActivity"

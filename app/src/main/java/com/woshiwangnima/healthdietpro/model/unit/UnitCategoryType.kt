@@ -1,6 +1,7 @@
 package com.woshiwangnima.healthdietpro.model.unit
 
 enum class UnitCategoryType(val id: String, val defaultUnitId: String) {
+    Unknown("unknown", "unknown"),
     Weight("weight", "kg"),
     Length("length", "cm"),
     Volume("volume", "l"),

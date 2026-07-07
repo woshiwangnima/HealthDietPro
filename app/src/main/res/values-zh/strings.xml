@@ -10,26 +10,24 @@
     <string name="no_record">暂无数据</string>
     <string name="chart_time_range_all">全部</string>
     <string name="chart_interval_auto">自动</string>
-
-    <string name="view_chart_line_style">Line Style</string>
-    <string name="view_chart_line_style_select_prompt">Line Style Select Prompt</string>
-    <string name="view_chart_x_axis_interval">X-Axis Interval</string>
-    <string name="view_chart_x_axis_range">X-Axis Range</string>
-    <string name="view_chart_x_axis_bounds">X-Axis Bounds</string>
-    <string name="view_chart_y_axis_interval">Y-Axis Interval</string>
-    <string name="view_chart_y_axis_range">Y-Axis Range</string>
-    <string name="view_chart_y_axis_bounds">Y-Axis Bounds</string>
-
-    <string name="view_chart_time_range">Time Range</string>
-    <string name="view_chart_time_interval">Time Interval</string>
-    <string name="view_chart_weight_interval">Weight Interval</string>
-    <string name="view_chart_weight_bounds">Weight Bounds</string>
-    <string name="view_chart_bmi_interval">BMI Interval</string>
-    <string name="view_chart_bmi_bounds">BMI Bounds</string>
-    <string name="view_chart_height_interval">Height Interval</string>
-    <string name="view_chart_height_bounds">Height Bounds</string>
-    <string name="view_chart_x_axis_range_select_prompt">X-Axis Range Select Prompt</string>
-    <string name="view_chart_x_axis_interval_select_prompt">X-Axis Interval Select Prompt</string>
+    <string name="view_chart_y_axis_bounds">纵轴数据边界</string>
+    <string name="view_chart_time_range">显示数据时段</string>
+    <string name="view_chart_time_interval">时间刻度间隔</string>
+    <string name="view_chart_line_style">图表线条样式</string>
+    <string name="view_chart_weight_interval">体重刻度间隔</string>
+    <string name="view_chart_weight_bounds">体重数据边界</string>
+    <string name="view_chart_bmi_interval">BMI刻度间隔</string>
+    <string name="view_chart_bmi_bounds">BMI数据边界</string>
+    <string name="view_chart_line_style_select_prompt">请选择-图表线条样式</string>
+    <string name="view_chart_x_axis_interval">横轴刻度间隔</string>
+    <string name="view_chart_x_axis_range">横轴显示范围</string>
+    <string name="view_chart_x_axis_bounds">横轴数据边界</string>
+    <string name="view_chart_y_axis_interval">纵轴刻度间隔</string>
+    <string name="view_chart_y_axis_range">纵轴显示范围</string>
+    <string name="view_chart_height_interval">身高刻度间隔</string>
+    <string name="view_chart_height_bounds">身高数据边界</string>
+    <string name="view_chart_x_axis_range_select_prompt">请选择-横轴显示范围</string>
+    <string name="view_chart_x_axis_interval_select_prompt">请选择-横轴刻度间隔</string>
 
     <string name="settings_app_title">软件设置</string>
     <string name="settings_message_notification">消息通知</string>
@@ -47,5 +45,4 @@
     <string name="compose_theme_preview_title">Compose 主题预览</string>
     <string name="compose_theme_preview_body">Material 3 主题已启用</string>
     <string name="compose_theme_preview_open_settings">打开软件设置</string>
-
 </resources>

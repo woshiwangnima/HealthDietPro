@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HealthDietPro</string>
+    <string name="nav_nutrition">Nutrition Table</string>
+    <string name="nav_record">Record</string>
+    <string name="nav_profile">Profile</string>
+    <string name="tab_nutrition_title">Nutrition Table</string>
+    <string name="tab_record_title">Record</string>
+    <string name="tab_profile_title">Profile</string>
+    <string name="no_record">No Record</string>
+    <string name="chart_time_range_all">All</string>
+    <string name="chart_interval_auto">Auto</string>
+    <string name="view_chart_line_style">Line Style</string>
+    <string name="view_chart_line_style_select_prompt">Line Style Select Prompt</string>
+    <string name="view_chart_x_axis_interval">X-Axis Interval</string>
+    <string name="view_chart_x_axis_range">X-Axis Range</string>
+    <string name="view_chart_x_axis_bounds">X-Axis Bounds (%)</string>
+    <string name="view_chart_y_axis_interval">Y-Axis Interval</string>
+    <string name="view_chart_y_axis_range">Y-Axis Range</string>
+    <string name="view_chart_y_axis_bounds">Y-Axis Bounds (%)</string>
+    <string name="view_chart_time_range">Time Range</string>
+    <string name="view_chart_time_interval">Time Interval</string>
+    <string name="view_chart_weight_interval">Weight Interval</string>
+    <string name="view_chart_weight_bounds">Weight Bounds (%)</string>
+    <string name="view_chart_bmi_interval">BMI Interval</string>
+    <string name="view_chart_bmi_bounds">BMI Bounds (%)</string>
+    <string name="view_chart_height_interval">Height Interval</string>
+    <string name="view_chart_height_bounds">Height Bounds (%)</string>
+    <string name="view_chart_x_axis_range_select_prompt">X-Axis Range Select Prompt</string>
+    <string name="view_chart_x_axis_interval_select_prompt">X-Axis Interval Select Prompt</string>
+
+    <string name="settings_app_title">App Settings</string>
+    <string name="settings_message_notification">Notifications</string>
+    <string name="settings_message_notification_desc">Manage app notifications</string>
+    <string name="settings_permission">System Permissions</string>
+    <string name="settings_permission_desc">Permissions, storage, etc.</string>
+    <string name="settings_clear_cache">Clear Cache</string>
+    <string name="settings_clear_cache_desc">Tap to clear app cache</string>
+    <string name="settings_clear_cache_confirm_title">Clear cache?</string>
+    <string name="settings_clear_cache_confirm_message">This will clear the app cache to free up storage. Your account and data are not affected.</string>
+    <string name="settings_clear_cache_confirm_ok">Clear</string>
+    <string name="settings_clear_cache_cancel">Cancel</string>
+    <string name="settings_cache_cleared_mb">Cleared %.1f MB</string>
+    <string name="settings_cache_cleared_kb">Cleared %1$d KB</string>
+    <string name="compose_theme_preview_title">Compose Theme Preview</string>
+    <string name="compose_theme_preview_body">Material 3 theme enabled</string>
+    <string name="compose_theme_preview_open_settings">Open App Settings</string>
+
+</resources>

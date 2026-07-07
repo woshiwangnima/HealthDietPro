@@ -15,7 +15,6 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <!-- Row 1: 图表样式 -->
     <LinearLayout
         android:id="@+id/controlsRow"
         android:layout_width="match_parent"
@@ -24,6 +23,7 @@
         android:paddingHorizontal="12dp"
         android:paddingVertical="2dp">
 
+        <!-- Row 1: 图表样式 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="36dp"
@@ -31,19 +31,21 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="图表样式"
-                android:textSize="@dimen/text_size_caption"
+                android:layout_width="@dimen/view_chart_label_width"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:layout_marginEnd="8dp"
+                android:text="@string/view_chart_line_style"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                android:layout_marginEnd="8dp" />
+                android:textSize="@dimen/text_size_caption" />
 
             <Spinner
                 android:id="@+id/chartTypeSpinner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dialog"
+                android:prompt="@string/view_chart_line_style_select_prompt" />
         </LinearLayout>
 
         <!-- Row 2: 显示时间 -->
@@ -54,9 +56,10 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="显示时间"
+                android:layout_width="@dimen/view_chart_label_width"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:text="@string/view_chart_x_axis_range"
                 android:textSize="@dimen/text_size_caption"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:layout_marginEnd="8dp" />
@@ -66,7 +69,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dialog"
+                android:prompt="@string/view_chart_x_axis_range_select_prompt" />
         </LinearLayout>
 
         <!-- Row 3: X轴间隔 -->
@@ -77,9 +81,10 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="X轴间隔"
+                android:layout_width="@dimen/view_chart_label_width"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:text="@string/view_chart_x_axis_interval"
                 android:textSize="@dimen/text_size_caption"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:layout_marginEnd="8dp" />
@@ -89,7 +94,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dialog"
+                android:prompt="@string/view_chart_x_axis_interval_select_prompt" />
         </LinearLayout>
 
         <!-- Row 4: Y轴 + 全屏按钮 -->
@@ -100,12 +106,13 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Y轴"
+                android:layout_width="@dimen/view_chart_label_width"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:text="@string/view_chart_y_axis_bounds"
                 android:textSize="@dimen/text_size_caption"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                android:layout_marginEnd="4dp" />
+                android:layout_marginEnd="8dp" />
 
             <EditText
                 android:id="@+id/yMinInput"

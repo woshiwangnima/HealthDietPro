@@ -23,7 +23,7 @@ import com.woshiwangnima.healthdietpro.databinding.FragmentProfileBinding
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
-import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsActivity
+import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsComposeActivity
 import com.woshiwangnima.healthdietpro.util.TextOverflowUtil
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.io.File
@@ -68,7 +68,7 @@ class ProfileFragment : Fragment() {
         diseaseRepo = DiseaseRepository(requireContext())
 
         binding.settingsBtn.setOnClickListener {
-            val intent = Intent(requireContext(), AppSettingsActivity::class.java)
+            val intent = Intent(requireContext(), AppSettingsComposeActivity::class.java)
             settingsLauncher.launch(intent)
         }
 
