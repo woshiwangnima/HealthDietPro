@@ -1,0 +1,57 @@
+{
+  "version": "DRIs_2023",
+  "population": {
+    "id": "children_7_8y_female",
+    "i18n": {
+      "zh": {
+        "label": "7-8岁学龄儿童（女）",
+        "description": "中国7-8岁学龄女性儿童膳食营养素参考摄入量（2023版）"
+      },
+      "en": {
+        "label": "School-age Children 7-8 years (Female)",
+        "description": "Dietary Reference Intakes for Chinese Female School-age Children Aged 7-8 Years (2023 Edition)"
+      }
+    }
+  },
+  "data": [
+    { "code": "ENERGY", "EAR": 5.86, "RNI": 7.11, "unit": "MJ/d" },
+    { "code": "ENERGY", "AI": 1400, "unit": "kcal/d" },
+    { "code": "PROTEIN", "EAR": 35, "RNI": 40, "unit": "g/d" },
+    { "code": "FAT", "AMDR": "20-30", "unit": "%E" },
+    { "code": "CHO", "AI": 170, "AMDR": "50-65", "unit": "g/d" },
+    { "code": "FIBER", "AI": 15, "unit": "g/d" },
+    { "code": "LA", "AI": 4.0, "unit": "%E" },
+    { "code": "ALA", "AI": 0.60, "unit": "%E" },
+    { "code": "EPA_DHA", "AI": 0.1, "unit": "g/d" },
+    { "code": "VITA", "EAR": 360, "RNI": 500, "UL": 1800, "unit": "μg RAE/d" },
+    { "code": "VITD", "RNI": 10, "UL": 30, "unit": "μg/d" },
+    { "code": "VITE", "AI": 9, "UL": 300, "unit": "mg α-TE/d" },
+    { "code": "VITK", "AI": 50, "unit": "μg/d" },
+    { "code": "VITB1", "EAR": 0.9, "RNI": 1.0, "unit": "mg/d" },
+    { "code": "VITB2", "EAR": 0.9, "RNI": 1.0, "unit": "mg/d" },
+    { "code": "NIACIN", "EAR": 8, "RNI": 11, "unit": "mg NE/d" },
+    { "code": "VITB6", "EAR": 0.9, "RNI": 1.0, "unit": "mg/d" },
+    { "code": "FOLATE", "EAR": 220, "RNI": 260, "UL": 600, "unit": "μg DFE/d" },
+    { "code": "VITB12", "EAR": 1.4, "RNI": 1.6, "unit": "μg/d" },
+    { "code": "PANTOTHENIC", "AI": 3.5, "unit": "mg/d" },
+    { "code": "BIOTIN", "AI": 30, "unit": "μg/d" },
+    { "code": "CHOLINE", "AI": 300, "UL": 1800, "unit": "mg/d" },
+    { "code": "VITC", "EAR": 55, "RNI": 70, "UL": 800, "unit": "mg/d" },
+    { "code": "CA", "EAR": 600, "RNI": 800, "UL": 2000, "unit": "mg/d" },
+    { "code": "P", "EAR": 380, "RNI": 450, "unit": "mg/d" },
+    { "code": "K", "AI": 1700, "PI": 2300, "unit": "mg/d" },
+    { "code": "NA", "AI": 900, "PI": 1100, "unit": "mg/d" },
+    { "code": "MG", "EAR": 180, "RNI": 210, "unit": "mg/d" },
+    { "code": "CL", "AI": 1400, "unit": "mg/d" },
+    { "code": "FE", "EAR": 8, "RNI": 10, "UL": 30, "unit": "mg/d" },
+    { "code": "I", "EAR": 65, "RNI": 90, "UL": 200, "unit": "μg/d" },
+    { "code": "ZN", "EAR": 6.3, "RNI": 7.5, "UL": 18, "unit": "mg/d" },
+    { "code": "SE", "EAR": 30, "RNI": 35, "UL": 220, "unit": "μg/d" },
+    { "code": "CU", "EAR": 0.4, "RNI": 0.5, "UL": 3.5, "unit": "mg/d" },
+    { "code": "MN", "AI": 3.0, "UL": 5.0, "unit": "mg/d" },
+    { "code": "CR", "AI": 25, "unit": "μg/d" },
+    { "code": "MO", "AI": 30, "unit": "μg/d" },
+    { "code": "F", "AI": 0.9, "UL": 1.5, "unit": "mg/d" },
+    { "code": "WATER", "AI": 1500, "unit": "mL/d" }
+  ]
+}

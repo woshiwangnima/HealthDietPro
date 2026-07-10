@@ -29,12 +29,10 @@ class PreferencesActivity : BaseBackActivity() {
 
         UnitConverter.init(this)
         com.woshiwangnima.healthdietpro.model.prefs.AppPrefs.ensureFontStyleTokenDefaults(this)
-        buildFontPreviews()
         buildFontStylePreviews()
         buildUnitRows()
         refreshDisplay()
         setupClickListeners()
-        setupFontScaleBar()
     }
 
     private data class FontPreviewItem(val cnName: String, val dimenRes: Int)

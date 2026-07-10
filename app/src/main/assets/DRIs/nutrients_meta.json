@@ -1,0 +1,492 @@
+[
+  {
+    "code": "ENERGY",
+    "category": "energy",
+    "needType": "macronutrient",
+    "baseUnit": "kcal",
+    "i18n": {
+      "zh": { "name": "能量", "description": "维持生命活动和身体功能所必需的能量来源。" },
+      "en": { "name": "Energy", "description": "Essential energy source for life activities and bodily functions." }
+    }
+  },
+  {
+    "code": "PROTEIN",
+    "category": "protein",
+    "needType": "macronutrient",
+    "baseUnit": "g",
+    "i18n": {
+      "zh": { "name": "蛋白质", "description": "构成身体组织的重要成分，参与修复和生长。" },
+      "en": { "name": "Protein", "description": "A key component for building body tissues, involved in repair and growth." }
+    }
+  },
+  {
+    "code": "FAT",
+    "category": "fat",
+    "needType": "macronutrient",
+    "baseUnit": "g",
+    "i18n": {
+      "zh": { "name": "脂肪", "description": "提供能量，帮助吸收脂溶性维生素，保护器官。" },
+      "en": { "name": "Fat", "description": "Provides energy, aids in the absorption of fat-soluble vitamins, and protects organs." }
+    }
+  },
+  {
+    "code": "CHO",
+    "category": "carbohydrate",
+    "needType": "macronutrient",
+    "baseUnit": "g",
+    "i18n": {
+      "zh": { "name": "碳水化合物", "description": "身体最主要的能量来源。" },
+      "en": { "name": "Carbohydrate", "description": "The body's primary source of energy." }
+    }
+  },
+  {
+    "code": "FIBER",
+    "category": "fiber",
+    "needType": "macronutrient",
+    "baseUnit": "g",
+    "i18n": {
+      "zh": { "name": "膳食纤维", "description": "促进肠道健康，预防便秘。" },
+      "en": { "name": "Dietary Fiber", "description": "Promotes gut health and prevents constipation." }
+    }
+  },
+  {
+    "code": "WATER",
+    "category": "water",
+    "needType": "other",
+    "baseUnit": "mL",
+    "i18n": {
+      "zh": { "name": "水", "description": "维持生命必需，参与营养运输和体温调节。" },
+      "en": { "name": "Water", "description": "Essential for life, involved in nutrient transport and temperature regulation." }
+    }
+  },
+  {
+    "code": "VITA",
+    "category": "vitamin.fat_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "维生素A", "description": "维持视力、皮肤健康和免疫功能。[reference:2][reference:3]" },
+      "en": { "name": "Vitamin A", "description": "Maintains vision, skin health, and immune function." }
+    }
+  },
+  {
+    "code": "VITD",
+    "category": "vitamin.fat_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "维生素D", "description": "促进钙吸收，维护骨骼健康。[reference:4]" },
+      "en": { "name": "Vitamin D", "description": "Promotes calcium absorption and maintains bone health." }
+    }
+  },
+  {
+    "code": "VITE",
+    "category": "vitamin.fat_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "维生素E", "description": "抗氧化，保护细胞免受损伤。[reference:5]" },
+      "en": { "name": "Vitamin E", "description": "Acts as an antioxidant, protecting cells from damage." }
+    }
+  },
+  {
+    "code": "VITK",
+    "category": "vitamin.fat_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "维生素K", "description": "参与凝血过程，维护骨骼健康。[reference:6]" },
+      "en": { "name": "Vitamin K", "description": "Involved in blood clotting and maintaining bone health." }
+    }
+  },
+  {
+    "code": "VITB1",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "维生素B1", "description": "参与能量代谢，维护神经系统功能。[reference:7][reference:8]" },
+      "en": { "name": "Vitamin B1", "description": "Involved in energy metabolism and maintaining nervous system function." }
+    }
+  },
+  {
+    "code": "VITB2",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "维生素B2", "description": "参与能量代谢，维护皮肤和黏膜健康。[reference:9][reference:10]" },
+      "en": { "name": "Vitamin B2", "description": "Involved in energy metabolism and maintaining skin and mucous membrane health." }
+    }
+  },
+  {
+    "code": "NIACIN",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "烟酸", "description": "参与能量代谢，维护神经系统和皮肤健康。[reference:11][reference:12]" },
+      "en": { "name": "Niacin", "description": "Involved in energy metabolism and maintaining nervous system and skin health." }
+    }
+  },
+  {
+    "code": "VITB6",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "维生素B6", "description": "参与蛋白质代谢和红细胞生成。[reference:13][reference:14]" },
+      "en": { "name": "Vitamin B6", "description": "Involved in protein metabolism and red blood cell production." }
+    }
+  },
+  {
+    "code": "FOLATE",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "叶酸", "description": "参与细胞分裂和生长，对胎儿发育至关重要。[reference:15][reference:16]" },
+      "en": { "name": "Folate", "description": "Involved in cell division and growth, crucial for fetal development." }
+    }
+  },
+  {
+    "code": "VITB12",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "维生素B12", "description": "参与红细胞生成和神经系统功能。[reference:17][reference:18]" },
+      "en": { "name": "Vitamin B12", "description": "Involved in red blood cell production and nervous system function." }
+    }
+  },
+  {
+    "code": "PANTOTHENIC",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "泛酸", "description": "参与能量代谢和脂肪酸合成。[reference:19][reference:20]" },
+      "en": { "name": "Pantothenic Acid", "description": "Involved in energy metabolism and fatty acid synthesis." }
+    }
+  },
+  {
+    "code": "BIOTIN",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "生物素", "description": "参与能量代谢和脂肪酸合成。[reference:21][reference:22]" },
+      "en": { "name": "Biotin", "description": "Involved in energy metabolism and fatty acid synthesis." }
+    }
+  },
+  {
+    "code": "CHOLINE",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "胆碱", "description": "参与细胞膜结构和神经递质合成。[reference:23][reference:24]" },
+      "en": { "name": "Choline", "description": "Involved in cell membrane structure and neurotransmitter synthesis." }
+    }
+  },
+  {
+    "code": "VITC",
+    "category": "vitamin.water_soluble",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "维生素C", "description": "抗氧化，促进铁吸收和胶原蛋白合成。[reference:25][reference:26]" },
+      "en": { "name": "Vitamin C", "description": "Acts as an antioxidant, enhances iron absorption, and is involved in collagen synthesis." }
+    }
+  },
+  {
+    "code": "CA",
+    "category": "mineral.major",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "钙", "description": "构成骨骼和牙齿，参与神经传导和肌肉收缩。[reference:27][reference:28]" },
+      "en": { "name": "Calcium", "description": "A major component of bones and teeth, involved in nerve transmission and muscle contraction." }
+    }
+  },
+  {
+    "code": "P",
+    "category": "mineral.major",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "磷", "description": "构成骨骼和牙齿，参与能量代谢。[reference:29]" },
+      "en": { "name": "Phosphorus", "description": "A component of bones and teeth, involved in energy metabolism." }
+    }
+  },
+  {
+    "code": "K",
+    "category": "mineral.major",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "钾", "description": "维持体液平衡和神经肌肉功能。[reference:30][reference:31]" },
+      "en": { "name": "Potassium", "description": "Maintains fluid balance and neuromuscular function." }
+    }
+  },
+  {
+    "code": "NA",
+    "category": "mineral.major",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "钠", "description": "维持体液平衡和神经信号传导。[reference:32][reference:33]" },
+      "en": { "name": "Sodium", "description": "Maintains fluid balance and nerve signal transmission." }
+    }
+  },
+  {
+    "code": "MG",
+    "category": "mineral.major",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "镁", "description": "参与多种酶的激活和骨骼构成。[reference:34][reference:35]" },
+      "en": { "name": "Magnesium", "description": "Involved in the activation of many enzymes and bone structure." }
+    }
+  },
+  {
+    "code": "CL",
+    "category": "mineral.major",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "氯", "description": "维持体液平衡和胃酸形成。[reference:36]" },
+      "en": { "name": "Chloride", "description": "Maintains fluid balance and is involved in stomach acid formation." }
+    }
+  },
+  {
+    "code": "S",
+    "category": "mineral.major",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "硫", "description": "参与蛋白质和酶的构成。[reference:37]" },
+      "en": { "name": "Sulfur", "description": "A component of proteins and enzymes." }
+    }
+  },
+  {
+    "code": "FE",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "铁", "description": "参与血红蛋白合成和氧气运输。[reference:38][reference:39]" },
+      "en": { "name": "Iron", "description": "Involved in hemoglobin synthesis and oxygen transport." }
+    }
+  },
+  {
+    "code": "ZN",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "锌", "description": "参与免疫功能和细胞分裂。[reference:40]" },
+      "en": { "name": "Zinc", "description": "Involved in immune function and cell division." }
+    }
+  },
+  {
+    "code": "CU",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "铜", "description": "参与铁代谢和神经系统功能。[reference:41]" },
+      "en": { "name": "Copper", "description": "Involved in iron metabolism and nervous system function." }
+    }
+  },
+  {
+    "code": "MN",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "锰", "description": "参与骨骼发育和代谢。[reference:42]" },
+      "en": { "name": "Manganese", "description": "Involved in bone development and metabolism." }
+    }
+  },
+  {
+    "code": "I",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "碘", "description": "参与甲状腺激素合成。[reference:43]" },
+      "en": { "name": "Iodine", "description": "Involved in thyroid hormone synthesis." }
+    }
+  },
+  {
+    "code": "SE",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "硒", "description": "抗氧化，保护细胞免受损伤。[reference:44]" },
+      "en": { "name": "Selenium", "description": "Acts as an antioxidant, protecting cells from damage." }
+    }
+  },
+  {
+    "code": "CR",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "铬", "description": "参与糖代谢和胰岛素功能。[reference:45]" },
+      "en": { "name": "Chromium", "description": "Involved in glucose metabolism and insulin function." }
+    }
+  },
+  {
+    "code": "MO",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "钼", "description": "参与某些酶的活性。[reference:46]" },
+      "en": { "name": "Molybdenum", "description": "Involved in the activity of certain enzymes." }
+    }
+  },
+  {
+    "code": "CO",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "μg",
+    "i18n": {
+      "zh": { "name": "钴", "description": "维生素B12的组成部分。[reference:47]" },
+      "en": { "name": "Cobalt", "description": "A component of vitamin B12." }
+    }
+  },
+  {
+    "code": "F",
+    "category": "mineral.trace",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "氟", "description": "预防龋齿，维护骨骼健康。[reference:48]" },
+      "en": { "name": "Fluoride", "description": "Prevents dental caries and maintains bone health." }
+    }
+  },
+  {
+    "code": "ALA",
+    "category": "fat.essential",
+    "needType": "macronutrient",
+    "baseUnit": "g",
+    "i18n": {
+      "zh": { "name": "α-亚麻酸", "description": "人体必需的ω-3脂肪酸。[reference:49]" },
+      "en": { "name": "α-Linolenic Acid", "description": "An essential omega-3 fatty acid." }
+    }
+  },
+  {
+    "code": "LA",
+    "category": "fat.essential",
+    "needType": "macronutrient",
+    "baseUnit": "g",
+    "i18n": {
+      "zh": { "name": "亚油酸", "description": "人体必需的ω-6脂肪酸。[reference:50]" },
+      "en": { "name": "Linoleic Acid", "description": "An essential omega-6 fatty acid." }
+    }
+  },
+  {
+    "code": "EPA_DHA",
+    "category": "fat",
+    "needType": "macronutrient",
+    "baseUnit": "g",
+    "i18n": {
+      "zh": { "name": "EPA+DHA", "description": "长链多不饱和脂肪酸，对心血管和大脑健康有益。[reference:51]" },
+      "en": { "name": "EPA+DHA", "description": "Long-chain polyunsaturated fatty acids beneficial for cardiovascular and brain health." }
+    }
+  },
+  {
+    "code": "ILE",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "异亮氨酸", "description": "人体必需氨基酸之一。[reference:52]" },
+      "en": { "name": "Isoleucine", "description": "An essential amino acid." }
+    }
+  },
+  {
+    "code": "LEU",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "亮氨酸", "description": "人体必需氨基酸之一。[reference:53]" },
+      "en": { "name": "Leucine", "description": "An essential amino acid." }
+    }
+  },
+  {
+    "code": "LYS",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "赖氨酸", "description": "人体必需氨基酸之一。[reference:54]" },
+      "en": { "name": "Lysine", "description": "An essential amino acid." }
+    }
+  },
+  {
+    "code": "MET",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "蛋氨酸", "description": "人体必需氨基酸之一。[reference:55]" },
+      "en": { "name": "Methionine", "description": "An essential amino acid." }
+    }
+  },
+  {
+    "code": "PHE",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "苯丙氨酸", "description": "人体必需氨基酸之一。[reference:56]" },
+      "en": { "name": "Phenylalanine", "description": "An essential amino acid." }
+    }
+  },
+  {
+    "code": "THR",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "苏氨酸", "description": "人体必需氨基酸之一。[reference:57]" },
+      "en": { "name": "Threonine", "description": "An essential amino acid." }
+    }
+  },
+  {
+    "code": "TRP",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "色氨酸", "description": "人体必需氨基酸之一。[reference:58]" },
+      "en": { "name": "Tryptophan", "description": "An essential amino acid." }
+    }
+  },
+  {
+    "code": "VAL",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "缬氨酸", "description": "人体必需氨基酸之一。[reference:59]" },
+      "en": { "name": "Valine", "description": "An essential amino acid." }
+    }
+  },
+  {
+    "code": "HIS",
+    "category": "protein.amino_acid",
+    "needType": "micronutrient",
+    "baseUnit": "mg",
+    "i18n": {
+      "zh": { "name": "组氨酸", "description": "婴幼儿必需氨基酸。[reference:60]" },
+      "en": { "name": "Histidine", "description": "An essential amino acid for infants." }
+    }
+  }
+]

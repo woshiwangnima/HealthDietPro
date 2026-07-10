@@ -1,0 +1,79 @@
+{
+  "indicators": [
+    {
+      "code": "EAR",
+      "i18n": {
+        "zh": {
+          "fullName": "平均需要量",
+          "description": "指某一特定性别、年龄及生理状况群体中，个体对某营养素需要量的平均值。即满足群体中 50% 个体需要的摄入水平，常用于评估群体摄入不足的概率。",
+          "unit": "视具体营养素而定（如 mg/d， μg/d）"
+        },
+        "en": {
+          "fullName": "Estimated Average Requirement",
+          "description": "The average daily nutrient intake level estimated to meet the requirement of half (50%) of the healthy individuals in a particular life stage and gender group. Commonly used to assess the risk of inadequacy in a population.",
+          "unit": "Varies by nutrient (e.g., mg/d, μg/d)"
+        }
+      }
+    },
+    {
+      "code": "RNI",
+      "i18n": {
+        "zh": {
+          "fullName": "推荐摄入量",
+          "description": "指可以满足某一特定性别、年龄及生理状况群体中绝大多数个体（97%-98%）需要的营养素摄入水平。是健康个体日常膳食摄入的达标目标。",
+          "unit": "视具体营养素而定（如 mg/d， μg/d）"
+        },
+        "en": {
+          "fullName": "Recommended Nutrient Intake",
+          "description": "The daily dietary nutrient intake level sufficient to meet the requirements of nearly all (97-98%) healthy individuals in a particular life stage and gender group. Serves as the goal for daily dietary intake.",
+          "unit": "Varies by nutrient (e.g., mg/d, μg/d)"
+        }
+      }
+    },
+    {
+      "code": "AMDR",
+      "i18n": {
+        "zh": {
+          "fullName": "宏量营养素可接受范围",
+          "description": "指蛋白质、脂肪和碳水化合物等宏量营养素的供能比范围。在此区间内摄入，有助于降低慢性病风险，同时保证必需营养素的充足摄入。",
+          "unit": "占全日总能量的百分比（%）"
+        },
+        "en": {
+          "fullName": "Acceptable Macronutrient Distribution Range",
+          "description": "A range of intakes for a particular energy source (protein, fat, carbohydrate) that is associated with reduced risk of chronic disease while providing adequate intakes of essential nutrients.",
+          "unit": "Percentage of total daily energy intake (%)"
+        }
+      }
+    },
+    {
+      "code": "PI",
+      "i18n": {
+        "zh": {
+          "fullName": "预防非传染性慢性病的建议摄入量",
+          "description": "为预防高血压、冠心病、糖尿病等非传染性慢性病（NCD），而建议的特定营养素（主要是钠、钾等）的每日摄入水平。",
+          "unit": "视具体营养素而定（如 g/d， mg/d）"
+        },
+        "en": {
+          "fullName": "Proposed Intake for NCD Prevention",
+          "description": "A suggested daily intake level for specific nutrients (mainly sodium and potassium) aimed at reducing the risk of non-communicable chronic diseases (NCD), such as hypertension, coronary heart disease, and diabetes.",
+          "unit": "Varies by nutrient (e.g., g/d, mg/d)"
+        }
+      }
+    },
+    {
+      "code": "UL",
+      "i18n": {
+        "zh": {
+          "fullName": "可耐受最高摄入量",
+          "description": "指平均每日摄入营养素的最高限量。该剂量对一般人群中的几乎所有个体不会引起不利于健康的作用，摄入量超过此限则中毒风险增加。",
+          "unit": "视具体营养素而定（如 mg/d， μg/d）"
+        },
+        "en": {
+          "fullName": "Tolerable Upper Intake Level",
+          "description": "The maximum daily nutrient intake level that is unlikely to pose a risk of adverse health effects in almost all individuals in the general population. The risk of toxic effects increases with intake above this level.",
+          "unit": "Varies by nutrient (e.g., mg/d, μg/d)"
+        }
+      }
+    }
+  ]
+}

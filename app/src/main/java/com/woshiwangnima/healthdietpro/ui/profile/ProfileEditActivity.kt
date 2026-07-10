@@ -37,6 +37,7 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 import com.woshiwangnima.healthdietpro.util.location.CurrentLocationProvider
 import java.io.File
+import java.util.Locale
 import java.io.FileOutputStream
 import java.util.Calendar
 
@@ -523,7 +524,8 @@ class ProfileEditActivity : BaseBackActivity() {
         selectedDiseaseIds.removeAll { id ->
             diseases.none { it.id == id && (it.gender?.contains(selectedGender.name) ?: true) }
         }
-        val names = diseases.map { it.name }.toTypedArray()
+        val locale = Locale.getDefault()
+        val names = diseases.map { it.displayName(locale) }.toTypedArray()
         val checked = BooleanArray(diseases.size) { i ->
             diseases[i].id in selectedDiseaseIds
         }
@@ -566,7 +568,7 @@ class ProfileEditActivity : BaseBackActivity() {
         } else {
             val diseases = diseaseRepo.loadAll()
             val names = selectedDiseaseIds.map { id ->
-                diseases.find { it.id == id }?.name ?: id
+                diseases.find { it.id == id }?.displayName(Locale.getDefault()) ?: id
             }
             binding.diseaseDisplay.text = names.joinToString("、")
         }

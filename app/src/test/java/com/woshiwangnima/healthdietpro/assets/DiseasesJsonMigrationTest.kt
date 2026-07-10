@@ -1,5 +1,6 @@
 package com.woshiwangnima.healthdietpro.assets
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -23,5 +24,38 @@ class DiseasesJsonMigrationTest {
                 assertTrue("prevalence key `$k` is not a GB/T 2260 code", k in allowedCodes)
             }
         }
+    }
+
+    @Test fun allDiseasesHaveLocalizedLabels() {
+        val raw = java.io.File("src/main/assets/diseases.json").readText()
+        val arr = org.json.JSONArray(raw)
+        for (i in 0 until arr.length()) {
+            val disease = arr.getJSONObject(i)
+            val id = disease.getString("id")
+            val i18n = disease.getJSONObject("i18n")
+            val zh = i18n.getJSONObject("zh")
+            val en = i18n.getJSONObject("en")
+
+            assertTrue("$id zh label is blank", zh.getString("label").isNotBlank())
+            assertTrue("$id en label is blank", en.getString("label").isNotBlank())
+        }
+    }
+
+    @Test fun diseaseLabelsIncludeExpectedEnglishValues() {
+        val raw = java.io.File("src/main/assets/diseases.json").readText()
+        val arr = org.json.JSONArray(raw)
+        val labelsById = buildMap {
+            for (i in 0 until arr.length()) {
+                val disease = arr.getJSONObject(i)
+                put(
+                    disease.getString("id"),
+                    disease.getJSONObject("i18n").getJSONObject("en").getString("label"),
+                )
+            }
+        }
+
+        assertEquals("Hypertension", labelsById["hypertension"])
+        assertEquals("Type 2 Diabetes", labelsById["type2_diabetes"])
+        assertEquals("Migraine", labelsById["migraine"])
     }
 }

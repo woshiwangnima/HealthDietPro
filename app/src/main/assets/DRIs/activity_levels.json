@@ -1,0 +1,46 @@
+{
+  "activityLevels": [
+    {
+      "code": "PAL_1",
+      "palValue": 1.4,
+      "i18n": {
+        "zh": {
+          "label": "低强度活动",
+          "description": "以静坐为主，很少或没有额外的体力活动。常见于办公室职员、司机、久坐的退休人员等。"
+        },
+        "en": {
+          "label": "Low Activity",
+          "description": "Predominantly sedentary, with little or no additional physical activity. Common for office workers, drivers, sedentary retirees, etc."
+        }
+      }
+    },
+    {
+      "code": "PAL_2",
+      "palValue": 1.7,
+      "i18n": {
+        "zh": {
+          "label": "中等强度活动",
+          "description": "工作中需要较多站立、行走或轻度体力劳动，或每周有 3-5 次中等强度锻炼。例如销售人员、家庭主妇、学生等。"
+        },
+        "en": {
+          "label": "Moderate Activity",
+          "description": "Involves substantial standing, walking, or light physical labor at work, or with 3-5 times of moderate exercise per week. Examples: salespeople, homemakers, students."
+        }
+      }
+    },
+    {
+      "code": "PAL_3",
+      "palValue": 2.0,
+      "i18n": {
+        "zh": {
+          "label": "高强度活动",
+          "description": "从事重体力劳动或高强度职业（如建筑工人、农民），或每日坚持高强度运动（如长跑、游泳、球类运动）。"
+        },
+        "en": {
+          "label": "High Activity",
+          "description": "Engaged in heavy manual labor or high-intensity occupations (e.g., construction workers, farmers), or daily vigorous exercise (e.g., long-distance running, swimming, ball sports)."
+        }
+      }
+    }
+  ]
+}

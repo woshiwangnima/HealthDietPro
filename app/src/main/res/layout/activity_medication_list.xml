@@ -23,13 +23,12 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <com.woshiwangnima.healthdietpro.ui.widget.tab.ToggleBar
+        <androidx.compose.ui.platform.ComposeView
             android:id="@+id/tabBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="56dp"
             android:background="?attr/colorSurface"
-            android:elevation="2dp"
-            app:displayMode="normal" />
+            android:elevation="2dp" />
     </LinearLayout>
 </layout>

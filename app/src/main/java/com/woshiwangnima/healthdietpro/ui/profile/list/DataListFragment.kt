@@ -9,6 +9,24 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -16,6 +34,11 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
+import com.woshiwangnima.healthdietpro.common.ui.AppDataTableAction
+import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
+import com.woshiwangnima.healthdietpro.common.ui.AppDataTableText
+import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.ui.profile.BodyRecordAdapter
@@ -33,6 +56,7 @@ class DataListFragment : Fragment() {
     private lateinit var adapter: BodyRecordAdapter
     private var isDialogShowing = false
     private var rootView: View? = null
+    private var refreshComposeTable: (() -> Unit)? = null
 
     companion object {
         private const val ARG_RECORDS = "records"
@@ -64,6 +88,7 @@ class DataListFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return createComposeTableView()
         val view = inflater.inflate(R.layout.fragment_data_list, container, false)
         val recyclerView = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recordList)
         val addBtn = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.addRecordBtn)
@@ -88,10 +113,78 @@ class DataListFragment : Fragment() {
         return view
     }
 
+    private fun createComposeTableView(): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                HealthDietProTheme {
+                    var refreshVersion by remember { mutableIntStateOf(0) }
+                    refreshComposeTable = { refreshVersion++ }
+                    val rows = remember(refreshVersion) {
+                        records.sortedByDescending { it.date }
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.body_record_count, rows.size),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Button(onClick = { showRecordSheet(editPosition = -1) }) {
+                                Text(stringResource(R.string.body_record_add))
+                            }
+                        }
+                        AppDataTable(
+                            rows = rows,
+                            columns = listOf(
+                                AppDataTableColumn<BodyRecord>(stringResource(R.string.body_record_date), 120.dp) { record ->
+                                    AppDataTableText(record.date)
+                                },
+                                AppDataTableColumn<BodyRecord>(stringResource(R.string.body_record_value), 120.dp) { record ->
+                                    val displayValue = UnitConverter.fromBase(category, record.value, unitId)
+                                    AppDataTableText("%.1f".format(displayValue))
+                                },
+                                AppDataTableColumn<BodyRecord>(stringResource(R.string.body_record_unit), 96.dp) {
+                                    AppDataTableText(unitId)
+                                },
+                            ),
+                            actions = listOf(
+                                AppDataTableAction(stringResource(R.string.body_record_delete)) { record ->
+                                    requireContext().showConfirmDialog(
+                                        getString(R.string.body_record_delete_confirm_title),
+                                        getString(R.string.body_record_delete_confirm_message)
+                                    ) {
+                                        val pos = records.indexOf(record)
+                                        if (pos >= 0) records.removeAt(pos)
+                                        refreshList()
+                                        onRecordsChanged?.invoke()
+                                    }
+                                },
+                            ),
+                            onRowClick = { record ->
+                                val pos = records.indexOf(record)
+                                if (pos >= 0) showRecordSheet(editPosition = pos)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun refreshList() {
         records.sortByDescending { it.date }
-        adapter.records = records
+        if (::adapter.isInitialized) adapter.records = records
         rootView?.findViewById<TextView>(R.id.totalCount)?.text = "共 ${records.size} 条记录"
+        refreshComposeTable?.invoke()
     }
 
     /**

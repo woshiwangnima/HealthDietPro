@@ -1,13 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App shell / navigation -->
     <string name="app_name">观颐</string>
     <string name="nav_nutrition">营养表</string>
     <string name="nav_record">记录</string>
     <string name="nav_profile">我的</string>
+    <string name="nav_test">测试</string>
     <string name="tab_nutrition_title">营养表</string>
     <string name="tab_record_title">记录</string>
     <string name="tab_profile_title">我的</string>
+    <string name="tab_test_title">测试</string>
+    <string name="tab_test_description">用于验证新功能和界面行为。</string>
+    <string name="onboarding_title">欢迎使用健康饮食计划</string>
+    <string name="onboarding_message">首次使用，请先填写您的个人信息，以便为您提供个性化的饮食建议。</string>
+    <string name="onboarding_start">开始填写</string>
+    <string name="back_press_exit_hint">再按一次退出应用</string>
+
+    <!-- Common empty states -->
     <string name="no_record">暂无数据</string>
+
+    <!-- Record module -->
+    <string name="record_section_baseline">我的基准</string>
+    <string name="record_section_daily">每日记录</string>
+    <string name="record_section_status">状态记录</string>
+    <string name="record_action_height">记身高</string>
+    <string name="record_action_weight">记体重</string>
+    <string name="record_action_waist">记腰围</string>
+    <string name="record_action_period">记经期</string>
+    <string name="record_action_diet">记饮食</string>
+    <string name="record_action_water">记喝水</string>
+    <string name="record_action_exercise">记运动</string>
+    <string name="record_action_sleep">记睡眠</string>
+    <string name="record_action_bowel">记排便</string>
+    <string name="record_action_medication">记用药</string>
+    <string name="record_action_habit">记习惯</string>
+    <string name="record_action_feeling">记感受</string>
+
+    <!-- Chart module -->
     <string name="chart_time_range_all">全部</string>
     <string name="chart_interval_auto">自动</string>
     <string name="view_chart_y_axis_bounds">纵轴数据边界</string>
@@ -29,6 +58,7 @@
     <string name="view_chart_x_axis_range_select_prompt">请选择-横轴显示范围</string>
     <string name="view_chart_x_axis_interval_select_prompt">请选择-横轴刻度间隔</string>
 
+    <!-- Settings module -->
     <string name="settings_app_title">软件设置</string>
     <string name="settings_message_notification">消息通知</string>
     <string name="settings_message_notification_desc">管理应用通知</string>
@@ -42,7 +72,64 @@
     <string name="settings_clear_cache_cancel">取消</string>
     <string name="settings_cache_cleared_mb">已清理 %.1f MB</string>
     <string name="settings_cache_cleared_kb">已清理 %1$d KB</string>
+    <string name="settings_default_font_size">默认字体大小</string>
+    <string name="settings_default_font_size_desc">应用于本软件内所有用户与已 Compose 化界面</string>
+    <string name="detail_tab_chart">图表</string>
+    <string name="detail_tab_data">数据</string>
+    <string name="detail_tab_reminder">提醒</string>
+    <string name="detail_tab_records">记录</string>
+    <string name="body_record_count">共 %1$d 条记录</string>
+    <string name="body_record_add">添加记录</string>
+    <string name="body_record_date">日期</string>
+    <string name="body_record_value">数值</string>
+    <string name="body_record_unit">单位</string>
+    <string name="body_record_delete">删除</string>
+    <string name="body_record_delete_confirm_title">确认删除</string>
+    <string name="body_record_delete_confirm_message">确定要删除这条记录吗？</string>
+
+    <!-- Compose/common UI previews -->
     <string name="compose_theme_preview_title">Compose 主题预览</string>
     <string name="compose_theme_preview_body">Material 3 主题已启用</string>
     <string name="compose_theme_preview_open_settings">打开软件设置</string>
+    <string name="compose_components_preview_title">公用组件预览</string>
+    <string name="compose_components_preview_open">打开公用组件预览</string>
+    <string name="compose_font_scale_section">字体大小滑动条</string>
+    <string name="compose_confirm_dialog_section">确认对话框</string>
+    <string name="compose_show_confirm_dialog">显示确认对话框</string>
+    <string name="compose_confirm_dialog_title">确认操作</string>
+    <string name="compose_confirm_dialog_message">这是一个公用确认对话框组件，用于破坏性动作的二次确认。</string>
+    <string name="compose_confirm_dialog_ok">确认</string>
+    <string name="compose_confirm_dialog_cancel">取消</string>
+    <string name="compose_text_overflow_section">文字溢出处理</string>
+
+    <!-- Text overflow settings -->
+    <string name="text_overflow_section_title">文字溢出处理</string>
+    <string name="text_overflow_auto_shrink">自适应缩小字体</string>
+    <string name="text_overflow_auto_shrink_desc">超出时先缩小字号，降到最小字号仍超出则按选择的降级模式处理</string>
+    <string name="text_overflow_auto_shrink_min">最小字号</string>
+    <string name="text_overflow_auto_shrink_min_desc">降到此字号仍超出则降级</string>
+    <string name="text_overflow_degrade_title">降级模式</string>
+    <string name="text_overflow_shrink">自适应缩小字体</string>
+    <string name="text_overflow_shrink_desc">超出时自动缩小字号以完整显示</string>
+    <string name="text_overflow_min_size">最小字号</string>
+    <string name="text_overflow_min_size_desc">降到此字号仍超出则降级省略号</string>
+    <string name="text_overflow_ellipsis">省略号模式</string>
+    <string name="text_overflow_ellipsis_desc">超出部分以省略号显示</string>
+    <string name="text_overflow_marquee">轮播模式</string>
+    <string name="text_overflow_marquee_desc">超出部分左右滚动显示</string>
+    <string name="text_overflow_marquee_speed">轮播速度</string>
+    <string name="text_overflow_marquee_speed_desc">ms/字，范围 50-2000</string>
+    <string name="text_overflow_preview_sample">这是一段较长的示例文字，用于演示文字溢出处理组件在不同模式下的实际渲染行为效果</string>
+
+    <!-- Profile module -->
+    <string name="profile_name_unknown">未设置</string>
+    <string name="profile_gender_male">男</string>
+    <string name="profile_gender_female">女</string>
+    <string name="profile_gender_unknown">性别未知</string>
+    <string name="profile_age_years">%1$d岁</string>
+    <string name="profile_age_unknown">年龄未知</string>
+    <string name="profile_birthday_unknown">出生年月未知</string>
+    <string name="profile_separator"> | </string>
+    <string name="profile_switch_user">切换用户</string>
+    <string name="profile_user_info">个人信息</string>
 </resources>

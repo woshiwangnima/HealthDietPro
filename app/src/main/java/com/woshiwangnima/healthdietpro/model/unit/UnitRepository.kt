@@ -3,7 +3,13 @@ package com.woshiwangnima.healthdietpro.model.unit
 import android.content.Context
 import kotlinx.serialization.json.Json
 
-class UnitRepository(private val context: Context) {
+class UnitRepository private constructor(
+    private val jsonStrProvider: () -> String,
+) {
+
+    constructor(context: Context) : this({
+        context.assets.open("units.json").bufferedReader().use { it.readText() }
+    })
 
     private var cache: List<UnitCategory>? = null
 
@@ -11,7 +17,7 @@ class UnitRepository(private val context: Context) {
 
     fun getCategories(): List<UnitCategory> {
         if (cache != null) return cache!!
-        val jsonStr = context.assets.open("units.json").bufferedReader().use { it.readText() }
+        val jsonStr = jsonStrProvider()
         val categories: List<UnitCategory> = json.decodeFromString(jsonStr)
         cache = categories
         return categories
@@ -25,4 +31,10 @@ class UnitRepository(private val context: Context) {
 
     fun getUnitIds(categoryId: String): Array<String> =
         getCategory(categoryId)?.units?.map { it.id }?.toTypedArray() ?: emptyArray()
+
+    companion object {
+        fun fromAsset(path: String): UnitRepository = UnitRepository({
+            java.io.File(path).readText()
+        })
+    }
 }

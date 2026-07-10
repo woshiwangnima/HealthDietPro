@@ -30,7 +30,6 @@ internal fun SettingRow(
     trailingValue: String = "",
     clickable: Boolean = true,
 ) {
-    val alphaMid = rememberFontStyleAlphaMid()
     val iconSize = with(LocalDensity.current) {
         MaterialTheme.typography.titleLarge.fontSize.toDp()
     }
@@ -49,21 +48,11 @@ internal fun SettingRow(
                 .padding(end = 12.dp),
             tint = MaterialTheme.colorScheme.onSurface,
         )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            if (subtitle.isNotEmpty()) {
-                Text(
-                    text = subtitle,
-                    style = TextStyle(fontSize = FontTokens.caption),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.alpha(alphaMid),
-                )
-            }
-        }
+        SettingTextContent(
+            title = title,
+            subtitle = subtitle,
+            modifier = Modifier.weight(1f),
+        )
         if (trailingValue.isNotEmpty()) {
             Text(
                 text = trailingValue,
@@ -78,6 +67,30 @@ internal fun SettingRow(
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(iconSize),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun SettingTextContent(
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+) {
+    val alphaMid = rememberFontStyleAlphaMid()
+    Column(modifier = modifier) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        if (subtitle.isNotEmpty()) {
+            Text(
+                text = subtitle,
+                style = TextStyle(fontSize = FontTokens.caption),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.alpha(alphaMid),
             )
         }
     }

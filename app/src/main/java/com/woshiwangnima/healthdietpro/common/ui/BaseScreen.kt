@@ -14,6 +14,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,7 +27,12 @@ fun BaseScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(title, style = androidx.compose.material3.MaterialTheme.typography.headlineLarge) },
+                title = {
+                    Text(
+                        title,
+                        style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
+                    )
+                },
                 navigationIcon = {
                     if (onBack != null) {
                         IconButton(onClick = onBack) {

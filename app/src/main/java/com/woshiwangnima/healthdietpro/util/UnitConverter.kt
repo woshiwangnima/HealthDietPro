@@ -13,6 +13,17 @@ object UnitConverter {
         repository?.getCategories()
     }
 
+    fun initFromAsset(path: String) {
+        appContext = null
+        repository = UnitRepository.fromAsset(path)
+        repository?.getCategories()
+    }
+
+    fun reset() {
+        repository = null
+        appContext = null
+    }
+
     fun getRepository(): UnitRepository? {
         if (repository == null && appContext != null) {
             repository = UnitRepository(appContext!!)

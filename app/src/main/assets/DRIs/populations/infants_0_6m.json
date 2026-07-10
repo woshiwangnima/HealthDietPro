@@ -1,0 +1,56 @@
+{
+  "version": "DRIs_2023",
+  "population": {
+    "id": "infants_0_6m",
+    "i18n": {
+    "zh": {
+      "label": "0-6月龄婴儿",
+      "description": "中国0-6月龄婴儿膳食营养素参考摄入量（2023版）"
+    },
+    "en": {
+      "label": "Infants 0-6 months",
+      "description": "Dietary Reference Intakes for Chinese Infants Aged 0-6 Months (2023 Edition)"
+    }
+	}
+  },
+  "data": [
+    { "code": "ENERGY", "AI": 0.38, "unit": "MJ/(kg·d)", "note": "EER，能量需要量" },
+    { "code": "ENERGY", "AI": 90, "unit": "kcal/(kg·d)", "note": "EER，能量需要量" },
+    { "code": "PROTEIN", "AI": 9, "unit": "g/d" },
+    { "code": "CHO", "AI": 60, "unit": "g/d" },
+    { "code": "FAT", "AI": 48, "unit": "%E", "note": "占总能量的百分比" },
+    { "code": "LA", "AI": 8.0, "unit": "%E", "note": "亚油酸，占总能量的百分比；相当于0.15g/d" },
+    { "code": "ALA", "AI": 0.9, "unit": "%E", "note": "α-亚麻酸，占总能量的百分比" },
+    { "code": "EPA_DHA", "AI": 0.1, "unit": "g/d", "note": "DHA" },
+    { "code": "VITA", "AI": 300, "UL": 600, "unit": "μg RAE/d", "note": "维生素A的UL不包括维生素A原类胡萝卜素RAE" },
+    { "code": "VITD", "AI": 10, "UL": 20, "unit": "μg/d" },
+    { "code": "VITE", "AI": 3, "unit": "mg α-TE/d", "note": "α-生育酚当量" },
+    { "code": "VITK", "AI": 2, "unit": "μg/d" },
+    { "code": "VITB1", "AI": 0.1, "unit": "mg/d" },
+    { "code": "VITB2", "AI": 0.4, "unit": "mg/d" },
+    { "code": "NIACIN", "AI": 1, "unit": "mg NE/d", "note": "烟酸当量" },
+    { "code": "VITB6", "AI": 0.1, "unit": "mg/d" },
+    { "code": "FOLATE", "AI": 65, "unit": "μg DFE/d", "note": "膳食叶酸当量" },
+    { "code": "VITB12", "AI": 0.3, "unit": "μg/d" },
+    { "code": "PANTOTHENIC", "AI": 1.7, "unit": "mg/d" },
+    { "code": "BIOTIN", "AI": 5, "unit": "μg/d" },
+    { "code": "CHOLINE", "AI": 120, "unit": "mg/d" },
+    { "code": "VITC", "AI": 40, "unit": "mg/d" },
+    { "code": "CA", "AI": 200, "UL": 1000, "unit": "mg/d" },
+    { "code": "P", "AI": 105, "unit": "mg/d" },
+    { "code": "K", "AI": 400, "unit": "mg/d" },
+    { "code": "NA", "AI": 80, "unit": "mg/d" },
+    { "code": "MG", "AI": 20, "unit": "mg/d" },
+    { "code": "CL", "AI": 120, "unit": "mg/d" },
+    { "code": "FE", "AI": 0.3, "unit": "mg/d" },
+    { "code": "I", "AI": 85, "unit": "μg/d" },
+    { "code": "ZN", "AI": 1.5, "unit": "mg/d" },
+    { "code": "SE", "AI": 15, "UL": 55, "unit": "μg/d" },
+    { "code": "CU", "AI": 0.3, "unit": "mg/d" },
+    { "code": "MN", "AI": 0.01, "unit": "mg/d" },
+    { "code": "CR", "AI": 0.2, "unit": "μg/d" },
+    { "code": "MO", "AI": 3, "unit": "μg/d" },
+    { "code": "F", "AI": 0.01, "unit": "mg/d" },
+    { "code": "WATER", "AI": 700, "unit": "mL/d", "note": "总摄入量，包括食物中的水和饮水中的水；纯母乳喂养婴儿无需额外补充水分" }
+  ]
+}

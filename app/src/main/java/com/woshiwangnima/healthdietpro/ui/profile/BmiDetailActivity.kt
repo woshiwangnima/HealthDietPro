@@ -5,8 +5,17 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
+import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
+import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
+import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiCalculatorView
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiReferenceView
@@ -18,8 +27,6 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.profile.chart.YAxisBand
-import com.woshiwangnima.healthdietpro.ui.widget.tab.TabItem
-import com.woshiwangnima.healthdietpro.ui.widget.tab.ToggleBar
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class BmiDetailActivity : BaseBackActivity() {
@@ -67,20 +74,41 @@ class BmiDetailActivity : BaseBackActivity() {
         }
         root.addView(bottomBar)
 
-        val tabBar = ToggleBar(this).apply {
-            displayMode = com.woshiwangnima.healthdietpro.ui.widget.tab.TabBar.DisplayMode.NORMAL
-            setTabs(listOf(TabItem(com.woshiwangnima.healthdietpro.R.drawable.ic_chart, "图表"),
-                TabItem(com.woshiwangnima.healthdietpro.R.drawable.ic_list, "数据")))
-            restore("tab_bmi_chart", 0)
-            listener = { idx, _ -> switchTab(idx) }
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT)
-        }
+        val tabBar = buildBmiTabBar()
         bottomBar.addView(tabBar)
-        tabBar.applyEnlargedTabHeight(hasIcon = true)
 
         setContentView(root)
-        switchTab(tabBar.selectedIndex)
+        switchTab(AppPrefs.getBmiChartTab(this))
+    }
+
+    private fun buildBmiTabBar(): ComposeView {
+        return ComposeView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setContent {
+                HealthDietProTheme {
+                    val items = listOf(
+                        DetailTabItem("0", R.string.detail_tab_chart, R.drawable.ic_chart),
+                        DetailTabItem("1", R.string.detail_tab_data, R.drawable.ic_list),
+                    )
+                    var selectedTab by remember {
+                        mutableIntStateOf(AppPrefs.getBmiChartTab(this@BmiDetailActivity))
+                    }
+                    DetailTabBar(
+                        items = items,
+                        selectedId = selectedTab.toString(),
+                        onSelected = { item ->
+                            val index = item.id.toInt()
+                            selectedTab = index
+                            AppPrefs.setBmiChartTab(this@BmiDetailActivity, index)
+                            switchTab(index)
+                        },
+                    )
+                }
+            }
+        }
     }
 
     private fun dp(n: Int): Int = (n * resources.displayMetrics.density).toInt()

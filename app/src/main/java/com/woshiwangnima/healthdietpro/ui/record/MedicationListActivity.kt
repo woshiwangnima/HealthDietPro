@@ -4,10 +4,17 @@ import android.os.Bundle
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
+import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
+import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
+import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.databinding.ActivityMedicationListBinding
-import com.woshiwangnima.healthdietpro.ui.widget.tab.TabItem
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
 class MedicationListActivity : BaseBackActivity() {
@@ -24,6 +31,9 @@ class MedicationListActivity : BaseBackActivity() {
         binding.root.applySystemBarInsets()
         setupToolbar(binding.toolbar)
 
+        setupTabBar()
+        switchTab(AppPrefs.getMedicationTab(this))
+        /*
         binding.tabBar.setTabs(listOf(
             TabItem(R.drawable.ic_notification, "提醒"),
             TabItem(R.drawable.ic_list, "记录")
@@ -32,6 +42,31 @@ class MedicationListActivity : BaseBackActivity() {
         binding.tabBar.restore("tab_medication", 0)
         binding.tabBar.listener = { idx, _ -> switchTab(idx) }
         switchTab(binding.tabBar.selectedIndex)
+        */
+    }
+
+    private fun setupTabBar() {
+        val items = listOf(
+            DetailTabItem("0", R.string.detail_tab_reminder, R.drawable.ic_notification),
+            DetailTabItem("1", R.string.detail_tab_records, R.drawable.ic_list),
+        )
+        binding.tabBar.setContent {
+            HealthDietProTheme {
+                var selectedTab by remember {
+                    mutableIntStateOf(AppPrefs.getMedicationTab(this@MedicationListActivity))
+                }
+                DetailTabBar(
+                    items = items,
+                    selectedId = selectedTab.toString(),
+                    onSelected = { item ->
+                        val index = item.id.toInt()
+                        selectedTab = index
+                        AppPrefs.setMedicationTab(this@MedicationListActivity, index)
+                        switchTab(index)
+                    },
+                )
+            }
+        }
     }
 
     private fun switchTab(index: Int) {

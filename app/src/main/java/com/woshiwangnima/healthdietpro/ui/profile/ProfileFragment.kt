@@ -2,7 +2,6 @@ package com.woshiwangnima.healthdietpro.ui.profile
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -16,24 +15,26 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
+import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.databinding.FragmentProfileBinding
-import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
 import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsComposeActivity
-import com.woshiwangnima.healthdietpro.util.TextOverflowUtil
 import com.woshiwangnima.healthdietpro.util.UnitConverter
-import java.io.File
 import kotlin.math.abs
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private lateinit var diseaseRepo: DiseaseRepository
+    private val userInfoViewModel: ProfileUserInfoViewModel by viewModels()
     private lateinit var editLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
     private lateinit var settingsLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
 
@@ -65,16 +66,10 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        diseaseRepo = DiseaseRepository(requireContext())
 
         binding.settingsBtn.setOnClickListener {
             val intent = Intent(requireContext(), AppSettingsComposeActivity::class.java)
             settingsLauncher.launch(intent)
-        }
-
-        binding.profileDetailBtn.setOnClickListener {
-            val intent = Intent(requireContext(), ProfileEditActivity::class.java)
-            editLauncher.launch(intent)
         }
 
         binding.userSettingsBtn.setOnClickListener {
@@ -82,103 +77,28 @@ class ProfileFragment : Fragment() {
                 com.woshiwangnima.healthdietpro.ui.settings.UserSettingsActivity::class.java))
         }
 
-        binding.switchUserBtn.setOnClickListener {
-            showUserSwitchSheet()
+        binding.profileUserInfoCompose.setViewCompositionStrategy(
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+        )
+        binding.profileUserInfoCompose.setContent {
+            HealthDietProTheme {
+                val state by userInfoViewModel.uiState.collectAsState()
+                ProfileUserInfoCard(
+                    state = state,
+                    onEditProfile = {
+                        val intent = Intent(requireContext(), ProfileEditActivity::class.java)
+                        editLauncher.launch(intent)
+                    },
+                    onSwitchUser = { showUserSwitchSheet() },
+                )
+            }
         }
 
         refreshProfile()
     }
 
     private fun refreshProfile() {
-        val ctx = requireContext()
-        val profile = ProfilePrefs.load(ctx)
-        val displayName = profile.name.ifEmpty { "未设置" }
-        binding.profileName.text = displayName
-
-        val initial = displayName.first().toString()
-        val colorIdx = abs(profile.id.hashCode()) % avatarColors.size
-
-        val avatarLoaded = if (profile.avatarFileName.isNotEmpty()) {
-            val file = File(ctx.filesDir, "avatars/${profile.avatarFileName}")
-            if (file.exists()) {
-                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                if (bitmap != null) {
-                    binding.avatarText.text = ""
-                    val d = androidx.core.graphics.drawable.RoundedBitmapDrawableFactory.create(resources, bitmap)
-                    d.isCircular = true
-                    binding.avatarText.background = d
-                    true
-                } else false
-            } else false
-        } else false
-
-        if (!avatarLoaded) {
-            binding.avatarText.text = initial
-            val bg = GradientDrawable().apply {
-                shape = GradientDrawable.OVAL
-                setColor(avatarColors[colorIdx])
-            }
-            binding.avatarText.background = bg
-        }
-
-        val genderIcon: String
-        val genderText: String
-        val genderColor: Int
-        if (profile.gender.name == "MALE") {
-            genderIcon = "\u2642"
-            genderText = "男"
-            genderColor = Color.parseColor("#2196F3")
-        } else {
-            genderIcon = "\u2640"
-            genderText = "女"
-            genderColor = Color.parseColor("#E91E63")
-        }
-        binding.profileGenderIcon.text = genderIcon
-        binding.profileGenderIcon.setTextColor(genderColor)
-        binding.profileGenderText.text = genderText
-        binding.profileGenderText.setTextColor(genderColor)
-
-        val age = profile.age
-        if (age != null) {
-            binding.profileAge.text = age.toString() + "岁"
-        } else {
-            binding.profileAge.text = ""
-        }
-
-        binding.profileBirthday.text = profile.birthday?.date ?: "未设置"
-
-        // 第三行：地区
-        var regionDisplay = profile.region.display()
-        // 兜底：若新 region 仅省代码无省名（迁移后的数据），补一下显示
-        if (profile.region.provinceCode.isNotEmpty() && profile.region.provinceName.isEmpty()) {
-            runCatching {
-                com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
-                    .fromContext(ctx).findByCode(profile.region.provinceCode)?.name
-            }.getOrNull()?.let { name ->
-                regionDisplay = profile.region.copy(provinceName = name).display()
-            }
-        }
-        binding.profileRegionLine.text = regionDisplay
-
-        // 第三行：病史 —— 为"无"时隐藏
-        val diseaseText = if (profile.diseaseIds.isEmpty()) {
-            ""
-        } else {
-            val diseases = diseaseRepo.loadAll()
-            val names = profile.diseaseIds.map { id ->
-                diseases.find { it.id == id }?.name ?: id
-            }
-            names.joinToString("、")
-        }
-        if (diseaseText.isEmpty()) {
-            binding.profileDiseaseLine.visibility = View.GONE
-            binding.profileDiseaseSeparator.visibility = View.GONE
-        } else {
-            binding.profileDiseaseLine.text = diseaseText
-            binding.profileDiseaseLine.visibility = View.VISIBLE
-            binding.profileDiseaseSeparator.visibility = View.VISIBLE
-            TextOverflowUtil.apply(binding.profileDiseaseLine, ctx)
-        }
+        userInfoViewModel.refresh()
     }
 
     private fun showUserSwitchSheet() {

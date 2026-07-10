@@ -4,20 +4,18 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
-import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 
 object FontTokens {
-    val headline @Composable get() = dimensionResource(R.dimen.text_size_headline).value.sp
-    val title @Composable get() = dimensionResource(R.dimen.text_size_title).value.sp
-    val subtitle @Composable get() = dimensionResource(R.dimen.text_size_subtitle).value.sp
-    val body @Composable get() = dimensionResource(R.dimen.text_size_body).value.sp
-    val label @Composable get() = dimensionResource(R.dimen.text_size_label).value.sp
-    val caption @Composable get() = dimensionResource(R.dimen.text_size_caption).value.sp
-    val micro @Composable get() = dimensionResource(R.dimen.text_size_micro).value.sp
+    val headline = 36.sp
+    val title = 28.sp
+    val subtitle = 22.sp
+    val body = 16.sp
+    val label = 14.sp
+    val caption = 12.sp
+    val micro = 11.sp
 }
 
 @Composable
@@ -28,15 +26,21 @@ fun rememberFontStyleAlphaMid(): Float {
 
 @Composable
 fun appTypography(): Typography {
-    val headline = FontTokens.headline
-    val title = FontTokens.title
-    val body = FontTokens.body
     return Typography(
-        headlineLarge = TextStyle(fontSize = headline),
-        headlineMedium = TextStyle(fontSize = headline),
-        titleLarge = TextStyle(fontSize = title),
-        titleMedium = TextStyle(fontSize = title),
-        bodyLarge = TextStyle(fontSize = body),
-        bodyMedium = TextStyle(fontSize = body),
+        displayLarge = TextStyle(fontSize = FontTokens.headline),
+        displayMedium = TextStyle(fontSize = FontTokens.headline),
+        displaySmall = TextStyle(fontSize = FontTokens.title),
+        headlineLarge = TextStyle(fontSize = FontTokens.headline),
+        headlineMedium = TextStyle(fontSize = FontTokens.headline),
+        headlineSmall = TextStyle(fontSize = FontTokens.title),
+        titleLarge = TextStyle(fontSize = FontTokens.title),
+        titleMedium = TextStyle(fontSize = FontTokens.title),
+        titleSmall = TextStyle(fontSize = FontTokens.subtitle),
+        bodyLarge = TextStyle(fontSize = FontTokens.body),
+        bodyMedium = TextStyle(fontSize = FontTokens.body),
+        bodySmall = TextStyle(fontSize = FontTokens.caption),
+        labelLarge = TextStyle(fontSize = FontTokens.label),
+        labelMedium = TextStyle(fontSize = FontTokens.label),
+        labelSmall = TextStyle(fontSize = FontTokens.micro),
     )
 }

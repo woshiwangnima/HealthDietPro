@@ -1,16 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">观颐</string>
-    <string name="nav_nutrition">营养表</string>
-    <string name="nav_record">记录</string>
-    <string name="nav_profile">我的</string>
-    <string name="tab_nutrition_title">营养表</string>
-    <string name="tab_record_title">记录</string>
-    <string name="tab_profile_title">我的</string>
-    <string name="no_record">暂无数据</string>
-    <string name="chart_time_range_all">全部</string>
-    <string name="chart_interval_auto">自动</string>
+    <!-- App shell / navigation -->
+    <string name="app_name">HealthDietPro</string>
+    <string name="nav_nutrition">Nutrition Table</string>
+    <string name="nav_record">Record</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_test">Test</string>
+    <string name="tab_nutrition_title">Nutrition Table</string>
+    <string name="tab_record_title">Record</string>
+    <string name="tab_profile_title">Profile</string>
+    <string name="tab_test_title">Test</string>
+    <string name="tab_test_description">Use this page to verify new features and UI behavior.</string>
+    <string name="onboarding_title">Welcome to Health Diet Plan</string>
+    <string name="onboarding_message">For first use, please fill in your personal information so we can provide personalized dietary suggestions.</string>
+    <string name="onboarding_start">Start</string>
+    <string name="back_press_exit_hint">Press again to exit</string>
 
+    <!-- Common empty states -->
+    <string name="no_record">No Record</string>
+
+    <!-- Record module -->
+    <string name="record_section_baseline">My Baseline</string>
+    <string name="record_section_daily">Daily Records</string>
+    <string name="record_section_status">Status Records</string>
+    <string name="record_action_height">Log Height</string>
+    <string name="record_action_weight">Log Weight</string>
+    <string name="record_action_waist">Log Waist</string>
+    <string name="record_action_period">Log Period</string>
+    <string name="record_action_diet">Log Diet</string>
+    <string name="record_action_water">Log Water</string>
+    <string name="record_action_exercise">Log Exercise</string>
+    <string name="record_action_sleep">Log Sleep</string>
+    <string name="record_action_bowel">Log Bowel</string>
+    <string name="record_action_medication">Log Medication</string>
+    <string name="record_action_habit">Log Habit</string>
+    <string name="record_action_feeling">Log Feeling</string>
+
+    <!-- Chart module -->
+    <string name="chart_time_range_all">All</string>
+    <string name="chart_interval_auto">Auto</string>
     <string name="view_chart_line_style">Line Style</string>
     <string name="view_chart_line_style_select_prompt">Line Style Select Prompt</string>
     <string name="view_chart_x_axis_interval">X-Axis Interval</string>
@@ -19,7 +47,6 @@
     <string name="view_chart_y_axis_interval">Y-Axis Interval</string>
     <string name="view_chart_y_axis_range">Y-Axis Range</string>
     <string name="view_chart_y_axis_bounds">Y-Axis Bounds</string>
-
     <string name="view_chart_time_range">Time Range</string>
     <string name="view_chart_time_interval">Time Interval</string>
     <string name="view_chart_weight_interval">Weight Interval</string>
@@ -31,21 +58,78 @@
     <string name="view_chart_x_axis_range_select_prompt">X-Axis Range Select Prompt</string>
     <string name="view_chart_x_axis_interval_select_prompt">X-Axis Interval Select Prompt</string>
 
-    <string name="settings_app_title">软件设置</string>
-    <string name="settings_message_notification">消息通知</string>
-    <string name="settings_message_notification_desc">管理应用通知</string>
-    <string name="settings_permission">系统权限管理</string>
-    <string name="settings_permission_desc">权限、存储等</string>
-    <string name="settings_clear_cache">清除缓存</string>
-    <string name="settings_clear_cache_desc">点击清除应用缓存</string>
-    <string name="settings_clear_cache_confirm_title">确认清除缓存</string>
-    <string name="settings_clear_cache_confirm_message">将清除应用缓存，释放存储空间。不影响你的账户与数据。</string>
-    <string name="settings_clear_cache_confirm_ok">清除</string>
-    <string name="settings_clear_cache_cancel">取消</string>
-    <string name="settings_cache_cleared_mb">已清理 %.1f MB</string>
-    <string name="settings_cache_cleared_kb">已清理 %1$d KB</string>
-    <string name="compose_theme_preview_title">Compose 主题预览</string>
-    <string name="compose_theme_preview_body">Material 3 主题已启用</string>
-    <string name="compose_theme_preview_open_settings">打开软件设置</string>
+    <!-- Settings module -->
+    <string name="settings_app_title">App Settings</string>
+    <string name="settings_message_notification">Notifications</string>
+    <string name="settings_message_notification_desc">Manage app notifications</string>
+    <string name="settings_permission">System Permissions</string>
+    <string name="settings_permission_desc">Permissions, storage, etc.</string>
+    <string name="settings_clear_cache">Clear Cache</string>
+    <string name="settings_clear_cache_desc">Tap to clear app cache</string>
+    <string name="settings_clear_cache_confirm_title">Clear cache?</string>
+    <string name="settings_clear_cache_confirm_message">This will clear the app cache to free up storage. Your account and data are not affected.</string>
+    <string name="settings_clear_cache_confirm_ok">Clear</string>
+    <string name="settings_clear_cache_cancel">Cancel</string>
+    <string name="settings_cache_cleared_mb">Cleared %.1f MB</string>
+    <string name="settings_cache_cleared_kb">Cleared %1$d KB</string>
+    <string name="settings_default_font_size">Default Font Size</string>
+    <string name="settings_default_font_size_desc">Applies to all users and Compose screens in this app</string>
+    <string name="detail_tab_chart">Chart</string>
+    <string name="detail_tab_data">Data</string>
+    <string name="detail_tab_reminder">Reminder</string>
+    <string name="detail_tab_records">Records</string>
+    <string name="body_record_count">%1$d records</string>
+    <string name="body_record_add">Add Record</string>
+    <string name="body_record_date">Date</string>
+    <string name="body_record_value">Value</string>
+    <string name="body_record_unit">Unit</string>
+    <string name="body_record_delete">Delete</string>
+    <string name="body_record_delete_confirm_title">Delete record?</string>
+    <string name="body_record_delete_confirm_message">This record will be permanently deleted.</string>
 
+    <!-- Compose/common UI previews -->
+    <string name="compose_theme_preview_title">Compose Theme Preview</string>
+    <string name="compose_theme_preview_body">Material 3 theme enabled</string>
+    <string name="compose_theme_preview_open_settings">Open App Settings</string>
+    <string name="compose_components_preview_title">Common Components Preview</string>
+    <string name="compose_components_preview_open">Open Common Components Preview</string>
+    <string name="compose_font_scale_section">Font Scale Slider</string>
+    <string name="compose_confirm_dialog_section">Confirm Dialog</string>
+    <string name="compose_show_confirm_dialog">Show Confirm Dialog</string>
+    <string name="compose_confirm_dialog_title">Confirm Action</string>
+    <string name="compose_confirm_dialog_message">This is a common confirm dialog component, used for destructive action secondary confirmation.</string>
+    <string name="compose_confirm_dialog_ok">Confirm</string>
+    <string name="compose_confirm_dialog_cancel">Cancel</string>
+    <string name="compose_text_overflow_section">Text Overflow</string>
+
+    <!-- Text overflow settings -->
+    <string name="text_overflow_section_title">Text Overflow</string>
+    <string name="text_overflow_auto_shrink">Auto Shrink Font</string>
+    <string name="text_overflow_auto_shrink_desc">Shrink font first; degrade to selected mode when below min size</string>
+    <string name="text_overflow_auto_shrink_min">Min Font Size</string>
+    <string name="text_overflow_auto_shrink_min_desc">Degrade when below this size</string>
+    <string name="text_overflow_degrade_title">Degrade Mode</string>
+    <string name="text_overflow_shrink">Auto Shrink Font</string>
+    <string name="text_overflow_shrink_desc">Shrink font size to fit when overflowing</string>
+    <string name="text_overflow_min_size">Min Font Size</string>
+    <string name="text_overflow_min_size_desc">Degrade to ellipsis when below this size</string>
+    <string name="text_overflow_ellipsis">Ellipsis Mode</string>
+    <string name="text_overflow_ellipsis_desc">Show ellipsis for overflow</string>
+    <string name="text_overflow_marquee">Marquee Mode</string>
+    <string name="text_overflow_marquee_desc">Scroll overflow horizontally</string>
+    <string name="text_overflow_marquee_speed">Marquee Speed</string>
+    <string name="text_overflow_marquee_speed_desc">ms/char, range 50-2000</string>
+    <string name="text_overflow_preview_sample">This is a long sample text used to demonstrate how the text overflow component renders in different modes.</string>
+
+    <!-- Profile module -->
+    <string name="profile_name_unknown">Not set</string>
+    <string name="profile_gender_male">Male</string>
+    <string name="profile_gender_female">Female</string>
+    <string name="profile_gender_unknown">Gender unknown</string>
+    <string name="profile_age_years">%1$d years old</string>
+    <string name="profile_age_unknown">Age unknown</string>
+    <string name="profile_birthday_unknown">Birth date unknown</string>
+    <string name="profile_separator"> | </string>
+    <string name="profile_switch_user">Switch user</string>
+    <string name="profile_user_info">User information</string>
 </resources>

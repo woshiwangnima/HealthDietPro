@@ -81,6 +81,15 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 ./gradlew installDebug       # 安装
 ```
 
+Windows / OpenCode 环境若 `JAVA_HOME` 未设置，使用 Android Studio 自带 JBR，仅在当前命令进程内设置环境变量，不修改系统环境：
+
+```powershell
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat assembleDebug
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat test
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat lint
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat installDebug
+```
+
 完成任何改动后必须跑 `test` + `lint`；无法确定命令时问用户并写回本文件。
 
 ## Compose 迁移规则

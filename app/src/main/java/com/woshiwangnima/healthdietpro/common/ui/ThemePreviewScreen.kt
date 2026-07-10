@@ -21,6 +21,7 @@ import com.woshiwangnima.healthdietpro.R
 fun ThemePreviewScreen(
     onBack: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
+    onOpenComponents: (() -> Unit)? = null,
 ) {
     BaseScreen(
         title = stringResource(R.string.compose_theme_preview_title),
@@ -42,10 +43,16 @@ fun ThemePreviewScreen(
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge,
                 )
+                Spacer(modifier = Modifier.height(24.dp))
                 if (onOpenSettings != null) {
-                    Spacer(modifier = Modifier.height(24.dp))
                     Button(onClick = onOpenSettings) {
                         Text(stringResource(R.string.compose_theme_preview_open_settings))
+                    }
+                }
+                if (onOpenComponents != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = onOpenComponents) {
+                        Text(stringResource(R.string.compose_components_preview_open))
                     }
                 }
             }

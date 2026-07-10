@@ -3,16 +3,25 @@ package com.woshiwangnima.healthdietpro.model.prefs
 import android.content.Context
 
 /**
- * 应用偏好设置入口。
+ * 应用偏好设置入口（app 存档模块，DESIGN §3.7.1）。
  *
- * 用户级设置（提醒开关、字体大小、文字溢出、单位、图表操作状态等）委托
- * [UserPrefs.current]，按当前登录用户存储在独立文件 `user_prefs_<uid>`。
- * 真正 app 级的键（首次启动标记、字体风格令牌）直接读写 `app_prefs`。
- * 现有调用方签名保持不变，透明获得按用户存储能力。
+ * **存储归属**：
+ * - **app 级**（`app_prefs` 文件）：首次启动标记、字体风格令牌（alpha/token）。
+ * - **用户级**（委托 [UserPrefs.current]，`user_prefs_<uid>` 文件）：单位选择、
+ *   首日、深色、字号、文字溢出、轮播速度、图表状态键、Tab 选中、提醒开关。
+ *   按当前登录用户隔离，删用户时随文件清理。
+ *
+ * **契约**：`getChart*(ctx, chartStateKey)` / `setChart*(...)` 涵盖
+ * `chartStyle / chartTimeRange / chartLabelInterval / chartYMin / chartYMax` 五组键值。
+ * `chartStateKey` 由 [com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs.makeChartStateKey]
+ * 构造 `_<userId>` 后缀。删除用户时 [ProfilePrefs.deleteUser] 调用清理所有以 `_<uid>` 结尾的键。
+ *
+ * **不变量**：用户级键的存储归属后续偏好设置重评估时可能迁回 app 级（DESIGN §10 待定）。
  */
 object AppPrefs {
     private const val PREFS_NAME = "app_prefs"
     private const val KEY_FIRST_LAUNCH = "is_first_launch"
+    private const val KEY_FONT_SCALE = "pref_font_scale"
 
     // ---- app 级 ----
 
@@ -113,10 +122,15 @@ object AppPrefs {
     fun setHeightChartTab(context: Context, tab: Int) =
         user(context).putInt("tab_height_chart", tab)
 
-    fun getFontScale(context: Context): Float =
-        user(context).getFloat("pref_font_scale", 1.0f)
+    fun getFontScale(context: Context): Float {
+        val app = appPrefs(context)
+        if (app.contains(KEY_FONT_SCALE)) return app.getFloat(KEY_FONT_SCALE, 1.0f)
+        val legacy = user(context).getFloat(KEY_FONT_SCALE, 1.0f)
+        app.edit().putFloat(KEY_FONT_SCALE, legacy).apply()
+        return legacy
+    }
     fun setFontScale(context: Context, scale: Float) =
-        user(context).putFloat("pref_font_scale", scale)
+        appPrefs(context).edit().putFloat(KEY_FONT_SCALE, scale).apply()
 
     fun getChartStyle(context: Context, key: String): Int =
         user(context).getInt("chart_style_$key", 0)
@@ -148,13 +162,35 @@ object AppPrefs {
     fun setBmiChartTab(context: Context, tab: Int) =
         user(context).putInt("tab_bmi_chart", tab)
 
+    fun getMedicationTab(context: Context): Int =
+        user(context).getInt("tab_medication", 0)
+    fun setMedicationTab(context: Context, tab: Int) =
+        user(context).putInt("tab_medication", tab)
+
+    // ---- 文字溢出处理（app 级，DESIGN §3.7.1）----
+    // overflowMode：枚举 ellipsis（省略号）/ marquee（轮播）二选一，控制降级/超出行为
+    // autoShrinkEnabled：bool，是否启用自适应缩小字号
+    // autoShrinkMinSize：Int sp，缩到此字号仍超出则按 overflowMode 降级
+    // marqueeSpeed：Int ms/字，overflowMode=marquee 时的轮播速度
+    // 降级链：autoShrink 缩字 → 仍超出 → 按 overflowMode（ellipsis 省略号 / marquee 轮播）处理
+
     fun getTextOverflowMode(context: Context): String =
-        user(context).getString("pref_text_overflow", "shrink")
+        appPrefs(context).getString("pref_text_overflow", "ellipsis") ?: "ellipsis"
     fun setTextOverflowMode(context: Context, mode: String) =
-        user(context).putString("pref_text_overflow", mode)
+        appPrefs(context).edit().putString("pref_text_overflow", mode).apply()
+
+    fun isAutoShrinkEnabled(context: Context): Boolean =
+        appPrefs(context).getBoolean("pref_auto_shrink", true)
+    fun setAutoShrinkEnabled(context: Context, enabled: Boolean) =
+        appPrefs(context).edit().putBoolean("pref_auto_shrink", enabled).apply()
+
+    fun getAutoShrinkMinSize(context: Context): Int =
+        appPrefs(context).getInt("pref_auto_shrink_min_size", 8)
+    fun setAutoShrinkMinSize(context: Context, sp: Int) =
+        appPrefs(context).edit().putInt("pref_auto_shrink_min_size", sp).apply()
 
     fun getMarqueeSpeed(context: Context): Int =
-        user(context).getInt("pref_marquee_speed", 200)
+        appPrefs(context).getInt("pref_marquee_speed", 200)
     fun setMarqueeSpeed(context: Context, speed: Int) =
-        user(context).putInt("pref_marquee_speed", speed)
+        appPrefs(context).edit().putInt("pref_marquee_speed", speed).apply()
 }

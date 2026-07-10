@@ -2,9 +2,17 @@ package com.woshiwangnima.healthdietpro.ui.profile
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
+import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
+import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
+import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.databinding.ActivityHeightDetailBinding
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -16,8 +24,6 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.profile.list.DataListFragment
-import com.woshiwangnima.healthdietpro.ui.widget.tab.TabItem
-import com.woshiwangnima.healthdietpro.ui.widget.tab.ToggleBar
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 import java.time.LocalDate
@@ -46,14 +52,8 @@ class HeightDetailActivity : BaseBackActivity() {
         unit = intent.getStringExtra("unit") ?: UnitCategoryType.Length.defaultUnitId
         category = UnitCategoryType.Length.id
 
-        binding.tabBar.setTabs(listOf(
-            TabItem(R.drawable.ic_chart, "图表"),
-            TabItem(R.drawable.ic_list, "数据")
-        ))
-        binding.tabBar.applyEnlargedTabHeight(hasIcon = true)
-        binding.tabBar.restore("tab_height_chart", 0)
-        binding.tabBar.listener = { idx, _ -> switchTab(idx) }
-        switchTab(binding.tabBar.selectedIndex)
+        setupTabBar()
+        switchTab(AppPrefs.getHeightChartTab(this))
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val cv = chartView
@@ -70,6 +70,30 @@ class HeightDetailActivity : BaseBackActivity() {
         intent.putExtra("records", ArrayList(records))
         setResult(RESULT_OK, intent)
         finish()
+    }
+
+    private fun setupTabBar() {
+        val items = listOf(
+            DetailTabItem("0", R.string.detail_tab_chart, R.drawable.ic_chart),
+            DetailTabItem("1", R.string.detail_tab_data, R.drawable.ic_list),
+        )
+        binding.tabBar.setContent {
+            HealthDietProTheme {
+                var selectedTab by remember {
+                    mutableIntStateOf(AppPrefs.getHeightChartTab(this@HeightDetailActivity))
+                }
+                DetailTabBar(
+                    items = items,
+                    selectedId = selectedTab.toString(),
+                    onSelected = { item ->
+                        val index = item.id.toInt()
+                        selectedTab = index
+                        AppPrefs.setHeightChartTab(this@HeightDetailActivity, index)
+                        switchTab(index)
+                    },
+                )
+            }
+        }
     }
 
     private fun switchTab(index: Int) {
