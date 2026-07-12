@@ -34,7 +34,6 @@ class ChartFullscreenActivity : BaseBackActivity() {
 
         try {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            window?.decorView?.windowInsetsController?.hide(WindowInsets.Type.systemBars())
         } catch (_: Exception) {}
 
         val root = FrameLayout(this).apply { applySystemBarInsets() }
@@ -44,7 +43,7 @@ class ChartFullscreenActivity : BaseBackActivity() {
             // Fullscreen hides the title row; skip setChartTitle entirely so the chart
             // fills the full landscape viewport.
             setChartStateKey(data.chartStateKey)
-            if (data.yAxisBands.isNotEmpty()) setYAxisBands(data.yAxisBands)
+            applyCanvasStyle(data.canvasStyle)
             setSeries(data.series, data.unitLabel)
             post {
                 setVisibleRange(data.visibleRangeMs)
@@ -55,10 +54,10 @@ class ChartFullscreenActivity : BaseBackActivity() {
         root.addView(chartView)
 
         val exitBtn = MaterialButton(this).apply {
-            text = "缩放"
+            text = getString(R.string.view_chart_exit_fullscreen)
             setIconResource(R.drawable.ic_fullscreen_exit)
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
-            contentDescription = "退出全屏"
+            contentDescription = getString(R.string.view_chart_exit_fullscreen)
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT
@@ -71,5 +70,22 @@ class ChartFullscreenActivity : BaseBackActivity() {
         root.addView(exitBtn)
 
         setContentView(root)
+    }
+
+    override fun finish() {
+        restoreSystemBars()
+        super.finish()
+    }
+
+    override fun onDestroy() {
+        restoreSystemBars()
+        super.onDestroy()
+    }
+
+    private fun restoreSystemBars() {
+        try {
+            window?.decorView?.windowInsetsController?.show(WindowInsets.Type.systemBars())
+        } catch (_: Exception) {
+        }
     }
 }

@@ -16,6 +16,8 @@ import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import com.woshiwangnima.healthdietpro.model.profile.bodyRecordEpochMillis
+import com.woshiwangnima.healthdietpro.model.profile.formatBodyRecordDisplayDateTime
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartView
@@ -26,8 +28,6 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.profile.list.DataListFragment
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
-import java.time.LocalDate
-import java.time.ZoneId
 
 class HeightDetailActivity : BaseBackActivity() {
 
@@ -38,7 +38,7 @@ class HeightDetailActivity : BaseBackActivity() {
     private var currentTab = -1
     private var chartView: ChartView? = null
 
-    override fun getTitleText(): String = "身高历史"
+    override fun getTitleText(): String = getString(R.string.height_history_title)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,18 +112,17 @@ class HeightDetailActivity : BaseBackActivity() {
             newCv
         }
         cv.setChartStateKey(ProfilePrefs.makeChartStateKey(this, "height_history"))
-        cv.setChartTitle("身高 历史")
+        cv.setChartTitle(getString(R.string.height_history_title))
         val dataPoints = if (records.isEmpty()) emptyList() else {
-            val sorted = records.sortedBy { it.date }
+            val sorted = records.sortedBy { bodyRecordEpochMillis(it.date) }
             sorted.map { record ->
                 val converted = UnitConverter.fromBase(category, record.value, unit)
-                val localDate = LocalDate.parse(record.date)
-                val ts = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                DataPoint(timestamp = ts, value = converted, dateLabel = record.date.takeLast(5))
+                val ts = bodyRecordEpochMillis(record.date)
+                DataPoint(timestamp = ts, value = converted, dateLabel = formatBodyRecordDisplayDateTime(record.date))
             }
         }
         val series = ChartSeries(
-            points = dataPoints, label = "测量值",
+            points = dataPoints, label = getString(R.string.body_record_value),
             color = resources.getColor(R.color.primary, null),
             lineStyle = LineStyle.LINEAR, lineType = LineType.SOLID,
             pointShape = PointShape.CIRCLE, pointFill = PointFill.FILLED

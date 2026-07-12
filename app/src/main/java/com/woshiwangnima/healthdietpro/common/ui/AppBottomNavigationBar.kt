@@ -1,5 +1,6 @@
 package com.woshiwangnima.healthdietpro.common.ui
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.NavigationBar
 import androidx.compose.runtime.Composable
 
@@ -9,7 +10,9 @@ fun AppBottomNavigationBar(
     selectedRoute: String,
     onItemClick: (AppBottomNavItem) -> Unit,
 ) {
-    NavigationBar {
+    NavigationBar(
+        windowInsets = WindowInsets(0, 0, 0, 0),
+    ) {
         items.forEach { item ->
             AppBottomNavigationButton(
                 item = item,

@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.common.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,7 +15,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,6 +22,7 @@ fun BaseScreen(
     title: String,
     onBack: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
+    includeNavigationBarPadding: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
@@ -52,6 +53,11 @@ fun BaseScreen(
             )
         },
         modifier = Modifier,
+        contentWindowInsets = if (includeNavigationBarPadding) {
+            adaptiveNavigationBarWindowInsets()
+        } else {
+            WindowInsets(0, 0, 0, 0)
+        },
     ) { innerPadding ->
         content(innerPadding)
     }

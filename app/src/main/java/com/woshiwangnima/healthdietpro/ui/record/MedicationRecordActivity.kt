@@ -2,34 +2,65 @@ package com.woshiwangnima.healthdietpro.ui.record
 
 import android.Manifest
 import android.app.Activity
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.AdapterView
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
-import com.woshiwangnima.healthdietpro.databinding.ActivityMedicationRecordBinding
+import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
+import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
+import com.woshiwangnima.healthdietpro.common.ui.AppEditableDropdownField
+import com.woshiwangnima.healthdietpro.common.ui.AppFormSubtitle
+import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.AppInputLabel
+import com.woshiwangnima.healthdietpro.common.ui.AppInputTextFieldColors
+import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
-import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
-import com.woshiwangnima.healthdietpro.ui.widget.tab.FilterBar
-import com.woshiwangnima.healthdietpro.ui.widget.tab.TabItem
-import com.woshiwangnima.healthdietpro.util.TextOverflowUtil
 import com.woshiwangnima.healthdietpro.util.UnitConverter
-import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 import com.woshiwangnima.healthdietpro.util.image.WatermarkUtil
 import com.woshiwangnima.healthdietpro.util.location.CurrentLocationProvider
 import com.woshiwangnima.healthdietpro.util.time.DateTimePicker
@@ -38,59 +69,39 @@ import java.io.FileOutputStream
 
 class MedicationRecordActivity : BaseBackActivity() {
 
-    override fun getTitleText(): String = "记用药"
+    override fun getTitleText(): String = getString(R.string.medication_record_title)
 
     companion object {
         const val EXTRA_RECORD_ID = "record_id"
     }
 
-    private lateinit var binding: ActivityMedicationRecordBinding
-
-    // 编辑模式：非空时表示修改已有记录
     private var editingRecordId: String? = null
-
-    // 默认感受标签
-    private val defaultFeelings = listOf(
-        "恶心", "便秘", "腹胀", "腹泻", "头痛", "头晕",
-        "失眠", "嗜睡", "皮疹", "心悸"
-    )
-
-    // 时间
-    private var selectedTimestamp: Long = System.currentTimeMillis()
-
-    // 单位转换
-    private var selectedSpecCategory: UnitCategory? = null
-    private var selectedSpecUnitId: String = ""
-
-    // 预填名称规格时抑制 spinners listener 误覆盖
-    private var isApplyingNameDefaults = false
-
-    // 单位分类下拉所用 unit categories（药品规格常用质量/体积/时间）
-    private val specCategories: List<UnitCategory> by lazy {
-        val ids = listOf(
-            UnitCategoryType.Weight.id, UnitCategoryType.Volume.id
-        )
-        UnitConverter.getRepository()?.getCategories()
-            ?.filter { it.id in ids }
-            .orEmpty()
-    }
-
-    // 图片路径（保存后的本地文件相对路径，相对 filesDir）
-    private var photoFileName: String? = null
-
-    // 定位（用于拍照水印）
+    private var formState by mutableStateOf(MedicationRecordFormState())
     private lateinit var locationProvider: CurrentLocationProvider
     private lateinit var provinceRepo: ProvinceRepository
-
-    // 拍照临时 Uri
     private var pendingCameraUri: Uri? = null
 
-    // 拍照权限申请之后再启动相机
+    private val specCategories: List<UnitCategory>
+        get() {
+            val ids = setOf(UnitCategoryType.Weight.id, UnitCategoryType.Volume.id)
+            return UnitConverter.getRepository()
+                ?.getCategories()
+                ?.filter { it.id in ids }
+                .orEmpty()
+        }
+
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) launchCamera()
-        else Toast.makeText(this, "需要相机权限才能拍照", Toast.LENGTH_SHORT).show()
+        if (granted) {
+            launchCamera()
+        } else {
+            Toast.makeText(
+                this,
+                getString(R.string.medication_record_camera_permission_required),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
     }
 
     private val cameraLauncher = registerForActivityResult(
@@ -109,363 +120,141 @@ class MedicationRecordActivity : BaseBackActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMedicationRecordBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.root.applySystemBarInsets()
-        setupToolbar(binding.toolbar)
-
         UnitConverter.init(this)
         locationProvider = CurrentLocationProvider(this)
         provinceRepo = ProvinceRepository.fromContext(this)
-
-        // 1. 先设适配器（无 listener），2. 再加载数据（listener 不会误触发），3. 最后注册 listener
-        setupSpecSpinnersAdapters()
         editingRecordId = intent.getStringExtra(EXTRA_RECORD_ID)
-        if (editingRecordId != null) {
-            loadRecordForEdit(editingRecordId!!)
-        } else {
-            binding.timeRow.text = DateTimePicker.format(selectedTimestamp)
-        }
-        setupSpecSpinnersListeners()
-        binding.timeRow.setOnClickListener {
-            DateTimePicker.show(this, selectedTimestamp) { ts ->
-                selectedTimestamp = ts
-                binding.timeRow.text = DateTimePicker.format(ts)
-            }
-        }
+        formState = initialFormState(editingRecordId)
 
-        setupMedNameInput()
-        setupMethodInput()
-        setupFeelingsBar()
-        setupPhotoButtons()
-        setupSaveButton()
-        applyOverflowAndHintStyle()
-
-        // 预览尚未加载的图片时占位隐藏
-        binding.photoPreview.visibility = View.GONE
-    }
-
-    /** 编辑模式：从已有记录回填所有字段。 */
-    private fun loadRecordForEdit(recordId: String) {
-        val record = MedicationPrefs.getRecords(this).find { it.id == recordId } ?: return
-        title = "编辑用药"
-        supportActionBar?.title = "编辑用药"
-        editingRecordId = record.id
-
-        selectedTimestamp = record.timestamp
-        binding.timeRow.text = DateTimePicker.format(record.timestamp)
-
-        binding.medNameInput.setText(record.medicationName)
-        binding.doseValueInput.setText(
-            if (record.doseValue > 0f) record.doseValue.toString() else ""
-        )
-        binding.doseUnitInput.setText(record.doseUnit)
-        binding.specValueInput.setText(
-            if (record.specValue > 0f) record.specValue.toString() else ""
-        )
-        binding.methodInput.setText(record.method)
-
-        // 规格分类和单位（此时 listener 尚未注册，不会误触发）
-        val catIdx = specCategories.indexOfFirst { it.id == record.specUnitCategory }
-        if (catIdx >= 0) {
-            binding.specCategorySpinner.setSelection(catIdx + 1)
-            val cat = specCategories[catIdx]
-            populateUnitSpinner(cat)
-            selectedSpecCategory = cat
-
-            val unitIdx = cat.units.indexOfFirst { it.id == record.specUnitId }
-            if (unitIdx >= 0) {
-                binding.specUnitSpinner.setSelection(unitIdx + 1)
-                selectedSpecUnitId = cat.units[unitIdx].id
-            }
-        }
-
-        // 感受
-        selectedFeelingLabels = record.feelings
-        val feelingIndices = record.feelings.mapNotNull { f ->
-            defaultFeelings.indexOf(f).takeIf { it >= 0 }
-        }.toSet()
-        binding.feelingsBar.setSelected(feelingIndices)
-        if (record.feelingNote.isNotEmpty()) {
-            val prefix = if (record.feelings.isEmpty()) "" else
-                record.feelings.joinToString("；") + "；"
-            binding.feelingNoteInput.setText(prefix + record.feelingNote)
-        }
-
-        // 照片
-        if (!record.photoPath.isNullOrEmpty()) {
-            val file = File(filesDir, record.photoPath)
-            if (file.exists()) {
-                photoFileName = record.photoPath
-                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                if (bitmap != null) {
-                    binding.photoPreview.visibility = View.VISIBLE
-                    binding.photoPreview.setImageBitmap(bitmap)
+        setContent {
+            HealthDietProTheme {
+                BaseScreen(
+                    title = if (editingRecordId == null) {
+                        stringResource(R.string.medication_record_title)
+                    } else {
+                        stringResource(R.string.medication_record_edit_title)
+                    },
+                    onBack = { finish() },
+                ) { innerPadding ->
+                    MedicationRecordScreen(
+                        state = formState,
+                        contentPadding = innerPadding,
+                        specCategories = specCategories,
+                        medicationHistory = MedicationPrefs.getMedicationNameHistory(this),
+                        methodHistory = MedicationPrefs.getMethodHistory(this),
+                        onStateChange = { formState = it },
+                        onApplyNameDefaults = ::applyNameDefaults,
+                        onPickTime = ::pickTime,
+                        onTakePhoto = ::requestCamera,
+                        onPickPhoto = { galleryLauncher.launch("image/*") },
+                        onSave = ::saveRecord,
+                    )
                 }
             }
         }
     }
 
-    /** 根据偏好设置统一应用文字溢出模式和深色模式提示文本颜色。 */
-    private fun applyOverflowAndHintStyle() {
-        val overflowMode = com.woshiwangnima.healthdietpro.model.prefs.AppPrefs.getTextOverflowMode(this)
-        TextOverflowUtil.apply(binding.feelingNoteInput, overflowMode)
-
-        // 深色模式提示文本颜色：降低透明度（~38%）
-        val isDark = (resources.configuration.uiMode and
-            android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-            android.content.res.Configuration.UI_MODE_NIGHT_YES
-        val hintAlpha = if (isDark) 0.45f else 0.38f
-        val hintColor = androidx.core.content.ContextCompat.getColor(this, R.color.on_surface_variant)
-        val alphaColor = (hintColor and 0x00FFFFFF) or ((0xFF * hintAlpha).toInt() shl 24)
-
-        binding.doseValueLayout.defaultHintTextColor =
-            android.content.res.ColorStateList.valueOf(alphaColor)
-        binding.doseUnitLayout.defaultHintTextColor =
-            android.content.res.ColorStateList.valueOf(alphaColor)
-        binding.specValueLayout.defaultHintTextColor =
-            android.content.res.ColorStateList.valueOf(alphaColor)
-        val feelingLayout = binding.feelingNoteInput.parent as? com.google.android.material.textfield.TextInputLayout
-        feelingLayout?.defaultHintTextColor =
-            android.content.res.ColorStateList.valueOf(alphaColor)
-    }
-
-    /** 药品名称：AutoCompleteTextView + 历史。焦点离开或选择时联动预填剂量/规格/方式。 */
-    private fun setupMedNameInput() {
-        val history = MedicationPrefs.getMedicationNameHistory(this)
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            history
+    private fun initialFormState(recordId: String?): MedicationRecordFormState {
+        val record = recordId?.let { id -> MedicationPrefs.getRecords(this).find { it.id == id } }
+            ?: return MedicationRecordFormState()
+        val category = specCategories.find { it.id == record.specUnitCategory }
+        val unitId = category?.units?.find { it.id == record.specUnitId }?.id ?: record.specUnitId
+        return MedicationRecordFormState(
+            timestamp = record.timestamp,
+            medicationName = record.medicationName,
+            doseValue = record.doseValue.takeIf { it > 0f }?.toString().orEmpty(),
+            doseUnit = record.doseUnit,
+            specValue = record.specValue.takeIf { it > 0f }?.toString().orEmpty(),
+            specCategoryId = category?.id.orEmpty(),
+            specUnitId = unitId,
+            method = record.method,
+            selectedFeelings = record.feelings.toSet(),
+            feelingNote = record.feelingNote,
+            photoFileName = record.photoPath,
+            photoBitmap = record.photoPath?.let(::loadBitmap),
         )
-        binding.medNameInput.setAdapter(adapter)
-        binding.medNameInput.setOnItemClickListener { _, _, _, _ ->
-            applyNameDefaults(binding.medNameInput.text.toString().trim())
-        }
-        // 当用户手输新名后焦点离开也尝试预填（若该名已有历史）
-        binding.medNameInput.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) applyNameDefaults(binding.medNameInput.text.toString().trim())
-        }
     }
 
-    /** 名称选定后预填剂量/规格/方式（取该名最近一条历史记录）。 */
     private fun applyNameDefaults(name: String) {
-        if (name.isEmpty()) return
+        if (name.isBlank()) return
         val defaults = MedicationPrefs.findNameDefaults(this, name) ?: return
-
-        binding.doseValueInput.setText(defaults.doseValue.toString())
-        binding.doseUnitInput.setText(defaults.doseUnit)
-
-        // 规格要从 spinners 中先选到对应 category 再选 unit
-        // 注意：spinner adapter 在 index 0 处插入了 "选择分类"/"选择单位" 占位项
-        isApplyingNameDefaults = true
-        val catIdx = specCategories.indexOfFirst { it.id == defaults.specUnitCategory }
-        if (catIdx >= 0) {
-            binding.specCategorySpinner.setSelection(catIdx + 1)
-            val cat = specCategories[catIdx]
-            populateUnitSpinner(cat)
-            selectedSpecCategory = cat
-
-            val unitIdx = cat.units.indexOfFirst { it.id == defaults.specUnitId }
-            if (unitIdx >= 0) {
-                binding.specUnitSpinner.setSelection(unitIdx + 1)
-                selectedSpecUnitId = cat.units[unitIdx].id
-            }
-        }
-        isApplyingNameDefaults = false
-        binding.specValueInput.setText(defaults.specValue.toString())
-
-        binding.methodInput.setText(defaults.method)
-    }
-
-    /** 用药规格：第 1 步，只设适配器（不得注册 listener）。 */
-    private fun setupSpecSpinnersAdapters() {
-        val categoryNames = specCategories.map { it.categoryCn }.toMutableList().apply {
-            add(0, "选择分类")
-        }
-        binding.specCategorySpinner.adapter = TextOverflowUtil.createSpinnerAdapter(
-            this, categoryNames
-        ).also {
-            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-
-        populateUnitSpinner(null)
-    }
-
-    /** 用药规格：第 2 步，注册 listener（等数据加载完毕后再设，防止 init 阶段误触发）。 */
-    private fun setupSpecSpinnersListeners() {
-        binding.specCategorySpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?, v: View?, pos: Int, id: Long
-                ) {
-                    if (isApplyingNameDefaults) return
-                    if (pos == 0) { selectedSpecCategory = null; populateUnitSpinner(null) }
-                    else {
-                        val cat = specCategories[pos - 1]
-                        selectedSpecCategory = cat
-                        populateUnitSpinner(cat)
-                    }
-                }
-
-                override fun onNothingSelected(p: AdapterView<*>?) {
-                    if (isApplyingNameDefaults) return
-                    selectedSpecCategory = null
-                    populateUnitSpinner(null)
-                }
-            }
-
-        binding.specUnitSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?, v: View?, pos: Int, id: Long
-                ) {
-                    if (isApplyingNameDefaults) return
-                    val cat = selectedSpecCategory
-                    // adapter 在 index 0 插入了"选择单位"占位项，真实单位在 pos-1
-                    if (cat == null || pos <= 0 || pos > cat.units.size) selectedSpecUnitId = ""
-                    else selectedSpecUnitId = cat.units[pos - 1].id
-                }
-
-                override fun onNothingSelected(p: AdapterView<*>?) {
-                    if (isApplyingNameDefaults) return
-                    selectedSpecUnitId = ""
-                }
-            }
-
-        // 防御性重选：某些 Android 版本注册 listener 时可能触发 selectionNotifier 重置 spinner
-        val cat = selectedSpecCategory
-        if (cat != null && selectedSpecUnitId.isNotEmpty()) {
-            val pos = cat.units.indexOfFirst { it.id == selectedSpecUnitId }
-            if (pos >= 0) {
-                binding.specUnitSpinner.setSelection(pos + 1)
-            }
-        }
-    }
-
-    private fun populateUnitSpinner(cat: UnitCategory?) {
-        val units = cat?.units.orEmpty()
-        val adapter = TextOverflowUtil.createSpinnerAdapter(
-            this,
-            units.map { "${it.symbolCn} (${it.id})" }.toMutableList().apply {
-                add(0, "选择单位")
-            }
+        val category = specCategories.find { it.id == defaults.specUnitCategory }
+        val unitId = category?.units?.find { it.id == defaults.specUnitId }?.id ?: defaults.specUnitId
+        formState = formState.copy(
+            doseValue = defaults.doseValue.takeIf { it > 0f }?.toString().orEmpty(),
+            doseUnit = defaults.doseUnit,
+            specValue = defaults.specValue.takeIf { it > 0f }?.toString().orEmpty(),
+            specCategoryId = category?.id.orEmpty(),
+            specUnitId = unitId,
+            method = defaults.method,
         )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.specUnitSpinner.adapter = adapter
     }
 
-    /** 用药方式：内置默认 + 历史，AutoCompleteTextView。 */
-    private fun setupMethodInput() {
-        val history = MedicationPrefs.getMethodHistory(this)
-        val adapter = ArrayAdapter(
+    private fun pickTime() {
+        DateTimePicker.show(this, formState.timestamp) { timestamp ->
+            formState = formState.copy(timestamp = timestamp)
+        }
+    }
+
+    private fun requestCamera() {
+        val granted = ContextCompat.checkSelfPermission(
             this,
-            android.R.layout.simple_spinner_dropdown_item,
-            history
-        )
-        binding.methodInput.setAdapter(adapter)
-        binding.methodInput.threshold = 1
-    }
-
-    /** 用药感受：FilterBar 多选 + 自由输入框。 */
-    private var selectedFeelingLabels: List<String> = emptyList()
-
-    private fun setupFeelingsBar() {
-        binding.feelingsBar.setTabs(defaultFeelings.map { TabItem(label = it) })
-        binding.feelingsBar.listener = { selected: Set<Int> ->
-            selectedFeelingLabels = selected.map { defaultFeelings[it] }
-            syncFeelingInput()
-        }
-    }
-
-    /** 把选中标签作为前缀写入输入框，分号分隔；保留用户原有正文。 */
-    private fun syncFeelingInput() {
-        val userNote = stripExistingPrefix(binding.feelingNoteInput.text.toString())
-        val prefix = if (selectedFeelingLabels.isEmpty()) "" else
-            selectedFeelingLabels.joinToString("；") + "；"
-        binding.feelingNoteInput.setText(prefix + userNote)
-        // 光标移到末尾
-        binding.feelingNoteInput.setSelection(binding.feelingNoteInput.text.toString().length)
-    }
-
-    private fun stripExistingPrefix(text: String): String {
-        // 已有前缀形如「恶心；腹泻；」→ 把这些分号分隔的标签全删掉，保留正文。
-        var rest = text.trimStart()
-        for (label in defaultFeelings) {
-            if (rest.startsWith(label + "；")) {
-                rest = rest.removePrefix(label + "；")
-            } else if (rest.startsWith(label + ";")) {
-                rest = rest.removePrefix(label + ";")
-            }
-        }
-        return rest
-    }
-
-    /** 图片记录：拍照 / 选相册。 */
-    private fun setupPhotoButtons() {
-        binding.takePhotoBtn.setOnClickListener {
-            val granted = ContextCompat.checkSelfPermission(
-                this, Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-            if (granted) launchCamera() else
-                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-        binding.pickPhotoBtn.setOnClickListener {
-            galleryLauncher.launch("image/*")
+            Manifest.permission.CAMERA,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (granted) {
+            launchCamera()
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
     private fun launchCamera() {
-        // 准备临时文件 + 通过 FileProvider 暴露给相机
         val dir = File(filesDir, "medication_photos").apply { if (!exists()) mkdirs() }
-        val tmpName = "camera_${System.currentTimeMillis()}.jpg"
-        val tmpFile = File(dir, tmpName)
+        val tmpFile = File(dir, "camera_${System.currentTimeMillis()}.jpg")
         pendingCameraUri = FileProvider.getUriForFile(
-            this, "${packageName}.fileprovider", tmpFile
+            this,
+            "${packageName}.fileprovider",
+            tmpFile,
         )
-        // 临时文件名先记下，成功保存到位后改正式名
         pendingCameraUri?.let { cameraLauncher.launch(it) }
     }
 
-    /**
-     * 拍照完成：解码后立即追加时间+地点水印，再写入正式文件。
-     */
     private fun handleCapturedPhoto(uri: Uri) {
         try {
             val raw = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return
             val bitmap = BitmapFactory.decodeByteArray(raw, 0, raw.size) ?: return
-            // 异步反查当前位置（不阻塞 UI 但水印合并在主线程")
             locationProvider.getCurrentLocation { result ->
                 runOnUiThread {
-                    val locText = when (result) {
+                    val locationText = when (result) {
                         is CurrentLocationProvider.Result.Ok -> {
-                            val p = provinceRepo.findByPoint(result.lng, result.lat)
-                            p?.name ?: "(未识别省份)"
+                            provinceRepo.findByPoint(result.lng, result.lat)?.name
+                                ?: getString(R.string.medication_record_location_unknown)
                         }
+
                         else -> ""
                     }
-                    saveAndPreview(WatermarkUtil.apply(
-                        bitmap,
-                        selectedTimestamp,
-                        locText
-                    ))
-                    // 临时 input stream 已读完，可删 camera temp
+                    saveAndPreview(
+                        WatermarkUtil.apply(
+                            bitmap,
+                            formState.timestamp,
+                            locationText,
+                        )
+                    )
                     runCatching { File(uri.path ?: "").delete() }
                 }
             }
-        } catch (e: Exception) {
-            Toast.makeText(this, "无法加载照片", Toast.LENGTH_SHORT).show()
+        } catch (_: Exception) {
+            Toast.makeText(this, getString(R.string.medication_record_photo_load_failed), Toast.LENGTH_SHORT).show()
         }
     }
 
-    /** 选相册：不加水印（已存在的图片默认按原样存储），仅预览与保存。 */
     private fun handlePickedPhoto(uri: Uri) {
         try {
             val raw = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return
             val bitmap = BitmapFactory.decodeByteArray(raw, 0, raw.size) ?: return
             saveAndPreview(bitmap)
         } catch (_: Exception) {
-            Toast.makeText(this, "无法加载图片", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.medication_record_photo_load_failed), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -476,58 +265,357 @@ class MedicationRecordActivity : BaseBackActivity() {
         FileOutputStream(file).use { out ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
         }
-        photoFileName = "medication_photos/$fileName"
-        binding.photoPreview.visibility = View.VISIBLE
-        binding.photoPreview.setImageBitmap(bitmap)
+        formState = formState.copy(
+            photoFileName = "medication_photos/$fileName",
+            photoBitmap = bitmap,
+        )
     }
 
-    /** 保存记录：组装 MedicationRecord 并存盘。 */
-    private fun setupSaveButton() {
-        binding.saveBtn.setOnClickListener {
-            val name = binding.medNameInput.text.toString().trim()
-            if (name.isEmpty()) {
-                Toast.makeText(this, "请填写药品名称", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+    private fun loadBitmap(relativePath: String): Bitmap? {
+        val file = File(filesDir, relativePath)
+        return if (file.exists()) BitmapFactory.decodeFile(file.absolutePath) else null
+    }
+
+    private fun saveRecord() {
+        val state = formState
+        val name = state.medicationName.trim()
+        if (name.isEmpty()) {
+            Toast.makeText(this, getString(R.string.medication_record_name_required), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val category = specCategories.find { it.id == state.specCategoryId }
+        val unitId = category?.units?.find { it.id == state.specUnitId }?.id.orEmpty()
+        val recordId = editingRecordId ?: "${System.currentTimeMillis()}_${(Math.random() * 10000).toInt()}"
+        val record = MedicationRecord(
+            id = recordId,
+            timestamp = state.timestamp,
+            medicationName = name,
+            doseValue = state.doseValue.toFloatOrNull() ?: 0f,
+            doseUnit = state.doseUnit.trim(),
+            specValue = state.specValue.toFloatOrNull() ?: 0f,
+            specUnitCategory = category?.id.orEmpty(),
+            specUnitId = unitId,
+            method = state.method.trim(),
+            feelings = state.selectedFeelings.toList(),
+            feelingNote = state.feelingNote.trim(),
+            photoPath = state.photoFileName,
+        )
+        if (editingRecordId != null) {
+            val all = MedicationPrefs.getRecords(this).toMutableList()
+            val index = all.indexOfFirst { it.id == editingRecordId }
+            if (index >= 0) all[index] = record else all.add(record)
+            MedicationPrefs.saveRecords(this, all)
+        } else {
+            MedicationPrefs.addRecord(this, record)
+        }
+        Toast.makeText(this, getString(R.string.medication_record_saved), Toast.LENGTH_SHORT).show()
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+}
+
+private data class MedicationRecordFormState(
+    val timestamp: Long = System.currentTimeMillis(),
+    val medicationName: String = "",
+    val doseValue: String = "",
+    val doseUnit: String = "",
+    val specValue: String = "",
+    val specCategoryId: String = "",
+    val specUnitId: String = "",
+    val method: String = "",
+    val selectedFeelings: Set<String> = emptySet(),
+    val feelingNote: String = "",
+    val photoFileName: String? = null,
+    val photoBitmap: Bitmap? = null,
+)
+
+@Composable
+private fun MedicationRecordScreen(
+    state: MedicationRecordFormState,
+    contentPadding: PaddingValues,
+    specCategories: List<UnitCategory>,
+    medicationHistory: List<String>,
+    methodHistory: List<String>,
+    onStateChange: (MedicationRecordFormState) -> Unit,
+    onApplyNameDefaults: (String) -> Unit,
+    onPickTime: () -> Unit,
+    onTakePhoto: () -> Unit,
+    onPickPhoto: () -> Unit,
+    onSave: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(contentPadding),
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            item {
+                TimeField(
+                    timestamp = state.timestamp,
+                    onClick = onPickTime,
+                )
             }
-            val dose = binding.doseValueInput.text.toString().toFloatOrNull()
-            val doseUnit = binding.doseUnitInput.text.toString().trim()
-            val spec = binding.specValueInput.text.toString().toFloatOrNull()
-            val method = binding.methodInput.text.toString().trim()
+            item {
+                AppEditableDropdownField(
+                    title = stringResource(R.string.medication_record_name),
+                    label = stringResource(R.string.medication_record_name_hint),
+                    value = state.medicationName,
+                    options = medicationHistory,
+                    onValueChange = { onStateChange(state.copy(medicationName = it)) },
+                    onSelect = {
+                        onStateChange(state.copy(medicationName = it))
+                        onApplyNameDefaults(it)
+                    },
+                )
+            }
+            item {
+                DoseSection(
+                    state = state,
+                    onStateChange = onStateChange,
+                )
+            }
+            item {
+                SpecSection(
+                    state = state,
+                    categories = specCategories,
+                    onStateChange = onStateChange,
+                )
+            }
+            item {
+                AppEditableDropdownField(
+                    title = stringResource(R.string.medication_record_method),
+                    label = stringResource(R.string.medication_record_method),
+                    value = state.method,
+                    options = methodHistory,
+                    onValueChange = { onStateChange(state.copy(method = it)) },
+                    onSelect = { onStateChange(state.copy(method = it)) },
+                )
+            }
+            item {
+                FeelingSection(
+                    state = state,
+                    onStateChange = onStateChange,
+                )
+            }
+            item {
+                PhotoSection(
+                    bitmap = state.photoBitmap,
+                    onTakePhoto = onTakePhoto,
+                    onPickPhoto = onPickPhoto,
+                )
+            }
+        }
+        AppIconTextButton(
+            text = stringResource(R.string.medication_record_save),
+            iconRes = R.drawable.ic_save,
+            onClick = onSave,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        )
+    }
+}
 
-            // 规范化感受：从输入框解析出选中的标签 + 正文
-            val noteText = binding.feelingNoteInput.text.toString()
-            val feelingsInNote = defaultFeelings.filter { noteText.contains(it) }
-            val noteBody = stripExistingPrefix(noteText)
-            // 此外用户可能在多选 tab 上又选了标签，统一以多选为准
-            val feelings = (feelingsInNote + selectedFeelingLabels).distinct()
-
-            val recordId = editingRecordId
-                ?: "${System.currentTimeMillis()}_${(Math.random() * 10000).toInt()}"
-            val record = MedicationRecord(
-                id = recordId,
-                timestamp = selectedTimestamp,
-                medicationName = name,
-                doseValue = dose ?: 0f,
-                doseUnit = doseUnit,
-                specValue = spec ?: 0f,
-                specUnitCategory = selectedSpecCategory?.id ?: "",
-                specUnitId = selectedSpecUnitId,
-                method = method,
-                feelings = feelings,
-                feelingNote = noteBody,
-                photoPath = photoFileName
+@Composable
+private fun TimeField(
+    timestamp: Long,
+    onClick: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = stringResource(R.string.medication_record_time),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f))
+                .clickable(onClick = onClick)
+                .padding(horizontal = 12.dp, vertical = 14.dp),
+        ) {
+            Text(
+                text = DateTimePicker.format(timestamp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            if (editingRecordId != null) {
-                val all = MedicationPrefs.getRecords(this).toMutableList()
-                val idx = all.indexOfFirst { it.id == editingRecordId }
-                if (idx >= 0) all[idx] = record else all.add(record)
-                MedicationPrefs.saveRecords(this, all)
-            } else {
-                MedicationPrefs.addRecord(this, record)
+        }
+    }
+}
+
+@Composable
+private fun DoseSection(
+    state: MedicationRecordFormState,
+    onStateChange: (MedicationRecordFormState) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.medication_record_dose_section),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = state.doseValue,
+                onValueChange = { onStateChange(state.copy(doseValue = it)) },
+                label = { AppInputLabel(stringResource(R.string.medication_record_dose_value_hint)) },
+                colors = AppInputTextFieldColors(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true,
+                modifier = Modifier.weight(1f),
+            )
+            OutlinedTextField(
+                value = state.doseUnit,
+                onValueChange = { onStateChange(state.copy(doseUnit = it)) },
+                label = { AppInputLabel(stringResource(R.string.medication_record_dose_unit_hint)) },
+                colors = AppInputTextFieldColors(),
+                singleLine = true,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        AppFormSubtitle(text = stringResource(R.string.medication_record_dose_help))
+    }
+}
+
+@Composable
+private fun SpecSection(
+    state: MedicationRecordFormState,
+    categories: List<UnitCategory>,
+    onStateChange: (MedicationRecordFormState) -> Unit,
+) {
+    val selectedCategory = categories.find { it.id == state.specCategoryId }
+    val unitOptions = selectedCategory
+        ?.units
+        ?.filter { !it.hidden }
+        .orEmpty()
+    val selectedUnit = unitOptions.find { it.id == state.specUnitId }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.medication_record_spec_section),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        OutlinedTextField(
+            value = state.specValue,
+            onValueChange = { onStateChange(state.copy(specValue = it)) },
+            label = { AppInputLabel(stringResource(R.string.medication_record_spec_value_hint)) },
+            colors = AppInputTextFieldColors(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppDropdownField(
+                label = stringResource(R.string.medication_record_spec_category_select),
+                value = selectedCategory?.displayName().orEmpty(),
+                options = categories.map { AppDropdownOption(id = it.id, label = it.displayName()) },
+                onSelect = { option ->
+                    val category = categories.find { it.id == option.id }
+                    onStateChange(
+                        state.copy(
+                            specCategoryId = option.id,
+                            specUnitId = category?.baseUnit.orEmpty(),
+                        )
+                    )
+                },
+                modifier = Modifier.weight(1f),
+            )
+            AppDropdownField(
+                label = stringResource(R.string.medication_record_spec_unit_select),
+                value = selectedUnit?.symbol().orEmpty(),
+                options = unitOptions.map { AppDropdownOption(id = it.id, label = "${it.symbol()} (${it.id})") },
+                onSelect = { option -> onStateChange(state.copy(specUnitId = option.id)) },
+                enabled = selectedCategory != null,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        AppFormSubtitle(text = stringResource(R.string.medication_record_spec_help))
+    }
+}
+
+@Composable
+private fun FeelingSection(
+    state: MedicationRecordFormState,
+    onStateChange: (MedicationRecordFormState) -> Unit,
+) {
+    val defaultFeelings = stringArrayResource(R.array.medication_record_default_feelings).toList()
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.medication_record_feeling_section),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            defaultFeelings.forEach { label ->
+                val selected = label in state.selectedFeelings
+                FilterChip(
+                    selected = selected,
+                    onClick = {
+                        val next = if (selected) {
+                            state.selectedFeelings - label
+                        } else {
+                            state.selectedFeelings + label
+                        }
+                        onStateChange(state.copy(selectedFeelings = next))
+                    },
+                    label = { Text(label) },
+                )
             }
-            Toast.makeText(this, "已保存", Toast.LENGTH_SHORT).show()
-            setResult(Activity.RESULT_OK)
-            finish()
+        }
+        OutlinedTextField(
+            value = state.feelingNote,
+            onValueChange = { onStateChange(state.copy(feelingNote = it)) },
+            label = { AppInputLabel(stringResource(R.string.medication_record_feeling_note_hint)) },
+            colors = AppInputTextFieldColors(),
+            minLines = 2,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun PhotoSection(
+    bitmap: Bitmap?,
+    onTakePhoto: () -> Unit,
+    onPickPhoto: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.medication_record_photo_section),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppOutlinedIconTextButton(
+                text = stringResource(R.string.medication_record_take_photo),
+                iconRes = R.drawable.ic_camera,
+                onClick = onTakePhoto,
+                modifier = Modifier.weight(1f),
+            )
+            AppOutlinedIconTextButton(
+                text = stringResource(R.string.medication_record_pick_photo),
+                iconRes = R.drawable.ic_photo,
+                onClick = onPickPhoto,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentScale = ContentScale.Crop,
+            )
         }
     }
 }

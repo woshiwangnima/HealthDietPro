@@ -169,17 +169,17 @@ class PreferencesActivity : BaseBackActivity() {
             val label = row.findViewById<TextView>(R.id.rowLabel)
             val value = row.findViewById<TextView>(R.id.rowValue)
 
-            label.text = category.categoryCn
+            label.text = category.displayName()
             val currentId = AppPrefs.getUnit(this, category.id, category.baseUnit)
             val currentUnit = visibleUnits.find { it.id == currentId }
-            value.text = currentUnit?.let { "${it.symbolCn} ${it.symbolEn}" } ?: currentId
+            value.text = currentUnit?.symbol() ?: currentId
 
             row.setOnClickListener {
-                val items = visibleUnits.map { "${it.symbolCn}  ${it.symbolEn}" }.toTypedArray()
+                val items = visibleUnits.map { "${it.symbol()}  (${it.id})" }.toTypedArray()
                 val checkedIndex = visibleUnits.indexOfFirst { u ->
                     u.id == AppPrefs.getUnit(this@PreferencesActivity, category.id, category.baseUnit)
                 }.coerceAtLeast(0)
-                showPicker(category.categoryCn, items, checkedIndex) { which ->
+                showPicker(category.displayName(), items, checkedIndex) { which ->
                     AppPrefs.setUnit(this@PreferencesActivity, category.id, visibleUnits[which].id)
                     buildUnitRows()
                 }

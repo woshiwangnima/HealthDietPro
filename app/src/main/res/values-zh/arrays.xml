@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="chart_type_options">
+        <item>折线图</item>
+        <item>贝塞尔曲线</item>
+        <item>自然样条曲线</item>
+        <item>Catmull-Rom 曲线</item>
+        <item>单调平滑曲线</item>
+        <item>前置阶梯线</item>
+        <item>后置阶梯线</item>
+    </string-array>
+    <string-array name="time_range_options">
+        <item>全部</item>
+        <item>1 天</item>
+        <item>1 周</item>
+        <item>1 个月</item>
+        <item>3 个月</item>
+        <item>6 个月</item>
+        <item>1 年</item>
+    </string-array>
+</resources>

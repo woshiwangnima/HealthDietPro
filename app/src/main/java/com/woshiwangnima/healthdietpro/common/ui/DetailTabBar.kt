@@ -30,6 +30,7 @@ fun DetailTabBar(
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
+        windowInsets = adaptiveNavigationBarWindowInsets(),
     ) {
         items.forEach { item ->
             DetailTabButton(

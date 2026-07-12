@@ -8,7 +8,12 @@ fun View.applySystemBarInsets() {
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
         val navBar = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
         val statusBar = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-        view.setPadding(0, statusBar.top, 0, navBar.bottom)
+        val bottom = if (view.context.systemNavigationMode().needsNavigationBarInset()) {
+            navBar.bottom
+        } else {
+            0
+        }
+        view.setPadding(0, statusBar.top, 0, bottom)
         WindowInsetsCompat.CONSUMED
     }
 }

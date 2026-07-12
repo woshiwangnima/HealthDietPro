@@ -1,0 +1,50 @@
+package com.woshiwangnima.healthdietpro.common.ui.motion
+
+import androidx.compose.animation.core.Easing
+
+internal enum class EasingCurve : Easing {
+    Linear,
+
+    SineIn,
+    SineOut,
+    SineInOut,
+
+    QuadIn,
+    QuadOut,
+    QuadInOut,
+
+    CubicIn,
+    CubicOut,
+    CubicInOut,
+
+    QuartIn,
+    QuartOut,
+    QuartInOut,
+
+    QuintIn,
+    QuintOut,
+    QuintInOut,
+
+    ExpoIn,
+    ExpoOut,
+    ExpoInOut,
+
+    CircIn,
+    CircOut,
+    CircInOut,
+
+    BackIn,
+    BackOut,
+    BackInOut,
+
+    ElasticIn,
+    ElasticOut,
+    ElasticInOut,
+
+    BounceIn,
+    BounceOut,
+    BounceInOut;
+
+    override fun transform(fraction: Float): Float =
+        easingTransform(this, fraction)
+}

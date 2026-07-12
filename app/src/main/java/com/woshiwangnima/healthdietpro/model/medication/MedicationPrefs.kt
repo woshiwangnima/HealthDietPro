@@ -3,6 +3,7 @@ package com.woshiwangnima.healthdietpro.model.medication
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 
 /**
@@ -55,7 +56,9 @@ object MedicationPrefs {
 
     /** 用药方式历史：内置默认 + 按最近使用排序的去重列表。 */
     fun getMethodHistory(context: Context): List<String> {
-        val defaults = listOf("口服", "注射", "冲泡", "外敷", "含服", "吸入", "直肠给药", "舌下含服")
+        val defaults = context.resources
+            .getStringArray(R.array.medication_record_default_methods)
+            .toList()
         val seen = linkedSetOf<String>()
         defaults.forEach { seen.add(it) }
         getRecords(context).forEach { if (it.method.isNotEmpty()) seen.add(it.method) }

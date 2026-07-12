@@ -33,6 +33,8 @@ class UnitRepository private constructor(
         getCategory(categoryId)?.units?.map { it.id }?.toTypedArray() ?: emptyArray()
 
     companion object {
+        fun fromContext(context: Context): UnitRepository = UnitRepository(context)
+
         fun fromAsset(path: String): UnitRepository = UnitRepository({
             java.io.File(path).readText()
         })

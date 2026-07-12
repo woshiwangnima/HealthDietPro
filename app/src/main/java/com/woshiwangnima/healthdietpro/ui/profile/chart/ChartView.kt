@@ -46,6 +46,10 @@ class ChartView @JvmOverloads constructor(
     private val legendScrollView: HorizontalScrollView
     private val legendLayout: LinearLayout
     private val chartTitle: TextView
+    private val lineStyleLabel: TextView
+    private val xAxisRangeLabel: TextView
+    private val xAxisIntervalLabel: TextView
+    private val yAxisBoundsLabel: TextView
 
     private var seriesList: List<ChartSeries> = emptyList()
     private var unitLabel: String = ""
@@ -62,7 +66,7 @@ class ChartView @JvmOverloads constructor(
     private val timelineShowDurationMs = 4000L
 
     private val timeConfigRepo: ChartTimeConfigRepository by lazy {
-        ChartTimeConfigRepository(context, UnitRepository(context))
+        ChartTimeConfigRepository(context, UnitRepository.fromContext(context))
     }
 
     var gridLineStyles: List<LineType> = listOf(LineType.DOTTED)
@@ -96,6 +100,10 @@ class ChartView @JvmOverloads constructor(
         legendLayout = findViewById(R.id.legendLayout)
         labelIntervalSpinner = findViewById(R.id.labelIntervalSpinner)
         chartTitle = findViewById(R.id.chartTitle)
+        lineStyleLabel = findViewById(R.id.chartLineStyleLabel)
+        xAxisRangeLabel = findViewById(R.id.chartXAxisRangeLabel)
+        xAxisIntervalLabel = findViewById(R.id.chartXAxisIntervalLabel)
+        yAxisBoundsLabel = findViewById(R.id.chartYAxisBoundsLabel)
 
         initChartTypeSpinner()
         initTimeRangeSpinner()
@@ -184,14 +192,30 @@ class ChartView @JvmOverloads constructor(
         chartCanvas.invalidate()
     }
 
-    fun setChartTitle(title: String, gravity: Int = android.view.Gravity.CENTER) {
+    fun applyCanvasStyle(style: ChartCanvasStyle) {
+        chartCanvas.applyStyle(style)
+    }
+
+    fun setControlLabels(labels: ChartControlLabels) {
+        lineStyleLabel.text = labels.lineStyle
+        xAxisRangeLabel.text = labels.xAxisRange
+        xAxisIntervalLabel.text = labels.xAxisInterval
+        yAxisBoundsLabel.text = labels.yAxisBounds
+        btnFullscreen.text = labels.fullscreen
+    }
+
+    fun setChartTitle(
+        title: String,
+        gravity: Int = android.view.Gravity.CENTER,
+        visible: Boolean = true,
+    ) {
         chartTitle.text = title
         chartTitle.gravity = gravity
         chartTitle.setTextSize(
             android.util.TypedValue.COMPLEX_UNIT_PX,
             resources.getDimension(R.dimen.text_size_subtitle)
         )
-        chartTitle.visibility = View.VISIBLE
+        chartTitle.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     fun setFullscreenMode(enabled: Boolean) {
@@ -216,6 +240,18 @@ class ChartView @JvmOverloads constructor(
             yMinPct = chartCanvas.yMinPct, yMaxPct = chartCanvas.yMaxPct,
             labelIntervalMs = chartCanvas.labelIntervalMs,
             yAxisBands = chartCanvas.yAxisBands,
+            canvasStyle = ChartCanvasStyle(
+                yAxisPosition = chartCanvas.yAxisPosition,
+                xAxisPosition = chartCanvas.xAxisPosition,
+                yGridLineStyles = chartCanvas.gridLineStyles,
+                xGridLineStyles = chartCanvas.xGridLineStyles,
+                yAxisBands = chartCanvas.yAxisBands,
+                xAxisBands = chartCanvas.xAxisBands,
+                yValueFormatter = chartCanvas.yValueFormatter,
+                xValueFormatter = chartCanvas.xValueFormatter,
+                crosshairValueFormatter = chartCanvas.crosshairValueFormatter,
+                crosshairTimeFormatter = chartCanvas.crosshairTimeFormatter,
+            ),
             chartTitle = title, chartStateKey = chartStateKey
         )
     }

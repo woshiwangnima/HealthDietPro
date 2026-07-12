@@ -40,8 +40,8 @@ fun formatProfileInfoLine(
         ProfileGenderDisplay.Unknown -> labels.genderUnknown
     }
     val icon = when (gender) {
-        ProfileGenderDisplay.Male -> "♂"
-        ProfileGenderDisplay.Female -> "♀"
+        ProfileGenderDisplay.Male -> "\u2642"
+        ProfileGenderDisplay.Female -> "\u2640"
         ProfileGenderDisplay.Unknown -> ""
     }
     val tone = when (gender) {

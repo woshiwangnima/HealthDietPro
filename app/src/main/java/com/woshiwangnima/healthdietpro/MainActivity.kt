@@ -2,6 +2,8 @@ package com.woshiwangnima.healthdietpro
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.WindowInsets
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -9,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.view.ViewCompat
 import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppBottomNavItem
 import com.woshiwangnima.healthdietpro.common.ui.AppBottomNavigationBar
@@ -23,7 +26,7 @@ import com.woshiwangnima.healthdietpro.ui.test.TestFragment
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabPersistence
 import com.woshiwangnima.healthdietpro.util.applySystemBarInsets
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), TestFragment.TestAccessHost {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -47,6 +50,7 @@ class MainActivity : BaseActivity() {
     )
 
     private var selectedRoute by mutableStateOf(ROUTE_NUTRITION)
+    private var routeBeforeTest = ROUTE_NUTRITION
     private var lastBackPressedAt = 0L
     private var onboardingLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -82,6 +86,17 @@ class MainActivity : BaseActivity() {
         checkFirstLaunch()
     }
 
+    override fun onResume() {
+        super.onResume()
+        try {
+            window?.decorView?.windowInsetsController?.show(WindowInsets.Type.systemBars())
+        } catch (_: Exception) {
+        }
+        if (::binding.isInitialized) {
+            ViewCompat.requestApplyInsets(binding.main)
+        }
+    }
+
     private fun restoredRoute(): String {
         val index = TabPersistence.loadIndex(this, MAIN_NAV_KEY, 0)
         return navItems.getOrNull(index)?.item?.route ?: ROUTE_NUTRITION
@@ -107,12 +122,22 @@ class MainActivity : BaseActivity() {
         val index = navItems.indexOfFirst { it.item.route == route }
         if (index == -1) return
 
+        if (route == ROUTE_TEST && selectedRoute != ROUTE_TEST) {
+            routeBeforeTest = selectedRoute
+        }
         selectedRoute = route
-        TabPersistence.saveIndex(this, MAIN_NAV_KEY, index)
+        if (route != ROUTE_TEST) {
+            TabPersistence.saveIndex(this, MAIN_NAV_KEY, index)
+        }
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, navItems[index].fragmentFactory())
             .commit()
+    }
+
+    override fun onTestAccessCancelled() {
+        Log.d(TAG, "Test access cancelled; returning to $routeBeforeTest")
+        switchTab(routeBeforeTest)
     }
 
     private fun handleDoubleBackExit() {
@@ -131,6 +156,7 @@ class MainActivity : BaseActivity() {
     )
 
     private companion object {
+        const val TAG = "MainActivity"
         const val MAIN_NAV_KEY = "main_nav"
         const val BACK_EXIT_WINDOW_MS = 2_000L
         const val ROUTE_NUTRITION = "nutrition"

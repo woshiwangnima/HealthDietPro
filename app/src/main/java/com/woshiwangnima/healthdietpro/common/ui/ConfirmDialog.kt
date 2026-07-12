@@ -2,8 +2,8 @@ package com.woshiwangnima.healthdietpro.common.ui
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.woshiwangnima.healthdietpro.R
 
 @Composable
 fun ConfirmDialog(
@@ -19,14 +19,18 @@ fun ConfirmDialog(
         title = { Text(title) },
         text = { Text(message) },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(confirmText)
-            }
+            AppTextIconButton(
+                text = confirmText,
+                iconRes = R.drawable.ic_check,
+                onClick = onConfirm,
+            )
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(cancelText)
-            }
+            AppTextIconButton(
+                text = cancelText,
+                iconRes = R.drawable.ic_cancel,
+                onClick = onDismiss,
+            )
         },
     )
 }

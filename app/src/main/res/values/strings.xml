@@ -11,6 +11,19 @@
     <string name="tab_profile_title">Profile</string>
     <string name="tab_test_title">Test</string>
     <string name="tab_test_description">Use this page to verify new features and UI behavior.</string>
+    <string name="test_access_title">Test Access</string>
+    <string name="test_access_description">Enter the verification password to open test pages.</string>
+    <string name="test_access_password">Verification password</string>
+    <string name="test_access_error">Incorrect password</string>
+    <string name="test_access_confirm">Confirm</string>
+    <string name="test_access_cancel">Cancel</string>
+    <string name="test_access_clear">Clear</string>
+    <string name="test_access_backspace">Backspace</string>
+    <string name="software_keyboard_shift">Shift</string>
+    <string name="software_keyboard_letters">ABC</string>
+    <string name="software_keyboard_numbers">123</string>
+    <string name="software_keyboard_symbols">#+=</string>
+    <string name="software_keyboard_space">Space</string>
     <string name="onboarding_title">Welcome to Health Diet Plan</string>
     <string name="onboarding_message">For first use, please fill in your personal information so we can provide personalized dietary suggestions.</string>
     <string name="onboarding_start">Start</string>
@@ -57,6 +70,10 @@
     <string name="view_chart_height_bounds">Height Bounds</string>
     <string name="view_chart_x_axis_range_select_prompt">X-Axis Range Select Prompt</string>
     <string name="view_chart_x_axis_interval_select_prompt">X-Axis Interval Select Prompt</string>
+    <string name="view_chart_fullscreen">Fullscreen</string>
+    <string name="view_chart_exit_fullscreen">Exit fullscreen</string>
+    <string name="view_chart_pan_left">Pan left</string>
+    <string name="view_chart_pan_right">Pan right</string>
 
     <!-- Settings module -->
     <string name="settings_app_title">App Settings</string>
@@ -81,11 +98,84 @@
     <string name="body_record_count">%1$d records</string>
     <string name="body_record_add">Add Record</string>
     <string name="body_record_date">Date</string>
+    <string name="body_record_time">Time</string>
     <string name="body_record_value">Value</string>
     <string name="body_record_unit">Unit</string>
     <string name="body_record_delete">Delete</string>
     <string name="body_record_delete_confirm_title">Delete record?</string>
     <string name="body_record_delete_confirm_message">This record will be permanently deleted.</string>
+    <string name="body_record_add_height_title">Add height record</string>
+    <string name="body_record_edit_height_title">Edit height record</string>
+    <string name="body_record_add_weight_title">Add weight record</string>
+    <string name="body_record_edit_weight_title">Edit weight record</string>
+    <string name="body_record_height_help">Select measurement time and enter height. Unit: %1$s.</string>
+    <string name="body_record_weight_help">Select measurement time and enter weight. Unit: %1$s.</string>
+    <string name="body_record_value_required">Please enter a value</string>
+    <string name="body_record_value_invalid">Please enter a valid value</string>
+    <string name="body_record_cancel">Cancel</string>
+    <string name="body_record_save">Save</string>
+    <string name="medication_record_add">Add Medication</string>
+    <string name="medication_record_time">Time</string>
+    <string name="medication_record_name">Medication</string>
+    <string name="medication_record_dose">Dose</string>
+    <string name="medication_record_method">Method</string>
+    <string name="medication_record_feeling">Feeling</string>
+    <string name="medication_record_actions">Actions</string>
+    <string name="medication_record_empty">No medication records</string>
+    <string name="medication_record_delete_content_description">Delete medication record</string>
+    <string name="medication_record_delete_tooltip">Delete</string>
+    <string name="medication_record_delete_confirm_title">Delete medication record?</string>
+    <string name="medication_record_delete_confirm_message">Delete the record for %1$s?</string>
+    <string name="medication_record_title">Log Medication</string>
+    <string name="medication_record_edit_title">Edit Medication</string>
+    <string name="medication_record_time_select">Select time</string>
+    <string name="medication_record_name_hint">Select from history or enter a new name</string>
+    <string name="medication_record_dose_section">Dose and Unit</string>
+    <string name="medication_record_dose_value_hint">e.g. 1</string>
+    <string name="medication_record_dose_unit_hint">e.g. tablet</string>
+    <string name="medication_record_dose_help">Example: for 1 tablet of 25 mg, enter 1 and tablet here.</string>
+    <string name="medication_record_spec_section">Strength and Unit</string>
+    <string name="medication_record_spec_value_hint">e.g. 100</string>
+    <string name="medication_record_spec_category_select">Select category</string>
+    <string name="medication_record_spec_unit_select">Select unit</string>
+    <string name="medication_record_spec_help">Strength is saved with the selected unit from units.json.</string>
+    <string name="medication_record_feeling_section">Feeling</string>
+    <string name="medication_record_feeling_note_hint">Additional notes</string>
+    <string name="medication_record_photo_section">Photo</string>
+    <string name="medication_record_take_photo">Take Photo</string>
+    <string name="medication_record_pick_photo">Choose From Gallery</string>
+    <string name="medication_record_save">Save Record</string>
+    <string name="medication_record_saved">Saved</string>
+    <string name="medication_record_name_required">Please enter medication name</string>
+    <string name="medication_record_camera_permission_required">Camera permission is required to take photos</string>
+    <string name="medication_record_photo_load_failed">Unable to load photo</string>
+    <string name="medication_record_location_unknown">Location unavailable</string>
+    <string-array name="medication_record_default_feelings">
+        <item>Nausea</item>
+        <item>Constipation</item>
+        <item>Bloating</item>
+        <item>Diarrhea</item>
+        <item>Headache</item>
+        <item>Dizziness</item>
+        <item>Insomnia</item>
+        <item>Drowsiness</item>
+        <item>Rash</item>
+        <item>Palpitation</item>
+    </string-array>
+    <string-array name="medication_record_default_methods">
+        <item>Oral</item>
+        <item>Injection</item>
+        <item>Dissolved</item>
+        <item>Topical</item>
+        <item>Buccal</item>
+        <item>Sublingual</item>
+        <item>Oral inhalation</item>
+        <item>Nasal spray</item>
+        <item>Spray</item>
+        <item>Eye drops</item>
+        <item>Ear drops</item>
+        <item>Rectal</item>
+    </string-array>
 
     <!-- Compose/common UI previews -->
     <string name="compose_theme_preview_title">Compose Theme Preview</string>
@@ -101,6 +191,75 @@
     <string name="compose_confirm_dialog_ok">Confirm</string>
     <string name="compose_confirm_dialog_cancel">Cancel</string>
     <string name="compose_text_overflow_section">Text Overflow</string>
+    <string name="compose_chart_section">Compose Charts</string>
+    <string name="compose_chart_time_value_demo">Time-value chart</string>
+    <string name="compose_chart_numeric_xy_demo">Numeric XY chart</string>
+    <string name="compose_chart_category_demo">Category X chart</string>
+    <string name="compose_chart_percent_demo">Percent and negative values</string>
+    <string name="compose_chart_axis_position_demo">Axis position and pan areas</string>
+    <string name="compose_chart_range_band_demo">Range backgrounds and grid patterns</string>
+    <string name="compose_chart_derived_demo">Derived percentage series</string>
+    <string name="compose_chart_x_axis">X axis</string>
+    <string name="compose_chart_y_axis">Y axis</string>
+    <string name="compose_chart_more_styles">More styles</string>
+    <string name="compose_chart_style_settings">Chart style settings</string>
+    <string name="compose_chart_series_style_settings">%1$s style settings</string>
+    <string name="compose_chart_selected_series">Selected</string>
+    <string name="compose_chart_x_axis_bounds">X axis data bounds</string>
+    <string name="compose_chart_y_axis_bounds">Y axis data bounds</string>
+    <string name="compose_chart_x_window_mode">X range mode</string>
+    <string name="compose_chart_y_window_mode">Y range mode</string>
+    <string name="compose_chart_axis_window_percent_range">Single percent range</string>
+    <string name="compose_chart_axis_window_percent_bounds">Double percent bounds</string>
+    <string name="compose_chart_x_axis_side">X axis side</string>
+    <string name="compose_chart_y_axis_side">Y axis side</string>
+    <string name="compose_chart_y_axis_interval">Y axis interval</string>
+    <string name="compose_chart_x_grid">X grid</string>
+    <string name="compose_chart_y_grid">Y grid</string>
+    <string name="compose_chart_crosshair_basis">Crosshair basis</string>
+    <string name="compose_chart_crosshair_basis_x">X value</string>
+    <string name="compose_chart_crosshair_basis_y">Y value</string>
+    <string name="compose_chart_crosshair_basis_perpendicular_x">Perpendicular to X axis</string>
+    <string name="compose_chart_crosshair_basis_perpendicular_y">Perpendicular to Y axis</string>
+    <string name="compose_chart_x_pan_area">X pan area</string>
+    <string name="compose_chart_y_pan_area">Y pan area</string>
+    <string name="compose_chart_fullscreen_areas">Fullscreen areas</string>
+    <string name="compose_chart_fullscreen_area_settings">Chart settings area</string>
+    <string name="compose_chart_fullscreen_area_title">Title</string>
+    <string name="compose_chart_fullscreen_area_controls">Controls</string>
+    <string name="compose_chart_fullscreen_area_chart">Chart area</string>
+    <string name="compose_chart_fullscreen_area_chart_drawing">Chart drawing area</string>
+    <string name="compose_chart_fullscreen_area_pan">Enabled pan areas</string>
+    <string name="compose_chart_fullscreen_area_crosshair">Crosshair details</string>
+    <string name="compose_chart_fullscreen_area_legend">Legend</string>
+    <string name="compose_chart_fullscreen_area_data_legend">Data group legend area</string>
+    <string name="compose_chart_line_pattern">Line pattern</string>
+    <string name="compose_chart_point_shape">Point shape</string>
+    <string name="compose_chart_point_fill">Point fill</string>
+    <string name="compose_chart_x_ticks">X ticks</string>
+    <string name="compose_chart_y_ticks">Y ticks</string>
+    <string name="compose_chart_axis_left">Left</string>
+    <string name="compose_chart_axis_right">Right</string>
+    <string name="compose_chart_axis_top">Top</string>
+    <string name="compose_chart_axis_bottom">Bottom</string>
+    <string name="compose_chart_grid_solid">Solid</string>
+    <string name="compose_chart_grid_dashed">Dashed</string>
+    <string name="compose_chart_grid_dotted">Dotted</string>
+    <string name="compose_chart_grid_dot_dashed">Dot-dashed</string>
+    <string name="compose_chart_line_linear">Linear</string>
+    <string name="compose_chart_line_bezier">Bezier</string>
+    <string name="compose_chart_line_spline">Spline</string>
+    <string name="compose_chart_line_catmull_rom">Catmull-Rom</string>
+    <string name="compose_chart_line_monotone">Monotone</string>
+    <string name="compose_chart_line_step_front">Step front</string>
+    <string name="compose_chart_line_step_back">Step back</string>
+    <string name="compose_chart_point_circle">Circle</string>
+    <string name="compose_chart_point_triangle">Triangle</string>
+    <string name="compose_chart_point_square">Square</string>
+    <string name="compose_chart_point_diamond">Diamond</string>
+    <string name="compose_chart_point_cross">Cross</string>
+    <string name="compose_chart_point_filled">Filled</string>
+    <string name="compose_chart_point_hollow">Hollow</string>
 
     <!-- Text overflow settings -->
     <string name="text_overflow_section_title">Text Overflow</string>
@@ -132,4 +291,68 @@
     <string name="profile_separator"> | </string>
     <string name="profile_switch_user">Switch user</string>
     <string name="profile_user_info">User information</string>
+    <string name="profile_user_settings">User settings</string>
+    <string name="profile_user_settings_desc">Personal preferences and reminder settings</string>
+    <string name="profile_create_user">Add user</string>
+    <string name="profile_no_users">No users yet</string>
+    <string name="profile_current_user_marker">Current</string>
+    <string name="profile_delete_user_title">Delete user</string>
+    <string name="profile_delete_user_message">Delete "%1$s"? All data for this user will be cleared.</string>
+    <string name="profile_delete_user_confirm">Delete</string>
+    <string name="profile_delete_user_cancel">Cancel</string>
+    <string name="profile_edit_title">Personal information</string>
+    <string name="profile_edit_avatar_change">Tap to change avatar</string>
+    <string name="profile_edit_name">Name</string>
+    <string name="profile_edit_name_required">Please enter name</string>
+    <string name="profile_edit_gender">Gender</string>
+    <string name="profile_edit_gender_select">Select gender</string>
+    <string name="profile_edit_birthday">Birthday</string>
+    <string name="profile_edit_region">Region</string>
+    <string name="profile_edit_disease">Special medical history</string>
+    <string name="profile_edit_latest_height">Latest height</string>
+    <string name="profile_edit_latest_weight">Latest weight</string>
+    <string name="profile_edit_latest_bmi">Latest BMI</string>
+    <string name="profile_edit_no_record">No record</string>
+    <string name="profile_edit_none">None</string>
+    <string name="profile_edit_choose">Tap to select</string>
+    <string name="profile_edit_save">Save</string>
+    <string name="profile_edit_select_region">Select region</string>
+    <string name="profile_edit_use_current_location">Use current location</string>
+    <string name="profile_edit_select_region_manual">Select province/city/county manually</string>
+    <string name="profile_edit_locating_title">Locating</string>
+    <string name="profile_edit_locating_message">Getting current location...</string>
+    <string name="profile_edit_location_recognized">Recognized: %1$s</string>
+    <string name="profile_edit_location_unknown_province">Could not identify province for current location</string>
+    <string name="profile_edit_location_failed">Location failed (%1$s)</string>
+    <string name="profile_edit_select_province">Select province</string>
+    <string name="profile_edit_select_city">Select city</string>
+    <string name="profile_edit_select_district">Select county/district</string>
+    <string name="profile_edit_no_city_data">No city data for %1$s</string>
+    <string name="profile_edit_select_disease">Select special medical history</string>
+    <string name="profile_edit_avatar_load_failed">Unable to load image</string>
+    <string name="height_history_title">Height history</string>
+    <string name="weight_history_title">Weight history</string>
+    <string name="bmi_title">BMI</string>
+    <string name="bmi_history_title">BMI history</string>
+    <string name="bmi_entry_desc">View BMI trend, reference ranges, and calculator</string>
+    <string name="bmi_chart_title">BMI history</string>
+    <string name="bmi_unit_label">kg/m2</string>
+    <string name="bmi_record_count">Total %1$d records</string>
+    <string name="bmi_no_records">No BMI records yet</string>
+    <string name="bmi_reference_title">BMI China reference ranges</string>
+    <string name="bmi_reference_range">BMI range</string>
+    <string name="bmi_reference_category">Category</string>
+    <string name="bmi_underweight">Underweight</string>
+    <string name="bmi_normal">Normal</string>
+    <string name="bmi_overweight">Overweight</string>
+    <string name="bmi_obese">Obese</string>
+    <string name="bmi_unknown">Unknown</string>
+    <string name="bmi_calculator_title">BMI calculator</string>
+    <string name="bmi_height_label">Height (cm)</string>
+    <string name="bmi_weight_label">Weight (kg)</string>
+    <string name="bmi_result_empty">BMI: --</string>
+    <string name="bmi_result_value">BMI: %1$.1f (%2$s)</string>
+    <string name="bmi_result_prefix">BMI:</string>
+    <string name="bmi_result_colored_value">%1$.1f (%2$s)</string>
+    <string name="compose_chart_series_color">Color</string>
 </resources>

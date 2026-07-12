@@ -3,9 +3,11 @@ package com.woshiwangnima.healthdietpro.common.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -28,10 +31,11 @@ internal fun SettingRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     trailingValue: String = "",
+    trailingValueColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     clickable: Boolean = true,
 ) {
     val iconSize = with(LocalDensity.current) {
-        MaterialTheme.typography.titleLarge.fontSize.toDp()
+        MaterialTheme.typography.titleLarge.fontSize.toDp() + 6.dp
     }
     Row(
         modifier = modifier
@@ -43,11 +47,10 @@ internal fun SettingRow(
         Icon(
             painter = painterResource(leadingIconRes),
             contentDescription = null,
-            modifier = Modifier
-                .size(iconSize)
-                .padding(end = 12.dp),
+            modifier = Modifier.size(iconSize),
             tint = MaterialTheme.colorScheme.onSurface,
         )
+        Spacer(Modifier.width(12.dp))
         SettingTextContent(
             title = title,
             subtitle = subtitle,
@@ -57,7 +60,7 @@ internal fun SettingRow(
             Text(
                 text = trailingValue,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = trailingValueColor,
                 modifier = Modifier.padding(end = if (clickable) 4.dp else 0.dp),
             )
         }

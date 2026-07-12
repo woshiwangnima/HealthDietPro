@@ -13,7 +13,7 @@ data class Quantity(
 
     fun getDisplayName(unitRepo: UnitRepository): String {
         val unitDef = unitRepo.getUnit("time", unit)
-        val symbol = unitDef?.symbolCn ?: unit
+        val symbol = unitDef?.symbol() ?: unit
         if (value == value.toLong().toDouble()) {
             return "${value.toLong()}$symbol"
         }

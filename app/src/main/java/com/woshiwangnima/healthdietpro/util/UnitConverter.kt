@@ -9,7 +9,7 @@ object UnitConverter {
 
     fun init(context: Context) {
         appContext = context.applicationContext
-        repository = UnitRepository(context)
+        repository = UnitRepository.fromContext(context)
         repository?.getCategories()
     }
 
@@ -26,7 +26,7 @@ object UnitConverter {
 
     fun getRepository(): UnitRepository? {
         if (repository == null && appContext != null) {
-            repository = UnitRepository(appContext!!)
+            repository = UnitRepository.fromContext(appContext!!)
             repository?.getCategories()
         }
         return repository
@@ -48,7 +48,7 @@ object UnitConverter {
         val repo = repository ?: return "$baseValue"
         val unit = repo.getUnit(category, unitId) ?: return "$baseValue"
         val converted = fromBase(category, baseValue, unitId)
-        val symbol = if (locale == "zh") unit.symbolCn else unit.symbolEn
+        val symbol = unit.symbol(java.util.Locale.forLanguageTag(locale))
         return if (unitId == "ft") {
             formatHeightFtIn(baseValue)
         } else {

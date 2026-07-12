@@ -105,3 +105,46 @@ $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JA
 - 改动前查 `README.md` 与 `docs/DESIGN.md` 对应模块节。
 - 不改 `assets/*.json` 与 `res/raw/*` 除非明确要求。
 - 现状：XML + DataBinding 单 Activity 多 Fragment，Compose 未启用；本规范描述目标态，迁移按 DESIGN §10 推进。
+
+## Android Debug / Logcat commands
+
+Use absolute paths in PowerShell so another agent can reproduce device debugging without relying on PATH.
+
+```powershell
+# Paths
+$ProjectRoot = "C:\Users\WSW\AndroidStudioProjects\HealthDietPro"
+$Adb = "C:\Users\WSW\AppData\Local\Android\Sdk\platform-tools\adb.exe"
+$JavaHome = "C:\Program Files\Android\Android Studio\jbr"
+
+# Build debug APK
+Set-Location $ProjectRoot
+$env:JAVA_HOME = $JavaHome
+$env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+.\gradlew.bat assembleDebug
+
+# List devices and pick an id from the first column.
+& $Adb devices
+
+# Known device ids during the 2026-07-11 debug session:
+# emulator-5554
+# adb-d794c3f-uZefzR._adb-tls-connect._tcp
+
+# Install the current debug APK to a selected device.
+& $Adb -s emulator-5554 install -r "C:\Users\WSW\AndroidStudioProjects\HealthDietPro\app\build\outputs\apk\debug\app-debug.apk"
+
+# Clear logcat, start the app, then reproduce the bug manually or with input commands.
+& $Adb -s emulator-5554 logcat -c
+& $Adb -s emulator-5554 shell am start -n com.woshiwangnima.healthdietpro/.MainActivity
+
+# Useful UI inspection for Compose screens exposed through accessibility.
+& $Adb -s emulator-5554 shell wm size
+& $Adb -s emulator-5554 shell uiautomator dump /sdcard/window.xml
+& $Adb -s emulator-5554 shell cat /sdcard/window.xml
+
+# Focused crash logs after reproducing the issue.
+& $Adb -s emulator-5554 logcat -d -v time | Select-String -Pattern "FATAL EXCEPTION|AndroidRuntime|healthdietpro|MainActivity|TestFragment|ComponentsPreview|ComposeBaseChart" -Context 8,40
+& $Adb -s adb-d794c3f-uZefzR._adb-tls-connect._tcp logcat -d -v time | Select-String -Pattern "FATAL EXCEPTION|AndroidRuntime|healthdietpro|MainActivity|TestFragment|ComponentsPreview|ComposeBaseChart" -Context 8,40
+
+# IME / system navigation investigation on MIUI or real devices.
+& $Adb -s adb-d794c3f-uZefzR._adb-tls-connect._tcp logcat -d -v time | Select-String -Pattern "ImeTracker|Insets|BarFollowAnimation|NavigationBar|healthdietpro|MainActivity|TestFragment" -Context 4,16
+```

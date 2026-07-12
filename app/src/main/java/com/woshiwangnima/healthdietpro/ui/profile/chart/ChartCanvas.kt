@@ -29,6 +29,14 @@ class ChartCanvas @JvmOverloads constructor(
     var autoIntervalResolver: ((Long) -> Long)? = null
     var dateFormatResolver: ((Long) -> String?)? = null
     var gridLineStyles: List<LineType> = listOf(LineType.DOTTED)
+    var xGridLineStyles: List<LineType> = emptyList()
+    var xAxisBands: List<XAxisBand> = emptyList()
+    var yAxisPosition: ChartVerticalAxisPosition = ChartVerticalAxisPosition.Right
+    var xAxisPosition: ChartHorizontalAxisPosition = ChartHorizontalAxisPosition.Bottom
+    var yValueFormatter: (Float) -> String = { value -> "%.0f".format(value) }
+    var xValueFormatter: ((timestamp: Long, intervalMs: Long) -> String)? = null
+    var crosshairValueFormatter: ((value: Float, unitLabel: String) -> String)? = null
+    var crosshairTimeFormatter: ((timestamp: Long) -> String)? = null
 
     private var touchX: Float = -1f
     private var touchY: Float = -1f
@@ -72,10 +80,24 @@ class ChartCanvas @JvmOverloads constructor(
     }
 
     private val density: Float get() = resources.displayMetrics.density
-    private val paddingLeft = 16f
-    private val paddingRight = 72f
-    private val paddingTop = 20f
-    private val paddingBottom = 50f
+    private val axisLabelPadding = 72f
+    private val contentPadding = 16f
+    private val xAxisLabelPadding = 50f
+    private val topContentPadding = 20f
+
+    fun applyStyle(style: ChartCanvasStyle) {
+        yAxisPosition = style.yAxisPosition
+        xAxisPosition = style.xAxisPosition
+        gridLineStyles = style.yGridLineStyles
+        xGridLineStyles = style.xGridLineStyles
+        yAxisBands = style.yAxisBands
+        xAxisBands = style.xAxisBands
+        yValueFormatter = style.yValueFormatter
+        xValueFormatter = style.xValueFormatter
+        crosshairValueFormatter = style.crosshairValueFormatter
+        crosshairTimeFormatter = style.crosshairTimeFormatter
+        invalidate()
+    }
 
     private fun resolveThemeColors() {
         val onSurface = resolveColorAttr(com.google.android.material.R.attr.colorOnSurface)
@@ -134,9 +156,11 @@ class ChartCanvas @JvmOverloads constructor(
     fun crosshairActive(): Boolean = persistedCrossVisible
 
     private fun updateCrosshair() {
-        val chartW = width - paddingLeft - paddingRight
+        val chartL = if (yAxisPosition == ChartVerticalAxisPosition.Left) axisLabelPadding else contentPadding
+        val chartR = width - if (yAxisPosition == ChartVerticalAxisPosition.Right) axisLabelPadding else contentPadding
+        val chartW = chartR - chartL
         if (chartW <= 0) return
-        val xFraction = ((touchX - paddingLeft) / chartW).coerceIn(0f, 1f)
+        val xFraction = ((touchX - chartL) / chartW).coerceIn(0f, 1f)
         val touchTs = windowStartMs + (xFraction * visibleRangeMs).toLong()
         val primarySeries = series.firstOrNull() ?: return
         val entries = ChartMath.toChartEntries(primarySeries.points, windowStartMs)
@@ -146,8 +170,10 @@ class ChartCanvas @JvmOverloads constructor(
         persistedCrossX = touchX; persistedCrossY = touchY; persistedCrossVisible = true
         val instant = Instant.ofEpochMilli(touchTs)
         val localDt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        persistedCrossDate = localDt.format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))
-        persistedCrossValue = "%.1f %s".format(y, unitLabel)
+        persistedCrossDate = crosshairTimeFormatter?.invoke(touchTs)
+            ?: localDt.format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))
+        persistedCrossValue = crosshairValueFormatter?.invoke(y, unitLabel)
+            ?: "%.1f %s".format(y, unitLabel)
         onCrosshairUpdate?.invoke(persistedCrossDate, persistedCrossValue)
     }
 
@@ -156,8 +182,10 @@ class ChartCanvas @JvmOverloads constructor(
         if (!themeResolved) resolveThemeColors()
 
         val w = width.toFloat(); val h = height.toFloat()
-        val chartL = paddingLeft; val chartT = paddingTop
-        val chartR = w - paddingRight; val chartB = h - paddingBottom
+        val chartL = if (yAxisPosition == ChartVerticalAxisPosition.Left) axisLabelPadding else contentPadding
+        val chartT = if (xAxisPosition == ChartHorizontalAxisPosition.Top) xAxisLabelPadding else topContentPadding
+        val chartR = w - if (yAxisPosition == ChartVerticalAxisPosition.Right) axisLabelPadding else contentPadding
+        val chartB = h - if (xAxisPosition == ChartHorizontalAxisPosition.Bottom) xAxisLabelPadding else topContentPadding
         val chartW = chartR - chartL; val chartH = chartB - chartT
         if (chartW <= 0 || chartH <= 0) return
 
@@ -165,12 +193,22 @@ class ChartCanvas @JvmOverloads constructor(
         val yRange = if (yMax > yMin) yMax - yMin else 1f
         fun screenY(yVal: Float) = chartB - ((yVal - yMin) / yRange) * chartH
 
-        // Layer 1: Y-axis background color bands
+        // Layer 1: range background color bands
         for (band in yAxisBands) {
             val bTop = screenY(band.maxValue.coerceAtMost(yMax).coerceAtLeast(yMin))
             val bBot = screenY(band.minValue.coerceAtLeast(yMin).coerceAtMost(yMax))
             val bandPaint = Paint().apply { color = band.color; style = Paint.Style.FILL }
             canvas.drawRect(chartL, bTop, chartR, bBot, bandPaint)
+        }
+        for (band in xAxisBands) {
+            val start = band.minTimestamp.coerceAtLeast(windowStartMs)
+            val end = band.maxTimestamp.coerceAtMost(windowStartMs + visibleRangeMs)
+            if (end > start) {
+                val left = chartL + ((start - windowStartMs).toFloat() / visibleRangeMs.toFloat()) * chartW
+                val right = chartL + ((end - windowStartMs).toFloat() / visibleRangeMs.toFloat()) * chartW
+                val bandPaint = Paint().apply { color = band.color; style = Paint.Style.FILL }
+                canvas.drawRect(left, chartT, right, chartB, bandPaint)
+            }
         }
 
         // Layer 2: Y-axis grid lines (alternating styles) + X/Y axis frame
@@ -185,21 +223,28 @@ class ChartCanvas @JvmOverloads constructor(
                 gridPaint.pathEffect = lineTypeToEffect(styles[i % styles.size])
             }
             canvas.drawLine(chartL, py, chartR, py, gridPaint)
-            canvas.drawText("%.0f".format(yVal), w - 4f, py + 8f, axisTextPaint)
+            axisTextPaint.textAlign = if (yAxisPosition == ChartVerticalAxisPosition.Left) {
+                Paint.Align.RIGHT
+            } else {
+                Paint.Align.LEFT
+            }
+            val labelX = if (yAxisPosition == ChartVerticalAxisPosition.Left) chartL - 6f else chartR + 6f
+            canvas.drawText(yValueFormatter(yVal), labelX, py + 8f, axisTextPaint)
         }
         gridPaint.pathEffect = null
-        // X-axis line (bottom) and Y-axis line (right side)
-        canvas.drawLine(chartL, chartB, chartR, chartB, axisPaint)
-        canvas.drawLine(chartR, chartT, chartR, chartB, axisPaint)
+        val xAxisY = if (xAxisPosition == ChartHorizontalAxisPosition.Top) chartT else chartB
+        val yAxisX = if (yAxisPosition == ChartVerticalAxisPosition.Left) chartL else chartR
+        canvas.drawLine(chartL, xAxisY, chartR, xAxisY, axisPaint)
+        canvas.drawLine(yAxisX, chartT, yAxisX, chartB, axisPaint)
 
         // Layer 3: X-axis interval tick marks (same level as Y-axis grid)
-        drawXAxisTicks(canvas, chartL, chartB, chartR, chartW)
+        drawXAxisTicks(canvas, chartL, chartT, chartB, chartR, chartW)
 
         // Layer 4: Series data
         for (s in series) drawSeries(canvas, s, chartL, chartT, chartR, chartB, chartW, chartH, yMin, yRange)
 
         // Layer 5: X-axis labels
-        drawXAxisLabels(canvas, chartL, chartB, chartR, chartW)
+        drawXAxisLabels(canvas, chartL, chartT, chartB, chartR, chartW)
 
         // Layer 6: Crosshair overlay
         if (allDataPoints.size >= 2) drawCrosshairOverlay(canvas, chartL, chartT, chartR, chartB, chartW, chartH, yMin, yRange)
@@ -289,7 +334,7 @@ class ChartCanvas @JvmOverloads constructor(
         return autoIntervalResolver?.invoke(visibleRangeMs) ?: ChartMath.computeLabelInterval(visibleRangeMs)
     }
 
-    private fun drawXAxisTicks(canvas: Canvas, l: Float, b: Float, r: Float, cw: Float) {
+    private fun drawXAxisTicks(canvas: Canvas, l: Float, t: Float, b: Float, r: Float, cw: Float) {
         val interval = computeEffectiveInterval()
         val tickH = when {
             interval < 60_000L -> 4f * density
@@ -304,14 +349,21 @@ class ChartCanvas @JvmOverloads constructor(
         while (ts <= windowStartMs + visibleRangeMs && tickCount < 5000) {
             val px = l + ((ts - windowStartMs).toFloat() / visibleRangeMs.toFloat()) * cw
             if (px in l..r) {
-                canvas.drawLine(px, b, px, b - tickH, tickPaint)
+                if (xGridLineStyles.isNotEmpty()) {
+                    gridPaint.pathEffect = lineTypeToEffect(xGridLineStyles[tickCount % xGridLineStyles.size])
+                    canvas.drawLine(px, t, px, b, gridPaint)
+                    gridPaint.pathEffect = null
+                }
+                val axisY = if (xAxisPosition == ChartHorizontalAxisPosition.Top) t else b
+                val tickEnd = if (xAxisPosition == ChartHorizontalAxisPosition.Top) axisY + tickH else axisY - tickH
+                canvas.drawLine(px, axisY, px, tickEnd, tickPaint)
             }
             ts += interval
             tickCount++
         }
     }
 
-    private fun drawXAxisLabels(canvas: Canvas, l: Float, b: Float, r: Float, cw: Float) {
+    private fun drawXAxisLabels(canvas: Canvas, l: Float, t: Float, b: Float, r: Float, cw: Float) {
         val interval = computeEffectiveInterval()
         val formatStr = dateFormatResolver?.invoke(interval)
         val fmt = if (!formatStr.isNullOrEmpty()) {
@@ -327,8 +379,12 @@ class ChartCanvas @JvmOverloads constructor(
         var labelCount = 0
         while (ts <= windowStartMs + visibleRangeMs && labelCount < 5000) {
             val px = l + ((ts - windowStartMs).toFloat() / visibleRangeMs.toFloat()) * cw
-            if (px in l..r) canvas.drawText(
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneId.systemDefault()).format(fmt), px, b + 32f, xAxisTextPaint)
+            if (px in l..r) {
+                val label = xValueFormatter?.invoke(ts, interval)
+                    ?: LocalDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneId.systemDefault()).format(fmt)
+                val y = if (xAxisPosition == ChartHorizontalAxisPosition.Top) t - 14f else b + 32f
+                canvas.drawText(label, px, y, xAxisTextPaint)
+            }
             ts += interval
             labelCount++
         }
@@ -355,9 +411,12 @@ class ChartCanvas @JvmOverloads constructor(
         circlePaint.color = primarySeries.color; canvas.drawCircle(px, py, 6f, circlePaint)
 
         if (!hasTouch) {
-            val instant = Instant.ofEpochMilli(windowStartMs + xVal.toLong())
-            persistedCrossDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))
-            persistedCrossValue = "%.1f %s".format(yVal, unitLabel)
+            val timestamp = windowStartMs + xVal.toLong()
+            val instant = Instant.ofEpochMilli(timestamp)
+            persistedCrossDate = crosshairTimeFormatter?.invoke(timestamp)
+                ?: LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))
+            persistedCrossValue = crosshairValueFormatter?.invoke(yVal, unitLabel)
+                ?: "%.1f %s".format(yVal, unitLabel)
         }
         drawInfoBubble(canvas, px, py, persistedCrossDate, persistedCrossValue, l, t, r, b)
     }

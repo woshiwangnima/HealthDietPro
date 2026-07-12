@@ -6,9 +6,11 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -114,7 +116,7 @@ fun AppSettingsScreen(
             SettingRow(
                 title = stringResource(R.string.settings_clear_cache),
                 subtitle = stringResource(R.string.settings_clear_cache_desc),
-                leadingIconRes = R.drawable.ic_broom,
+                leadingIconRes = R.drawable.ic_cleaning_services,
                 trailingValue = uiState.cacheSizeText,
                 onClick = { showClearCacheConfirm = true },
             )
@@ -126,16 +128,15 @@ fun AppSettingsScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     val iconSize = with(LocalDensity.current) {
-                        MaterialTheme.typography.titleLarge.fontSize.toDp()
+                        MaterialTheme.typography.titleLarge.fontSize.toDp() + 6.dp
                     }
                     Icon(
-                        painter = painterResource(R.drawable.ic_preferences),
+                        painter = painterResource(R.drawable.ic_font_size),
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(iconSize)
-                            .padding(end = 12.dp),
+                        modifier = Modifier.size(iconSize),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
+                    Spacer(Modifier.width(12.dp))
                     SettingTextContent(
                         title = stringResource(R.string.settings_default_font_size),
                         subtitle = stringResource(R.string.settings_default_font_size_desc),

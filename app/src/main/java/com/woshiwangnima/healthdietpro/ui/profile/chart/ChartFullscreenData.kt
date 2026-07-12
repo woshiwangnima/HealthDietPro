@@ -9,6 +9,7 @@ data class ChartFullscreenData(
     val yMaxPct: Float,
     val labelIntervalMs: Long,
     val yAxisBands: List<YAxisBand>,
+    val canvasStyle: ChartCanvasStyle = ChartCanvasStyle(yAxisBands = yAxisBands),
     val chartTitle: String,
     val chartStateKey: String
 )

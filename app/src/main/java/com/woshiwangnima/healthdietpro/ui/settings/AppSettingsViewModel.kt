@@ -93,7 +93,7 @@ class AppSettingsViewModel(application: Application) : AndroidViewModel(applicat
             ?: storage.units.firstOrNull()
             ?: return formatLegacy(bytes)
         val converted = UnitConverter.fromBase(UnitCategoryType.Storage.id, bytes.toFloat(), best.id)
-        val symbol = best.symbolCn
+        val symbol = best.symbol()
         return if (best.id == "b" || best.id == "kb") {
             "%.0f %s".format(converted, symbol)
         } else {

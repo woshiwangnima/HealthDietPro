@@ -62,13 +62,17 @@ internal fun ProfileUserInfoCard(
                 ProfileAvatar(state = state)
                 IconButton(
                     onClick = onSwitchUser,
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier
+                        .width(44.dp)
+                        .height(32.dp),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_switch_user),
                         contentDescription = stringResource(R.string.profile_switch_user),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier
+                            .width(30.dp)
+                            .height(24.dp),
                     )
                 }
             }
@@ -88,6 +92,10 @@ internal fun ProfileUserInfoCard(
                 )
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    val infoSegments = state.infoLine
+                        .split("|")
+                        .map { it.trim() }
+                        .filter { it.isNotBlank() }
                     if (state.genderIcon.isNotBlank()) {
                         Text(
                             text = state.genderIcon,
@@ -96,13 +104,29 @@ internal fun ProfileUserInfoCard(
                         )
                         Spacer(Modifier.width(2.dp))
                     }
-                    Text(
-                        text = state.infoLine,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    infoSegments.forEachIndexed { index, segment ->
+                        if (index > 0) {
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.profile_separator),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(Modifier.width(8.dp))
+                        }
+                        TextOverflowText(
+                            text = segment,
+                            modifier = Modifier.weight(
+                                when (index) {
+                                    0 -> 0.72f
+                                    1 -> 0.78f
+                                    else -> 1.55f
+                                },
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
                 Spacer(Modifier.height(2.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -113,11 +137,13 @@ internal fun ProfileUserInfoCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     if (state.hasDiseaseText) {
+                        Spacer(Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.profile_separator),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        Spacer(Modifier.width(8.dp))
                         TextOverflowText(
                             text = state.diseaseText,
                             modifier = Modifier.weight(1f),

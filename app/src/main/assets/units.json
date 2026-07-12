@@ -1,132 +1,1062 @@
 [
   {
     "id": "length",
-    "categoryCn": "长度",
-    "categoryEn": "Length",
     "baseUnit": "cm",
     "units": [
-      { "id": "nm",    "symbolCn": "纳米(奈米)",          "symbolEn": "nm",   "toBase": 1e-7,    "hidden": false },
-      { "id": "μm",    "symbolCn": "微米(µm)",            "symbolEn": "µm",   "toBase": 0.0001,  "hidden": false },
-      { "id": "mm",    "symbolCn": "毫米(公厘)",           "symbolEn": "mm",    "toBase": 0.1,    "hidden": false },
-      { "id": "cm",    "symbolCn": "厘米(公分)",           "symbolEn": "cm",    "toBase": 1.0,    "hidden": false },
-      { "id": "dm",    "symbolCn": "分米(公寸)",           "symbolEn": "dm",    "toBase": 10.0,   "hidden": false },
-      { "id": "m",     "symbolCn": "米(公尺)",             "symbolEn": "m",     "toBase": 100.0,  "hidden": false },
-      { "id": "km",    "symbolCn": "千米(公里)",           "symbolEn": "km",    "toBase": 100000.0, "hidden": false },
-      { "id": "li",    "symbolCn": "里(华里)",             "symbolEn": "li",    "toBase": 50000.0, "hidden": false },
-      { "id": "zhang", "symbolCn": "丈",                   "symbolEn": "zhang", "toBase": 333.333, "hidden": false },
-      { "id": "chi",   "symbolCn": "尺(市尺)",             "symbolEn": "chi",   "toBase": 33.3333, "hidden": false },
-      { "id": "cun",   "symbolCn": "寸(市寸)",             "symbolEn": "cun",   "toBase": 3.33333, "hidden": false },
-      { "id": "fen",   "symbolCn": "分(市分)",             "symbolEn": "fen",   "toBase": 0.333333,"hidden": false },
-      { "id": "in",    "symbolCn": "英寸(吋)",             "symbolEn": "in",    "toBase": 2.54,    "hidden": false },
-      { "id": "ft",    "symbolCn": "英尺(呎)",             "symbolEn": "ft",    "toBase": 30.48,   "hidden": false },
-      { "id": "yd",    "symbolCn": "码",                   "symbolEn": "yd",    "toBase": 91.44,   "hidden": false },
-      { "id": "mi",    "symbolCn": "英里(哩)",             "symbolEn": "mi",    "toBase": 160934.4,"hidden": false },
-      { "id": "nmi",   "symbolCn": "海里(海哩)",           "symbolEn": "nmi",   "toBase": 185200.0,"hidden": false }
-    ]
+      {
+        "id": "nm",
+        "toBase": 1e-07,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "纳米(奈米)"
+          },
+          "en": {
+            "symbol": "nm"
+          }
+        }
+      },
+      {
+        "id": "μm",
+        "toBase": 0.0001,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "微米(µm)"
+          },
+          "en": {
+            "symbol": "µm"
+          }
+        }
+      },
+      {
+        "id": "mm",
+        "toBase": 0.1,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "毫米(公厘)"
+          },
+          "en": {
+            "symbol": "mm"
+          }
+        }
+      },
+      {
+        "id": "cm",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "厘米(公分)"
+          },
+          "en": {
+            "symbol": "cm"
+          }
+        }
+      },
+      {
+        "id": "dm",
+        "toBase": 10.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "分米(公寸)"
+          },
+          "en": {
+            "symbol": "dm"
+          }
+        }
+      },
+      {
+        "id": "m",
+        "toBase": 100.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "米(公尺)"
+          },
+          "en": {
+            "symbol": "m"
+          }
+        }
+      },
+      {
+        "id": "km",
+        "toBase": 100000.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "千米(公里)"
+          },
+          "en": {
+            "symbol": "km"
+          }
+        }
+      },
+      {
+        "id": "li",
+        "toBase": 50000.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "里(华里)"
+          },
+          "en": {
+            "symbol": "li"
+          }
+        }
+      },
+      {
+        "id": "zhang",
+        "toBase": 333.333,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "丈"
+          },
+          "en": {
+            "symbol": "zhang"
+          }
+        }
+      },
+      {
+        "id": "chi",
+        "toBase": 33.3333,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "尺(市尺)"
+          },
+          "en": {
+            "symbol": "chi"
+          }
+        }
+      },
+      {
+        "id": "cun",
+        "toBase": 3.33333,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "寸(市寸)"
+          },
+          "en": {
+            "symbol": "cun"
+          }
+        }
+      },
+      {
+        "id": "fen",
+        "toBase": 0.333333,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "分(市分)"
+          },
+          "en": {
+            "symbol": "fen"
+          }
+        }
+      },
+      {
+        "id": "in",
+        "toBase": 2.54,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "英寸(吋)"
+          },
+          "en": {
+            "symbol": "in"
+          }
+        }
+      },
+      {
+        "id": "ft",
+        "toBase": 30.48,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "英尺(呎)"
+          },
+          "en": {
+            "symbol": "ft"
+          }
+        }
+      },
+      {
+        "id": "yd",
+        "toBase": 91.44,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "码"
+          },
+          "en": {
+            "symbol": "yd"
+          }
+        }
+      },
+      {
+        "id": "mi",
+        "toBase": 160934.4,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "英里(哩)"
+          },
+          "en": {
+            "symbol": "mi"
+          }
+        }
+      },
+      {
+        "id": "nmi",
+        "toBase": 185200.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "海里(海哩)"
+          },
+          "en": {
+            "symbol": "nmi"
+          }
+        }
+      }
+    ],
+    "i18n": {
+      "zh": {
+        "label": "长度"
+      },
+      "en": {
+        "label": "Length"
+      }
+    }
   },
   {
     "id": "weight",
-    "categoryCn": "重量",
-    "categoryEn": "Weight",
     "baseUnit": "kg",
     "units": [
-      { "id": "mcg",   "symbolCn": "微克(µg)",             "symbolEn": "µg",      "toBase": 1e-9,   "hidden": false },
-      { "id": "mg",    "symbolCn": "毫克(公丝)",           "symbolEn": "mg",      "toBase": 1e-6,   "hidden": false },
-      { "id": "ct",    "symbolCn": "克拉",                 "symbolEn": "ct",      "toBase": 0.0002, "hidden": false },
-      { "id": "g",     "symbolCn": "克(公克)",             "symbolEn": "g",       "toBase": 0.001,  "hidden": false },
-      { "id": "kg",    "symbolCn": "千克(公斤)",           "symbolEn": "kg",      "toBase": 1.0,    "hidden": false },
-      { "id": "t",     "symbolCn": "吨(公吨)",             "symbolEn": "t",       "toBase": 1000.0, "hidden": false },
-      { "id": "qian",  "symbolCn": "钱(市钱)",             "symbolEn": "qian",    "toBase": 0.005,  "hidden": false },
-      { "id": "liang", "symbolCn": "两(市两)",             "symbolEn": "liang",   "toBase": 0.05,   "hidden": false },
-      { "id": "jin",   "symbolCn": "斤(市斤)",             "symbolEn": "jin",     "toBase": 0.5,    "hidden": false },
-      { "id": "dan",   "symbolCn": "担(市担)",             "symbolEn": "dan",     "toBase": 50.0,   "hidden": false },
-      { "id": "oz",    "symbolCn": "盎司(安士)",           "symbolEn": "oz",      "toBase": 0.0283495,"hidden": false },
-      { "id": "lb",    "symbolCn": "磅(英磅)",             "symbolEn": "lb",      "toBase": 0.453592,"hidden": false },
-      { "id": "st",    "symbolCn": "英石",                 "symbolEn": "st",      "toBase": 6.35029, "hidden": false },
-      { "id": "qr",    "symbolCn": "夸特(英夸)",           "symbolEn": "qr",      "toBase": 12.7006, "hidden": false },
-      { "id": "cwt",   "symbolCn": "英担",                 "symbolEn": "cwt",     "toBase": 50.8023, "hidden": false },
-      { "id": "slug",  "symbolCn": "斯勒格",               "symbolEn": "slug",    "toBase": 14.5939, "hidden": false }
-    ]
+      {
+        "id": "mcg",
+        "toBase": 1e-09,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "微克(µg)"
+          },
+          "en": {
+            "symbol": "µg"
+          }
+        }
+      },
+      {
+        "id": "mg",
+        "toBase": 1e-06,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "毫克(公丝)"
+          },
+          "en": {
+            "symbol": "mg"
+          }
+        }
+      },
+      {
+        "id": "ct",
+        "toBase": 0.0002,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "克拉"
+          },
+          "en": {
+            "symbol": "ct"
+          }
+        }
+      },
+      {
+        "id": "g",
+        "toBase": 0.001,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "克(公克)"
+          },
+          "en": {
+            "symbol": "g"
+          }
+        }
+      },
+      {
+        "id": "kg",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "千克(公斤)"
+          },
+          "en": {
+            "symbol": "kg"
+          }
+        }
+      },
+      {
+        "id": "t",
+        "toBase": 1000.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "吨(公吨)"
+          },
+          "en": {
+            "symbol": "t"
+          }
+        }
+      },
+      {
+        "id": "qian",
+        "toBase": 0.005,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "钱(市钱)"
+          },
+          "en": {
+            "symbol": "qian"
+          }
+        }
+      },
+      {
+        "id": "liang",
+        "toBase": 0.05,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "两(市两)"
+          },
+          "en": {
+            "symbol": "liang"
+          }
+        }
+      },
+      {
+        "id": "jin",
+        "toBase": 0.5,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "斤(市斤)"
+          },
+          "en": {
+            "symbol": "jin"
+          }
+        }
+      },
+      {
+        "id": "dan",
+        "toBase": 50.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "担(市担)"
+          },
+          "en": {
+            "symbol": "dan"
+          }
+        }
+      },
+      {
+        "id": "oz",
+        "toBase": 0.0283495,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "盎司(安士)"
+          },
+          "en": {
+            "symbol": "oz"
+          }
+        }
+      },
+      {
+        "id": "lb",
+        "toBase": 0.453592,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "磅(英磅)"
+          },
+          "en": {
+            "symbol": "lb"
+          }
+        }
+      },
+      {
+        "id": "st",
+        "toBase": 6.35029,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "英石"
+          },
+          "en": {
+            "symbol": "st"
+          }
+        }
+      },
+      {
+        "id": "qr",
+        "toBase": 12.7006,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "夸特(英夸)"
+          },
+          "en": {
+            "symbol": "qr"
+          }
+        }
+      },
+      {
+        "id": "cwt",
+        "toBase": 50.8023,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "英担"
+          },
+          "en": {
+            "symbol": "cwt"
+          }
+        }
+      },
+      {
+        "id": "slug",
+        "toBase": 14.5939,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "斯勒格"
+          },
+          "en": {
+            "symbol": "slug"
+          }
+        }
+      }
+    ],
+    "i18n": {
+      "zh": {
+        "label": "重量"
+      },
+      "en": {
+        "label": "Weight"
+      }
+    }
   },
   {
     "id": "volume",
-    "categoryCn": "体积",
-    "categoryEn": "Volume",
     "baseUnit": "l",
     "units": [
-      { "id": "ml",    "symbolCn": "毫升(毫公升)",         "symbolEn": "mL",      "toBase": 0.001,  "hidden": false },
-      { "id": "cl",    "symbolCn": "厘升(公勺)",           "symbolEn": "cL",      "toBase": 0.01,   "hidden": false },
-      { "id": "dl",    "symbolCn": "分升(公合)",           "symbolEn": "dL",      "toBase": 0.1,    "hidden": false },
-      { "id": "l",     "symbolCn": "升(公升)",             "symbolEn": "L",       "toBase": 1.0,    "hidden": false },
-      { "id": "dal",   "symbolCn": "十升(公斗)",           "symbolEn": "daL",     "toBase": 10.0,   "hidden": false },
-      { "id": "hl",    "symbolCn": "百升(公石)",           "symbolEn": "hL",      "toBase": 100.0,  "hidden": false },
-      { "id": "kl",    "symbolCn": "千升(公秉)",           "symbolEn": "kL",      "toBase": 1000.0, "hidden": false },
-      { "id": "dou",   "symbolCn": "斗",                   "symbolEn": "dou",     "toBase": 10.0,   "hidden": false },
-      { "id": "sheng", "symbolCn": "市升",                 "symbolEn": "sheng",   "toBase": 1.0,    "hidden": false },
-      { "id": "he",    "symbolCn": "合",                   "symbolEn": "he",      "toBase": 0.1,    "hidden": false },
-      { "id": "tsp",   "symbolCn": "茶匙(小匙)",           "symbolEn": "tsp",     "toBase": 0.00492892,"hidden": false },
-      { "id": "tbsp",  "symbolCn": "汤匙(大匙)",           "symbolEn": "tbsp",    "toBase": 0.0147868,"hidden": false },
-      { "id": "floz",  "symbolCn": "液量盎司(盎司)",       "symbolEn": "fl oz",   "toBase": 0.0295735,"hidden": false },
-      { "id": "cup",   "symbolCn": "杯(量杯)",             "symbolEn": "cup",     "toBase": 0.236588,"hidden": false },
-      { "id": "pt",    "symbolCn": "品脱",                 "symbolEn": "pt",      "toBase": 0.473176,"hidden": false },
-      { "id": "qt",    "symbolCn": "夸脱(夸)",             "symbolEn": "qt",      "toBase": 0.946353,"hidden": false },
-      { "id": "gal",   "symbolCn": "加仑(美制加仑)",       "symbolEn": "gal",     "toBase": 3.78541, "hidden": false },
-      { "id": "bbl",   "symbolCn": "桶(美制桶)",           "symbolEn": "bbl",     "toBase": 158.987, "hidden": false }
-    ]
+      {
+        "id": "ml",
+        "toBase": 0.001,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "毫升(毫公升)"
+          },
+          "en": {
+            "symbol": "mL"
+          }
+        }
+      },
+      {
+        "id": "cl",
+        "toBase": 0.01,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "厘升(公勺)"
+          },
+          "en": {
+            "symbol": "cL"
+          }
+        }
+      },
+      {
+        "id": "dl",
+        "toBase": 0.1,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "分升(公合)"
+          },
+          "en": {
+            "symbol": "dL"
+          }
+        }
+      },
+      {
+        "id": "l",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "升(公升)"
+          },
+          "en": {
+            "symbol": "L"
+          }
+        }
+      },
+      {
+        "id": "dal",
+        "toBase": 10.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "十升(公斗)"
+          },
+          "en": {
+            "symbol": "daL"
+          }
+        }
+      },
+      {
+        "id": "hl",
+        "toBase": 100.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "百升(公石)"
+          },
+          "en": {
+            "symbol": "hL"
+          }
+        }
+      },
+      {
+        "id": "kl",
+        "toBase": 1000.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "千升(公秉)"
+          },
+          "en": {
+            "symbol": "kL"
+          }
+        }
+      },
+      {
+        "id": "dou",
+        "toBase": 10.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "斗"
+          },
+          "en": {
+            "symbol": "dou"
+          }
+        }
+      },
+      {
+        "id": "sheng",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "市升"
+          },
+          "en": {
+            "symbol": "sheng"
+          }
+        }
+      },
+      {
+        "id": "he",
+        "toBase": 0.1,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "合"
+          },
+          "en": {
+            "symbol": "he"
+          }
+        }
+      },
+      {
+        "id": "tsp",
+        "toBase": 0.00492892,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "茶匙(小匙)"
+          },
+          "en": {
+            "symbol": "tsp"
+          }
+        }
+      },
+      {
+        "id": "tbsp",
+        "toBase": 0.0147868,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "汤匙(大匙)"
+          },
+          "en": {
+            "symbol": "tbsp"
+          }
+        }
+      },
+      {
+        "id": "floz",
+        "toBase": 0.0295735,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "液量盎司(盎司)"
+          },
+          "en": {
+            "symbol": "fl oz"
+          }
+        }
+      },
+      {
+        "id": "cup",
+        "toBase": 0.236588,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "杯(量杯)"
+          },
+          "en": {
+            "symbol": "cup"
+          }
+        }
+      },
+      {
+        "id": "pt",
+        "toBase": 0.473176,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "品脱"
+          },
+          "en": {
+            "symbol": "pt"
+          }
+        }
+      },
+      {
+        "id": "qt",
+        "toBase": 0.946353,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "夸脱(夸)"
+          },
+          "en": {
+            "symbol": "qt"
+          }
+        }
+      },
+      {
+        "id": "gal",
+        "toBase": 3.78541,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "加仑(美制加仑)"
+          },
+          "en": {
+            "symbol": "gal"
+          }
+        }
+      },
+      {
+        "id": "bbl",
+        "toBase": 158.987,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "桶(美制桶)"
+          },
+          "en": {
+            "symbol": "bbl"
+          }
+        }
+      }
+    ],
+    "i18n": {
+      "zh": {
+        "label": "体积"
+      },
+      "en": {
+        "label": "Volume"
+      }
+    }
   },
   {
     "id": "density",
-    "categoryCn": "密度",
-    "categoryEn": "Density",
     "baseUnit": "g_ml",
     "units": [
-      { "id": "kg_m3", "symbolCn": "千克/立方米",   "symbolEn": "kg/m³", "toBase": 0.001, "hidden": false },
-      { "id": "g_ml",  "symbolCn": "克/毫升",       "symbolEn": "g/mL",  "toBase": 1.0,   "hidden": false },
-      { "id": "kg_l",  "symbolCn": "千克/升",       "symbolEn": "kg/L",  "toBase": 1.0,   "hidden": false }
-    ]
+      {
+        "id": "kg_m3",
+        "toBase": 0.001,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "千克/立方米"
+          },
+          "en": {
+            "symbol": "kg/m³"
+          }
+        }
+      },
+      {
+        "id": "g_ml",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "克/毫升"
+          },
+          "en": {
+            "symbol": "g/mL"
+          }
+        }
+      },
+      {
+        "id": "kg_l",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "千克/升"
+          },
+          "en": {
+            "symbol": "kg/L"
+          }
+        }
+      }
+    ],
+    "i18n": {
+      "zh": {
+        "label": "密度"
+      },
+      "en": {
+        "label": "Density"
+      }
+    }
   },
   {
     "id": "time",
-    "categoryCn": "时间",
-    "categoryEn": "Time",
     "baseUnit": "s",
     "units": [
-      { "id": "ms",     "symbolCn": "毫秒",            "symbolEn": "ms",   "toBase": 0.001,     "hidden": false },
-      { "id": "s",      "symbolCn": "秒",              "symbolEn": "s",    "toBase": 1.0,       "hidden": false },
-      { "id": "min",    "symbolCn": "分钟",            "symbolEn": "min",  "toBase": 60,        "hidden": false },
-      { "id": "h",      "symbolCn": "小时",            "symbolEn": "h",    "toBase": 3600,      "hidden": false },
-      { "id": "d",      "symbolCn": "天(日)",          "symbolEn": "d",    "toBase": 86400,     "hidden": false },
-      { "id": "week",   "symbolCn": "周(星期)",        "symbolEn": "wk",   "toBase": 604800,    "hidden": false },
-      { "id": "xun",    "symbolCn": "旬(10天)",        "symbolEn": "xun",  "toBase": 864000,    "hidden": false },
-      { "id": "month",  "symbolCn": "月(月份)",        "symbolEn": "mo",   "toBase": 2592000,   "hidden": false },
-      { "id": "quarter","symbolCn": "季(季度)",        "symbolEn": "qtr",  "toBase": 7776000,   "hidden": false },
-      { "id": "year",   "symbolCn": "年",              "symbolEn": "yr",   "toBase": 31536000,  "hidden": false }
-    ]
+      {
+        "id": "ms",
+        "toBase": 0.001,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "毫秒"
+          },
+          "en": {
+            "symbol": "ms"
+          }
+        }
+      },
+      {
+        "id": "s",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "秒"
+          },
+          "en": {
+            "symbol": "s"
+          }
+        }
+      },
+      {
+        "id": "min",
+        "toBase": 60,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "分钟"
+          },
+          "en": {
+            "symbol": "min"
+          }
+        }
+      },
+      {
+        "id": "h",
+        "toBase": 3600,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "小时"
+          },
+          "en": {
+            "symbol": "h"
+          }
+        }
+      },
+      {
+        "id": "d",
+        "toBase": 86400,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "天(日)"
+          },
+          "en": {
+            "symbol": "d"
+          }
+        }
+      },
+      {
+        "id": "week",
+        "toBase": 604800,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "周(星期)"
+          },
+          "en": {
+            "symbol": "wk"
+          }
+        }
+      },
+      {
+        "id": "xun",
+        "toBase": 864000,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "旬(10天)"
+          },
+          "en": {
+            "symbol": "xun"
+          }
+        }
+      },
+      {
+        "id": "month",
+        "toBase": 2592000,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "月(月份)"
+          },
+          "en": {
+            "symbol": "mo"
+          }
+        }
+      },
+      {
+        "id": "quarter",
+        "toBase": 7776000,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "季(季度)"
+          },
+          "en": {
+            "symbol": "qtr"
+          }
+        }
+      },
+      {
+        "id": "year",
+        "toBase": 31536000,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "年"
+          },
+          "en": {
+            "symbol": "yr"
+          }
+        }
+      }
+    ],
+    "i18n": {
+      "zh": {
+        "label": "时间"
+      },
+      "en": {
+        "label": "Time"
+      }
+    }
   },
   {
     "id": "energy",
-    "categoryCn": "热量",
-    "categoryEn": "Energy",
     "baseUnit": "kcal",
     "units": [
-      { "id": "j",     "symbolCn": "焦耳",            "symbolEn": "J",     "toBase": 0.000239006, "hidden": false },
-      { "id": "kj",    "symbolCn": "千焦(千焦耳)",    "symbolEn": "kJ",    "toBase": 0.239006,    "hidden": false },
-      { "id": "kcal",  "symbolCn": "千卡(大卡)",      "symbolEn": "kcal",  "toBase": 1.0,         "hidden": false },
-      { "id": "cal",   "symbolCn": "卡路里(卡)",      "symbolEn": "cal",   "toBase": 0.001,       "hidden": false }
-    ]
+      {
+        "id": "j",
+        "toBase": 0.000239006,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "焦耳"
+          },
+          "en": {
+            "symbol": "J"
+          }
+        }
+      },
+      {
+        "id": "kj",
+        "toBase": 0.239006,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "千焦(千焦耳)"
+          },
+          "en": {
+            "symbol": "kJ"
+          }
+        }
+      },
+      {
+        "id": "kcal",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "千卡(大卡)"
+          },
+          "en": {
+            "symbol": "kcal"
+          }
+        }
+      },
+      {
+        "id": "cal",
+        "toBase": 0.001,
+        "hidden": false,
+        "i18n": {
+          "zh": {
+            "symbol": "卡路里(卡)"
+          },
+          "en": {
+            "symbol": "cal"
+          }
+        }
+      }
+    ],
+    "i18n": {
+      "zh": {
+        "label": "热量"
+      },
+      "en": {
+        "label": "Energy"
+      }
+    }
   },
   {
     "id": "storage",
-    "categoryCn": "储存",
-    "categoryEn": "Storage",
     "baseUnit": "b",
     "units": [
-      { "id": "b",     "symbolCn": "字节",            "symbolEn": "B",     "toBase": 1.0,        "hidden": true },
-      { "id": "kb",    "symbolCn": "千字节",          "symbolEn": "KB",    "toBase": 1024.0,     "hidden": true },
-      { "id": "mb",    "symbolCn": "兆字节",          "symbolEn": "MB",    "toBase": 1048576.0,  "hidden": true },
-      { "id": "gb",    "symbolCn": "千兆字节",        "symbolEn": "GB",    "toBase": 1073741824.0,"hidden": true },
-      { "id": "tb",    "symbolCn": "太字节",          "symbolEn": "TB",    "toBase": 1099511627776.0,"hidden": true },
-      { "id": "pb",    "symbolCn": "拍字节",          "symbolEn": "PB",    "toBase": 1125899906842624.0,"hidden": true }
-    ]
+      {
+        "id": "b",
+        "toBase": 1.0,
+        "hidden": true,
+        "i18n": {
+          "zh": {
+            "symbol": "字节"
+          },
+          "en": {
+            "symbol": "B"
+          }
+        }
+      },
+      {
+        "id": "kb",
+        "toBase": 1024.0,
+        "hidden": true,
+        "i18n": {
+          "zh": {
+            "symbol": "千字节"
+          },
+          "en": {
+            "symbol": "KB"
+          }
+        }
+      },
+      {
+        "id": "mb",
+        "toBase": 1048576.0,
+        "hidden": true,
+        "i18n": {
+          "zh": {
+            "symbol": "兆字节"
+          },
+          "en": {
+            "symbol": "MB"
+          }
+        }
+      },
+      {
+        "id": "gb",
+        "toBase": 1073741824.0,
+        "hidden": true,
+        "i18n": {
+          "zh": {
+            "symbol": "千兆字节"
+          },
+          "en": {
+            "symbol": "GB"
+          }
+        }
+      },
+      {
+        "id": "tb",
+        "toBase": 1099511627776.0,
+        "hidden": true,
+        "i18n": {
+          "zh": {
+            "symbol": "太字节"
+          },
+          "en": {
+            "symbol": "TB"
+          }
+        }
+      },
+      {
+        "id": "pb",
+        "toBase": 1125899906842624.0,
+        "hidden": true,
+        "i18n": {
+          "zh": {
+            "symbol": "拍字节"
+          },
+          "en": {
+            "symbol": "PB"
+          }
+        }
+      }
+    ],
+    "i18n": {
+      "zh": {
+        "label": "储存"
+      },
+      "en": {
+        "label": "Storage"
+      }
+    }
   }
 ]
