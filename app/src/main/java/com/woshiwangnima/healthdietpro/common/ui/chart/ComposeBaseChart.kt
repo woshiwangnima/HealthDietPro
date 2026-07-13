@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
@@ -35,7 +37,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -82,6 +83,10 @@ import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppStepperDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppRepeatAdjustButton
+import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.adaptiveNavigationBarsWindowInsets
+import com.woshiwangnima.healthdietpro.model.chart.ComposeChartSeriesState
+import com.woshiwangnima.healthdietpro.model.chart.ComposeChartState
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -194,6 +199,8 @@ internal data class ComposeChartAxisSpec(
     val position: ComposeChartAxisSide,
     val tickCount: Int = 5,
     val interval: Double? = null,
+    val tickPolicy: ChartTickPolicy = NumericChartTickPolicy,
+    val tickOptionId: String? = null,
     val gridLinePatterns: List<ComposeChartLinePattern> = listOf(ComposeChartLinePattern.Dotted),
     val valueFormatter: (Double, Double) -> String = { value, _ -> "%.0f".format(value) },
     val minLabelGapPx: Float = 8f,
@@ -202,6 +209,7 @@ internal data class ComposeChartAxisSpec(
 @Immutable
 internal data class ComposeBaseChartSpec(
     val title: String,
+    val chartStateKey: String? = null,
     val series: List<ComposeChartSeries>,
     val xAxis: ComposeChartAxisSpec,
     val yAxis: ComposeChartAxisSpec,
@@ -219,8 +227,6 @@ internal data class ComposeChartControls(
     val allowFullscreen: Boolean = true,
     val allowMoreStyles: Boolean = true,
     val labels: ComposeChartControlLabels = ComposeChartControlLabels(),
-    val xIntervalOptions: List<Double> = emptyList(),
-    val yIntervalOptions: List<Double> = emptyList(),
     val axisRangePercentOptions: List<Int> = listOf(5, 10, 25, 50, 75, 90, 100),
     val axisBoundPercentOptions: List<Int> = listOf(-200, -150, -100, -50, -25, -10, 0, 10, 25, 50, 75, 90, 100, 110, 125, 150, 200),
     val defaultXAxisWindowMode: ComposeChartAxisWindowMode = ComposeChartAxisWindowMode.PercentRange,
@@ -247,25 +253,32 @@ private data class CrosshairState(
 @Composable
 internal fun ComposeBaseChart(
     spec: ComposeBaseChartSpec,
+    savedState: ComposeChartState? = null,
+    onChartStateChanged: (ComposeChartState) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    var liveState by remember(spec.chartStateKey) { mutableStateOf(savedState) }
+    LaunchedEffect(savedState) {
+        if (savedState != null) liveState = savedState
+    }
     val seriesStyleKey = remember(spec.series) { spec.series.joinToString("|") { it.id } }
-    val seriesStyles = remember(spec.title, seriesStyleKey) {
+    val seriesStyles = remember(spec.chartStateKey, savedState, seriesStyleKey) {
         mutableStateMapOf<String, ComposeChartSeriesStyle>().apply {
             spec.series.forEach { series ->
-                put(series.id, series.toSeriesStyle())
+                put(series.id, savedState?.seriesStyles?.get(series.id)?.toComposeStyle() ?: series.toSeriesStyle())
             }
         }
     }
-    var selectedSeriesId by remember(spec.title, seriesStyleKey) {
+    var selectedSeriesId by remember(spec.chartStateKey, seriesStyleKey) {
         mutableStateOf(spec.series.firstOrNull()?.id)
     }
-    var fullscreenAreas by remember(spec.title) {
-        mutableStateOf(spec.controls.defaultFullscreenAreas)
+    var fullscreenAreas by remember(spec.chartStateKey, savedState) {
+        mutableStateOf(savedState?.fullscreenAreas?.mapNotNull { it.toFullscreenAreaOrNull() }?.toSet() ?: spec.controls.defaultFullscreenAreas)
     }
     var fullscreen by remember { mutableStateOf(false) }
     ChartSurface(
         spec = spec,
+        savedState = liveState,
         fullscreen = false,
         fullscreenAreas = fullscreenAreas,
         seriesStyles = seriesStyles,
@@ -274,6 +287,10 @@ internal fun ComposeBaseChart(
         onSeriesStyleChange = { id, style -> seriesStyles[id] = style },
         onFullscreenAreas = { fullscreenAreas = it },
         onFullscreen = { fullscreen = true },
+        onChartStateChanged = { state ->
+            liveState = state
+            onChartStateChanged(state)
+        },
         modifier = modifier,
     )
     if (fullscreen) {
@@ -284,22 +301,18 @@ internal fun ComposeBaseChart(
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.navigationBars),
+                    .windowInsetsPadding(adaptiveNavigationBarsWindowInsets()),
                 color = MaterialTheme.colorScheme.background,
             ) {
                 FixedLandscapeBox {
-                    Column(Modifier.padding(12.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            TextButton(onClick = { fullscreen = false }) {
-                                Text(stringResource(R.string.view_chart_exit_fullscreen))
-                            }
-                        }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp),
+                    ) {
                         ChartSurface(
                             spec = spec,
+                            savedState = liveState,
                             fullscreen = true,
                             fullscreenAreas = fullscreenAreas,
                             seriesStyles = seriesStyles,
@@ -308,7 +321,12 @@ internal fun ComposeBaseChart(
                             onSeriesStyleChange = { id, style -> seriesStyles[id] = style },
                             onFullscreenAreas = { fullscreenAreas = it },
                             onFullscreen = { },
-                            modifier = Modifier.weight(1f),
+                            onExitFullscreen = { fullscreen = false },
+                            onChartStateChanged = { state ->
+                                liveState = state
+                                onChartStateChanged(state)
+                            },
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
                 }
@@ -340,6 +358,7 @@ private fun FixedLandscapeBox(content: @Composable () -> Unit) {
 @Composable
 private fun ChartSurface(
     spec: ComposeBaseChartSpec,
+    savedState: ComposeChartState?,
     fullscreen: Boolean,
     fullscreenAreas: Set<ComposeChartFullscreenArea>,
     seriesStyles: Map<String, ComposeChartSeriesStyle>,
@@ -348,6 +367,8 @@ private fun ChartSurface(
     onSeriesStyleChange: (String, ComposeChartSeriesStyle) -> Unit,
     onFullscreenAreas: (Set<ComposeChartFullscreenArea>) -> Unit,
     onFullscreen: () -> Unit,
+    onExitFullscreen: (() -> Unit)? = null,
+    onChartStateChanged: (ComposeChartState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val allPoints = remember(spec.series) { spec.series.flatMap { it.points } }
@@ -378,26 +399,23 @@ private fun ChartSurface(
         maxPercent = spec.controls.defaultYMaxPercent,
         rangePercent = initialYRangePercent,
     )
-    var xWindowMode by remember(spec.title) { mutableStateOf(spec.controls.defaultXAxisWindowMode) }
-    var yWindowMode by remember(spec.title) { mutableStateOf(spec.controls.defaultYAxisWindowMode) }
-    var xRangePercent by remember(spec.title) { mutableDoubleStateOf(initialXRangePercent) }
-    var yRangePercent by remember(spec.title) { mutableDoubleStateOf(initialYRangePercent) }
-    var xMinPercent by remember(spec.title) { mutableDoubleStateOf(spec.controls.defaultXMinPercent.toDouble()) }
-    var xMaxPercent by remember(spec.title) { mutableDoubleStateOf(initialXMaxPercent) }
-    var xInterval by remember(spec.title) {
-        mutableDoubleStateOf(spec.xAxis.interval ?: niceTicks(dataMinX, dataMinX + initialXRange, spec.xAxis.tickCount).step)
-    }
-    var yInterval by remember(spec.title) {
-        mutableDoubleStateOf(spec.yAxis.interval ?: niceTicks(dataMinY, dataMinY + initialYRange, spec.yAxis.tickCount).step)
-    }
-    var yMinPercent by remember(spec.title) { mutableDoubleStateOf(spec.controls.defaultYMinPercent.toDouble()) }
-    var yMaxPercent by remember(spec.title) { mutableDoubleStateOf(initialYMaxPercent) }
-    var xAxisSide by remember(spec.title) { mutableStateOf(spec.xAxis.position) }
-    var yAxisSide by remember(spec.title) { mutableStateOf(spec.yAxis.position) }
-    var xGridPattern by remember(spec.title) { mutableStateOf(spec.xAxis.gridLinePatterns.firstOrNull() ?: ComposeChartLinePattern.Dotted) }
-    var yGridPattern by remember(spec.title) { mutableStateOf(spec.yAxis.gridLinePatterns.firstOrNull() ?: ComposeChartLinePattern.Dotted) }
-    var crosshairBasis by remember(spec.title) { mutableStateOf(spec.controls.defaultCrosshairBasis) }
+    var xWindowMode by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.xWindowMode.toAxisWindowModeOrNull() ?: spec.controls.defaultXAxisWindowMode) }
+    var yWindowMode by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.yWindowMode.toAxisWindowModeOrNull() ?: spec.controls.defaultYAxisWindowMode) }
+    var xRangePercent by remember(spec.chartStateKey, savedState) { mutableDoubleStateOf(savedState?.xRangePercent ?: initialXRangePercent) }
+    var yRangePercent by remember(spec.chartStateKey, savedState) { mutableDoubleStateOf(savedState?.yRangePercent ?: initialYRangePercent) }
+    var xMinPercent by remember(spec.chartStateKey, savedState) { mutableDoubleStateOf(savedState?.xMinPercent ?: spec.controls.defaultXMinPercent.toDouble()) }
+    var xMaxPercent by remember(spec.chartStateKey, savedState) { mutableDoubleStateOf(savedState?.xMaxPercent ?: initialXMaxPercent) }
+    var xTickOptionId by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.xTickOptionId) }
+    var yTickOptionId by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.yTickOptionId) }
+    var yMinPercent by remember(spec.chartStateKey, savedState) { mutableDoubleStateOf(savedState?.yMinPercent ?: spec.controls.defaultYMinPercent.toDouble()) }
+    var yMaxPercent by remember(spec.chartStateKey, savedState) { mutableDoubleStateOf(savedState?.yMaxPercent ?: initialYMaxPercent) }
+    var xAxisSide by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.xAxisSide.toAxisSideOrNull() ?: spec.xAxis.position) }
+    var yAxisSide by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.yAxisSide.toAxisSideOrNull() ?: spec.yAxis.position) }
+    var xGridPattern by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.xGridPattern.toLinePatternOrNull() ?: spec.xAxis.gridLinePatterns.firstOrNull() ?: ComposeChartLinePattern.Dotted) }
+    var yGridPattern by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.yGridPattern.toLinePatternOrNull() ?: spec.yAxis.gridLinePatterns.firstOrNull() ?: ComposeChartLinePattern.Dotted) }
+    var crosshairBasis by remember(spec.chartStateKey, savedState) { mutableStateOf(savedState?.crosshairBasis.toCrosshairBasisOrNull() ?: spec.controls.defaultCrosshairBasis) }
     var chartStyleDialog by remember { mutableStateOf(false) }
+    var controlsExpanded by remember(spec.chartStateKey) { mutableStateOf(false) }
     var seriesStyleDialogId by remember { mutableStateOf<String?>(null) }
     var crosshair by remember { mutableStateOf<CrosshairState?>(null) }
     var xStart by remember(spec.title) { mutableDoubleStateOf(dataMinX) }
@@ -425,6 +443,45 @@ private fun ChartSurface(
         ComposeChartAxisWindowMode.PercentBounds -> dataMinY + fullYRange * effectiveYMinPercent / 100.0
     }
     val yVisibleRange = fullYRange * effectiveYRangePercent / 100.0
+    val xTickResolution = spec.xAxis.tickPolicy.resolve(xVisibleRange, xTickOptionId)
+    val yTickResolution = spec.yAxis.tickPolicy.resolve(yVisibleRange, yTickOptionId)
+    LaunchedEffect(
+        xWindowMode, yWindowMode, xRangePercent, yRangePercent, xMinPercent, xMaxPercent,
+        yMinPercent, yMaxPercent, xTickResolution, yTickResolution, xAxisSide, yAxisSide,
+        xGridPattern, yGridPattern, crosshairBasis, fullscreenAreas, seriesStyles.toMap(),
+    ) {
+        onChartStateChanged(
+            ComposeChartState(
+                xWindowMode = xWindowMode.name,
+                yWindowMode = yWindowMode.name,
+                xRangePercent = xRangePercent,
+                yRangePercent = yRangePercent,
+                xMinPercent = xMinPercent,
+                xMaxPercent = xMaxPercent,
+                yMinPercent = yMinPercent,
+                yMaxPercent = yMaxPercent,
+                xInterval = xTickResolution.interval,
+                yInterval = yTickResolution.interval,
+                xTickOptionId = xTickResolution.selectedId,
+                yTickOptionId = yTickResolution.selectedId,
+                xAxisSide = xAxisSide.name,
+                yAxisSide = yAxisSide.name,
+                xGridPattern = xGridPattern.name,
+                yGridPattern = yGridPattern.name,
+                crosshairBasis = crosshairBasis.name,
+                fullscreenAreas = fullscreenAreas.map { it.name }.toSet(),
+                seriesStyles = seriesStyles.mapValues { (_, style) ->
+                    ComposeChartSeriesState(
+                        colorArgb = style.color.value.toLong(),
+                        lineStyle = style.lineStyle.name,
+                        linePattern = style.linePattern.name,
+                        pointShape = style.pointShape.name,
+                        pointFill = style.pointFill.name,
+                    )
+                },
+            ),
+        )
+    }
     val effectiveSpec = spec.copy(
         series = spec.series.map {
             val style = seriesStyles[it.id] ?: it.toSeriesStyle()
@@ -440,12 +497,14 @@ private fun ChartSurface(
         yVisibleRange = yVisibleRange,
         xAxis = spec.xAxis.copy(
             position = xAxisSide,
-            interval = xInterval,
+            interval = xTickResolution.interval,
+            tickOptionId = xTickResolution.selectedId,
             gridLinePatterns = listOf(xGridPattern),
         ),
         yAxis = spec.yAxis.copy(
             position = yAxisSide,
-            interval = yInterval,
+            interval = yTickResolution.interval,
+            tickOptionId = yTickResolution.selectedId,
             gridLinePatterns = listOf(yGridPattern),
         ),
     )
@@ -513,29 +572,40 @@ private fun ChartSurface(
     }
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = if (fullscreen) 0.dp else 460.dp),
         shape = RoundedCornerShape(8.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = if (fullscreen) 0.dp else 1.dp,
     ) {
         Column(
-            modifier = Modifier.padding(if (fullscreen) 8.dp else 12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier
+                .then(if (fullscreen) Modifier.fillMaxSize() else Modifier)
+                .padding(if (fullscreen) 4.dp else 12.dp),
+            verticalArrangement = Arrangement.spacedBy(if (fullscreen) 4.dp else 10.dp),
         ) {
-            if (spec.controls.showControls && (!fullscreen || ComposeChartFullscreenArea.ChartSettings in fullscreenAreas)) {
+            if (spec.controls.showControls && !fullscreen) {
+                AppOutlinedIconTextButton(
+                    text = stringResource(R.string.compose_chart_style_settings),
+                    iconRes = R.drawable.ic_settings,
+                    onClick = { controlsExpanded = !controlsExpanded },
+                )
+            }
+            if (spec.controls.showControls && !fullscreen && controlsExpanded) {
                 ChartControls(
                     xWindowMode = xWindowMode,
                     yWindowMode = yWindowMode,
                     xRangePercent = xRangePercent,
                     xMinPercent = xMinPercent,
                     xMaxPercent = xMaxPercent,
-                    xInterval = xInterval,
-                    yInterval = yInterval,
+                    xTickOptions = xTickResolution.options,
+                    yTickOptions = yTickResolution.options,
+                    xTickOptionId = xTickResolution.selectedId,
+                    yTickOptionId = yTickResolution.selectedId,
                     yRangePercent = yRangePercent,
                     yMinPercent = yMinPercent,
                     yMaxPercent = yMaxPercent,
-                    xValueFormatter = effectiveSpec.xAxis.valueFormatter,
-                    yValueFormatter = effectiveSpec.yAxis.valueFormatter,
                     controls = spec.controls,
                     onXWindowMode = {
                         xWindowMode = it
@@ -563,8 +633,8 @@ private fun ChartSurface(
                         if (xMinPercent >= maxPercent) xMinPercent = maxPercent - 0.5
                         crosshair = null
                     },
-                    onXInterval = { xInterval = it; crosshair = null },
-                    onYInterval = { yInterval = it; crosshair = null },
+                    onXInterval = { xTickOptionId = it; crosshair = null },
+                    onYInterval = { yTickOptionId = it; crosshair = null },
                     onYRangePercent = {
                         val rangePercent = it.coerceIn(0.5, 100.0)
                         yRangePercent = rangePercent
@@ -587,13 +657,14 @@ private fun ChartSurface(
                     allowMoreStyles = spec.controls.allowMoreStyles,
                 )
             }
-            if (!fullscreen || ComposeChartFullscreenArea.Title in fullscreenAreas) {
+            if (!fullscreen || ComposeChartFullscreenArea.Title in fullscreenAreas || onExitFullscreen != null) {
                 ChartTitleArea(
-                    title = spec.title,
+                    title = if (!fullscreen || ComposeChartFullscreenArea.Title in fullscreenAreas) spec.title else String(CharArray(0)),
                     fullscreen = fullscreen,
                     allowFullscreen = spec.controls.allowFullscreen && !fullscreen,
                     fullscreenLabel = spec.controls.labels.fullscreen ?: stringResource(R.string.view_chart_fullscreen),
                     onFullscreen = onFullscreen,
+                    onExitFullscreen = onExitFullscreen,
                 )
             }
             ChartCanvasArea(
@@ -632,7 +703,8 @@ private fun ChartSurface(
                         yMin = it
                 },
                 onCrosshair = { crosshair = it },
-                heightDp = if (fullscreen) 420.dp else 280.dp,
+                fullscreen = fullscreen,
+                modifier = if (fullscreen) Modifier.weight(1f) else Modifier,
             )
             if (spec.controls.showLegend && (!fullscreen || ComposeChartFullscreenArea.DataGroupLegend in fullscreenAreas)) {
                 ChartLegend(
@@ -659,36 +731,27 @@ private fun ChartControls(
     xRangePercent: Double,
     xMinPercent: Double,
     xMaxPercent: Double,
-    xInterval: Double,
-    yInterval: Double,
+    xTickOptions: List<ChartTickOption>,
+    yTickOptions: List<ChartTickOption>,
+    xTickOptionId: String,
+    yTickOptionId: String,
     yRangePercent: Double,
     yMinPercent: Double,
     yMaxPercent: Double,
-    xValueFormatter: (Double, Double) -> String,
-    yValueFormatter: (Double, Double) -> String,
     controls: ComposeChartControls,
     onXWindowMode: (ComposeChartAxisWindowMode) -> Unit,
     onYWindowMode: (ComposeChartAxisWindowMode) -> Unit,
     onXRangePercent: (Double) -> Unit,
     onXMinPercent: (Double) -> Unit,
     onXMaxPercent: (Double) -> Unit,
-    onXInterval: (Double) -> Unit,
-    onYInterval: (Double) -> Unit,
+    onXInterval: (String) -> Unit,
+    onYInterval: (String) -> Unit,
     onYRangePercent: (Double) -> Unit,
     onYMinPercent: (Double) -> Unit,
     onYMaxPercent: (Double) -> Unit,
     onMoreStyles: () -> Unit,
     allowMoreStyles: Boolean,
 ) {
-    fun intervalLabel(value: Double, formatter: (Double, Double) -> String): String =
-        formatter(value, value).ifBlank { "%.2f".format(value) }
-    val xIntervalOptions = controls.xIntervalOptions.ifEmpty {
-        intervalOptionsAround(xInterval)
-    }
-    val yIntervalOptions = controls.yIntervalOptions.ifEmpty {
-        intervalOptionsAround(yInterval)
-    }
-
     Column(
         modifier = Modifier.horizontalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -728,25 +791,27 @@ private fun ChartControls(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             ChartDropdown(
                 label = controls.labels.xAxisInterval ?: stringResource(R.string.view_chart_x_axis_interval),
-                value = intervalLabel(xInterval, xValueFormatter),
-                options = xIntervalOptions,
-                optionLabel = { intervalLabel(it, xValueFormatter) },
-                onSelected = onXInterval,
+                value = xTickOptions.firstOrNull { it.id == xTickOptionId }?.label.orEmpty(),
+                options = xTickOptions,
+                optionId = { it.id },
+                optionLabel = { it.label },
+                onSelected = { onXInterval(it.id) },
             )
             ChartDropdown(
                 label = controls.labels.yAxisInterval ?: stringResource(R.string.compose_chart_y_axis_interval),
-                value = intervalLabel(yInterval, yValueFormatter),
-                options = yIntervalOptions,
-                optionLabel = { intervalLabel(it, yValueFormatter) },
-                onSelected = onYInterval,
+                value = yTickOptions.firstOrNull { it.id == yTickOptionId }?.label.orEmpty(),
+                options = yTickOptions,
+                optionId = { it.id },
+                optionLabel = { it.label },
+                onSelected = { onYInterval(it.id) },
             )
         }
         if (allowMoreStyles) {
-            Row {
-                OutlinedButton(onClick = onMoreStyles) {
-                    Text(controls.labels.moreStyles ?: stringResource(R.string.compose_chart_more_styles))
-                }
-            }
+            AppOutlinedIconTextButton(
+                text = controls.labels.moreStyles ?: stringResource(R.string.compose_chart_more_styles),
+                iconRes = R.drawable.ic_settings,
+                onClick = onMoreStyles,
+            )
         }
     }
 }
@@ -844,18 +909,23 @@ private fun ChartTitleArea(
     allowFullscreen: Boolean,
     fullscreenLabel: String,
     onFullscreen: () -> Unit,
+    onExitFullscreen: (() -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = title,
-            style = if (fullscreen) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
-        )
+        if (title.isNotEmpty()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+        } else {
+            Spacer(Modifier.weight(1f))
+        }
         if (allowFullscreen) {
             Button(onClick = onFullscreen) {
                 Icon(
@@ -867,6 +937,17 @@ private fun ChartTitleArea(
                 Text(fullscreenLabel)
             }
         }
+        onExitFullscreen?.let { exit ->
+            TextButton(onClick = exit) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_fullscreen),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(stringResource(R.string.view_chart_exit_fullscreen))
+            }
+        }
     }
 }
 
@@ -875,18 +956,18 @@ private fun <T> ChartDropdown(
     label: String,
     value: String,
     options: List<T>,
+    optionId: (T) -> String = { it.toString() },
     optionLabel: @Composable (T) -> String,
     onSelected: (T) -> Unit,
 ) {
-    val dropdownOptions = mutableListOf<AppDropdownOption>()
-    for ((index, option) in options.withIndex()) {
-        dropdownOptions += AppDropdownOption(id = index.toString(), label = optionLabel(option))
+    val dropdownOptions = options.map { option ->
+        AppDropdownOption(id = optionId(option), label = optionLabel(option))
     }
     AppDropdownField(
         label = label,
         value = value,
         options = dropdownOptions,
-        onSelect = { option -> onSelected(options[option.id.toInt()]) },
+        onSelect = { selected -> options.firstOrNull { optionId(it) == selected.id }?.let(onSelected) },
         modifier = Modifier.requiredWidth(180.dp),
     )
 }
@@ -952,8 +1033,10 @@ private fun ChartStyleDialog(
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                ComposeChartFullscreenArea.entries
-                    .filterNot { it == ComposeChartFullscreenArea.ChartDrawing }
+                listOf(
+                    ComposeChartFullscreenArea.Title,
+                    ComposeChartFullscreenArea.DataGroupLegend,
+                )
                     .forEach { area ->
                     val checked = area in fullscreenAreas
                     Row(
@@ -1078,7 +1161,8 @@ private fun ChartCanvasArea(
     onXStart: (Double) -> Unit,
     onYMin: (Double) -> Unit,
     onCrosshair: (CrosshairState?) -> Unit,
-    heightDp: androidx.compose.ui.unit.Dp,
+    fullscreen: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val textMeasurer = rememberTextMeasurer()
     var marqueeTimeNanos by remember { mutableLongStateOf(0L) }
@@ -1134,43 +1218,47 @@ private fun ChartCanvasArea(
         )
     }
 
-    val chartModifier = Modifier
-        .fillMaxWidth()
-        .height(heightDp)
-        .background(surfaceVariant.copy(alpha = 0.16f), RoundedCornerShape(8.dp))
-        .pointerInput(spec, selectedSeriesId, crosshairBasis, xStart, yMin, xVisibleRange, yVisibleRange) {
-            detectTapGestures { offset ->
-                onCrosshair(crosshairFromOffset(offset, size.width.toFloat(), size.height.toFloat()))
-            }
-        }
-        .pointerInput(spec, selectedSeriesId, crosshairBasis, xStart, yMin, xVisibleRange, yVisibleRange) {
-            detectDragGestures(
-                onDragStart = { offset ->
+    Column(modifier = modifier.fillMaxWidth()) {
+        val chartModifier = Modifier
+            .fillMaxWidth()
+            .then(if (fullscreen) Modifier.fillMaxHeight() else Modifier.height(320.dp))
+            .background(surfaceVariant.copy(alpha = 0.16f), RoundedCornerShape(8.dp))
+            .pointerInput(spec, selectedSeriesId, crosshairBasis, xStart, yMin, xVisibleRange, yVisibleRange) {
+                detectTapGestures { offset ->
                     onCrosshair(crosshairFromOffset(offset, size.width.toFloat(), size.height.toFloat()))
-                },
-                onDrag = { change, _ ->
-                    change.consume()
-                    onCrosshair(crosshairFromOffset(change.position, size.width.toFloat(), size.height.toFloat()))
-                },
+                }
+            }
+            .pointerInput(spec, selectedSeriesId, crosshairBasis, xStart, yMin, xVisibleRange, yVisibleRange) {
+                detectDragGestures(
+                    onDragStart = { offset ->
+                        onCrosshair(crosshairFromOffset(offset, size.width.toFloat(), size.height.toFloat()))
+                    },
+                    onDrag = { change, _ ->
+                        change.consume()
+                        onCrosshair(crosshairFromOffset(change.position, size.width.toFloat(), size.height.toFloat()))
+                    },
+                )
+            }
+        val yPanModifier = Modifier
+            .width(42.dp)
+            .then(if (fullscreen) Modifier.fillMaxHeight() else Modifier.height(320.dp))
+
+        if (canPanX && spec.xAxis.position == ComposeChartAxisSide.Top) {
+            HorizontalPanControl(
+                dataMin = dataMinX,
+                dataMax = dataMaxX,
+                windowStart = xStart,
+                visibleRange = xVisibleRange,
+                onWindowStart = onXStart,
+                color = onSurfaceVariant,
+                containerColor = surfaceVariant,
+                positiveXOnRight = spec.yAxis.position == ComposeChartAxisSide.Start,
             )
         }
-    val yPanModifier = Modifier
-        .width(42.dp)
-        .height(heightDp)
-
-    if (canPanX && spec.xAxis.position == ComposeChartAxisSide.Top) {
-        HorizontalPanControl(
-            dataMin = dataMinX,
-            dataMax = dataMaxX,
-            windowStart = xStart,
-            visibleRange = xVisibleRange,
-            onWindowStart = onXStart,
-            color = onSurfaceVariant,
-            containerColor = surfaceVariant,
-            positiveXOnRight = spec.yAxis.position == ComposeChartAxisSide.Start,
-        )
-    }
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(
+            modifier = if (fullscreen) Modifier.weight(1f) else Modifier,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
         if (canPanY && spec.yAxis.position == ComposeChartAxisSide.Start) {
             VerticalPanControl(
                 dataMin = dataMinY,
@@ -1214,18 +1302,19 @@ private fun ChartCanvasArea(
                 modifier = yPanModifier,
             )
         }
-    }
-    if (canPanX && spec.xAxis.position == ComposeChartAxisSide.Bottom) {
-        HorizontalPanControl(
-            dataMin = dataMinX,
-            dataMax = dataMaxX,
-            windowStart = xStart,
-            visibleRange = xVisibleRange,
-            onWindowStart = onXStart,
-            color = onSurfaceVariant,
-            containerColor = surfaceVariant,
-            positiveXOnRight = spec.yAxis.position == ComposeChartAxisSide.Start,
-        )
+        }
+        if (canPanX && spec.xAxis.position == ComposeChartAxisSide.Bottom) {
+            HorizontalPanControl(
+                dataMin = dataMinX,
+                dataMax = dataMaxX,
+                windowStart = xStart,
+                visibleRange = xVisibleRange,
+                onWindowStart = onXStart,
+                color = onSurfaceVariant,
+                containerColor = surfaceVariant,
+                positiveXOnRight = spec.yAxis.position == ComposeChartAxisSide.Start,
+            )
+        }
     }
 }
 
@@ -1916,6 +2005,12 @@ private fun axisTicks(
     max: Double,
     axis: ComposeChartAxisSpec,
 ): TickSet {
+    (axis.tickPolicy as? TimeChartTickPolicy)
+        ?.calendarTicks(min, max, axis.tickOptionId)
+        ?.let { calendarValues ->
+            val interval = axis.interval?.takeIf { it > 0.0 && it.isFiniteValue() } ?: return niceTicks(min, max, axis.tickCount)
+            return TickSet(calendarValues.withVisibleEndpoints(min, max), interval)
+        }
     val interval = axis.interval?.takeIf { it > 0.0 && it.isFiniteValue() }
         ?: return niceTicks(min, max, axis.tickCount)
     val values = buildList {
@@ -2213,11 +2308,11 @@ private fun chartRect(
     val xHeight = xTicks.maxOfOrNull { textMeasurer.measure(spec.xAxis.valueFormatter(it, xTicks.step), textStyle).size.height } ?: 0
     val yWidth = yTicks.maxOfOrNull { textMeasurer.measure(spec.yAxis.valueFormatter(it, yTicks.step), textStyle).size.width } ?: 0
     val xBandHeight = spec.xBands
-        .flatMap { listOf(it.min, it.max) }
+        .flatMap { listOf(it.min.coerceIn(xMin, xMax), it.max.coerceIn(xMin, xMax)) }
         .maxOfOrNull { textMeasurer.measure(spec.xAxis.valueFormatter(it, xTicks.step), textStyle).size.height }
         ?: 0
     val yBandWidth = spec.yBands
-        .flatMap { listOf(it.min, it.max) }
+        .flatMap { listOf(it.min.coerceIn(yMin, yMax), it.max.coerceIn(yMin, yMax)) }
         .maxOfOrNull { textMeasurer.measure(spec.yAxis.valueFormatter(it, yTicks.step), textStyle).size.width }
         ?: 0
     val xUnitWidth = textMeasurer.measure(spec.xAxis.label, textStyle).size.width
@@ -2263,6 +2358,30 @@ private fun percentInRange(
 }
 
 private fun Double.isFiniteValue(): Boolean = !isNaN() && !isInfinite()
+
+private fun ComposeChartSeriesState.toComposeStyle(): ComposeChartSeriesStyle =
+    ComposeChartSeriesStyle(
+        color = Color(colorArgb.toULong()),
+        lineStyle = ComposeChartLineStyle.entries.firstOrNull { it.name == lineStyle } ?: ComposeChartLineStyle.Linear,
+        linePattern = ComposeChartLinePattern.entries.firstOrNull { it.name == linePattern } ?: ComposeChartLinePattern.Solid,
+        pointShape = ComposeChartPointShape.entries.firstOrNull { it.name == pointShape } ?: ComposeChartPointShape.Circle,
+        pointFill = ComposeChartPointFill.entries.firstOrNull { it.name == pointFill } ?: ComposeChartPointFill.Filled,
+    )
+
+private fun String?.toAxisWindowModeOrNull(): ComposeChartAxisWindowMode? =
+    ComposeChartAxisWindowMode.entries.firstOrNull { it.name == this }
+
+private fun String?.toAxisSideOrNull(): ComposeChartAxisSide? =
+    ComposeChartAxisSide.entries.firstOrNull { it.name == this }
+
+private fun String?.toLinePatternOrNull(): ComposeChartLinePattern? =
+    ComposeChartLinePattern.entries.firstOrNull { it.name == this }
+
+private fun String?.toCrosshairBasisOrNull(): ComposeChartCrosshairBasis? =
+    ComposeChartCrosshairBasis.entries.firstOrNull { it.name == this }
+
+private fun String.toFullscreenAreaOrNull(): ComposeChartFullscreenArea? =
+    ComposeChartFullscreenArea.entries.firstOrNull { it.name == this }
 
 private fun Float.isFiniteValue(): Boolean = !isNaN() && !isInfinite()
 

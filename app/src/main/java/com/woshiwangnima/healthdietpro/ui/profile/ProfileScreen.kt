@@ -40,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +52,6 @@ import com.woshiwangnima.healthdietpro.common.ui.AppTextIconButton
 import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
-import java.io.File
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +60,7 @@ internal fun ProfileScreen(
     state: ProfileUserInfoUiState,
     loadUsers: () -> List<UserProfile>,
     loadCurrentUserId: () -> String,
+    onUsersLoaded: (List<UserProfile>) -> Unit,
     onOpenAppSettings: () -> Unit,
     onOpenBmi: () -> Unit,
     onOpenUserSettings: () -> Unit,
@@ -79,6 +78,7 @@ internal fun ProfileScreen(
     fun reloadUsers() {
         users = loadUsers()
         currentUserId = loadCurrentUserId()
+        onUsersLoaded(users)
     }
 
     Column(
@@ -142,6 +142,7 @@ internal fun ProfileScreen(
             UserSwitchSheetContent(
                 users = users,
                 currentUserId = currentUserId,
+                userAvatarBitmaps = state.userAvatarBitmaps,
                 onCreateUser = {
                     showUserSheet = false
                     onCreateUser()
@@ -196,6 +197,7 @@ internal fun ProfileScreen(
 private fun UserSwitchSheetContent(
     users: List<UserProfile>,
     currentUserId: String,
+    userAvatarBitmaps: Map<String, android.graphics.Bitmap>,
     onCreateUser: () -> Unit,
     onSelectUser: (UserProfile) -> Unit,
     onDeleteUser: (UserProfile) -> Unit,
@@ -251,6 +253,7 @@ private fun UserSwitchSheetContent(
                     UserSwitchRow(
                         user = user,
                         isCurrent = user.id == currentUserId,
+                        avatarBitmap = userAvatarBitmaps[user.id],
                         onSelect = { onSelectUser(user) },
                         onDelete = { onDeleteUser(user) },
                     )
@@ -264,19 +267,13 @@ private fun UserSwitchSheetContent(
 private fun UserSwitchRow(
     user: UserProfile,
     isCurrent: Boolean,
+    avatarBitmap: android.graphics.Bitmap?,
     onSelect: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val fallbackName = stringResource(R.string.profile_name_unknown)
     val name = user.name.ifBlank { fallbackName }
-    val context = LocalContext.current
     val avatarColor = remember(user.id) { avatarColorFor(user.id) }
-    val avatarFile = remember(context, user.avatarFileName) {
-        user.avatarFileName.takeIf { it.isNotBlank() }?.let { File(context.filesDir, "avatars/$it") }
-    }
-    val bitmap = remember(avatarFile) {
-        avatarFile?.takeIf { it.exists() }?.let { android.graphics.BitmapFactory.decodeFile(it.absolutePath) }
-    }
     val background = if (isCurrent) {
         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
     } else {
@@ -299,9 +296,9 @@ private fun UserSwitchRow(
                 .background(avatarColor),
             contentAlignment = Alignment.Center,
         ) {
-            if (bitmap != null) {
+            if (avatarBitmap != null) {
                 Image(
-                    bitmap = bitmap.asImageBitmap(),
+                    bitmap = avatarBitmap.asImageBitmap(),
                     contentDescription = null,
                     modifier = Modifier
                         .size(48.dp)

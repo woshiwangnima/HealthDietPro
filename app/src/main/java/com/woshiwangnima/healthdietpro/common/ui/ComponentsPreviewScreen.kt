@@ -95,6 +95,7 @@ fun ComponentsPreviewScreen(
                 currentScale = fontScale,
                 onScaleChangeStopped = { AppFontScaleState.update(context, it) },
             )
+            TypographyPreview()
 
             HorizontalDivider()
 
@@ -158,6 +159,24 @@ fun ComponentsPreviewScreen(
                 color = MaterialTheme.colorScheme.onSurface,
             )
             ComposeChartPreviewSamples()
+        }
+    }
+}
+
+@Composable
+private fun TypographyPreview() {
+    val styles = listOf(
+        "Headline" to MaterialTheme.typography.headlineLarge,
+        "Title" to MaterialTheme.typography.titleLarge,
+        "Subtitle" to MaterialTheme.typography.titleSmall,
+        "Body" to MaterialTheme.typography.bodyLarge,
+        "Label" to MaterialTheme.typography.labelLarge,
+        "Caption" to MaterialTheme.typography.bodySmall,
+        "Micro" to MaterialTheme.typography.labelSmall,
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        styles.forEach { (name, style) ->
+            Text(text = "$name  AaBbCc 0123", style = style, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }

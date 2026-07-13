@@ -47,7 +47,7 @@
 ### 界面模块（仅屏，不含可复用 UI 元素）
 
 - 个人资料查看/编辑（`ProfileFragment`/`ProfileEditActivity`，整合 GPS + 疾病 + 地区）
-- 用药记录（`MedicationRecord*`/`RecordInputDialog`）
+- 用药记录（`MedicationRecord*`）
 - 设置（`AppSettings`/`Preferences`/`Reminder`/`UserSettings`）
 - `MainActivity`（app shell + 底栏导航）
 
@@ -65,7 +65,7 @@
 
 ### 基础设施模块（若干小模块）
 
-- **UI 公用**：`BaseBack`/`BaseActivity`、`DialogExtensions`、`TextOverflowUtil`、`ViewExtensions`、`DateTimePicker`、`WatermarkUtil`、**Tab 控件**（`TabBar`/`ToggleBar`/`FilterBar` + 三策略 `TabBinder`/`TabAnimator`/`TabIndicator` + `MultiLevelTabCoordinator`）
+- **UI 公用**：`BaseBack`/`BaseActivity`、`TextOverflowUtil`、`ViewExtensions`、`ComposeDateTimePicker`、`WatermarkUtil`、**Tab 控件**（`TabBar`/`ToggleBar`/`FilterBar` + 三策略 `TabBinder`/`TabAnimator`/`TabIndicator` + `MultiLevelTabCoordinator`）
 - **多层 Tag**：GameplayTag 式层级标签系统（点分字符串、层级查询、继承/包含语义）——**待实现**；食物分类树（营养表系统）与 Tab 命名空间（`tab_${screenId}_level_${level}`）后续接入此能力替代字符串拼装
 - **图表渲染**：`ChartView`/`ChartCanvas`/`ChartMath`/`ChartSeries`/`LineStyle`/`ChartFragment`/`ChartFullscreen` + `DataPoint`/`RecordHistory`
 

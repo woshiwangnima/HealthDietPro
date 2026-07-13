@@ -20,7 +20,10 @@ import java.io.File
 import java.util.Locale
 import kotlin.math.abs
 
-internal class ProfileUserInfoViewModel(application: Application) : AndroidViewModel(application) {
+internal class ProfileUserInfoViewModel(
+    application: Application,
+    private val avatarBitmapCache: ProfileAvatarBitmapCache,
+) : AndroidViewModel(application) {
 
     private val avatarColors = listOf(
         Color(0xFF1976D2),
@@ -45,6 +48,17 @@ internal class ProfileUserInfoViewModel(application: Application) : AndroidViewM
         }
     }
 
+    fun loadUserAvatars(users: List<UserProfile>) {
+        viewModelScope.launch {
+            val bitmaps = withContext(Dispatchers.IO) {
+                users.mapNotNull { user ->
+                    avatarPath(user)?.let(avatarBitmapCache::load)?.let { user.id to it }
+                }.toMap()
+            }
+            _uiState.value = _uiState.value.copy(userAvatarBitmaps = bitmaps)
+        }
+    }
+
     private fun buildState(profile: UserProfile): ProfileUserInfoUiState {
         val app = getApplication<Application>()
         val displayName = profile.name.ifEmpty { app.getString(R.string.profile_name_unknown) }
@@ -63,23 +77,30 @@ internal class ProfileUserInfoViewModel(application: Application) : AndroidViewM
             ),
         )
         val colorIndex = abs(profile.id.hashCode()) % avatarColors.size
-        val avatarPath = profile.avatarFileName
-            .takeIf { it.isNotBlank() }
-            ?.let { File(app.filesDir, "avatars/$it") }
-            ?.takeIf { it.exists() }
-            ?.absolutePath
+        val avatarBitmap = avatarPath(profile)?.let(avatarBitmapCache::load)
 
         return ProfileUserInfoUiState(
             displayName = displayName,
             avatarInitial = displayName.firstOrNull()?.toString() ?: "?",
             avatarColor = avatarColors[colorIndex],
-            avatarFilePath = avatarPath,
+            avatarBitmap = avatarBitmap,
             genderIcon = infoLine.genderIcon,
             genderTone = infoLine.genderTone,
             infoLine = infoLine.text,
+            birthdayText = profile.birthday?.date?.takeIf { it.isNotBlank() }
+                ?: app.getString(R.string.profile_birthday_unknown),
             regionText = resolveRegionText(profile),
             diseaseText = resolveDiseaseText(profile),
         )
+    }
+
+    private fun avatarPath(profile: UserProfile): String? {
+        val app = getApplication<Application>()
+        return profile.avatarFileName
+            .takeIf { it.isNotBlank() }
+            ?.let { File(app.filesDir, "avatars/$it") }
+            ?.takeIf { it.exists() }
+            ?.absolutePath
     }
 
     private fun Gender.toDisplay(): ProfileGenderDisplay = when (name) {

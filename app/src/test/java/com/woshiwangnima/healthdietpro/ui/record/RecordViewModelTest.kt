@@ -15,6 +15,7 @@ class RecordViewModelTest {
             listOf(
                 RecordActionId.Height,
                 RecordActionId.Weight,
+                RecordActionId.BloodGlucose,
                 RecordActionId.Waist,
                 RecordActionId.Period,
             ),
@@ -36,6 +37,7 @@ class RecordViewModelTest {
 
         assertTrue(state.sections[0].items.first { it.id == RecordActionId.Height }.enabled)
         assertTrue(state.sections[0].items.first { it.id == RecordActionId.Weight }.enabled)
+        assertTrue(state.sections[0].items.first { it.id == RecordActionId.BloodGlucose }.enabled)
         assertTrue(state.sections[1].items.first { it.id == RecordActionId.Medication }.enabled)
         assertFalse(state.sections[1].items.first { it.id == RecordActionId.Diet }.enabled)
     }

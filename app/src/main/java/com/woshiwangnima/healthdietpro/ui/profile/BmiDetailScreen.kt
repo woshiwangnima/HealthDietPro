@@ -20,11 +20,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,10 +43,12 @@ import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ColumnWidth
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
+import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartEvent
+import com.woshiwangnima.healthdietpro.model.chart.ComposeChartState
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
-import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartCanvasStyle
+import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartAxisKind
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartControlLabels
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ComposeChart
@@ -63,13 +65,12 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 internal fun BmiDetailScreen(
-    bmiData: List<DataPoint>,
-    initialTab: Int,
+    viewModel: BmiDetailViewModel,
     onBack: () -> Unit,
-    onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var selectedTab by rememberSaveable { mutableIntStateOf(initialTab.coerceIn(0, 1)) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val chartState by viewModel.chartState.collectAsStateWithLifecycle()
     val tabs = remember {
         listOf(
             DetailTabItem("0", R.string.detail_tab_chart, R.drawable.ic_chart),
@@ -89,17 +90,21 @@ internal fun BmiDetailScreen(
                 .padding(padding),
         ) {
             Box(modifier = Modifier.weight(1f)) {
-                when (selectedTab) {
-                    0 -> BmiChartPage(bmiData = bmiData)
-                    1 -> BmiDataPage(bmiData = bmiData)
+                when (uiState.selectedTab) {
+                    0 -> BmiChartPage(
+                        bmiData = uiState.bmiData,
+                        chartState = chartState,
+                        chartStateKey = viewModel.chartStateKey,
+                        onChartStateChanged = { viewModel.onChartEvent(BaseChartEvent.StateChanged(it)) },
+                    )
+                    1 -> BmiDataPage(bmiData = uiState.bmiData)
                 }
             }
             DetailTabBar(
                 items = tabs,
-                selectedId = selectedTab.toString(),
+                selectedId = uiState.selectedTab.toString(),
                 onSelected = { item ->
-                    selectedTab = item.id.toInt()
-                    onTabSelected(selectedTab)
+                    viewModel.onEvent(BmiDetailEvent.TabSelected(item.id.toInt()))
                 },
             )
         }
@@ -109,32 +114,23 @@ internal fun BmiDetailScreen(
 @Composable
 private fun BmiChartPage(
     bmiData: List<DataPoint>,
+    chartState: ComposeChartState?,
+    chartStateKey: String,
+    onChartStateChanged: (ComposeChartState) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 4.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Card(
+            BmiChart(
+                bmiData = bmiData,
+                chartState = chartState,
+                chartStateKey = chartStateKey,
+                onChartStateChanged = onChartStateChanged,
                 modifier = Modifier.fillMaxWidth(),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    BmiCardTitle(text = stringResource(R.string.bmi_chart_title))
-                    BmiChartAndroidView(
-                        bmiData = bmiData,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(336.dp),
-                    )
-                }
-            }
+            )
         }
         item { BmiReferenceCard() }
         item { BmiCalculatorCard() }
@@ -142,12 +138,16 @@ private fun BmiChartPage(
 }
 
 @Composable
-private fun BmiChartAndroidView(
+private fun BmiChart(
     bmiData: List<DataPoint>,
+    chartState: ComposeChartState?,
+    chartStateKey: String,
+    onChartStateChanged: (ComposeChartState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val title = stringResource(R.string.bmi_chart_title)
+    val timeUnitLabel = stringResource(R.string.chart_axis_time_unit)
     val unitLabel = stringResource(R.string.bmi_unit_label)
     val seriesLabel = stringResource(R.string.bmi_title)
     val controlLabels = ChartControlLabels(
@@ -178,8 +178,9 @@ private fun BmiChartAndroidView(
     ComposeChart(
         spec = ComposeChartSpec(
             title = title,
-            chartStateKey = ProfilePrefs.makeChartStateKey(context, "bmi_history"),
+            chartStateKey = chartStateKey,
             canvasStyle = ChartCanvasStyle(
+                xAxisKind = ChartAxisKind.TimestampMs,
                 yAxisBands = bands,
                 yValueFormatter = { value -> "%.1f".format(value) },
                 xValueFormatter = ::formatProfileChartTimeAxis,
@@ -190,10 +191,13 @@ private fun BmiChartAndroidView(
             ),
             controlLabels = controlLabels,
             series = listOf(series),
-            unitLabel = unitLabel,
+            xAxisLabel = timeUnitLabel,
+            yAxisLabel = unitLabel,
             titleGravity = android.view.Gravity.START,
             titleVisible = false,
         ),
+        chartState = chartState,
+        onChartStateChanged = onChartStateChanged,
         modifier = modifier,
     )
 }

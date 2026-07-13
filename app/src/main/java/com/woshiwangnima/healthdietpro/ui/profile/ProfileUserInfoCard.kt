@@ -1,6 +1,5 @@
 package com.woshiwangnima.healthdietpro.ui.profile
 
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -104,7 +102,7 @@ internal fun ProfileUserInfoCard(
                         )
                         Spacer(Modifier.width(2.dp))
                     }
-                    infoSegments.forEachIndexed { index, segment ->
+                    infoSegments.take(2).forEachIndexed { index, segment ->
                         if (index > 0) {
                             Spacer(Modifier.width(8.dp))
                             Text(
@@ -117,41 +115,17 @@ internal fun ProfileUserInfoCard(
                         TextOverflowText(
                             text = segment,
                             modifier = Modifier.weight(
-                                when (index) {
-                                    0 -> 0.72f
-                                    1 -> 0.78f
-                                    else -> 1.55f
-                                },
+                                if (index == 0) 1f else 1.15f,
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
-                Spacer(Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    TextOverflowText(
-                        text = state.regionText,
-                        modifier = Modifier.weight(if (state.hasDiseaseText) 1f else 2f),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    if (state.hasDiseaseText) {
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.profile_separator),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        TextOverflowText(
-                            text = state.diseaseText,
-                            modifier = Modifier.weight(1f),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
+                Spacer(Modifier.height(4.dp))
+                ProfileInfoLabelRow(R.drawable.ic_birthday, state.birthdayText)
+                ProfileInfoLabelRow(R.drawable.ic_region, state.regionText)
+                if (state.hasDiseaseText) ProfileInfoLabelRow(R.drawable.ic_medical_history, state.diseaseText)
             }
 
             Spacer(Modifier.width(10.dp))
@@ -172,9 +146,6 @@ internal fun ProfileUserInfoCard(
 
 @Composable
 private fun ProfileAvatar(state: ProfileUserInfoUiState) {
-    val bitmap = remember(state.avatarFilePath) {
-        state.avatarFilePath?.let { BitmapFactory.decodeFile(it) }
-    }
     Box(
         modifier = Modifier
             .size(56.dp)
@@ -182,9 +153,9 @@ private fun ProfileAvatar(state: ProfileUserInfoUiState) {
             .background(state.avatarColor),
         contentAlignment = Alignment.Center,
     ) {
-        if (bitmap != null) {
+        if (state.avatarBitmap != null) {
             Image(
-                bitmap = bitmap.asImageBitmap(),
+                bitmap = state.avatarBitmap.asImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier
                     .size(56.dp)
@@ -198,6 +169,24 @@ private fun ProfileAvatar(state: ProfileUserInfoUiState) {
                 color = Color.White,
             )
         }
+    }
+}
+
+@Composable
+private fun ProfileInfoLabelRow(iconRes: Int, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(16.dp),
+        )
+        Spacer(Modifier.width(6.dp))
+        TextOverflowText(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

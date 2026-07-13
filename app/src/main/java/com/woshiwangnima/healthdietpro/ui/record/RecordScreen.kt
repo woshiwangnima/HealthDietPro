@@ -32,7 +32,10 @@ fun RecordScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         uiState.sections.forEach { section ->
-            ActionSectionCard(title = stringResource(section.titleRes)) {
+            ActionSectionCard(
+                title = stringResource(section.titleRes),
+                titleIconRes = section.titleIconRes,
+            ) {
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     maxItemsInEachRow = 4,

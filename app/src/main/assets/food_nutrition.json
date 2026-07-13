@@ -1,0 +1,9 @@
+{
+  "foods": [
+    {"id":"builtin.rice.cooked","name":{"zh":"米饭","en":"Cooked rice"},"aliases":["白米饭"],"categoryTag":"food.staple.grain","nutrientsPer100g":{"ENERGY":116.0,"PROTEIN":2.6,"FAT":0.3,"CHO":25.9}},
+    {"id":"builtin.oats","name":{"zh":"燕麦片","en":"Oats"},"categoryTag":"food.staple.whole_grain","nutrientsPer100g":{"ENERGY":367.0,"PROTEIN":15.0,"FAT":6.7,"CHO":61.6}},
+    {"id":"builtin.chicken_egg","name":{"zh":"鸡蛋","en":"Chicken egg"},"categoryTag":"food.meat_egg.egg","nutrientsPer100g":{"ENERGY":144.0,"PROTEIN":13.3,"FAT":8.8,"CHO":2.8}},
+    {"id":"builtin.apple","name":{"zh":"苹果","en":"Apple"},"categoryTag":"food.fruit","nutrientsPer100g":{"ENERGY":53.0,"PROTEIN":0.2,"FAT":0.2,"CHO":13.5}},
+    {"id":"builtin.milk","name":{"zh":"牛奶","en":"Milk"},"categoryTag":"food.dairy","nutrientsPer100g":{"ENERGY":54.0,"PROTEIN":3.0,"FAT":3.2,"CHO":3.4}}
+  ]
+}

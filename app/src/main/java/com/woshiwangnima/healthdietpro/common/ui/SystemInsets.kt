@@ -22,3 +22,8 @@ internal fun adaptiveNavigationBarWindowInsets(): WindowInsets {
         WindowInsets(0, 0, 0, 0)
     }
 }
+
+@Composable
+internal fun adaptiveNavigationBarsWindowInsets(): WindowInsets {
+    return WindowInsets.navigationBars
+}

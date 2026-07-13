@@ -1,5 +1,10 @@
 package com.woshiwangnima.healthdietpro.ui.profile.chart
 
+enum class ChartAxisKind {
+    Numeric,
+    TimestampMs,
+}
+
 enum class ChartVerticalAxisPosition {
     Left,
     Right,
@@ -16,9 +21,16 @@ data class XAxisBand(
     val color: Int,
 )
 
+data class YAxisBand(
+    val minValue: Float,
+    val maxValue: Float,
+    val color: Int,
+)
+
 data class ChartCanvasStyle(
     val yAxisPosition: ChartVerticalAxisPosition = ChartVerticalAxisPosition.Right,
     val xAxisPosition: ChartHorizontalAxisPosition = ChartHorizontalAxisPosition.Bottom,
+    val xAxisKind: ChartAxisKind = ChartAxisKind.Numeric,
     val yGridLineStyles: List<LineType> = listOf(LineType.DOTTED),
     val xGridLineStyles: List<LineType> = emptyList(),
     val yAxisBands: List<YAxisBand> = emptyList(),

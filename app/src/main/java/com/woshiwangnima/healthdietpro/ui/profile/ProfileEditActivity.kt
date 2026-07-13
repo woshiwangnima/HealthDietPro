@@ -1,8 +1,6 @@
 package com.woshiwangnima.healthdietpro.ui.profile
 
 import android.Manifest
-import android.app.DatePickerDialog
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -66,6 +64,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.AppInputLabel
 import com.woshiwangnima.healthdietpro.common.ui.AppInputTextFieldColors
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.ui.AppTextIconButton
@@ -86,7 +85,8 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.util.location.CurrentLocationProvider
 import java.io.File
 import java.io.FileOutputStream
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Locale
 
 class ProfileEditActivity : BaseBackActivity() {
@@ -107,8 +107,6 @@ class ProfileEditActivity : BaseBackActivity() {
     private var originalProfile: UserProfile? = null
     private var editingUserId: String = ""
     private var isNewUser: Boolean = false
-    private var currentDialog: Dialog? = null
-
     private var uiState by androidx.compose.runtime.mutableStateOf(ProfileEditUiState())
     private var dialogState by mutableStateOf<ProfileEditDialogState?>(null)
 
@@ -180,7 +178,7 @@ class ProfileEditActivity : BaseBackActivity() {
                         refreshUiState()
                     },
                     onAvatarClick = { avatarPickerLauncher.launch("image/*") },
-                    onBirthdayClick = { showDatePicker() },
+                    onBirthdayClick = { showBirthdayPicker() },
                     onRegionClick = { showRegionChoiceSheet() },
                     onDiseaseClick = { showDiseasePicker() },
                     onHeightClick = { openHeightDetail() },
@@ -292,33 +290,20 @@ class ProfileEditActivity : BaseBackActivity() {
     }
 
     private fun dismissCurrentDialog() {
-        currentDialog?.dismiss()
-        currentDialog = null
         dialogState = null
     }
 
-    private fun showDatePicker() {
-        dismissCurrentDialog()
-        val cal = Calendar.getInstance()
-        selectedBirthday?.let {
-            runCatching {
-                val parts = it.date.split("-")
-                cal.set(Calendar.YEAR, parts[0].toInt())
-                cal.set(Calendar.MONTH, parts[1].toInt() - 1)
-                cal.set(Calendar.DAY_OF_MONTH, parts[2].toInt())
-            }
-        }
-        currentDialog = DatePickerDialog(
-            this,
-            { _, year, month, day ->
-                selectedBirthday = AppDate(date = "%04d-%02d-%02d".format(year, month + 1, day))
+    private fun showBirthdayPicker() {
+        val initialDate = selectedBirthday?.date?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+            ?: LocalDate.now()
+        dialogState = ProfileEditDialogState.BirthdayPicker(
+            initialMillis = initialDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+            onDatePicked = { date ->
+                selectedBirthday = AppDate(date = date.toString())
+                dismissCurrentDialog()
                 refreshUiState()
-                currentDialog = null
             },
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH),
-        ).apply { show() }
+        )
     }
 
     private fun showRegionChoiceSheet() {
@@ -563,6 +548,11 @@ private sealed interface ProfileEditDialogState {
     data class LocationProgress(
         val onCancel: () -> Unit,
     ) : ProfileEditDialogState
+
+    data class BirthdayPicker(
+        val initialMillis: Long,
+        val onDatePicked: (LocalDate) -> Unit,
+    ) : ProfileEditDialogState
 }
 
 private data class ProfileSelectionItem(
@@ -712,6 +702,11 @@ private fun ProfileEditDialogs(
         )
         is ProfileEditDialogState.LocationProgress -> LocationProgressDialog(
             state = dialogState,
+        )
+        is ProfileEditDialogState.BirthdayPicker -> ComposeDatePickerDialog(
+            initialMillis = dialogState.initialMillis,
+            onDismiss = onDismiss,
+            onDatePicked = dialogState.onDatePicked,
         )
     }
 }

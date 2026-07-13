@@ -47,23 +47,21 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
-import com.woshiwangnima.healthdietpro.common.ui.AppEditableDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppFormSubtitle
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.AppInputLabel
 import com.woshiwangnima.healthdietpro.common.ui.AppInputTextFieldColors
 import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.common.ui.ComposeDateTimePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
+import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
 import com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
-import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
-import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.util.image.WatermarkUtil
 import com.woshiwangnima.healthdietpro.util.location.CurrentLocationProvider
-import com.woshiwangnima.healthdietpro.util.time.DateTimePicker
 import java.io.File
 import java.io.FileOutputStream
 
@@ -77,18 +75,10 @@ class MedicationRecordActivity : BaseBackActivity() {
 
     private var editingRecordId: String? = null
     private var formState by mutableStateOf(MedicationRecordFormState())
+    private var showDateTimePicker by mutableStateOf(false)
     private lateinit var locationProvider: CurrentLocationProvider
     private lateinit var provinceRepo: ProvinceRepository
     private var pendingCameraUri: Uri? = null
-
-    private val specCategories: List<UnitCategory>
-        get() {
-            val ids = setOf(UnitCategoryType.Weight.id, UnitCategoryType.Volume.id)
-            return UnitConverter.getRepository()
-                ?.getCategories()
-                ?.filter { it.id in ids }
-                .orEmpty()
-        }
 
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -120,7 +110,6 @@ class MedicationRecordActivity : BaseBackActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        UnitConverter.init(this)
         locationProvider = CurrentLocationProvider(this)
         provinceRepo = ProvinceRepository.fromContext(this)
         editingRecordId = intent.getStringExtra(EXTRA_RECORD_ID)
@@ -139,15 +128,22 @@ class MedicationRecordActivity : BaseBackActivity() {
                     MedicationRecordScreen(
                         state = formState,
                         contentPadding = innerPadding,
-                        specCategories = specCategories,
-                        medicationHistory = MedicationPrefs.getMedicationNameHistory(this),
-                        methodHistory = MedicationPrefs.getMethodHistory(this),
+                        catalog = MedicationPrefs.getCatalog(this),
                         onStateChange = { formState = it },
-                        onApplyNameDefaults = ::applyNameDefaults,
-                        onPickTime = ::pickTime,
+                        onPickTime = { showDateTimePicker = true },
                         onTakePhoto = ::requestCamera,
                         onPickPhoto = { galleryLauncher.launch("image/*") },
                         onSave = ::saveRecord,
+                    )
+                }
+                if (showDateTimePicker) {
+                    ComposeDateTimePickerDialog(
+                        initialMillis = formState.timestamp,
+                        onDismiss = { showDateTimePicker = false },
+                        onDateTimePicked = { timestamp ->
+                            formState = formState.copy(timestamp = timestamp)
+                            showDateTimePicker = false
+                        },
                     )
                 }
             }
@@ -157,43 +153,23 @@ class MedicationRecordActivity : BaseBackActivity() {
     private fun initialFormState(recordId: String?): MedicationRecordFormState {
         val record = recordId?.let { id -> MedicationPrefs.getRecords(this).find { it.id == id } }
             ?: return MedicationRecordFormState()
-        val category = specCategories.find { it.id == record.specUnitCategory }
-        val unitId = category?.units?.find { it.id == record.specUnitId }?.id ?: record.specUnitId
         return MedicationRecordFormState(
             timestamp = record.timestamp,
             medicationName = record.medicationName,
+            medicationId = record.medicationId,
             doseValue = record.doseValue.takeIf { it > 0f }?.toString().orEmpty(),
             doseUnit = record.doseUnit,
             specValue = record.specValue.takeIf { it > 0f }?.toString().orEmpty(),
-            specCategoryId = category?.id.orEmpty(),
-            specUnitId = unitId,
+            specCategoryId = record.specUnitCategory,
+            specUnitId = record.specUnitId,
             method = record.method,
+            manufacturer = record.manufacturer,
+            medicationImagePath = record.medicationImagePath,
             selectedFeelings = record.feelings.toSet(),
             feelingNote = record.feelingNote,
             photoFileName = record.photoPath,
             photoBitmap = record.photoPath?.let(::loadBitmap),
         )
-    }
-
-    private fun applyNameDefaults(name: String) {
-        if (name.isBlank()) return
-        val defaults = MedicationPrefs.findNameDefaults(this, name) ?: return
-        val category = specCategories.find { it.id == defaults.specUnitCategory }
-        val unitId = category?.units?.find { it.id == defaults.specUnitId }?.id ?: defaults.specUnitId
-        formState = formState.copy(
-            doseValue = defaults.doseValue.takeIf { it > 0f }?.toString().orEmpty(),
-            doseUnit = defaults.doseUnit,
-            specValue = defaults.specValue.takeIf { it > 0f }?.toString().orEmpty(),
-            specCategoryId = category?.id.orEmpty(),
-            specUnitId = unitId,
-            method = defaults.method,
-        )
-    }
-
-    private fun pickTime() {
-        DateTimePicker.show(this, formState.timestamp) { timestamp ->
-            formState = formState.copy(timestamp = timestamp)
-        }
     }
 
     private fun requestCamera() {
@@ -278,28 +254,29 @@ class MedicationRecordActivity : BaseBackActivity() {
 
     private fun saveRecord() {
         val state = formState
-        val name = state.medicationName.trim()
-        if (name.isEmpty()) {
-            Toast.makeText(this, getString(R.string.medication_record_name_required), Toast.LENGTH_SHORT).show()
+        val medicationId = state.medicationId
+        if (medicationId == null && editingRecordId == null) {
+            Toast.makeText(this, getString(R.string.medication_record_select_required), Toast.LENGTH_SHORT).show()
             return
         }
 
-        val category = specCategories.find { it.id == state.specCategoryId }
-        val unitId = category?.units?.find { it.id == state.specUnitId }?.id.orEmpty()
         val recordId = editingRecordId ?: "${System.currentTimeMillis()}_${(Math.random() * 10000).toInt()}"
         val record = MedicationRecord(
             id = recordId,
             timestamp = state.timestamp,
-            medicationName = name,
+            medicationName = state.medicationName,
             doseValue = state.doseValue.toFloatOrNull() ?: 0f,
             doseUnit = state.doseUnit.trim(),
             specValue = state.specValue.toFloatOrNull() ?: 0f,
-            specUnitCategory = category?.id.orEmpty(),
-            specUnitId = unitId,
+            specUnitCategory = state.specCategoryId,
+            specUnitId = state.specUnitId,
             method = state.method.trim(),
             feelings = state.selectedFeelings.toList(),
             feelingNote = state.feelingNote.trim(),
             photoPath = state.photoFileName,
+            medicationId = medicationId,
+            manufacturer = state.manufacturer,
+            medicationImagePath = state.medicationImagePath,
         )
         if (editingRecordId != null) {
             val all = MedicationPrefs.getRecords(this).toMutableList()
@@ -318,12 +295,15 @@ class MedicationRecordActivity : BaseBackActivity() {
 private data class MedicationRecordFormState(
     val timestamp: Long = System.currentTimeMillis(),
     val medicationName: String = "",
+    val medicationId: String? = null,
     val doseValue: String = "",
     val doseUnit: String = "",
     val specValue: String = "",
     val specCategoryId: String = "",
     val specUnitId: String = "",
     val method: String = "",
+    val manufacturer: String = "",
+    val medicationImagePath: String? = null,
     val selectedFeelings: Set<String> = emptySet(),
     val feelingNote: String = "",
     val photoFileName: String? = null,
@@ -334,11 +314,8 @@ private data class MedicationRecordFormState(
 private fun MedicationRecordScreen(
     state: MedicationRecordFormState,
     contentPadding: PaddingValues,
-    specCategories: List<UnitCategory>,
-    medicationHistory: List<String>,
-    methodHistory: List<String>,
+    catalog: List<MedicationCatalogItem>,
     onStateChange: (MedicationRecordFormState) -> Unit,
-    onApplyNameDefaults: (String) -> Unit,
     onPickTime: () -> Unit,
     onTakePhoto: () -> Unit,
     onPickPhoto: () -> Unit,
@@ -363,16 +340,13 @@ private fun MedicationRecordScreen(
                 )
             }
             item {
-                AppEditableDropdownField(
-                    title = stringResource(R.string.medication_record_name),
-                    label = stringResource(R.string.medication_record_name_hint),
+                AppDropdownField(
+                    label = stringResource(R.string.medication_record_name),
                     value = state.medicationName,
-                    options = medicationHistory,
-                    onValueChange = { onStateChange(state.copy(medicationName = it)) },
-                    onSelect = {
-                        onStateChange(state.copy(medicationName = it))
-                        onApplyNameDefaults(it)
-                    },
+                    options = catalog.filter { !it.archived || it.id == state.medicationId }.map { AppDropdownOption(it.id, it.name) },
+                    onSelect = { option -> catalog.find { it.id == option.id }?.let { item ->
+                        onStateChange(state.copy(medicationId = item.id, medicationName = item.name, specValue = item.specValue.takeIf { value -> value > 0f }?.toString().orEmpty(), specCategoryId = item.specUnitCategory, specUnitId = item.specUnitId, method = item.defaultMethod, manufacturer = item.manufacturer, medicationImagePath = item.imagePath))
+                    } },
                 )
             }
             item {
@@ -382,21 +356,7 @@ private fun MedicationRecordScreen(
                 )
             }
             item {
-                SpecSection(
-                    state = state,
-                    categories = specCategories,
-                    onStateChange = onStateChange,
-                )
-            }
-            item {
-                AppEditableDropdownField(
-                    title = stringResource(R.string.medication_record_method),
-                    label = stringResource(R.string.medication_record_method),
-                    value = state.method,
-                    options = methodHistory,
-                    onValueChange = { onStateChange(state.copy(method = it)) },
-                    onSelect = { onStateChange(state.copy(method = it)) },
-                )
+                Text(text = stringResource(R.string.medication_record_catalog_snapshot, state.method), style = MaterialTheme.typography.bodyMedium)
             }
             item {
                 FeelingSection(
@@ -441,7 +401,7 @@ private fun TimeField(
                 .padding(horizontal = 12.dp, vertical = 14.dp),
         ) {
             Text(
-                text = DateTimePicker.format(timestamp),
+                text = formatDateTime(timestamp),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -479,61 +439,6 @@ private fun DoseSection(
             )
         }
         AppFormSubtitle(text = stringResource(R.string.medication_record_dose_help))
-    }
-}
-
-@Composable
-private fun SpecSection(
-    state: MedicationRecordFormState,
-    categories: List<UnitCategory>,
-    onStateChange: (MedicationRecordFormState) -> Unit,
-) {
-    val selectedCategory = categories.find { it.id == state.specCategoryId }
-    val unitOptions = selectedCategory
-        ?.units
-        ?.filter { !it.hidden }
-        .orEmpty()
-    val selectedUnit = unitOptions.find { it.id == state.specUnitId }
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = stringResource(R.string.medication_record_spec_section),
-            style = MaterialTheme.typography.titleSmall,
-        )
-        OutlinedTextField(
-            value = state.specValue,
-            onValueChange = { onStateChange(state.copy(specValue = it)) },
-            label = { AppInputLabel(stringResource(R.string.medication_record_spec_value_hint)) },
-            colors = AppInputTextFieldColors(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AppDropdownField(
-                label = stringResource(R.string.medication_record_spec_category_select),
-                value = selectedCategory?.displayName().orEmpty(),
-                options = categories.map { AppDropdownOption(id = it.id, label = it.displayName()) },
-                onSelect = { option ->
-                    val category = categories.find { it.id == option.id }
-                    onStateChange(
-                        state.copy(
-                            specCategoryId = option.id,
-                            specUnitId = category?.baseUnit.orEmpty(),
-                        )
-                    )
-                },
-                modifier = Modifier.weight(1f),
-            )
-            AppDropdownField(
-                label = stringResource(R.string.medication_record_spec_unit_select),
-                value = selectedUnit?.symbol().orEmpty(),
-                options = unitOptions.map { AppDropdownOption(id = it.id, label = "${it.symbol()} (${it.id})") },
-                onSelect = { option -> onStateChange(state.copy(specUnitId = option.id)) },
-                enabled = selectedCategory != null,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        AppFormSubtitle(text = stringResource(R.string.medication_record_spec_help))
     }
 }
 

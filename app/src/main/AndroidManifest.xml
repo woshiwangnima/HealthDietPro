@@ -52,23 +52,9 @@
             android:name=".ui.settings.ReminderSettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.profile.chart.HeightChartActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.chart.WeightChartActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.chart.ChartFullscreenActivity"
-            android:configChanges="orientation|screenSize"
-            android:exported="false" />
-        <activity
             android:name=".ui.profile.BmiDetailActivity"
             android:configChanges="orientation|screenSize|uiMode"
             android:exported="false" />
-        <activity
-            android:name=".ui.widget.tab.demo.DemoTabsActivity"
-            android:exported="true" />
-
         <activity
             android:name=".common.ui.ComposePreviewActivity"
             android:exported="true"
@@ -82,6 +68,12 @@
             android:name=".ui.record.MedicationListActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize|uiMode" />
+        <activity
+            android:name=".ui.record.MedicationCatalogActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.record.BloodGlucoseActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

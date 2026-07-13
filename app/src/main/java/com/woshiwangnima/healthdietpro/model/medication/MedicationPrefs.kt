@@ -5,6 +5,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * 用药记录的 per-user 存储。所有数据挂在 `medication_records_${userId}` 这个键下，
@@ -18,6 +20,8 @@ import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 object MedicationPrefs {
 
     private const val KEY_RECORDS = "medication_records"
+    private const val KEY_CATALOG = "medication_catalog"
+    private val json = Json { ignoreUnknownKeys = true }
 
     private fun prefs(context: Context) =
         context.getSharedPreferences("health_diet_prefs", Context.MODE_PRIVATE)
@@ -25,19 +29,16 @@ object MedicationPrefs {
     private fun keyFor(context: Context): String =
         ProfilePrefs.makeChartStateKey(context, KEY_RECORDS)
 
+    private fun catalogKeyFor(context: Context): String =
+        ProfilePrefs.makeChartStateKey(context, KEY_CATALOG)
+
     fun getRecords(context: Context): List<MedicationRecord> {
-        val raw = prefs(context).getString(keyFor(context), null) ?: return emptyList()
-        val type = object : TypeToken<List<MedicationRecord>>() {}.type
-        return try {
-            Gson().fromJson<List<MedicationRecord>>(raw, type) ?: emptyList()
-        } catch (_: Exception) {
-            emptyList()
-        }
+        return migrated(context).records
     }
 
     fun saveRecords(context: Context, records: List<MedicationRecord>) {
         prefs(context).edit()
-            .putString(keyFor(context), Gson().toJson(records))
+            .putString(keyFor(context), json.encodeToString(records))
             .apply()
     }
 
@@ -45,6 +46,55 @@ object MedicationPrefs {
         val list = getRecords(context).toMutableList()
         list.add(0, record) // 最近记录排在最前
         saveRecords(context, list)
+    }
+
+    fun getCatalog(context: Context): List<MedicationCatalogItem> {
+        return migrated(context).catalog
+    }
+
+    private fun migrated(context: Context): MedicationMigration.Result {
+        val records = readRecords(context)
+        val catalog = readCatalog(context)
+        val migration = MedicationMigration.migrate(catalog, records)
+        if (migration.changed) {
+            saveCatalog(context, migration.catalog)
+            saveRecords(context, migration.records)
+        }
+        return migration
+    }
+
+    private fun readRecords(context: Context): List<MedicationRecord> {
+        val raw = prefs(context).getString(keyFor(context), null) ?: return emptyList()
+        return try {
+            json.decodeFromString<List<MedicationRecord>>(raw)
+        } catch (_: Exception) {
+            // Existing installations wrote this key with Gson before kotlinx serialization.
+            runCatching {
+                Gson().fromJson<List<MedicationRecord>>(
+                    raw,
+                    object : TypeToken<List<MedicationRecord>>() {}.type,
+                ) ?: emptyList()
+            }.getOrDefault(emptyList())
+        }
+    }
+
+    private fun readCatalog(context: Context): List<MedicationCatalogItem> {
+        val stored = prefs(context).getString(catalogKeyFor(context), null)
+        return stored?.let { runCatching { json.decodeFromString<List<MedicationCatalogItem>>(it) }.getOrDefault(emptyList()) }
+            ?: emptyList()
+    }
+
+    fun saveCatalog(context: Context, catalog: List<MedicationCatalogItem>) {
+        prefs(context).edit()
+            .putString(catalogKeyFor(context), json.encodeToString(catalog))
+            .apply()
+    }
+
+    fun upsertCatalogItem(context: Context, item: MedicationCatalogItem) {
+        val catalog = getCatalog(context).toMutableList()
+        val index = catalog.indexOfFirst { it.id == item.id }
+        if (index >= 0) catalog[index] = item else catalog.add(item)
+        saveCatalog(context, catalog)
     }
 
     /** 药品名历史：按最近使用排序的去重列表。 */
