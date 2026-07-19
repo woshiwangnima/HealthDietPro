@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.Density
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 
 private val LightPrimary = Color(0xFF4CAF50)
 private val LightPrimaryContainer = Color(0xFFC8E6C9)
@@ -83,10 +84,11 @@ private val AppTypography @Composable get() = appTypography()
 
 @Composable
 fun HealthDietProTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean? = null,
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
+    val darkMode by AppPrefs.darkMode.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(context, lifecycleOwner) {
         AppFontScaleState.load(context)
@@ -102,13 +104,19 @@ fun HealthDietProTheme(
     }
     val fontScale by AppFontScaleState.scale.collectAsState()
     val density = LocalDensity.current
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val resolvedDarkTheme = darkTheme ?: when (darkMode) {
+        "YES" -> true
+        "NO" -> false
+        else -> isSystemInDarkTheme()
+    }
+    val colorScheme = if (resolvedDarkTheme) DarkColorScheme else LightColorScheme
     CompositionLocalProvider(
         LocalDensity provides Density(
             density = density.density,
             fontScale = fontScale,
         )
     ) {
+        DisposableEffect(context) { AppPrefs.loadDarkMode(context); onDispose {} }
         MaterialTheme(
             colorScheme = colorScheme,
             typography = AppTypography,

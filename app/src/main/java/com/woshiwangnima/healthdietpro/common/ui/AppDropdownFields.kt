@@ -7,7 +7,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -36,6 +38,7 @@ fun AppDropdownField(
     onSelect: (AppDropdownOption) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    showOptionDividers: Boolean = false,
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
@@ -53,7 +56,7 @@ fun AppDropdownField(
             colors = AppDropdownTextFieldColors(),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
-                .menuAnchor()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled)
                 .fillMaxWidth(),
         )
         ExposedDropdownMenu(
@@ -61,7 +64,7 @@ fun AppDropdownField(
             onDismissRequest = { expanded = false },
             containerColor = AppDropdownContainerColor(),
         ) {
-            options.forEach { option ->
+            options.forEachIndexed { index, option ->
                 DropdownMenuItem(
                     text = { Text(option.label) },
                     onClick = {
@@ -69,6 +72,9 @@ fun AppDropdownField(
                         onSelect(option)
                     },
                 )
+                if (showOptionDividers && index < options.lastIndex) {
+                    HorizontalDivider()
+                }
             }
         }
     }
@@ -112,7 +118,7 @@ fun AppEditableDropdownField(
                     }
                 },
                 modifier = Modifier
-                    .menuAnchor()
+                    .menuAnchor(MenuAnchorType.PrimaryEditable, enabled = options.isNotEmpty())
                     .fillMaxWidth(),
             )
             ExposedDropdownMenu(

@@ -90,6 +90,14 @@ $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JA
 $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat installDebug
 ```
 
+同一工作区不得并行运行 Gradle（包括把 `test` 与 `lint` 同时启动）。并发 Kotlin 编译会争用 `app/build/kotlin/.../cacheable` 增量缓存，触发 daemon 的 `Storage ... is already registered` 回退编译并显著卡顿。验证时按顺序执行，先用 `--stop` 清理遗留 daemon：
+
+```powershell
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat --stop
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat test
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat lint
+```
+
 完成任何改动后必须跑 `test` + `lint`；无法确定命令时问用户并写回本文件。
 
 ## Compose 迁移规则

@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.model.profile
 
 data class UserProfile(
     val id: String = "",
+    val archiveSchemaVersion: Int = 2,
     val name: String = "",
     val gender: Gender = Gender.MALE,
     val birthday: AppDate? = null,

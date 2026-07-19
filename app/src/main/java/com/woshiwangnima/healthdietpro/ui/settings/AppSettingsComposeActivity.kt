@@ -27,14 +27,10 @@ class AppSettingsComposeActivity : ComponentActivity() {
                                 setResult(Activity.RESULT_OK)
                                 finish()
                             },
-                            onOpenTextOverflow = { navController.navigate(Routes.TEXT_OVERFLOW) },
+                            onOpenTextDisplay = { navController.navigate(Routes.TEXT_DISPLAY) },
                         )
                     }
-                    composable(Routes.TEXT_OVERFLOW) {
-                        TextOverflowScreen(
-                            onBack = { navController.popBackStack() },
-                        )
-                    }
+                    composable(Routes.TEXT_DISPLAY) { TextDisplaySettingsScreen { navController.popBackStack() } }
                 }
             }
         }
@@ -43,5 +39,5 @@ class AppSettingsComposeActivity : ComponentActivity() {
 
 private object Routes {
     const val APP_SETTINGS = "app_settings"
-    const val TEXT_OVERFLOW = "text_overflow"
+    const val TEXT_DISPLAY = "text_display"
 }

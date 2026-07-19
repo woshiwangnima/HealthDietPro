@@ -11,6 +11,7 @@ object ProfilePrefs {
     private const val KEY_LEGACY_PROFILE = "user_profile"
     private const val KEY_ALL_USERS = "all_users"
     private const val KEY_CURRENT_USER_ID = "current_user_id"
+    private const val CURRENT_ARCHIVE_SCHEMA_VERSION = 2
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -22,6 +23,7 @@ object ProfilePrefs {
             // 在 load 时封装成 RegionSnapshot。这里只触发一次：探测首条用户
             // 数据中是否还有遗留的 'province' 字段。
             migrateLegacyProvinceField(context)
+            migrateArchiveSchema(context)
             return
         }
         val legacyJson = p.getString(KEY_LEGACY_PROFILE, null) ?: return
@@ -32,6 +34,17 @@ object ProfilePrefs {
             setCurrentUserId(context, "default")
             p.edit().remove(KEY_LEGACY_PROFILE).apply()
         } catch (_: Exception) {}
+    }
+
+    private fun migrateArchiveSchema(context: Context) {
+        val users = readUsersWithoutMigration(context)
+        if (users.isEmpty() || users.all { it.archiveSchemaVersion >= CURRENT_ARCHIVE_SCHEMA_VERSION }) return
+        saveUserMap(context, users.map { user ->
+            when (user.archiveSchemaVersion) {
+                0, 1 -> user.copy(archiveSchemaVersion = CURRENT_ARCHIVE_SCHEMA_VERSION)
+                else -> user
+            }
+        })
     }
 
     /**
@@ -87,6 +100,10 @@ object ProfilePrefs {
 
     private fun loadUserMap(context: Context): List<UserProfile> {
         ensureMigrated(context)
+        return readUsersWithoutMigration(context)
+    }
+
+    private fun readUsersWithoutMigration(context: Context): List<UserProfile> {
         val json = prefs(context).getString(KEY_ALL_USERS, null) ?: return emptyList()
         return try {
             val type = object : TypeToken<List<UserProfile>>() {}.type
@@ -138,16 +155,15 @@ object ProfilePrefs {
 
 fun load(context: Context): UserProfile {
         val current = getProfile(context, getCurrentUserId(context))
-        val seed = createSeedProfile()
         return UserProfile(
             id = current?.id ?: "",
-            name = current?.name ?: seed.name,
-            gender = current?.gender ?: seed.gender,
-            birthday = current?.birthday ?: seed.birthday,
-            region = current?.region ?: seed.region,
-            diseaseIds = current?.diseaseIds ?: seed.diseaseIds,
-            heightRecords = joinRecords(current?.heightRecords.orEmpty(), seed.heightRecords, false),
-            weightRecords = joinRecords(current?.weightRecords.orEmpty(), seed.weightRecords, true),
+            name = current?.name.orEmpty(),
+            gender = current?.gender ?: Gender.MALE,
+            birthday = current?.birthday,
+            region = current?.region ?: com.woshiwangnima.healthdietpro.model.region.RegionSnapshot(),
+            diseaseIds = current?.diseaseIds.orEmpty(),
+            heightRecords = current?.heightRecords.orEmpty().map { fixUnit(it, false) },
+            weightRecords = current?.weightRecords.orEmpty().map { fixUnit(it, true) },
             avatarFileName = current?.avatarFileName ?: ""
         )
     }
@@ -195,52 +211,10 @@ fun load(context: Context): UserProfile {
 
     private fun genId(): String = (System.currentTimeMillis() xor Math.random().toLong().and(0xFFFF)).toString()
 
-    private fun joinRecords(saved: List<BodyRecord>, seed: List<BodyRecord>, isWeight: Boolean): List<BodyRecord> {
-        val fixedSaved = saved.map { fixUnit(it, isWeight) }
-        val savedDates = fixedSaved.map { it.date }.toSet()
-        return (fixedSaved + seed.filter { it.date !in savedDates }).sortedBy { it.date }
-    }
-
     private fun fixUnit(record: BodyRecord, isWeight: Boolean): BodyRecord {
         val u = record.unit
         if (u != null && u.isNotEmpty()) return record
         return record.copy(unit = if (isWeight) UnitCategoryType.Weight.defaultUnitId else UnitCategoryType.Length.defaultUnitId)
     }
 
-    private fun createSeedProfile(): UserProfile {
-        val now = java.time.LocalDate.now()
-        val rng = java.util.Random(42)
-
-        val weightRecords = (0 until 30).map { daysAgo ->
-            val date = now.minusDays(daysAgo.toLong())
-            val trend = daysAgo * 0.02f
-            val noise = (rng.nextFloat() - 0.5f) * 1.6f
-            val value = (67.5f - trend + noise).coerceIn(63f, 72f)
-            BodyRecord(
-                date = date.toString(),
-                value = value,
-                unit = "kg"
-            )
-        }
-
-        val heightRecords = listOf(
-            now.minusMonths(12) to 169.2f,
-            now.minusMonths(10) to 169.5f,
-            now.minusMonths(7) to 169.8f,
-            now.minusMonths(4) to 170.1f,
-            now.minusMonths(2) to 170.3f,
-            now.minusMonths(0) to 170.5f
-        ).map { (dateOffset, value) ->
-            BodyRecord(
-                date = dateOffset.toString(),
-                value = value,
-                unit = "cm"
-            )
-        }
-
-        return UserProfile(
-            weightRecords = weightRecords.sortedBy { it.date },
-            heightRecords = heightRecords.sortedBy { it.date }
-        )
-    }
 }

@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.common.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,13 +24,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 data class AppDataTableColumn<T>(
     val key: String,
@@ -209,8 +215,19 @@ private fun <T> HorizontalDataTable(
     val rowEven = MaterialTheme.colorScheme.surface
     val rowOdd = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f)
     val border = MaterialTheme.colorScheme.outlineVariant
+    val isHorizontallyScrollable = contentWidth > maxWidth
+    val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
+        if (isHorizontallyScrollable) {
+            HorizontalScrollHandle(
+                maxWidth = maxWidth,
+                contentWidth = contentWidth,
+                scrollValue = horizontalScroll.value,
+                scrollMax = horizontalScroll.maxValue,
+                onScroll = { target -> scope.launch { horizontalScroll.scrollTo(target) } },
+            )
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -292,6 +309,45 @@ private fun <T> HorizontalDataTable(
                 }
                 Divider(border = border, style = style)
             }
+        }
+    }
+}
+
+@Composable
+private fun HorizontalScrollHandle(
+    maxWidth: Dp,
+    contentWidth: Dp,
+    scrollValue: Int,
+    scrollMax: Int,
+    onScroll: (Int) -> Unit,
+) {
+    val viewportRatio = (maxWidth / contentWidth).coerceIn(0.16f, 1f)
+    val thumbWidth = maxWidth * viewportRatio
+    val travel = (maxWidth - thumbWidth).coerceAtLeast(0.dp)
+    val offsetFraction = if (scrollMax == 0) 0f else scrollValue.toFloat() / scrollMax
+    val thumbOffset = travel * offsetFraction
+    Column(
+        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)).padding(horizontal = 12.dp, vertical = 4.dp),
+    ) {
+        Text(
+            text = stringResource(com.woshiwangnima.healthdietpro.R.string.data_table_scroll_hint),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Box(
+            modifier = Modifier.fillMaxWidth().height(10.dp).pointerInput(scrollMax, travel) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    if (travel.value > 0f) {
+                        val next = (scrollValue + dragAmount.x / travel.value * scrollMax).toInt().coerceIn(0, scrollMax)
+                        onScroll(next)
+                    }
+                }
+            },
+        ) {
+            Box(
+                modifier = Modifier.offset(x = thumbOffset).width(thumbWidth).height(6.dp).background(MaterialTheme.colorScheme.primary, androidx.compose.foundation.shape.RoundedCornerShape(3.dp)),
+            )
         }
     }
 }

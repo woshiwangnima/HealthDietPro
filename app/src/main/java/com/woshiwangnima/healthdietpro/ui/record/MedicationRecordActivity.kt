@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -27,16 +26,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.woshiwangnima.healthdietpro.R
-import com.woshiwangnima.healthdietpro.base.BaseBackActivity
+import com.woshiwangnima.healthdietpro.base.DirtyFormActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppFormSubtitle
@@ -55,17 +54,24 @@ import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDateTimePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.HorizontalImageEditor
+import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
 import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
+import com.woshiwangnima.healthdietpro.model.medication.formatSelectionDetails
+import com.woshiwangnima.healthdietpro.model.medication.formatSpecification
+import com.woshiwangnima.healthdietpro.model.medication.format
+import com.woshiwangnima.healthdietpro.model.medication.defaultIntakeRules
 import com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
 import com.woshiwangnima.healthdietpro.util.image.WatermarkUtil
 import com.woshiwangnima.healthdietpro.util.location.CurrentLocationProvider
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.io.File
 import java.io.FileOutputStream
 
-class MedicationRecordActivity : BaseBackActivity() {
+class MedicationRecordActivity : DirtyFormActivity() {
 
     override fun getTitleText(): String = getString(R.string.medication_record_title)
 
@@ -75,6 +81,7 @@ class MedicationRecordActivity : BaseBackActivity() {
 
     private var editingRecordId: String? = null
     private var formState by mutableStateOf(MedicationRecordFormState())
+    private var originalFormState = MedicationRecordFormState()
     private var showDateTimePicker by mutableStateOf(false)
     private lateinit var locationProvider: CurrentLocationProvider
     private lateinit var provinceRepo: ProvinceRepository
@@ -105,8 +112,8 @@ class MedicationRecordActivity : BaseBackActivity() {
     }
 
     private val galleryLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> uri?.let { handlePickedPhoto(it) } }
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris -> uris.forEach(::handlePickedPhoto) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +121,7 @@ class MedicationRecordActivity : BaseBackActivity() {
         provinceRepo = ProvinceRepository.fromContext(this)
         editingRecordId = intent.getStringExtra(EXTRA_RECORD_ID)
         formState = initialFormState(editingRecordId)
+        originalFormState = formState
 
         setContent {
             HealthDietProTheme {
@@ -123,7 +131,7 @@ class MedicationRecordActivity : BaseBackActivity() {
                     } else {
                         stringResource(R.string.medication_record_edit_title)
                     },
-                    onBack = { finish() },
+                    onBack = ::requestFormExit,
                 ) { innerPadding ->
                     MedicationRecordScreen(
                         state = formState,
@@ -133,7 +141,9 @@ class MedicationRecordActivity : BaseBackActivity() {
                         onPickTime = { showDateTimePicker = true },
                         onTakePhoto = ::requestCamera,
                         onPickPhoto = { galleryLauncher.launch("image/*") },
+                        onRemovePhoto = ::removePhoto,
                         onSave = ::saveRecord,
+                        saveEnabled = formState != originalFormState,
                     )
                 }
                 if (showDateTimePicker) {
@@ -146,6 +156,7 @@ class MedicationRecordActivity : BaseBackActivity() {
                         },
                     )
                 }
+                DiscardChangesConfirmation()
             }
         }
     }
@@ -164,11 +175,18 @@ class MedicationRecordActivity : BaseBackActivity() {
             specUnitId = record.specUnitId,
             method = record.method,
             manufacturer = record.manufacturer,
-            medicationImagePath = record.medicationImagePath,
+            medicationImagePaths = record.medicationImagePaths,
             selectedFeelings = record.feelings.toSet(),
             feelingNote = record.feelingNote,
-            photoFileName = record.photoPath,
-            photoBitmap = record.photoPath?.let(::loadBitmap),
+            photoFileNames = record.recordPhotoPaths,
+            photoBitmaps = record.recordPhotoPaths.mapNotNull(::loadBitmap),
+            frequency = record.frequency,
+            intakeRules = record.intakeRules.ifEmpty { record.frequency.defaultIntakeRules() },
+            purposes = record.purposes,
+            purposeOptions = record.purposes,
+            sideEffectWarning = record.sideEffectWarning,
+            lotNumber = record.lotNumber,
+            expiresAt = record.expiresAt,
         )
     }
 
@@ -235,6 +253,7 @@ class MedicationRecordActivity : BaseBackActivity() {
     }
 
     private fun saveAndPreview(bitmap: Bitmap) {
+        if (formState.photoBitmaps.any { it.sameAs(bitmap) }) return
         val dir = File(filesDir, "medication_photos").apply { if (!exists()) mkdirs() }
         val fileName = "med_${System.currentTimeMillis()}.jpg"
         val file = File(dir, fileName)
@@ -242,14 +261,23 @@ class MedicationRecordActivity : BaseBackActivity() {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
         }
         formState = formState.copy(
-            photoFileName = "medication_photos/$fileName",
-            photoBitmap = bitmap,
+            photoFileNames = formState.photoFileNames + "medication_photos/$fileName",
+            photoBitmaps = formState.photoBitmaps + bitmap,
         )
     }
 
     private fun loadBitmap(relativePath: String): Bitmap? {
         val file = File(filesDir, relativePath)
         return if (file.exists()) BitmapFactory.decodeFile(file.absolutePath) else null
+    }
+
+    private fun removePhoto(index: Int) {
+        val path = formState.photoFileNames.getOrNull(index) ?: return
+        File(filesDir, path).delete()
+        formState = formState.copy(
+            photoFileNames = formState.photoFileNames.filterIndexed { i, _ -> i != index },
+            photoBitmaps = formState.photoBitmaps.filterIndexed { i, _ -> i != index },
+        )
     }
 
     private fun saveRecord() {
@@ -273,10 +301,16 @@ class MedicationRecordActivity : BaseBackActivity() {
             method = state.method.trim(),
             feelings = state.selectedFeelings.toList(),
             feelingNote = state.feelingNote.trim(),
-            photoPath = state.photoFileName,
+            recordPhotoPaths = state.photoFileNames,
             medicationId = medicationId,
             manufacturer = state.manufacturer,
-            medicationImagePath = state.medicationImagePath,
+            medicationImagePaths = state.medicationImagePaths,
+            frequency = state.frequency,
+            intakeRules = state.intakeRules,
+            purposes = state.purposes,
+            sideEffectWarning = state.sideEffectWarning,
+            lotNumber = state.lotNumber,
+            expiresAt = state.expiresAt,
         )
         if (editingRecordId != null) {
             val all = MedicationPrefs.getRecords(this).toMutableList()
@@ -290,6 +324,10 @@ class MedicationRecordActivity : BaseBackActivity() {
         setResult(Activity.RESULT_OK)
         finish()
     }
+
+    override fun hasUnsavedChanges(): Boolean = formState != originalFormState
+
+    override fun saveFormChanges() = saveRecord()
 }
 
 private data class MedicationRecordFormState(
@@ -303,11 +341,18 @@ private data class MedicationRecordFormState(
     val specUnitId: String = "",
     val method: String = "",
     val manufacturer: String = "",
-    val medicationImagePath: String? = null,
     val selectedFeelings: Set<String> = emptySet(),
     val feelingNote: String = "",
-    val photoFileName: String? = null,
-    val photoBitmap: Bitmap? = null,
+    val medicationImagePaths: List<String> = emptyList(),
+    val frequency: com.woshiwangnima.healthdietpro.model.medication.MedicationFrequency = com.woshiwangnima.healthdietpro.model.medication.MedicationFrequency(),
+    val intakeRules: List<com.woshiwangnima.healthdietpro.model.medication.MedicationIntakeRule> = emptyList(),
+    val purposes: List<String> = emptyList(),
+    val purposeOptions: List<String> = emptyList(),
+    val sideEffectWarning: String = "",
+    val lotNumber: String = "",
+    val expiresAt: Long? = null,
+    val photoFileNames: List<String> = emptyList(),
+    val photoBitmaps: List<Bitmap> = emptyList(),
 )
 
 @Composable
@@ -319,8 +364,12 @@ private fun MedicationRecordScreen(
     onPickTime: () -> Unit,
     onTakePhoto: () -> Unit,
     onPickPhoto: () -> Unit,
+    onRemovePhoto: (Int) -> Unit,
     onSave: () -> Unit,
+    saveEnabled: Boolean,
 ) {
+    var safetyWarning by androidx.compose.runtime.remember { mutableStateOf<String?>(null) }
+    val expiredWarning = stringResource(R.string.medication_record_expired_warning)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -343,9 +392,13 @@ private fun MedicationRecordScreen(
                 AppDropdownField(
                     label = stringResource(R.string.medication_record_name),
                     value = state.medicationName,
-                    options = catalog.filter { !it.archived || it.id == state.medicationId }.map { AppDropdownOption(it.id, it.name) },
+                    options = catalog.filter { !it.archived || it.id == state.medicationId }.map { item -> AppDropdownOption(item.id, formatMedicationOption(item)) },
+                    showOptionDividers = true,
                     onSelect = { option -> catalog.find { it.id == option.id }?.let { item ->
-                        onStateChange(state.copy(medicationId = item.id, medicationName = item.name, specValue = item.specValue.takeIf { value -> value > 0f }?.toString().orEmpty(), specCategoryId = item.specUnitCategory, specUnitId = item.specUnitId, method = item.defaultMethod, manufacturer = item.manufacturer, medicationImagePath = item.imagePath))
+                        val isExpired = item.expiresAt?.let { it < System.currentTimeMillis() } == true
+                        val warning = listOfNotNull(if (isExpired) expiredWarning else null, item.sideEffectWarning.takeIf { it.isNotBlank() }).joinToString("\n")
+                        onStateChange(state.copy(medicationId = item.id, medicationName = item.name, doseValue = item.defaultDoseValue.takeIf { value -> value > 0f }?.toString().orEmpty(), doseUnit = item.defaultDoseUnit, specValue = item.specValue.takeIf { value -> value > 0f }?.toString().orEmpty(), specCategoryId = item.specUnitCategory, specUnitId = item.specUnitId, method = item.defaultMethod, manufacturer = item.manufacturer, medicationImagePaths = item.imagePaths, frequency = item.frequency, intakeRules = item.intakeRules.ifEmpty { item.frequency.defaultIntakeRules() }, purposes = item.indicationTags, purposeOptions = item.indicationTags, sideEffectWarning = item.sideEffectWarning, lotNumber = item.lotNumber, expiresAt = item.expiresAt))
+                        if (warning.isNotBlank()) safetyWarning = warning
                     } },
                 )
             }
@@ -356,7 +409,12 @@ private fun MedicationRecordScreen(
                 )
             }
             item {
-                Text(text = stringResource(R.string.medication_record_catalog_snapshot, state.method), style = MaterialTheme.typography.bodyMedium)
+                CatalogSnapshot(state)
+            }
+            if (state.purposes.isNotEmpty()) {
+                item {
+                    PurposeSection(state, onStateChange)
+                }
             }
             item {
                 FeelingSection(
@@ -366,20 +424,59 @@ private fun MedicationRecordScreen(
             }
             item {
                 PhotoSection(
-                    bitmap = state.photoBitmap,
+                    bitmaps = state.photoBitmaps,
                     onTakePhoto = onTakePhoto,
                     onPickPhoto = onPickPhoto,
+                    onRemovePhoto = onRemovePhoto,
                 )
             }
         }
-        AppIconTextButton(
-            text = stringResource(R.string.medication_record_save),
-            iconRes = R.drawable.ic_save,
-            onClick = onSave,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-        )
+        FormSaveBar(stringResource(R.string.medication_record_save), saveEnabled, onSave)
+    }
+    safetyWarning?.let { warning ->
+        AlertDialog(onDismissRequest = { safetyWarning = null }, title = { Text(stringResource(R.string.medication_record_safety_warning)) }, text = { Text(warning) }, confirmButton = { TextButton(onClick = { safetyWarning = null }) { Text(stringResource(R.string.test_access_confirm)) } })
+    }
+}
+
+private fun formatMedicationOption(item: MedicationCatalogItem): String = listOf(
+    item.name,
+    item.formatSelectionDetails(UnitConverter.getRepository(), java.util.Locale.getDefault(), " / "),
+).filter { it.isNotBlank() }.joinToString("\n")
+
+@Composable
+private fun CatalogSnapshot(state: MedicationRecordFormState) {
+    val spec = MedicationCatalogItem(
+        id = "", name = "", specValue = state.specValue.toFloatOrNull() ?: 0f,
+        specUnitCategory = state.specCategoryId, specUnitId = state.specUnitId,
+    ).formatSpecification(UnitConverter.getRepository(), java.util.Locale.getDefault())
+    val locale = java.util.Locale.getDefault()
+    val content = listOf(spec, state.manufacturer, state.method, state.frequency.format(locale), state.intakeRules.format(locale), state.purposes.joinToString(", "), state.lotNumber).filter { it.isNotBlank() }.joinToString(" / ")
+    Text(text = stringResource(R.string.medication_record_catalog_snapshot, content), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
+
+@Composable
+private fun PurposeSection(
+    state: MedicationRecordFormState,
+    onStateChange: (MedicationRecordFormState) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.medication_record_purpose), style = MaterialTheme.typography.titleSmall)
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            state.purposeOptions.forEach { purpose ->
+                FilterChip(
+                    selected = purpose in state.purposes,
+                    onClick = {
+                        val purposes = if (purpose in state.purposes) state.purposes - purpose else state.purposes + purpose
+                        onStateChange(state.copy(purposes = purposes))
+                    },
+                    label = { Text(purpose) },
+                )
+            }
+        }
+        AppFormSubtitle(stringResource(R.string.medication_record_purpose_help))
     }
 }
 
@@ -431,9 +528,9 @@ private fun DoseSection(
             )
             OutlinedTextField(
                 value = state.doseUnit,
-                onValueChange = { onStateChange(state.copy(doseUnit = it)) },
+                onValueChange = {},
                 label = { AppInputLabel(stringResource(R.string.medication_record_dose_unit_hint)) },
-                colors = AppInputTextFieldColors(),
+                colors = AppInputTextFieldColors(), readOnly = true,
                 singleLine = true,
                 modifier = Modifier.weight(1f),
             )
@@ -488,9 +585,10 @@ private fun FeelingSection(
 
 @Composable
 private fun PhotoSection(
-    bitmap: Bitmap?,
+    bitmaps: List<Bitmap>,
     onTakePhoto: () -> Unit,
     onPickPhoto: () -> Unit,
+    onRemovePhoto: (Int) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
@@ -511,16 +609,6 @@ private fun PhotoSection(
                 modifier = Modifier.weight(1f),
             )
         }
-        if (bitmap != null) {
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentScale = ContentScale.Crop,
-            )
-        }
+        HorizontalImageEditor(bitmaps, onPickPhoto, onRemovePhoto)
     }
 }

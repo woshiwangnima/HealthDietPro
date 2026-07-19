@@ -15,6 +15,7 @@
     <string name="nutrition_add_tag">新建标签</string>
     <string name="nutrition_tag_name">标签名称</string>
     <string name="nutrition_energy_per_100g">%1$.0f 千卡 / 100 克</string>
+    <string name="nutrition_energy_for_basis">%1$.0f 千卡 / %2$.0f %3$s</string>
     <string name="nutrition_food_image">食物图片</string>
     <string name="nutrition_favorite">收藏</string>
     <string name="nutrition_compare">对比食物</string>
@@ -28,6 +29,24 @@
     <string name="nutrition_add_custom_meal_set">添加自定义套餐</string>
     <string name="nutrition_custom_food">自定义食物</string>
     <string name="nutrition_custom_meal_set">自定义套餐</string>
+    <string name="nutrition_health_metrics">健康指标</string>
+    <string name="nutrition_nutrients">营养素</string>
+    <string name="nutrition_profile_item">项目</string>
+    <string name="nutrition_profile_amount">含量</string>
+    <string name="nutrition_metric_gi">升糖指数（GI）</string>
+    <string name="nutrition_metric_gl">血糖负荷（GL）/ 100 克</string>
+    <string name="nutrition_metric_inflammatory_potential">炎症潜力</string>
+    <string name="nutrition_health_metrics_help">健康指标说明</string>
+    <string name="nutrition_metric_gi_help">升糖指数用于比较等量可利用碳水化合物引起血糖升高的相对速度。品种、成熟度、加工、烹调方式及同餐食物都会影响实际反应。</string>
+    <string name="nutrition_metric_gl_help">血糖负荷将碳水化合物含量与升糖指数结合，按本表所列可食基准计算，近似为可利用碳水化合物乘以 GI 后除以 100。</string>
+    <string name="nutrition_metric_inflammatory_potential_help">炎症潜力是用于研究的膳食指数估算值，不是诊断指标。它反映的是食物成分模型，应结合整体膳食模式理解。</string>
+    <string name="nutrition_nutrient_energy">能量</string>
+    <string name="nutrition_nutrient_protein">蛋白质</string>
+    <string name="nutrition_nutrient_fat">脂肪</string>
+    <string name="nutrition_nutrient_carbohydrate">碳水化合物</string>
+    <string name="nutrition_nutrient_fiber">膳食纤维</string>
+    <string name="nutrition_nutrient_other">其他营养素</string>
+    <string name="data_table_scroll_hint">左右滑动可查看全部列</string>
     <string name="food_category_staple">主食</string><string name="food_category_vegetable">蔬菜</string><string name="food_category_fruit">水果</string><string name="food_category_meat_egg">畜禽肉蛋</string><string name="food_category_aquatic">水产</string><string name="food_category_soy">大豆及制品</string><string name="food_category_dairy">奶类及制品</string><string name="food_category_nut">坚果</string><string name="food_category_oil">油脂</string><string name="food_category_beverage">饮料</string><string name="food_category_seasoning">调味品</string><string name="food_category_grain">谷物</string><string name="food_category_whole_grain">全谷物</string><string name="food_category_mixed_bean">杂豆</string><string name="food_category_tuber">薯芋</string><string name="food_category_staple_processed">加工制品</string><string name="food_category_livestock">畜肉</string><string name="food_category_poultry">禽肉</string><string name="food_category_egg">蛋</string><string name="food_category_meat_processed">加工制品</string><string name="food_category_fish">鱼</string><string name="food_category_shrimp_crab">虾蟹</string><string name="food_category_shellfish">贝</string><string name="food_category_mollusk">软体</string>
     <string name="nav_record">记录</string>
     <string name="nav_profile">我的</string>
@@ -46,6 +65,18 @@
     <string name="test_access_cancel">取消</string>
     <string name="test_access_clear">清空</string>
     <string name="test_access_backspace">退格</string>
+    <string name="test_gm_title">测试命令</string>
+    <string name="test_gm_description">为当前用户添加彼此隔离的虚假记录。</string>
+    <string name="test_gm_add_height">添加虚假身高记录</string>
+    <string name="test_gm_add_weight">添加虚假体重记录</string>
+    <string name="test_gm_add_medication">添加虚假用药记录</string>
+    <string name="test_gm_height_added">已添加虚假身高记录</string>
+    <string name="test_gm_weight_added">已添加虚假体重记录</string>
+    <string name="test_gm_medication_added">已添加虚假用药记录</string>
+    <string name="test_gm_medication_name">测试药品</string>
+    <string name="test_gm_medication_unit">粒</string>
+    <string name="test_gm_medication_method">口服</string>
+    <string name="test_landing_title">测试</string><string name="test_landing_commands">测试命令</string><string name="test_landing_features">功能测试展示</string>
     <string name="software_keyboard_shift">切换大小写</string>
     <string name="software_keyboard_letters">字母</string>
     <string name="software_keyboard_numbers">数字</string>
@@ -121,6 +152,25 @@
     <string name="settings_cache_cleared_kb">已清理 %1$d KB</string>
     <string name="settings_default_font_size">默认字体大小</string>
     <string name="settings_default_font_size_desc">应用于本软件内所有用户与已 Compose 化界面</string>
+    <string name="text_display_font_headline">大标题</string>
+    <string name="text_display_font_title">标题</string>
+    <string name="text_display_font_subtitle">副标题</string>
+    <string name="text_display_font_body">正文</string>
+    <string name="text_display_font_label">标注</string>
+    <string name="text_display_font_caption">脚注</string>
+    <string name="text_display_font_micro">微型文字</string>
+    <string name="text_display_overflow_title">文字溢出处理</string>
+    <string name="settings_first_day_of_week">每周第一天</string>
+    <string name="settings_first_day_of_week_desc">点击切换周一或周日</string>
+    <string name="settings_monday">周一</string>
+    <string name="settings_sunday">周日</string>
+    <string name="settings_dark_mode">深色模式</string>
+    <string name="settings_dark_mode_desc">点击循环切换跟随系统、深色和浅色</string>
+    <string name="settings_dark_mode_system">跟随系统</string>
+    <string name="settings_dark_mode_on">深色模式</string>
+    <string name="settings_dark_mode_off">浅色模式</string>
+    <string name="text_display_settings_title">文字显示设置</string>
+    <string name="text_display_settings_desc">字体大小与文字溢出处理</string>
     <string name="detail_tab_chart">图表</string>
     <string name="detail_tab_data">数据</string>
     <string name="detail_tab_reminder">提醒</string>
@@ -130,6 +180,7 @@
     <string name="medication_catalog_heading">记药品</string>
     <string name="medication_catalog_unavailable">药品目录管理将在这里提供。</string>
     <string name="medication_catalog_add">添加药品</string>
+    <string name="medication_catalog_save">保存药品</string>
     <string name="medication_catalog_empty">暂无药品，请先添加药品再记录用药。</string>
     <string name="medication_catalog_archived">已归档</string>
     <string name="medication_catalog_name">药品名称</string>
@@ -137,9 +188,14 @@
     <string name="medication_catalog_specification">规格数值</string>
     <string name="medication_catalog_manufacturer">生产厂家</string>
     <string name="medication_catalog_default_method">默认给药方式</string>
+    <string name="medication_catalog_default_dose">默认剂量</string>
+    <string name="medication_catalog_spec_dose">规格 / 默认剂量</string>
     <string name="medication_catalog_pick_image">选择药品图片</string>
     <string name="medication_catalog_archive">归档药品</string>
-    <string name="body_record_count">共 %1$d 条记录</string>
+    <string name="medication_catalog_archive_help">归档药品会保留在已有用药记录中，但新增用药记录时不能再选择它。</string>
+    <string name="medication_catalog_frequency">默认用药频率</string><string name="medication_catalog_timing">默认服用时间点</string><string name="medication_catalog_basic">基本信息</string><string name="medication_catalog_default_medication">默认用药</string><string name="medication_frequency_regular">规律服用</string><string name="medication_frequency_as_needed">必要时</string><string name="medication_frequency_interval">每隔</string><string name="medication_frequency_unit">时间单位</string><string name="medication_frequency_times">次数</string><string name="medication_frequency_hours">小时</string><string name="medication_frequency_days">天</string><string name="medication_timing_period">时段</string><string name="medication_timing_relation">与进餐关系</string><string name="medication_timing_hours">小时数</string><string name="medication_timing_morning">早</string><string name="medication_timing_noon">中</string><string name="medication_timing_evening">晚</string><string name="medication_timing_wake_up">睡起</string><string name="medication_timing_bedtime">睡前</string><string name="medication_timing_before_meal">餐前</string><string name="medication_timing_after_meal">餐后</string><string name="medication_timing_with_meal">随餐</string><string name="medication_timing_offset_hours">间隔</string><string name="medication_catalog_inventory">库存与溯源</string><string name="medication_catalog_package_quantity">每盒总量</string><string name="medication_catalog_package_unit">包装单位</string><string name="medication_catalog_package_description">包装规格说明</string><string name="medication_catalog_lot_number">生产批号（非必填）</string><string name="medication_catalog_expiry_date">有效期，格式 YYYY-MM-DD（非必填）</string><string name="medication_catalog_clinical">临床关联</string><string name="medication_catalog_indications">适应症或用途标签，以逗号分隔</string><string name="medication_catalog_side_effect_warning">主要副作用及应对</string><string name="medication_catalog_image_count">已选择 %1$d 张药品图片</string><string name="medication_catalog_delete_confirm_title">删除已归档药品？</string><string name="medication_catalog_delete_confirm_message">确定从药品目录删除“%1$s”？已有用药记录会保留。</string>
+    <string name="medication_frequency_minutes">分钟</string><string name="medication_timing_period_relation">与时段关系</string><string name="medication_timing_anchor">参考时刻</string><string name="medication_timing_breakfast">早餐</string><string name="medication_timing_lunch">午餐</string><string name="medication_timing_dinner">晚餐</string><string name="medication_catalog_other">其他</string>
+    <string name="form_discard_changes_save">保存修改</string><string name="form_discard_changes_cancel">取消</string><string name="medication_timing_offset_minutes">相对分钟</string><string name="medication_timing_offset_minutes_help">单位为分钟：-60 表示前 60 分钟，0 表示同时，30 表示后 30 分钟。</string><string name="body_record_count">共 %1$d 条记录</string>
     <string name="body_record_add">添加记录</string>
     <string name="body_record_date">日期</string>
     <string name="body_record_time">时间</string>
@@ -158,6 +214,8 @@
     <string name="body_record_value_invalid">请输入有效数值</string>
     <string name="body_record_cancel">取消</string>
     <string name="body_record_save">保存</string>
+    <string name="body_record_save_height">保存身高记录</string>
+    <string name="body_record_save_weight">保存体重记录</string>
     <string name="medication_record_add">添加用药</string>
     <string name="medication_record_time">时间</string>
     <string name="medication_record_name">药品</string>
@@ -190,7 +248,10 @@
     <string name="medication_record_photo_section">图片记录</string>
     <string name="medication_record_take_photo">拍照</string>
     <string name="medication_record_pick_photo">从相册选择</string>
-    <string name="medication_record_save">保存记录</string>
+    <string name="medication_record_save">保存用药记录</string>
+    <string name="form_discard_changes_title">放弃未保存的修改？</string>
+    <string name="form_discard_changes_message">未保存的修改将会丢失。</string>
+    <string name="form_discard_changes_confirm">放弃修改</string>
     <string name="medication_record_saved">已保存</string>
     <string name="medication_record_name_required">请填写药品名称</string>
     <string name="medication_record_select_required">请选择药品</string>
@@ -198,6 +259,10 @@
     <string name="medication_record_camera_permission_required">需要相机权限才能拍照</string>
     <string name="medication_record_photo_load_failed">无法加载照片</string>
     <string name="medication_record_location_unknown">未识别位置</string>
+    <string name="medication_record_image_count">已附加 %1$d 张记录图片</string><string name="medication_record_safety_warning">用药安全提醒</string><string name="medication_record_expired_warning">该药品已超过有效期。除非临床医生确认安全，否则请勿服用。</string>
+    <string name="medication_record_purpose">本次服药用途</string><string name="medication_record_purpose_help">点击用途可将其从本次记录中移除，尤其适用于按需服用的药物。</string>
+    <string-array name="medication_catalog_frequencies"><item>每日1次</item><item>每8小时1次</item><item>必要时（PRN）</item><item>每周1次</item></string-array>
+    <string-array name="medication_catalog_timings"><item>空腹（餐前1h）</item><item>餐后</item><item>随餐</item><item>睡前</item></string-array>
     <string-array name="medication_record_default_feelings">
         <item>恶心</item>
         <item>便秘</item>
@@ -369,7 +434,7 @@
     <string name="profile_edit_no_record">无记录</string>
     <string name="profile_edit_none">无</string>
     <string name="profile_edit_choose">点击选择</string>
-    <string name="profile_edit_save">保存</string>
+    <string name="profile_edit_save">保存个人信息</string>
     <string name="profile_edit_select_region">选择地区</string>
     <string name="profile_edit_use_current_location">使用当前位置</string>
     <string name="profile_edit_select_region_manual">手动选择省/市/县</string>
@@ -403,6 +468,7 @@
     <string name="bmi_obese">肥胖</string>
     <string name="bmi_unknown">未知</string>
     <string name="bmi_calculator_title">BMI 计算器</string>
+    <string name="bmi_calculator_help">BMI = 体重（kg）÷ 身高（m）的平方。BMI 仅用于筛查参考，不能替代临床诊断。</string>
     <string name="bmi_height_label">身高 (cm)</string>
     <string name="bmi_weight_label">体重 (kg)</string>
     <string name="bmi_result_empty">BMI: --</string>

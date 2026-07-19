@@ -40,7 +40,13 @@ import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
 import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
+import com.woshiwangnima.healthdietpro.model.medication.formatDefaultDose
+import com.woshiwangnima.healthdietpro.model.medication.formatDose
+import com.woshiwangnima.healthdietpro.model.medication.formatSpecification
+import com.woshiwangnima.healthdietpro.model.medication.format
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
+import com.woshiwangnima.healthdietpro.util.UnitConverter
+import java.util.Locale
 
 @Composable
 internal fun MedicationListScreen(
@@ -53,6 +59,7 @@ internal fun MedicationListScreen(
     onDeleteRecord: (MedicationRecord) -> Unit,
     onAddCatalogItem: () -> Unit,
     onEditCatalogItem: (MedicationCatalogItem) -> Unit,
+    onDeleteCatalogItem: (MedicationCatalogItem) -> Unit,
 ) {
     val tabs = remember {
         listOf(
@@ -78,7 +85,7 @@ internal fun MedicationListScreen(
                         onEdit = onEditRecord,
                         onDelete = onDeleteRecord,
                     )
-                    2 -> MedicationCatalogPage(uiState.catalog, onAddCatalogItem, onEditCatalogItem)
+                    2 -> MedicationCatalogPage(uiState.catalog, onAddCatalogItem, onEditCatalogItem, onDeleteCatalogItem)
                 }
             }
             DetailTabBar(
@@ -95,35 +102,46 @@ private fun MedicationCatalogPage(
     catalog: List<MedicationCatalogItem>,
     onAdd: () -> Unit,
     onEdit: (MedicationCatalogItem) -> Unit,
+    onDelete: (MedicationCatalogItem) -> Unit,
 ) {
-    androidx.compose.foundation.lazy.LazyColumn(
+    var pendingDeletion by remember { mutableStateOf<MedicationCatalogItem?>(null) }
+    pendingDeletion?.let { item ->
+        AlertDialog(onDismissRequest = { pendingDeletion = null }, title = { Text(stringResource(R.string.medication_catalog_delete_confirm_title)) }, text = { Text(stringResource(R.string.medication_catalog_delete_confirm_message, item.name)) }, confirmButton = { TextButton(onClick = { pendingDeletion = null; onDelete(item) }) { Text(stringResource(R.string.body_record_delete)) } }, dismissButton = { TextButton(onClick = { pendingDeletion = null }) { Text(stringResource(R.string.body_record_cancel)) } })
+    }
+    Column(
         modifier = Modifier.fillMaxSize().padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.medication_catalog_heading), style = MaterialTheme.typography.titleMedium)
-                AppIconTextButton(stringResource(R.string.medication_catalog_add), R.drawable.ic_add, onAdd)
-            }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.medication_catalog_heading), style = MaterialTheme.typography.titleMedium)
+            AppIconTextButton(stringResource(R.string.medication_catalog_add), R.drawable.ic_add, onAdd)
         }
         if (catalog.isEmpty()) {
-            item { Text(stringResource(R.string.medication_catalog_empty), color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        }
-        items(catalog, key = { it.id }) { item ->
-            androidx.compose.material3.ListItem(
-                headlineContent = { Text(item.name) },
-                supportingContent = {
-                    Text(listOf(formatCatalogSpec(item), item.manufacturer, item.defaultMethod).filter { it.isNotBlank() }.joinToString(" / "))
-                },
-                trailingContent = { Text(if (item.archived) stringResource(R.string.medication_catalog_archived) else "") },
-                modifier = Modifier.clickable { onEdit(item) },
-            )
+            Text(stringResource(R.string.medication_catalog_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } else {
+            CatalogTable(catalog, onEdit, { pendingDeletion = it }, Modifier.weight(1f))
         }
     }
 }
 
-private fun formatCatalogSpec(item: MedicationCatalogItem): String =
-    if (item.specValue > 0f || item.specUnitId.isNotBlank()) "${item.specValue}${item.specUnitId}" else ""
+@Composable
+private fun CatalogTable(catalog: List<MedicationCatalogItem>, onEdit: (MedicationCatalogItem) -> Unit, onDelete: (MedicationCatalogItem) -> Unit, modifier: Modifier = Modifier) {
+    val locale = Locale.getDefault()
+    val units = UnitConverter.getRepository()
+    AppDataTable(
+        rows = catalog, modifier = modifier, rowKey = { _, item -> item.id },
+        columns = listOf(
+            AppDataTableColumn<MedicationCatalogItem>("name", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_name)) }, ColumnWidth.Flex(1.2f, 130.dp)) { AppDataTableText(it.name) },
+            AppDataTableColumn<MedicationCatalogItem>("specDose", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_spec_dose)) }, ColumnWidth.Fixed(136.dp)) { AppDataTableText(listOf(it.formatSpecification(units, locale), it.formatDefaultDose(locale)).filter(String::isNotBlank).joinToString(" / ")) },
+            AppDataTableColumn<MedicationCatalogItem>("frequency", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_frequency)) }, ColumnWidth.Fixed(112.dp)) { AppDataTableText(it.frequency.format(locale)) },
+            AppDataTableColumn<MedicationCatalogItem>("timing", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_timing)) }, ColumnWidth.Fixed(128.dp)) { AppDataTableText(it.intakeRules.format(locale)) },
+            AppDataTableColumn<MedicationCatalogItem>("purpose", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_indications)) }, ColumnWidth.Flex(1f, 130.dp)) { AppDataTableText(it.indicationTags.joinToString(", ")) },
+            AppDataTableColumn<MedicationCatalogItem>("manufacturer", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_manufacturer)) }, ColumnWidth.Flex(1f, 120.dp)) { AppDataTableText(it.manufacturer) },
+        ),
+        layoutPolicy = AppDataTableLayoutPolicy.HorizontalScroll(minTableWidth = 900.dp), actionsHeader = { AppDataTableHeaderText(stringResource(R.string.medication_record_actions)) },
+        rowActions = { item -> AppDataTableDeleteAction(stringResource(R.string.body_record_delete), onClick = { onDelete(item) }, enabled = item.archived) }, onRowClick = onEdit,
+    )
+}
 
 @Composable
 private fun MedicationReminderPage() {
@@ -309,8 +327,7 @@ private fun CompactMedicationRow(record: MedicationRecord, onDelete: (Medication
     }
 }
 
-private fun formatDose(record: MedicationRecord): String =
-    if (record.doseValue > 0f || record.doseUnit.isNotBlank()) "${record.doseValue}${record.doseUnit}" else ""
+private fun formatDose(record: MedicationRecord): String = record.formatDose(Locale.getDefault())
 
 private fun formatFeeling(record: MedicationRecord): String =
     listOf(record.feelings.joinToString(", "), record.feelingNote)

@@ -1,6 +1,8 @@
 package com.woshiwangnima.healthdietpro.model.prefs
 
 import android.content.Context
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * 应用偏好设置入口（app 存档模块，DESIGN §3.7.1）。
@@ -22,6 +24,12 @@ object AppPrefs {
     private const val PREFS_NAME = "app_prefs"
     private const val KEY_FIRST_LAUNCH = "is_first_launch"
     private const val KEY_FONT_SCALE = "pref_font_scale"
+    private const val KEY_DARK_MODE = "pref_dark_mode"
+    private const val KEY_FIRST_DAY_OF_WEEK = "pref_first_day_of_week"
+    private const val KEY_TEXT_OVERFLOW = "pref_text_overflow"
+    private const val KEY_MARQUEE_SPEED = "pref_marquee_speed"
+    private val darkModeState = MutableStateFlow("FOLLOW_SYSTEM")
+    val darkMode = darkModeState.asStateFlow()
 
     // ---- app 级 ----
 
@@ -83,14 +91,25 @@ object AppPrefs {
         user(context).putString("pref_unit_$categoryId", unitId)
 
     fun getFirstDayOfWeek(context: Context): String =
-        user(context).getString("pref_first_day_of_week", "MONDAY")
+        appPrefs(context).getString(KEY_FIRST_DAY_OF_WEEK, "MONDAY") ?: "MONDAY"
     fun setFirstDayOfWeek(context: Context, day: String) =
-        user(context).putString("pref_first_day_of_week", day)
+        appPrefs(context).edit().putString(KEY_FIRST_DAY_OF_WEEK, day).apply()
 
     fun getDarkMode(context: Context): String =
-        user(context).getString("pref_dark_mode", "FOLLOW_SYSTEM")
-    fun setDarkMode(context: Context, mode: String) =
-        user(context).putString("pref_dark_mode", mode)
+        appPrefs(context).getString(KEY_DARK_MODE, "FOLLOW_SYSTEM") ?: "FOLLOW_SYSTEM"
+    fun loadDarkMode(context: Context) { darkModeState.value = getDarkMode(context) }
+    fun setDarkMode(context: Context, mode: String) {
+        appPrefs(context).edit().putString(KEY_DARK_MODE, mode).apply()
+        darkModeState.value = mode
+    }
+
+    fun getTextOverflowMode(context: Context): String =
+        appPrefs(context).getString(KEY_TEXT_OVERFLOW, "ellipsis") ?: "ellipsis"
+    fun setTextOverflowMode(context: Context, mode: String) =
+        appPrefs(context).edit().putString(KEY_TEXT_OVERFLOW, mode).apply()
+    fun getMarqueeSpeed(context: Context): Int = appPrefs(context).getInt(KEY_MARQUEE_SPEED, 200)
+    fun setMarqueeSpeed(context: Context, speed: Int) =
+        appPrefs(context).edit().putInt(KEY_MARQUEE_SPEED, speed.coerceIn(50, 2000)).apply()
 
     fun getReminderDrinkWater(context: Context): Boolean =
         user(context).getBoolean("reminder_drink_water", false)
@@ -98,7 +117,7 @@ object AppPrefs {
         user(context).putBoolean("reminder_drink_water", enabled)
 
     fun getReminderMedication(context: Context): Boolean =
-        user(context).getBoolean("reminder_medication", false)
+        user(context).getBoolean("reminder_medication", true)
     fun setReminderMedication(context: Context, enabled: Boolean) =
         user(context).putBoolean("reminder_medication", enabled)
 
@@ -167,30 +186,4 @@ object AppPrefs {
     fun setMedicationTab(context: Context, tab: Int) =
         user(context).putInt("tab_medication", tab)
 
-    // ---- 文字溢出处理（app 级，DESIGN §3.7.1）----
-    // overflowMode：枚举 ellipsis（省略号）/ marquee（轮播）二选一，控制降级/超出行为
-    // autoShrinkEnabled：bool，是否启用自适应缩小字号
-    // autoShrinkMinSize：Int sp，缩到此字号仍超出则按 overflowMode 降级
-    // marqueeSpeed：Int ms/字，overflowMode=marquee 时的轮播速度
-    // 降级链：autoShrink 缩字 → 仍超出 → 按 overflowMode（ellipsis 省略号 / marquee 轮播）处理
-
-    fun getTextOverflowMode(context: Context): String =
-        appPrefs(context).getString("pref_text_overflow", "ellipsis") ?: "ellipsis"
-    fun setTextOverflowMode(context: Context, mode: String) =
-        appPrefs(context).edit().putString("pref_text_overflow", mode).apply()
-
-    fun isAutoShrinkEnabled(context: Context): Boolean =
-        appPrefs(context).getBoolean("pref_auto_shrink", true)
-    fun setAutoShrinkEnabled(context: Context, enabled: Boolean) =
-        appPrefs(context).edit().putBoolean("pref_auto_shrink", enabled).apply()
-
-    fun getAutoShrinkMinSize(context: Context): Int =
-        appPrefs(context).getInt("pref_auto_shrink_min_size", 8)
-    fun setAutoShrinkMinSize(context: Context, sp: Int) =
-        appPrefs(context).edit().putInt("pref_auto_shrink_min_size", sp).apply()
-
-    fun getMarqueeSpeed(context: Context): Int =
-        appPrefs(context).getInt("pref_marquee_speed", 200)
-    fun setMarqueeSpeed(context: Context, speed: Int) =
-        appPrefs(context).edit().putInt("pref_marquee_speed", speed).apply()
 }

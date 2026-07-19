@@ -1,9 +1,1413 @@
 {
   "foods": [
-    {"id":"builtin.rice.cooked","name":{"zh":"米饭","en":"Cooked rice"},"aliases":["白米饭"],"categoryTag":"food.staple.grain","nutrientsPer100g":{"ENERGY":116.0,"PROTEIN":2.6,"FAT":0.3,"CHO":25.9}},
-    {"id":"builtin.oats","name":{"zh":"燕麦片","en":"Oats"},"categoryTag":"food.staple.whole_grain","nutrientsPer100g":{"ENERGY":367.0,"PROTEIN":15.0,"FAT":6.7,"CHO":61.6}},
-    {"id":"builtin.chicken_egg","name":{"zh":"鸡蛋","en":"Chicken egg"},"categoryTag":"food.meat_egg.egg","nutrientsPer100g":{"ENERGY":144.0,"PROTEIN":13.3,"FAT":8.8,"CHO":2.8}},
-    {"id":"builtin.apple","name":{"zh":"苹果","en":"Apple"},"categoryTag":"food.fruit","nutrientsPer100g":{"ENERGY":53.0,"PROTEIN":0.2,"FAT":0.2,"CHO":13.5}},
-    {"id":"builtin.milk","name":{"zh":"牛奶","en":"Milk"},"categoryTag":"food.dairy","nutrientsPer100g":{"ENERGY":54.0,"PROTEIN":3.0,"FAT":3.2,"CHO":3.4}}
+    {
+      "id": "food:taxon:oryza_sativa:polished:steamed",
+      "names": {
+        "zh": [
+          "米饭",
+          "白米饭",
+          "熟米饭"
+        ],
+        "en": [
+          "Cooked white rice",
+          "Steamed rice"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 73.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 18.9,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": 0.44,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "standard food composition values"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "rice, cooked white"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 116.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 25.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "蒸熟的精白米主食，主要提供碳水化合物；实际升糖反应受品种、米饭软硬和同餐食物影响。",
+        "en": "Cooked polished rice is a carbohydrate-rich staple; glycemic response varies with variety, texture, and the accompanying meal."
+      }
+    },
+    {
+      "id": "food:taxon:oryza_sativa:wholegrain:steamed",
+      "names": {
+        "zh": [
+          "糙米饭",
+          "糙米",
+          "熟糙米"
+        ],
+        "en": [
+          "Cooked brown rice",
+          "Brown rice"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain",
+        "food.staple.whole_grain"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 50.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 11.5,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.19,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "standard food composition values"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "brown rice, cooked"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 111.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 23.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "保留麸皮和胚芽的熟糙米，膳食纤维通常高于精白米；烹调软硬会影响消化速度。",
+        "en": "Cooked brown rice retains bran and germ and typically provides more dietary fiber than polished rice; cooking texture affects digestion."
+      }
+    },
+    {
+      "id": "food:taxon:avena_sativa:rolled:dry",
+      "names": {
+        "zh": [
+          "燕麦片",
+          "燕麦",
+          "压片燕麦"
+        ],
+        "en": [
+          "Rolled oats",
+          "Oats"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain",
+        "food.staple.whole_grain"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 55.0,
+          "unit": "GI",
+          "note": "rolled oats; preparation changes GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 33.9,
+          "unit": "GL",
+          "note": "dry edible portion"
+        },
+        "inflammatoryPotential": {
+          "value": -0.52,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "standard food composition values"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "rolled oats"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 367.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 15.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 6.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 61.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 10.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "压片燕麦属于全谷物，可提供可溶性膳食纤维；加糖、煮制时间和冲泡方式会改变实际能量和升糖反应。",
+        "en": "Rolled oats are a whole grain and provide soluble fiber; added sugar and preparation affect actual energy and glycemic response."
+      }
+    },
+    {
+      "id": "food:taxon:solanum_tuberosum:boiled",
+      "names": {
+        "zh": [
+          "煮土豆",
+          "马铃薯",
+          "洋芋"
+        ],
+        "en": [
+          "Boiled potato",
+          "Potato"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.tuber",
+        "food.vegetable"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 78.0,
+          "unit": "GI",
+          "note": "boiled; variety and cooling change GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 13.9,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.08,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "standard food composition values"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "potato, boiled"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 76.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 17.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "煮马铃薯是富含淀粉的薯类食物；品种、熟化程度及冷却后再食用都会影响血糖反应。",
+        "en": "Boiled potato is a starchy tuber; variety, doneness, and cooling before eating affect glycemic response."
+      }
+    },
+    {
+      "id": "food:taxon:cucumis_sativus:commercial:raw",
+      "names": {
+        "zh": [
+          "黄瓜",
+          "商品黄瓜",
+          "设施黄瓜"
+        ],
+        "en": [
+          "Cucumber",
+          "Commercial cucumber"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.4,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.16,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "cucumber with peel, raw"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "cucumber"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 15.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "生黄瓜含水量高、能量密度低，适合作为蔬菜搭配；应注意清洗和可食部分。",
+        "en": "Raw cucumber has high water content and low energy density; use it as part of a varied vegetable intake and wash before eating."
+      }
+    },
+    {
+      "id": "food:taxon:cucumis_sativus:landrace:raw",
+      "names": {
+        "zh": [
+          "本地黄瓜",
+          "土黄瓜",
+          "露地黄瓜"
+        ],
+        "en": [
+          "Landrace cucumber",
+          "Field cucumber"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15.0,
+          "unit": "GI",
+          "note": "proxy from raw cucumber; cultivar-specific measurement unavailable"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.5,
+          "unit": "GL",
+          "note": "estimated from available carbohydrate"
+        },
+        "inflammatoryPotential": {
+          "value": -0.16,
+          "unit": "DII",
+          "note": "proxy from raw cucumber"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "raw cucumber proxy; cultivar composition varies"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 16.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "露地或地方品系黄瓜的外观和风味可能不同；营养值采用同类生黄瓜数据，品种间会有自然差异。",
+        "en": "Field or landrace cucumber may differ in appearance and flavor; values use raw cucumber data because cultivar composition naturally varies."
+      }
+    },
+    {
+      "id": "food:taxon:solanum_lycopersicum:raw",
+      "names": {
+        "zh": [
+          "番茄",
+          "西红柿",
+          "洋柿子"
+        ],
+        "en": [
+          "Tomato",
+          "Red tomato"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.fruit"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.6,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.36,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "tomato, raw"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "tomato"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 20.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "生番茄可同时作为蔬菜或水果食用，含有类胡萝卜素等植物化学物；成熟度和加工方式会影响成分利用。",
+        "en": "Raw tomato may be eaten as a vegetable or fruit and contains carotenoids; ripeness and processing affect nutrient availability."
+      }
+    },
+    {
+      "id": "food:taxon:brassica_oleracea:broccoli:raw",
+      "names": {
+        "zh": [
+          "西兰花",
+          "绿花椰菜",
+          "青花菜"
+        ],
+        "en": [
+          "Broccoli",
+          "Green broccoli"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 10.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.4,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.45,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "broccoli, raw"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 36.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 4.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "西兰花属于十字花科蔬菜，含维生素和多种植物化学物；烹调时间会影响部分热敏营养素。",
+        "en": "Broccoli is a cruciferous vegetable with vitamins and phytochemicals; cooking duration affects some heat-sensitive nutrients."
+      }
+    },
+    {
+      "id": "food:taxon:malus_domestica:raw",
+      "names": {
+        "zh": [
+          "苹果",
+          "鲜苹果",
+          "红富士苹果"
+        ],
+        "en": [
+          "Apple",
+          "Raw apple"
+        ]
+      },
+      "categoryTags": [
+        "food.fruit"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 36.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 4.9,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.32,
+          "unit": "DII"
+        }
+      },
+      "servings": [
+        {
+          "id": "per_100g",
+          "labels": {
+            "zh": "100 克",
+            "en": "100 g"
+          },
+          "nutritionTableKey": "standard.100g",
+          "ratioToTable": 1.0
+        },
+        {
+          "id": "small",
+          "labels": {
+            "zh": "1 小个",
+            "en": "1 small"
+          },
+          "nutritionTableKey": "standard.100g",
+          "ratioToTable": 1.3
+        },
+        {
+          "id": "medium",
+          "labels": {
+            "zh": "1 中个",
+            "en": "1 medium"
+          },
+          "nutritionTableKey": "standard.100g",
+          "ratioToTable": 1.8
+        },
+        {
+          "id": "large",
+          "labels": {
+            "zh": "1 大个",
+            "en": "1 large"
+          },
+          "nutritionTableKey": "standard.100g",
+          "ratioToTable": 2.5
+        }
+      ],
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "apple, raw"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "apple"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 53.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 13.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "带皮鲜苹果提供水分和膳食纤维；大小、品种和可食比例不同，单个重量仅为估算。",
+        "en": "Raw apple with peel provides water and dietary fiber; fruit size, cultivar, and edible yield vary, so per-fruit portions are estimates."
+      }
+    },
+    {
+      "id": "food:taxon:musa_acuminata:ripe:raw",
+      "names": {
+        "zh": [
+          "香蕉",
+          "熟香蕉",
+          "甘蕉"
+        ],
+        "en": [
+          "Banana",
+          "Ripe banana"
+        ]
+      },
+      "categoryTags": [
+        "food.fruit"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 51.0,
+          "unit": "GI",
+          "note": "ripeness changes GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 11.2,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.21,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "banana, raw"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "banana"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 93.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 22.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "成熟香蕉提供碳水化合物和钾；成熟度越高，糖和淀粉的比例及升糖反应可能变化。",
+        "en": "Ripe banana provides carbohydrate and potassium; ripeness changes the balance of sugars and starch and may alter glycemic response."
+      }
+    },
+    {
+      "id": "food:taxon:glycine_max:tofu:firm",
+      "names": {
+        "zh": [
+          "北豆腐",
+          "老豆腐",
+          "卤水豆腐"
+        ],
+        "en": [
+          "Firm tofu",
+          "Pressed tofu"
+        ]
+      },
+      "categoryTags": [
+        "food.soy"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.6,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.4,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "firm tofu"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 81.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 8.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "北豆腐以大豆为原料，是植物蛋白来源；凝固剂和含水量会使不同产品的营养值不同。",
+        "en": "Firm tofu is a soy-based source of plant protein; coagulant choice and water content cause product-to-product variation."
+      }
+    },
+    {
+      "id": "food:taxon:gallus_gallus:egg:whole",
+      "names": {
+        "zh": [
+          "鸡蛋",
+          "鸡子",
+          "全蛋"
+        ],
+        "en": [
+          "Chicken egg",
+          "Whole egg"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg.egg"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 0.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.0,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": 0.16,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "chicken egg, whole"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 144.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 13.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 8.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "全鸡蛋提供优质蛋白质和脂溶性营养素；烹调用油和调味会显著改变实际摄入。",
+        "en": "Whole egg provides high-quality protein and fat-soluble nutrients; cooking oil and seasoning substantially change intake."
+      }
+    },
+    {
+      "id": "food:taxon:gallus_gallus:breast:steamed",
+      "names": {
+        "zh": [
+          "鸡胸肉",
+          "去皮鸡胸",
+          "鸡脯肉"
+        ],
+        "en": [
+          "Cooked chicken breast",
+          "Skinless chicken breast"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg.poultry"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 0.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.0,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": 0.02,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "chicken breast, cooked"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 133.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 29.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "去皮熟鸡胸肉是高蛋白、低碳水的禽肉选择；数据不包含额外烹调用油或酱料。",
+        "en": "Cooked skinless chicken breast is a high-protein, low-carbohydrate poultry option; values exclude added oil and sauces."
+      }
+    },
+    {
+      "id": "food:taxon:salmo_salar:raw",
+      "names": {
+        "zh": [
+          "三文鱼",
+          "大西洋鲑",
+          "鲑鱼"
+        ],
+        "en": [
+          "Atlantic salmon",
+          "Salmon"
+        ]
+      },
+      "categoryTags": [
+        "food.aquatic.fish"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 0.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.0,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.32,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Atlantic salmon, raw"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 139.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 17.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 7.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "大西洋鲑是脂肪鱼，含蛋白质和不饱和脂肪；生食应符合食品安全和冷链要求。",
+        "en": "Atlantic salmon is an oily fish with protein and unsaturated fat; raw consumption requires appropriate food-safety and cold-chain controls."
+      }
+    },
+    {
+      "id": "food:taxon:bos_taurus:milk:whole",
+      "names": {
+        "zh": [
+          "全脂牛奶",
+          "牛奶",
+          "鲜奶"
+        ],
+        "en": [
+          "Whole milk",
+          "Cow milk"
+        ]
+      },
+      "categoryTags": [
+        "food.dairy"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 31.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 1.1,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.05,
+          "unit": "DII"
+        }
+      },
+      "densityGramsPerMl": 1.03,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          },
+          "nutritionTableKey": "standard.100ml",
+          "ratioToTable": 1.0
+        },
+        {
+          "id": "cup",
+          "labels": {
+            "zh": "1 杯",
+            "en": "1 cup"
+          },
+          "nutritionTableKey": "standard.100ml",
+          "ratioToTable": 2.5
+        },
+        {
+          "id": "carton",
+          "labels": {
+            "zh": "1 盒",
+            "en": "1 carton"
+          },
+          "nutritionTableKey": "standard.100ml",
+          "ratioToTable": 2.4902912621359223
+        }
+      ],
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "whole cow milk"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "whole milk"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 54.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 3.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        },
+        "standard.100ml": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "volume",
+            "unitId": "ml"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 55.620000000000005,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 3.09,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.2960000000000003,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.502,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "全脂牛奶提供蛋白质、脂肪和乳糖；包装规格不同，杯和盒的体积仅作为常见份量估算。",
+        "en": "Whole milk provides protein, fat, and lactose; cup and carton sizes are common serving estimates and vary by package."
+      }
+    },
+    {
+      "id": "food:taxon:arachis_hypogaea:roasted",
+      "names": {
+        "zh": [
+          "烤花生",
+          "炒花生",
+          "熟花生"
+        ],
+        "en": [
+          "Roasted peanuts",
+          "Peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut",
+        "food.soy"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 14.0,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 3.0,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.55,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "roasted peanuts"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "peanuts"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 589.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 24.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 48.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 21.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 8.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "烤花生能量密度较高，含脂肪、蛋白质和膳食纤维；食用时应控制份量并留意过敏风险。",
+        "en": "Roasted peanuts are energy-dense and provide fat, protein, and fiber; manage portions and consider allergy risk."
+      }
+    }
   ]
 }

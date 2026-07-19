@@ -30,9 +30,12 @@ import androidx.compose.ui.res.stringResource
 import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppBottomNavItem
 import com.woshiwangnima.healthdietpro.common.ui.AppBottomNavigationBar
-import com.woshiwangnima.healthdietpro.common.ui.ComponentsPreviewScreen
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
+import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
+import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.ui.nutrition.NutritionScreen
@@ -43,6 +46,7 @@ import com.woshiwangnima.healthdietpro.ui.profile.ProfileEditActivity
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileScreen
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileAvatarBitmapCache
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileUserInfoViewModel
+import com.woshiwangnima.healthdietpro.ui.profile.UserSwitchActivity
 import com.woshiwangnima.healthdietpro.ui.profile.WeightDetailActivity
 import com.woshiwangnima.healthdietpro.ui.record.MedicationListActivity
 import com.woshiwangnima.healthdietpro.ui.record.BloodGlucoseActivity
@@ -53,6 +57,11 @@ import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsComposeActivity
 import com.woshiwangnima.healthdietpro.ui.settings.UserSettingsActivity
 import com.woshiwangnima.healthdietpro.ui.test.TestAccessScreen
 import com.woshiwangnima.healthdietpro.ui.test.TestAccessViewModel
+import com.woshiwangnima.healthdietpro.ui.test.TestGmScreen
+import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestScreen
+import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestCategory
+import com.woshiwangnima.healthdietpro.ui.test.TestLandingScreen
+import com.woshiwangnima.healthdietpro.common.ui.ComponentsPreviewScreen
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabPersistence
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 
@@ -88,6 +97,8 @@ class MainActivity : BaseActivity() {
     private var showOnboarding by mutableStateOf(false)
     private var lastBackPressedAt = 0L
     private var previousSoftInputMode: Int? = null
+    private var testPage by mutableStateOf(TestPage.Landing)
+    private var commonUiTestCategory by mutableStateOf<CommonUiTestCategory?>(null)
 
     private val onboardingLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -103,9 +114,32 @@ class MainActivity : BaseActivity() {
         profileViewModel.refresh()
     }
 
+    private val userSwitchLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) {
+        profileViewModel.refresh()
+        nutritionViewModel.refreshUser()
+    }
+
     private val settingsLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
+        profileViewModel.refresh()
+    }
+
+    private val heightDetailLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        val records = result.bodyRecordsResult() ?: return@registerForActivityResult
+        ProfilePrefs.save(this, ProfilePrefs.load(this).copy(heightRecords = records))
+        profileViewModel.refresh()
+    }
+
+    private val weightDetailLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        val records = result.bodyRecordsResult() ?: return@registerForActivityResult
+        ProfilePrefs.save(this, ProfilePrefs.load(this).copy(weightRecords = records))
         profileViewModel.refresh()
     }
 
@@ -121,7 +155,15 @@ class MainActivity : BaseActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                handleDoubleBackExit()
+                if (selectedRoute == ROUTE_NUTRITION && nutritionViewModel.navigateBack()) {
+                    return
+                } else if (selectedRoute == ROUTE_TEST && testAccessViewModel.isVerified.value) {
+                    when {
+                        commonUiTestCategory != null -> commonUiTestCategory = null
+                        testPage != TestPage.Landing -> testPage = TestPage.Landing
+                        else -> returnFromTest()
+                    }
+                } else handleDoubleBackExit()
             }
         })
 
@@ -146,7 +188,7 @@ class MainActivity : BaseActivity() {
     private fun MainShell() {
         val nutritionState by nutritionViewModel.state.collectAsState()
         val showBottomNavigation = selectedRoute != ROUTE_NUTRITION ||
-            (nutritionState.selectedFood == null && !nutritionState.showComparison)
+            (nutritionState.selectedFood == null && nutritionState.comparisonReturnTarget == null && nutritionState.managementScreen == null)
         if (showOnboarding) {
             AlertDialog(
                 onDismissRequest = {},
@@ -200,9 +242,6 @@ class MainActivity : BaseActivity() {
                 val state by profileViewModel.uiState.collectAsState()
                 ProfileScreen(
                     state = state,
-                    loadUsers = { ProfilePrefs.getAllUsers(this@MainActivity) },
-                    loadCurrentUserId = { ProfilePrefs.getCurrentUserId(this@MainActivity) },
-                    onUsersLoaded = profileViewModel::loadUserAvatars,
                     onOpenAppSettings = {
                         settingsLauncher.launch(Intent(this@MainActivity, AppSettingsComposeActivity::class.java))
                     },
@@ -215,21 +254,8 @@ class MainActivity : BaseActivity() {
                     onEditProfile = {
                         profileEditLauncher.launch(Intent(this@MainActivity, ProfileEditActivity::class.java))
                     },
-                    onCreateUser = {
-                        profileEditLauncher.launch(
-                            Intent(this@MainActivity, ProfileEditActivity::class.java)
-                                .putExtra("create_new", true),
-                        )
-                    },
-                    onSwitchUser = { user ->
-                        ProfilePrefs.setCurrentUserId(this@MainActivity, user.id)
-                        profileViewModel.refresh()
-                        nutritionViewModel.refreshUser()
-                    },
-                    onDeleteUser = { user ->
-                        ProfilePrefs.deleteUser(this@MainActivity, user.id)
-                        profileViewModel.refresh()
-                        nutritionViewModel.refreshUser()
+                    onOpenUserSwitch = {
+                        userSwitchLauncher.launch(Intent(this@MainActivity, UserSwitchActivity::class.java))
                     },
                     modifier = modifier,
                 )
@@ -237,8 +263,11 @@ class MainActivity : BaseActivity() {
             ROUTE_TEST -> {
                 val isVerified by testAccessViewModel.isVerified.collectAsState()
                 if (isVerified) {
-                    Box(modifier = modifier) {
-                        ComponentsPreviewScreen(onBack = ::returnFromTest)
+                    when (testPage) {
+                        TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, modifier)
+                        TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, { testPage = TestPage.Landing }, modifier)
+                        TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
+                        TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, modifier)
                     }
                 } else {
                     TestAccessScreen(
@@ -267,6 +296,8 @@ class MainActivity : BaseActivity() {
 
         if (route == ROUTE_TEST) {
             routeBeforeTest = selectedRoute
+            testPage = TestPage.Landing
+            commonUiTestCategory = null
             applyTestSoftInputMode()
         } else {
             restoreSoftInputMode()
@@ -277,6 +308,55 @@ class MainActivity : BaseActivity() {
 
     private fun returnFromTest() {
         switchTab(routeBeforeTest)
+    }
+
+    private fun addTestHeightRecord() = addTestBodyRecord(isWeight = false)
+
+    private fun addTestWeightRecord() = addTestBodyRecord(isWeight = true)
+
+    private fun addTestBodyRecord(isWeight: Boolean) {
+        val profile = ProfilePrefs.createDefaultIfEmpty(this)
+        val record = BodyRecord(
+            date = java.time.LocalDate.now().toString(),
+            value = if (isWeight) 67.5f else 170f,
+            unit = if (isWeight) "kg" else "cm",
+        )
+        val updated = if (isWeight) {
+            profile.copy(weightRecords = (profile.weightRecords + record).sortedBy { it.date })
+        } else {
+            profile.copy(heightRecords = (profile.heightRecords + record).sortedBy { it.date })
+        }
+        ProfilePrefs.save(this, updated)
+        profileViewModel.refresh()
+        Toast.makeText(this, if (isWeight) R.string.test_gm_weight_added else R.string.test_gm_height_added, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun addTestMedicationRecord() {
+        ProfilePrefs.createDefaultIfEmpty(this)
+        val catalogId = "test_medication"
+        val catalog = MedicationPrefs.getCatalog(this)
+        val item = catalog.find { it.id == catalogId } ?: MedicationCatalogItem(
+            id = catalogId,
+            name = getString(R.string.test_gm_medication_name),
+            defaultDoseValue = 1f,
+            defaultDoseUnit = getString(R.string.test_gm_medication_unit),
+            defaultMethod = getString(R.string.test_gm_medication_method),
+        ).also { MedicationPrefs.upsertCatalogItem(this, it) }
+        MedicationPrefs.addRecord(this, MedicationRecord(
+            id = "test_${System.currentTimeMillis()}",
+            timestamp = System.currentTimeMillis(),
+            medicationName = item.name,
+            medicationId = item.id,
+            doseValue = item.defaultDoseValue,
+            doseUnit = item.defaultDoseUnit,
+            specValue = item.specValue,
+            specUnitCategory = item.specUnitCategory,
+            specUnitId = item.specUnitId,
+            method = item.defaultMethod,
+            manufacturer = item.manufacturer,
+            medicationImagePaths = item.imagePaths,
+        ))
+        Toast.makeText(this, R.string.test_gm_medication_added, Toast.LENGTH_SHORT).show()
     }
 
     private fun handleRecordAction(actionId: RecordActionId) {
@@ -300,18 +380,24 @@ class MainActivity : BaseActivity() {
 
     private fun openHeightDetail() {
         val profile = ProfilePrefs.load(this)
-        startActivity(Intent(this, HeightDetailActivity::class.java).apply {
+        heightDetailLauncher.launch(Intent(this, HeightDetailActivity::class.java).apply {
             putExtra("records", ArrayList(profile.heightRecords))
-            putExtra("unit", UnitCategoryType.Length.defaultUnitId)
+            putExtra("unit", AppPrefs.getUnit(this@MainActivity, UnitCategoryType.Length.id, UnitCategoryType.Length.defaultUnitId))
         })
     }
 
     private fun openWeightDetail() {
         val profile = ProfilePrefs.load(this)
-        startActivity(Intent(this, WeightDetailActivity::class.java).apply {
+        weightDetailLauncher.launch(Intent(this, WeightDetailActivity::class.java).apply {
             putExtra("records", ArrayList(profile.weightRecords))
-            putExtra("unit", UnitCategoryType.Weight.defaultUnitId)
+            putExtra("unit", AppPrefs.getUnit(this@MainActivity, UnitCategoryType.Weight.id, UnitCategoryType.Weight.defaultUnitId))
         })
+    }
+
+    @Suppress("DEPRECATION", "UNCHECKED_CAST")
+    private fun androidx.activity.result.ActivityResult.bodyRecordsResult(): List<BodyRecord>? {
+        if (resultCode != RESULT_OK) return null
+        return data?.getSerializableExtra("records", ArrayList::class.java) as? ArrayList<BodyRecord>
     }
 
     private fun applyTestSoftInputMode() {
@@ -345,4 +431,6 @@ class MainActivity : BaseActivity() {
         const val ROUTE_PROFILE = "profile"
         const val ROUTE_TEST = "test"
     }
+
+    private enum class TestPage { Landing, Commands, Features, CommonUi }
 }

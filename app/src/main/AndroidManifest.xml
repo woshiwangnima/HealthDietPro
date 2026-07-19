@@ -39,17 +39,17 @@
             android:configChanges="orientation|screenSize|uiMode"
             android:exported="false" />
         <activity
+            android:name=".ui.profile.BodyMetricRecordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.UserSwitchActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.settings.AppSettingsComposeActivity"
             android:exported="false"
             android:label="@string/settings_app_title" />
         <activity
             android:name=".ui.settings.UserSettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.settings.PreferencesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.settings.ReminderSettingsActivity"
             android:exported="false" />
         <activity
             android:name=".ui.profile.BmiDetailActivity"

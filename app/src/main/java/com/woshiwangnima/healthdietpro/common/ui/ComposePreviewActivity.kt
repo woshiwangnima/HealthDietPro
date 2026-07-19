@@ -30,12 +30,7 @@ class ComposePreviewActivity : ComponentActivity() {
                     composable(Routes.APP_SETTINGS) {
                         AppSettingsScreen(
                             onBack = { navController.popBackStack() },
-                            onOpenTextOverflow = { navController.navigate(Routes.TEXT_OVERFLOW) },
-                        )
-                    }
-                    composable(Routes.TEXT_OVERFLOW) {
-                        com.woshiwangnima.healthdietpro.ui.settings.TextOverflowScreen(
-                            onBack = { navController.popBackStack() },
+                            onOpenTextDisplay = { },
                         )
                     }
                     composable(Routes.COMPONENTS_PREVIEW) {
@@ -52,6 +47,5 @@ class ComposePreviewActivity : ComponentActivity() {
 object Routes {
     const val THEME_PREVIEW = "theme_preview"
     const val APP_SETTINGS = "app_settings"
-    const val TEXT_OVERFLOW = "text_overflow"
     const val COMPONENTS_PREVIEW = "components_preview"
 }

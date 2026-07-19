@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText
@@ -287,6 +289,7 @@ private fun BmiReferenceRow(
 
 @Composable
 private fun BmiCalculatorCard() {
+    var showHelp by rememberSaveable { mutableStateOf(false) }
     val labels = listOf(
         stringResource(R.string.bmi_underweight),
         stringResource(R.string.bmi_normal),
@@ -323,7 +326,10 @@ private fun BmiCalculatorCard() {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            BmiCardTitle(text = stringResource(R.string.bmi_calculator_title))
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                BmiCardTitle(text = stringResource(R.string.bmi_calculator_title))
+                IconButton(onClick = { showHelp = true }) { Text("?") }
+            }
             OutlinedTextField(
                 value = heightText,
                 onValueChange = { heightText = it },
@@ -366,6 +372,9 @@ private fun BmiCalculatorCard() {
                 )
             }
         }
+    }
+    if (showHelp) AppInfoDialog(stringResource(R.string.bmi_calculator_title), { showHelp = false }) {
+        Text(stringResource(R.string.bmi_calculator_help))
     }
 }
 

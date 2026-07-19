@@ -19,6 +19,7 @@ import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
+import com.woshiwangnima.healthdietpro.model.medication.removeRecordById
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,6 +53,7 @@ class MedicationListActivity : BaseActivity() {
                     onEditRecord = ::openRecord,
                     onAddCatalogItem = { openCatalogItem(null) },
                     onEditCatalogItem = ::openCatalogItem,
+                    onDeleteCatalogItem = viewModel::deleteCatalogItem,
                 )
             }
         }
@@ -82,6 +84,7 @@ private fun MedicationListRoute(
     onEditRecord: (MedicationRecord) -> Unit,
     onAddCatalogItem: () -> Unit,
     onEditCatalogItem: (MedicationCatalogItem) -> Unit,
+    onDeleteCatalogItem: (MedicationCatalogItem) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     MedicationListScreen(
@@ -94,6 +97,7 @@ private fun MedicationListRoute(
         onDeleteRecord = viewModel::deleteRecord,
         onAddCatalogItem = onAddCatalogItem,
         onEditCatalogItem = onEditCatalogItem,
+        onDeleteCatalogItem = onDeleteCatalogItem,
     )
 }
 
@@ -135,11 +139,18 @@ internal class MedicationListViewModel(application: Application) : ViewModel() {
         viewModelScope.launch {
             val records = withContext(Dispatchers.IO) {
                 MedicationPrefs.getRecords(app)
-                    .filterNot { it.id == record.id }
+                    .removeRecordById(record.id)
                     .also { MedicationPrefs.saveRecords(app, it) }
                     .sortedByDescending { it.timestamp }
             }
             _uiState.value = _uiState.value.copy(records = records)
+        }
+    }
+
+    fun deleteCatalogItem(item: MedicationCatalogItem) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { MedicationPrefs.deleteCatalogItem(app, item.id) }
+            refresh()
         }
     }
 

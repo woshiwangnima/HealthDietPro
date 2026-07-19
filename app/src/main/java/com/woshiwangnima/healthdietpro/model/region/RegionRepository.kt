@@ -66,7 +66,7 @@ class RegionRepository private constructor(
         }
 
         fun fromContext(context: Context): RegionRepository {
-            val raw = context.assets.open("regions.json").bufferedReader().use { it.readText() }
+            val raw = context.assets.open("location/regions.json").bufferedReader().use { it.readText() }
             return parse(raw)
         }
 

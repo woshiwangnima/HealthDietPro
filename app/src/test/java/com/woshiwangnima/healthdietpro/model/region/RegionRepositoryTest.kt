@@ -1,41 +1,38 @@
 package com.woshiwangnima.healthdietpro.model.region
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RegionRepositoryTest {
 
+    private val provinces = ProvinceRepository.fromAsset("src/main/assets/location/provinces.json")
+    private val regions = RegionRepository.fromAsset("src/main/assets/location/regions.json")
+
     @Test
-    fun loadsAnhuiProvinceData() {
-        val repo = RegionRepository.fromAsset("src/main/assets/regions.json")
-        val cities = repo.citiesOf("34")
-        assertEquals(16, cities.size)
-        assertEquals("合肥市", cities.first().name)
+    fun bundledLocationDataCoversNationalCityAndDistrictIndexes() {
+        assertEquals(34, provinces.all().size)
+        assertTrue(regions.citiesOf("44").isNotEmpty())
+        assertTrue(regions.districtsOf("4401").isNotEmpty())
+        assertTrue(regions.citiesOf("34").isNotEmpty())
+        assertTrue(regions.districtsOf("3401").isNotEmpty())
     }
 
     @Test
-    fun hefeiHasDistricts() {
-        val repo = RegionRepository.fromAsset("src/main/assets/regions.json")
-        val districts = repo.districtsOf("3401")
-        assertTrue(districts.isNotEmpty())
-        assertEquals("瑶海区", districts.first().name)
-    }
+    fun resolvesKnownCoordinatesToProvinceCityAndDistrict() {
+        val beijing = regions.resolve(116.397, 39.916, provinces)
+        assertEquals("11", beijing.provinceCode)
+        assertEquals("北京市", beijing.cityName)
+        assertTrue(beijing.districtName.isNotBlank())
 
-    @Test
-    fun resolveHefeiReturnsAnhuiThenHefeiThenCentreDistrict() {
-        val regionRepo = RegionRepository.fromAsset("src/main/assets/regions.json")
-        val provinceRepo = ProvinceRepository.fromAsset("src/main/assets/provinces.json")
-        // 合肥市中心坐标
-        val snap = regionRepo.resolve(117.227, 31.821, provinceRepo)
-        assertEquals("34", snap.provinceCode)
-        assertEquals("安徽省", snap.provinceName)
-        assertEquals("3401", snap.cityCode)
-        assertEquals("合肥市", snap.cityName)
-        // 县级在质心点上返回的应该是距中心点最近的一个，但一定会命中
-        assertNotNull(snap.districtCode)
-        assertTrue(snap.districtCode.isNotEmpty())
-        println("合肥定位 → ${snap.display()}")
+        val guangzhou = regions.resolve(113.324, 23.135, provinces)
+        assertEquals("44", guangzhou.provinceCode)
+        assertEquals("广州市", guangzhou.cityName)
+        assertTrue(guangzhou.districtName.isNotBlank())
+
+        val hefei = regions.resolve(117.315, 31.859, provinces)
+        assertEquals("34", hefei.provinceCode)
+        assertEquals("合肥市", hefei.cityName)
+        assertEquals("瑶海区", hefei.districtName)
     }
 }

@@ -48,7 +48,7 @@ class ProvinceRepository private constructor(
 
         /** 用于运行时 (Activity / Fragment)：通过 Android AssetManager 加载。 */
         fun fromContext(context: Context): ProvinceRepository {
-            val raw = context.assets.open("provinces.json").bufferedReader().use { it.readText() }
+            val raw = context.assets.open("location/provinces.json").bufferedReader().use { it.readText() }
             val type = object : TypeToken<List<ProvinceJsonDto>>() {}.type
             val dtos: List<ProvinceJsonDto> = Gson().fromJson(raw, type)
             return ProvinceRepository(dtos.map { Province(it.code, it.name, it.polygons, it.lng, it.lat) })

@@ -57,7 +57,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
-import com.woshiwangnima.healthdietpro.base.BaseBackActivity
+import com.woshiwangnima.healthdietpro.base.DirtyFormActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
@@ -68,6 +68,7 @@ import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.ui.AppTextIconButton
+import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.AppDate
@@ -89,7 +90,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Locale
 
-class ProfileEditActivity : BaseBackActivity() {
+class ProfileEditActivity : DirtyFormActivity() {
 
     private lateinit var diseaseRepo: DiseaseRepository
     private lateinit var provinceRepo: ProvinceRepository
@@ -163,7 +164,7 @@ class ProfileEditActivity : BaseBackActivity() {
                 ProfileEditScreen(
                     state = uiState,
                     dialogState = dialogState,
-                    onBack = { saveAndFinish() },
+                    onBack = ::requestFormExit,
                     onNameChange = {
                         profileName = it
                         refreshUiState()
@@ -187,13 +188,9 @@ class ProfileEditActivity : BaseBackActivity() {
                     onSave = { saveProfile() },
                     onDismissDialog = { dismissCurrentDialog() },
                 )
+                DiscardChangesConfirmation()
             }
         }
-        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                saveAndFinish()
-            }
-        })
     }
 
     private fun loadProfile() {
@@ -485,9 +482,9 @@ class ProfileEditActivity : BaseBackActivity() {
         return Bitmap.createScaledBitmap(square, maxSize, maxSize, true)
     }
 
-    private fun saveAndFinish() {
-        saveProfile(allowBlankName = true)
-    }
+    override fun hasUnsavedChanges(): Boolean = hasChanges()
+
+    override fun saveFormChanges() = saveProfile()
 
     private fun saveProfile(allowBlankName: Boolean = false) {
         val name = profileName.trim()
@@ -664,15 +661,7 @@ private fun ProfileEditScreen(
                     }
                 }
             }
-            AppIconTextButton(
-                text = stringResource(R.string.profile_edit_save),
-                iconRes = R.drawable.ic_save,
-                onClick = onSave,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                enabled = state.saveEnabled,
-            )
+            FormSaveBar(stringResource(R.string.profile_edit_save), state.saveEnabled, onSave)
         }
     }
     ProfileEditDialogs(

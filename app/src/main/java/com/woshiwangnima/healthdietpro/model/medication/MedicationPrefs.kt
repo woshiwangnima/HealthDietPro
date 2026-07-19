@@ -1,8 +1,6 @@
 package com.woshiwangnima.healthdietpro.model.medication
 
 import android.content.Context
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import kotlinx.serialization.encodeToString
@@ -33,7 +31,7 @@ object MedicationPrefs {
         ProfilePrefs.makeChartStateKey(context, KEY_CATALOG)
 
     fun getRecords(context: Context): List<MedicationRecord> {
-        return migrated(context).records
+        return readRecords(context)
     }
 
     fun saveRecords(context: Context, records: List<MedicationRecord>) {
@@ -49,37 +47,24 @@ object MedicationPrefs {
     }
 
     fun getCatalog(context: Context): List<MedicationCatalogItem> {
-        return migrated(context).catalog
-    }
-
-    private fun migrated(context: Context): MedicationMigration.Result {
-        val records = readRecords(context)
-        val catalog = readCatalog(context)
-        val migration = MedicationMigration.migrate(catalog, records)
-        if (migration.changed) {
-            saveCatalog(context, migration.catalog)
-            saveRecords(context, migration.records)
-        }
-        return migration
+        return readCatalog(context)
     }
 
     private fun readRecords(context: Context): List<MedicationRecord> {
-        val raw = prefs(context).getString(keyFor(context), null) ?: return emptyList()
-        return try {
-            json.decodeFromString<List<MedicationRecord>>(raw)
-        } catch (_: Exception) {
-            // Existing installations wrote this key with Gson before kotlinx serialization.
-            runCatching {
-                Gson().fromJson<List<MedicationRecord>>(
-                    raw,
-                    object : TypeToken<List<MedicationRecord>>() {}.type,
-                ) ?: emptyList()
-            }.getOrDefault(emptyList())
-        }
+        return readRecords(context, keyFor(context))
+    }
+
+    private fun readRecords(context: Context, key: String = keyFor(context)): List<MedicationRecord> {
+        val raw = prefs(context).getString(key, null) ?: return emptyList()
+        return runCatching { json.decodeFromString<List<MedicationRecord>>(raw) }.getOrDefault(emptyList())
     }
 
     private fun readCatalog(context: Context): List<MedicationCatalogItem> {
-        val stored = prefs(context).getString(catalogKeyFor(context), null)
+        return readCatalog(context, catalogKeyFor(context))
+    }
+
+    private fun readCatalog(context: Context, key: String = catalogKeyFor(context)): List<MedicationCatalogItem> {
+        val stored = prefs(context).getString(key, null)
         return stored?.let { runCatching { json.decodeFromString<List<MedicationCatalogItem>>(it) }.getOrDefault(emptyList()) }
             ?: emptyList()
     }
@@ -95,6 +80,10 @@ object MedicationPrefs {
         val index = catalog.indexOfFirst { it.id == item.id }
         if (index >= 0) catalog[index] = item else catalog.add(item)
         saveCatalog(context, catalog)
+    }
+
+    fun deleteCatalogItem(context: Context, id: String) {
+        saveCatalog(context, getCatalog(context).filterNot { it.id == id })
     }
 
     /** 药品名历史：按最近使用排序的去重列表。 */

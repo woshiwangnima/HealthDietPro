@@ -182,7 +182,7 @@ private fun TypographyPreview() {
 }
 
 @Composable
-private fun ComposeChartPreviewSamples() {
+fun ComposeChartPreviewSamples() {
     val baseSeries = remember {
         listOf(
             ComposeChartSeries(

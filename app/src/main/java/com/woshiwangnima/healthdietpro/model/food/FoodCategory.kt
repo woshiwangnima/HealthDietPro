@@ -39,4 +39,12 @@ internal object FoodCategories {
         FoodCategory("food.aquatic.mollusk", R.string.food_category_mollusk, "food.aquatic"),
     )
     fun isWithin(tag: String, ancestor: String): Boolean = tag == ancestor || tag.startsWith("$ancestor.")
+    fun hasTagWithin(tags: List<String>, ancestor: String): Boolean = tags.any { isWithin(it, ancestor) }
+    fun labelRes(tag: String): Int? = (roots + children).firstOrNull { it.tag == tag }?.labelRes
+    fun displayTags(tags: List<String>): List<Int> = tags.flatMap { tag ->
+        buildList {
+            roots.firstOrNull { isWithin(tag, it.tag) }?.let { add(it.labelRes) }
+            labelRes(tag)?.let { if (it !in this) add(it) }
+        }
+    }.distinct()
 }

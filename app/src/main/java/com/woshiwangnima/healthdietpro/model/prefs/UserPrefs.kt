@@ -18,8 +18,6 @@ object UserPrefs {
     /** 迁移到用户级的精确键名（app_prefs → user_prefs_<uid>）。 */
     private val MIGRATE_KEYS_EXACT = listOf(
         "reminder_drink_water", "reminder_medication", "reminder_period", "reminder_fasting",
-        "pref_text_overflow", "pref_marquee_speed",
-        "pref_first_day_of_week", "pref_dark_mode",
         "tab_weight_chart", "tab_height_chart", "tab_bmi_chart"
     )
 
