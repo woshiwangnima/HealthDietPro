@@ -189,6 +189,7 @@
         "id": "yd",
         "toBase": 91.44,
         "hidden": false,
+
         "i18n": {
           "zh": {
             "symbol": "码"

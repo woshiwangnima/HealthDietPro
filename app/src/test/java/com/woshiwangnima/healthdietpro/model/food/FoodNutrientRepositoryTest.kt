@@ -12,7 +12,13 @@ class FoodNutrientRepositoryTest {
         assertTrue(foods.size >= 15)
         assertTrue(foods.all { it.categoryTags.isNotEmpty() && it.nutrientTable("standard.100g").nutrients.keys.containsAll(setOf("ENERGY", "PROTEIN", "FAT", "CHO")) })
         assertTrue(foods.all { food -> food.nutritionTables.values.all { table -> table.basis.unitCategory.isNotBlank() && table.basis.unitId.isNotBlank() && table.nutrients.values.all { it.unitCategory.isNotBlank() && it.unitId.isNotBlank() } } })
-        assertTrue(foods.all { it.healthMetrics.glycemicIndex != null && it.healthMetrics.glycemicLoadPer100g != null })
+        assertTrue(foods.all { food ->
+            val hasGi = food.healthMetrics.glycemicIndex != null
+            val hasGl = food.healthMetrics.glycemicLoadPer100g != null
+            val carbohydrate = food.nutrientTable("standard.100g").nutrients.getValue("CHO").value
+            hasGi == hasGl && (carbohydrate > 0 || !hasGi)
+        })
+        assertTrue(foods.all { it.commonness in 1..5 })
         assertEquals("米饭", foods.first { it.id == "food:taxon:oryza_sativa:polished:steamed" }.displayName("zh"))
     }
 
@@ -43,5 +49,31 @@ class FoodNutrientRepositoryTest {
         assertTrue(FoodCategories.isWithin("food.staple.grain", "food.staple"))
         assertTrue(FoodCategories.isWithin("food.aquatic.fish", "food.aquatic"))
         assertTrue(!FoodCategories.isWithin("food.fruit", "food.staple"))
+        assertTrue(
+            FoodCategories.hasTagWithinAny(
+                listOf("food.vegetable"),
+                setOf("food.staple", "food.vegetable"),
+            ),
+        )
+        assertTrue(
+            !FoodCategories.hasTagWithinAny(
+                listOf("food.fruit"),
+                setOf("food.staple", "food.vegetable"),
+            ),
+        )
+    }
+
+    @Test
+    fun selectedRootsExposeTheUnionOfTheirChildren() {
+        val children = FoodCategories.childrenForRoots(setOf("food.staple", "food.meat_egg"))
+        assertTrue(children.any { it.tag == "food.staple.grain" })
+        assertTrue(children.any { it.tag == "food.meat_egg.livestock" })
+        assertEquals(
+            setOf("food.staple.grain"),
+            FoodCategories.retainChildrenForRoots(
+                setOf("food.staple.grain", "food.meat_egg.livestock"),
+                setOf("food.staple"),
+            ),
+        )
     }
 }

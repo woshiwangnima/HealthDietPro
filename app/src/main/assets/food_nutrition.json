@@ -82,7 +82,8 @@
       "description": {
         "zh": "蒸熟的精白米主食，主要提供碳水化合物；实际升糖反应受品种、米饭软硬和同餐食物影响。",
         "en": "Cooked polished rice is a carbohydrate-rich staple; glycemic response varies with variety, texture, and the accompanying meal."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:oryza_sativa:wholegrain:steamed",
@@ -167,7 +168,8 @@
       "description": {
         "zh": "保留麸皮和胚芽的熟糙米，膳食纤维通常高于精白米；烹调软硬会影响消化速度。",
         "en": "Cooked brown rice retains bran and germ and typically provides more dietary fiber than polished rice; cooking texture affects digestion."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:avena_sativa:rolled:dry",
@@ -254,7 +256,8 @@
       "description": {
         "zh": "压片燕麦属于全谷物，可提供可溶性膳食纤维；加糖、煮制时间和冲泡方式会改变实际能量和升糖反应。",
         "en": "Rolled oats are a whole grain and provide soluble fiber; added sugar and preparation affect actual energy and glycemic response."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:solanum_tuberosum:boiled",
@@ -340,7 +343,8 @@
       "description": {
         "zh": "煮马铃薯是富含淀粉的薯类食物；品种、熟化程度及冷却后再食用都会影响血糖反应。",
         "en": "Boiled potato is a starchy tuber; variety, doneness, and cooling before eating affect glycemic response."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:cucumis_sativus:commercial:raw",
@@ -424,7 +428,8 @@
       "description": {
         "zh": "生黄瓜含水量高、能量密度低，适合作为蔬菜搭配；应注意清洗和可食部分。",
         "en": "Raw cucumber has high water content and low energy density; use it as part of a varied vegetable intake and wash before eating."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:cucumis_sativus:landrace:raw",
@@ -507,7 +512,8 @@
       "description": {
         "zh": "露地或地方品系黄瓜的外观和风味可能不同；营养值采用同类生黄瓜数据，品种间会有自然差异。",
         "en": "Field or landrace cucumber may differ in appearance and flavor; values use raw cucumber data because cultivar composition naturally varies."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:solanum_lycopersicum:raw",
@@ -592,7 +598,8 @@
       "description": {
         "zh": "生番茄可同时作为蔬菜或水果食用，含有类胡萝卜素等植物化学物；成熟度和加工方式会影响成分利用。",
         "en": "Raw tomato may be eaten as a vegetable or fruit and contains carotenoids; ripeness and processing affect nutrient availability."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:brassica_oleracea:broccoli:raw",
@@ -672,7 +679,8 @@
       "description": {
         "zh": "西兰花属于十字花科蔬菜，含维生素和多种植物化学物；烹调时间会影响部分热敏营养素。",
         "en": "Broccoli is a cruciferous vegetable with vitamins and phytochemicals; cooking duration affects some heat-sensitive nutrients."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:malus_domestica:raw",
@@ -794,7 +802,8 @@
       "description": {
         "zh": "带皮鲜苹果提供水分和膳食纤维；大小、品种和可食比例不同，单个重量仅为估算。",
         "en": "Raw apple with peel provides water and dietary fiber; fruit size, cultivar, and edible yield vary, so per-fruit portions are estimates."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:musa_acuminata:ripe:raw",
@@ -879,7 +888,8 @@
       "description": {
         "zh": "成熟香蕉提供碳水化合物和钾；成熟度越高，糖和淀粉的比例及升糖反应可能变化。",
         "en": "Ripe banana provides carbohydrate and potassium; ripeness changes the balance of sugars and starch and may alter glycemic response."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:glycine_max:tofu:firm",
@@ -959,7 +969,8 @@
       "description": {
         "zh": "北豆腐以大豆为原料，是植物蛋白来源；凝固剂和含水量会使不同产品的营养值不同。",
         "en": "Firm tofu is a soy-based source of plant protein; coagulant choice and water content cause product-to-product variation."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:gallus_gallus:egg:whole",
@@ -1034,7 +1045,8 @@
       "description": {
         "zh": "全鸡蛋提供优质蛋白质和脂溶性营养素；烹调用油和调味会显著改变实际摄入。",
         "en": "Whole egg provides high-quality protein and fat-soluble nutrients; cooking oil and seasoning substantially change intake."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:gallus_gallus:breast:steamed",
@@ -1053,14 +1065,6 @@
         "food.meat_egg.poultry"
       ],
       "healthMetrics": {
-        "glycemicIndex": {
-          "value": 0.0,
-          "unit": "GI"
-        },
-        "glycemicLoadPer100g": {
-          "value": 0.0,
-          "unit": "GL"
-        },
         "inflammatoryPotential": {
           "value": 0.02,
           "unit": "DII"
@@ -1109,7 +1113,8 @@
       "description": {
         "zh": "去皮熟鸡胸肉是高蛋白、低碳水的禽肉选择；数据不包含额外烹调用油或酱料。",
         "en": "Cooked skinless chicken breast is a high-protein, low-carbohydrate poultry option; values exclude added oil and sauces."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:salmo_salar:raw",
@@ -1128,14 +1133,6 @@
         "food.aquatic.fish"
       ],
       "healthMetrics": {
-        "glycemicIndex": {
-          "value": 0.0,
-          "unit": "GI"
-        },
-        "glycemicLoadPer100g": {
-          "value": 0.0,
-          "unit": "GL"
-        },
         "inflammatoryPotential": {
           "value": -0.32,
           "unit": "DII"
@@ -1184,7 +1181,8 @@
       "description": {
         "zh": "大西洋鲑是脂肪鱼，含蛋白质和不饱和脂肪；生食应符合食品安全和冷链要求。",
         "en": "Atlantic salmon is an oily fish with protein and unsaturated fat; raw consumption requires appropriate food-safety and cold-chain controls."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:bos_taurus:milk:whole",
@@ -1322,7 +1320,8 @@
       "description": {
         "zh": "全脂牛奶提供蛋白质、脂肪和乳糖；包装规格不同，杯和盒的体积仅作为常见份量估算。",
         "en": "Whole milk provides protein, fat, and lactose; cup and carton sizes are common serving estimates and vary by package."
-      }
+      },
+      "commonness": 3
     },
     {
       "id": "food:taxon:arachis_hypogaea:roasted",
@@ -1407,6 +1406,2833 @@
       "description": {
         "zh": "烤花生能量密度较高，含脂肪、蛋白质和膳食纤维；食用时应控制份量并留意过敏风险。",
         "en": "Roasted peanuts are energy-dense and provide fat, protein, and fiber; manage portions and consider allergy risk."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:mantou",
+      "names": {
+        "zh": [
+          "馒头"
+        ],
+        "en": [
+          "Steamed wheat bun",
+          "Mantou"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 88,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 41.4,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "馒头, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Steamed wheat bun, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 223,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 7.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 47.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "馒头的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Steamed wheat bun are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:bread_white",
+      "names": {
+        "zh": [
+          "面包",
+          "白面包"
+        ],
+        "en": [
+          "White bread",
+          "Bread"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 75,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 37.0,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "面包, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "White bread, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 266,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 8.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 49.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "面包的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for White bread are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:bread_whole_wheat",
+      "names": {
+        "zh": [
+          "全麦面包"
+        ],
+        "en": [
+          "Whole-wheat bread"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.whole_grain"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 64,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 27.5,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "全麦面包, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Whole-wheat bread, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 246,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 12.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 43.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "全麦面包的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Whole-wheat bread are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:zea_mays:boiled",
+      "names": {
+        "zh": [
+          "煮玉米",
+          "玉米"
+        ],
+        "en": [
+          "Boiled sweet corn",
+          "Corn"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 52,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 11.9,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "煮玉米, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Boiled sweet corn, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 112,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 4.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 22.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "煮玉米的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Boiled sweet corn are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:ipomoea_batatas:steamed",
+      "names": {
+        "zh": [
+          "红薯",
+          "蒸红薯"
+        ],
+        "en": [
+          "Steamed sweet potato",
+          "Sweet potato"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.tuber"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 63,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 15.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "红薯, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Steamed sweet potato, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 99,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 24.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "红薯的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Steamed sweet potato are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:colocasia_esculenta:boiled",
+      "names": {
+        "zh": [
+          "芋头",
+          "煮芋头"
+        ],
+        "en": [
+          "Boiled taro",
+          "Taro"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.tuber"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 54,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 10.7,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "芋头, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Boiled taro, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 58,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 19.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "芋头的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Boiled taro are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:panicum_miliaceum:porridge",
+      "names": {
+        "zh": [
+          "小米粥"
+        ],
+        "en": [
+          "Millet porridge"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 62,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 6.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "小米粥, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Millet porridge, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 46,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 10.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "小米粥的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Millet porridge are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:oryza_sativa:porridge",
+      "names": {
+        "zh": [
+          "白粥",
+          "大米粥"
+        ],
+        "en": [
+          "Rice porridge"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 69,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 7.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "白粥, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Rice porridge, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 46,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 11.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "白粥的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Rice porridge are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:oryza_sativa:glutinous_steamed",
+      "names": {
+        "zh": [
+          "糯米饭"
+        ],
+        "en": [
+          "Steamed glutinous rice"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "commonness": 3,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 87,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 22.0,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "糯米饭, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Steamed glutinous rice, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 116,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 25.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "糯米饭的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Steamed glutinous rice are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:oryza_sativa:zongzi",
+      "names": {
+        "zh": [
+          "粽子"
+        ],
+        "en": [
+          "Rice dumpling",
+          "Zongzi"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 87,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 31.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "粽子, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Rice dumpling, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 170,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 3.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 2.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 36.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "粽子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Rice dumpling are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:oryza_sativa:rice_noodles",
+      "names": {
+        "zh": [
+          "米粉"
+        ],
+        "en": [
+          "Rice noodles"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 61,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 14.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "米粉, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Rice noodles, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 109,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 23.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "米粉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Rice noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:oryza_sativa:liangpi",
+      "names": {
+        "zh": [
+          "凉皮"
+        ],
+        "en": [
+          "Cold rice noodles",
+          "Liangpi"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 55,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 11.0,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "凉皮, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Cold rice noodles, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 99,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 20.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "凉皮的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Cold rice noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:oryza_sativa:rice_cake",
+      "names": {
+        "zh": [
+          "年糕"
+        ],
+        "en": [
+          "Rice cake"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 3,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 83,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 34.9,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "年糕, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Rice cake, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 188,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 3.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 42.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "年糕的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Rice cake are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:noodles_boiled",
+      "names": {
+        "zh": [
+          "面条",
+          "煮面条"
+        ],
+        "en": [
+          "Boiled wheat noodles",
+          "Noodles"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 55,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 13.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "面条, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Boiled wheat noodles, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 110,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 3.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 25.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "面条的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Boiled wheat noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:nelumbo_nucifera:starch_drink",
+      "names": {
+        "zh": [
+          "藕粉"
+        ],
+        "en": [
+          "Lotus root starch drink"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 2,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 85,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 12.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "藕粉, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Lotus root starch drink, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 63,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 15.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "藕粉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Lotus root starch drink are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:glycine_max:soy_milk",
+      "names": {
+        "zh": [
+          "豆浆"
+        ],
+        "en": [
+          "Soy milk"
+        ]
+      },
+      "categoryTags": [
+        "food.soy",
+        "food.beverage"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 34,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "豆浆, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Soy milk, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 31,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 3.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "豆浆的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Soy milk are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:youtiao",
+      "names": {
+        "zh": [
+          "油条"
+        ],
+        "en": [
+          "Chinese fried dough",
+          "Youtiao"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 75,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 33.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "油条, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Chinese fried dough, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 388,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 6.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 18.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 45.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "油条的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Chinese fried dough are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:meat_bun",
+      "names": {
+        "zh": [
+          "肉包子"
+        ],
+        "en": [
+          "Meat-filled steamed bun",
+          "Meat bun"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 72,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 21.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "肉包子, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Meat-filled steamed bun, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 223,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 9.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 6.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 30.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "肉包子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Meat-filled steamed bun are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:solanum_melongena:raw",
+      "names": {
+        "zh": [
+          "茄子"
+        ],
+        "en": [
+          "Eggplant"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "茄子, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Eggplant, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 23,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 5.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "茄子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Eggplant are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:lactuca_sativa:raw",
+      "names": {
+        "zh": [
+          "生菜"
+        ],
+        "en": [
+          "Lettuce"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.4,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "生菜, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Lettuce, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 15,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "生菜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Lettuce are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:daucus_carota:raw",
+      "names": {
+        "zh": [
+          "胡萝卜"
+        ],
+        "en": [
+          "Carrot"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 16,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 1.4,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "胡萝卜, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Carrot, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 37,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 8.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "胡萝卜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Carrot are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:solanum_melongena:local_round_raw",
+      "names": {
+        "zh": [
+          "本地圆茄",
+          "圆茄"
+        ],
+        "en": [
+          "Local round eggplant",
+          "Round eggplant"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 3,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "本地圆茄, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Local round eggplant, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 23,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 5.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "本地圆茄的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Local round eggplant are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:vigna_unguiculata:raw",
+      "names": {
+        "zh": [
+          "豆角"
+        ],
+        "en": [
+          "Yardlong bean",
+          "Long bean"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 1.0,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "豆角, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Yardlong bean, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 34,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 6.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "豆角的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Yardlong bean are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:phaseolus_vulgaris:raw",
+      "names": {
+        "zh": [
+          "四季豆"
+        ],
+        "en": [
+          "Green bean",
+          "French bean"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "四季豆, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Green bean, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 27,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 5.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "四季豆的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Green bean are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:lactuca_sativa:asparagus_lettuce",
+      "names": {
+        "zh": [
+          "莴苣"
+        ],
+        "en": [
+          "Asparagus lettuce",
+          "Celtuce"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.5,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "莴苣, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Asparagus lettuce, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 15,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "莴苣的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Asparagus lettuce are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:zingiber_mioga:raw",
+      "names": {
+        "zh": [
+          "茭白"
+        ],
+        "en": [
+          "Water bamboo shoot"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 3,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.7,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "茭白, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Water bamboo shoot, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 23,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "茭白的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Water bamboo shoot are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:dioscorea_polystachya:raw",
+      "names": {
+        "zh": [
+          "山药"
+        ],
+        "en": [
+          "Chinese yam"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 51,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 6.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "山药, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Chinese yam, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 56,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 12.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "山药的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Chinese yam are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:apium_graveolens:raw",
+      "names": {
+        "zh": [
+          "芹菜"
+        ],
+        "en": [
+          "Celery"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "芹菜, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Celery, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 16,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "芹菜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Celery are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:capsicum_annuum:chili",
+      "names": {
+        "zh": [
+          "小米辣"
+        ],
+        "en": [
+          "Bird's eye chili"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 3,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 1.0,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "小米辣, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Bird's eye chili, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 32,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 6.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "小米辣的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Bird's eye chili are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:coriandrum_sativum:raw",
+      "names": {
+        "zh": [
+          "香菜"
+        ],
+        "en": [
+          "Coriander",
+          "Cilantro"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 1.0,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "香菜, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Coriander, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 31,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 6.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "香菜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Coriander are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:allium_sativum:raw",
+      "names": {
+        "zh": [
+          "大蒜"
+        ],
+        "en": [
+          "Garlic"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 30,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 8.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "大蒜, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Garlic, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 126,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 4.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 27.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "大蒜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Garlic are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:zingiber_officinale:raw",
+      "names": {
+        "zh": [
+          "生姜"
+        ],
+        "en": [
+          "Ginger"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 1.1,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "生姜, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Ginger, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 41,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 7.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "生姜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Ginger are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:solanum_lycopersicum:cherry_raw",
+      "names": {
+        "zh": [
+          "圣女果",
+          "樱桃番茄"
+        ],
+        "en": [
+          "Cherry tomato"
+        ]
+      },
+      "categoryTags": [
+        "food.fruit",
+        "food.vegetable"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 30,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 1.2,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "圣女果, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Cherry tomato, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 22,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "圣女果的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Cherry tomato are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:hylocereus_undatus:raw",
+      "names": {
+        "zh": [
+          "火龙果"
+        ],
+        "en": [
+          "Dragon fruit",
+          "Pitaya"
+        ]
+      },
+      "categoryTags": [
+        "food.fruit"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 48,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 5.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "火龙果, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Dragon fruit, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 51,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 11.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "火龙果的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Dragon fruit are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:durio_zibethinus:raw",
+      "names": {
+        "zh": [
+          "榴莲"
+        ],
+        "en": [
+          "Durian"
+        ]
+      },
+      "categoryTags": [
+        "food.fruit"
+      ],
+      "commonness": 3,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 49,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 13.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "榴莲, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Durian, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 147,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 27.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "榴莲的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Durian are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:pyrus_pyrifolia:raw",
+      "names": {
+        "zh": [
+          "梨子",
+          "梨"
+        ],
+        "en": [
+          "Pear"
+        ]
+      },
+      "categoryTags": [
+        "food.fruit"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 38,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 4.1,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "梨子, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Pear, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 44,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 10.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "梨子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Pear are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:citrullus_lanatus:raw",
+      "names": {
+        "zh": [
+          "西瓜"
+        ],
+        "en": [
+          "Watermelon"
+        ]
+      },
+      "categoryTags": [
+        "food.fruit"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 72,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 4.2,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "西瓜, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Watermelon, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 31,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 5.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "西瓜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Watermelon are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:sus_scrofa:lean_raw",
+      "names": {
+        "zh": [
+          "猪肉",
+          "瘦猪肉"
+        ],
+        "en": [
+          "Lean pork",
+          "Pork"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg",
+        "food.meat_egg.livestock"
+      ],
+      "commonness": 5,
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "猪肉, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Lean pork, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 143,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 20.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 6.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "猪肉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Lean pork are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:bos_taurus:lean_raw",
+      "names": {
+        "zh": [
+          "牛肉",
+          "瘦牛肉"
+        ],
+        "en": [
+          "Lean beef",
+          "Beef"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg",
+        "food.meat_egg.livestock"
+      ],
+      "commonness": 5,
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "牛肉, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Lean beef, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 106,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 20.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 2.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "牛肉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Lean beef are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      }
+    },
+    {
+      "id": "food:taxon:ovis_aries:lean_raw",
+      "names": {
+        "zh": [
+          "羊肉",
+          "瘦羊肉"
+        ],
+        "en": [
+          "Lean lamb",
+          "Lamb"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg",
+        "food.meat_egg.livestock"
+      ],
+      "commonness": 4,
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "羊肉, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Lean lamb, preparation-matched reference"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 118,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 19.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "羊肉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Lean lamb are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
       }
     }
   ]

@@ -27,13 +27,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.lifecycleScope
 import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppBottomNavItem
 import com.woshiwangnima.healthdietpro.common.ui.AppBottomNavigationBar
+import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
+import com.woshiwangnima.healthdietpro.common.ui.PagePreloader
+import com.woshiwangnima.healthdietpro.common.ui.PAGE_ENTER_DURATION_MILLIS
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.HealthDietProApplication
 import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
+import com.woshiwangnima.healthdietpro.model.archive.PlainUserArchiveRepository
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -64,6 +70,9 @@ import com.woshiwangnima.healthdietpro.ui.test.TestLandingScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComponentsPreviewScreen
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabPersistence
 import com.woshiwangnima.healthdietpro.util.UnitConverter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : BaseActivity() {
 
@@ -76,7 +85,9 @@ class MainActivity : BaseActivity() {
 
     private val recordViewModel: RecordViewModel by viewModels()
     private val nutritionViewModel: NutritionViewModel by viewModels()
-    private val profileAvatarBitmapCache = ProfileAvatarBitmapCache()
+    private val profileAvatarBitmapCache by lazy {
+        ProfileAvatarBitmapCache(cacheRegistry = (application as HealthDietProApplication).cacheRegistry)
+    }
     private val profileViewModel: ProfileUserInfoViewModel by viewModels {
         androidx.lifecycle.ViewModelProvider.NewInstanceFactory().let { factory ->
             object : androidx.lifecycle.ViewModelProvider.Factory {
@@ -93,12 +104,16 @@ class MainActivity : BaseActivity() {
     private val testAccessViewModel: TestAccessViewModel by viewModels()
 
     private var selectedRoute by mutableStateOf(ROUTE_NUTRITION)
+    private var isMainPageTransitionRunning by mutableStateOf(false)
     private var routeBeforeTest = ROUTE_NUTRITION
     private var showOnboarding by mutableStateOf(false)
     private var lastBackPressedAt = 0L
     private var previousSoftInputMode: Int? = null
     private var testPage by mutableStateOf(TestPage.Landing)
     private var commonUiTestCategory by mutableStateOf<CommonUiTestCategory?>(null)
+    private val pagePreloader = PagePreloader()
+    private val plainUserArchiveRepository by lazy { PlainUserArchiveRepository(this) }
+    private var pendingPlainArchiveContent: String? = null
 
     private val onboardingLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -143,6 +158,56 @@ class MainActivity : BaseActivity() {
         profileViewModel.refresh()
     }
 
+    private val plainJsonExportLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        val archiveContent = pendingPlainArchiveContent
+        pendingPlainArchiveContent = null
+        if (uri == null || archiveContent == null) return@registerForActivityResult
+        lifecycleScope.launch {
+            val saved = withContext(Dispatchers.IO) {
+                runCatching {
+                    checkNotNull(contentResolver.openOutputStream(uri)).bufferedWriter(Charsets.UTF_8).use {
+                        it.write(archiveContent)
+                    }
+                }
+            }
+            Toast.makeText(
+                this@MainActivity,
+                if (saved.isSuccess) R.string.profile_plain_json_export_success else R.string.profile_plain_json_operation_failed,
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+    }
+
+    private val plainJsonImportLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri == null) return@registerForActivityResult
+        lifecycleScope.launch {
+            val imported = withContext(Dispatchers.IO) {
+                runCatching {
+                    checkNotNull(contentResolver.openInputStream(uri)).bufferedReader(Charsets.UTF_8).use {
+                        it.readText()
+                    }
+                }.fold(
+                    onSuccess = plainUserArchiveRepository::importIntoCurrentUser,
+                    onFailure = { error -> Result.failure(error) },
+                )
+            }
+            if (imported.isSuccess) {
+                profileAvatarBitmapCache.clearCache()
+                profileViewModel.refresh()
+                nutritionViewModel.refreshUser()
+            }
+            Toast.makeText(
+                this@MainActivity,
+                if (imported.isSuccess) R.string.profile_plain_json_import_success else R.string.profile_plain_json_operation_failed,
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         UnitConverter.init(this)
@@ -152,6 +217,7 @@ class MainActivity : BaseActivity() {
                 MainShell()
             }
         }
+        window.decorView.post(::preloadMainPages)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -214,6 +280,7 @@ class MainActivity : BaseActivity() {
                         items = navItems,
                         selectedRoute = selectedRoute,
                         onItemClick = { switchTab(it.route) },
+                        enabled = !isMainPageTransitionRunning,
                         modifier = Modifier.navigationBarsPadding(),
                     )
                 }
@@ -228,56 +295,75 @@ class MainActivity : BaseActivity() {
         val modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-        when (selectedRoute) {
-            ROUTE_NUTRITION -> NutritionScreen(viewModel = nutritionViewModel, modifier = modifier)
-            ROUTE_RECORD -> {
-                val uiState by recordViewModel.uiState.collectAsState()
-                RecordScreen(
-                    uiState = uiState,
-                    onActionClick = ::handleRecordAction,
-                    modifier = modifier,
-                )
-            }
-            ROUTE_PROFILE -> {
-                val state by profileViewModel.uiState.collectAsState()
-                ProfileScreen(
-                    state = state,
-                    onOpenAppSettings = {
-                        settingsLauncher.launch(Intent(this@MainActivity, AppSettingsComposeActivity::class.java))
-                    },
-                    onOpenBmi = {
-                        startActivity(Intent(this@MainActivity, BmiDetailActivity::class.java))
-                    },
-                    onOpenUserSettings = {
-                        startActivity(Intent(this@MainActivity, UserSettingsActivity::class.java))
-                    },
-                    onEditProfile = {
-                        profileEditLauncher.launch(Intent(this@MainActivity, ProfileEditActivity::class.java))
-                    },
-                    onOpenUserSwitch = {
-                        userSwitchLauncher.launch(Intent(this@MainActivity, UserSwitchActivity::class.java))
-                    },
-                    modifier = modifier,
-                )
-            }
-            ROUTE_TEST -> {
-                val isVerified by testAccessViewModel.isVerified.collectAsState()
-                if (isVerified) {
-                    when (testPage) {
-                        TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, modifier)
-                        TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, { testPage = TestPage.Landing }, modifier)
-                        TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
-                        TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, modifier)
-                    }
-                } else {
-                    TestAccessScreen(
-                        onCancel = ::returnFromTest,
-                        onVerify = testAccessViewModel::verify,
-                        modifier = modifier,
+        AnimatedPageContent(
+            targetState = selectedRoute,
+            modifier = modifier,
+            direction = { initialRoute, targetRoute ->
+                navItems.indexOfFirst { it.route == targetRoute } -
+                    navItems.indexOfFirst { it.route == initialRoute }
+            },
+        ) { route ->
+            when (route) {
+                ROUTE_NUTRITION -> NutritionScreen(viewModel = nutritionViewModel, modifier = Modifier.fillMaxSize())
+                ROUTE_RECORD -> {
+                    val uiState by recordViewModel.uiState.collectAsState()
+                    RecordScreen(
+                        uiState = uiState,
+                        onActionClick = ::handleRecordAction,
+                        modifier = Modifier.fillMaxSize(),
                     )
+                }
+                ROUTE_PROFILE -> {
+                    val state by profileViewModel.uiState.collectAsState()
+                    ProfileScreen(
+                        state = state,
+                        onOpenAppSettings = {
+                            settingsLauncher.launch(Intent(this@MainActivity, AppSettingsComposeActivity::class.java))
+                        },
+                        onOpenBmi = {
+                            startActivity(Intent(this@MainActivity, BmiDetailActivity::class.java))
+                        },
+                        onOpenUserSettings = {
+                            startActivity(Intent(this@MainActivity, UserSettingsActivity::class.java))
+                        },
+                        onEditProfile = {
+                            profileEditLauncher.launch(Intent(this@MainActivity, ProfileEditActivity::class.java))
+                        },
+                        onOpenUserSwitch = {
+                            userSwitchLauncher.launch(Intent(this@MainActivity, UserSwitchActivity::class.java))
+                        },
+                        onExportPlainJson = ::exportPlainJsonArchive,
+                        onImportPlainJson = {
+                            plainJsonImportLauncher.launch(arrayOf("application/json", "text/plain"))
+                        },
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+                ROUTE_TEST -> {
+                    val isVerified by testAccessViewModel.isVerified.collectAsState()
+                    if (isVerified) {
+                        when (testPage) {
+                            TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, Modifier.fillMaxSize())
+                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
+                            TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
+                            TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
+                        }
+                    } else {
+                        TestAccessScreen(
+                            onCancel = ::returnFromTest,
+                            onVerify = testAccessViewModel::verify,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
                 }
             }
         }
+    }
+
+    private fun preloadMainPages() {
+        pagePreloader.preloadData(ROUTE_NUTRITION) { nutritionViewModel.state }
+        pagePreloader.preloadData(ROUTE_RECORD) { recordViewModel.uiState }
+        pagePreloader.preloadData(ROUTE_PROFILE) { profileViewModel.refresh() }
     }
 
     private fun restoredRoute(): String {
@@ -290,7 +376,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun switchTab(route: String) {
-        if (route == selectedRoute) return
+        if (route == selectedRoute || isMainPageTransitionRunning) return
         val index = navItems.indexOfFirst { it.route == route }
         if (index == -1) return
 
@@ -304,6 +390,11 @@ class MainActivity : BaseActivity() {
             TabPersistence.saveIndex(this, MAIN_NAV_KEY, index)
         }
         selectedRoute = route
+        isMainPageTransitionRunning = true
+        window.decorView.postDelayed(
+            { isMainPageTransitionRunning = false },
+            PAGE_ENTER_DURATION_MILLIS.toLong(),
+        )
     }
 
     private fun returnFromTest() {
@@ -311,6 +402,24 @@ class MainActivity : BaseActivity() {
     }
 
     private fun addTestHeightRecord() = addTestBodyRecord(isWeight = false)
+
+    private fun exportPlainJsonArchive() {
+        lifecycleScope.launch {
+            val archive = withContext(Dispatchers.IO) {
+                plainUserArchiveRepository.exportCurrentUser()
+            }
+            archive.onSuccess { content ->
+                pendingPlainArchiveContent = content
+                plainJsonExportLauncher.launch("health-diet-pro-user.json")
+            }.onFailure {
+                Toast.makeText(
+                    this@MainActivity,
+                    R.string.profile_plain_json_operation_failed,
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        }
+    }
 
     private fun addTestWeightRecord() = addTestBodyRecord(isWeight = true)
 

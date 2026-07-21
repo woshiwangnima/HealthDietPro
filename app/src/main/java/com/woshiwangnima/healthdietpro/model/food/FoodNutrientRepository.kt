@@ -15,6 +15,7 @@ internal data class Food(
     val nutritionTables: Map<String, FoodNutrientTable> = emptyMap(),
     val nutrients: Map<String, FoodAmount> = emptyMap(),
     val healthMetrics: FoodHealthMetrics = FoodHealthMetrics(),
+    val commonness: Int = 0,
     val servings: List<FoodServing> = emptyList(),
     val densityGramsPerMl: Double? = null,
     val description: Map<String, String> = emptyMap(),

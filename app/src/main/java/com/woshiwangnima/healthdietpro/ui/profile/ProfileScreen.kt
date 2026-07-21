@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,8 +40,13 @@ internal fun ProfileScreen(
     onOpenUserSettings: () -> Unit,
     onEditProfile: () -> Unit,
     onOpenUserSwitch: () -> Unit,
+    onExportPlainJson: () -> Unit,
+    onImportPlainJson: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showExportConfirmation by remember { mutableStateOf(false) }
+    var showImportConfirmation by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -89,7 +96,63 @@ internal fun ProfileScreen(
                     leadingIconRes = R.drawable.ic_preferences,
                     onClick = onOpenUserSettings,
                 )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                SettingRow(
+                    title = stringResource(R.string.profile_plain_json_export),
+                    subtitle = stringResource(R.string.profile_plain_json_export_desc),
+                    leadingIconRes = R.drawable.ic_export,
+                    onClick = { showExportConfirmation = true },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                SettingRow(
+                    title = stringResource(R.string.profile_plain_json_import),
+                    subtitle = stringResource(R.string.profile_plain_json_import_desc),
+                    leadingIconRes = R.drawable.ic_import,
+                    onClick = { showImportConfirmation = true },
+                )
             }
         }
+    }
+
+    if (showExportConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showExportConfirmation = false },
+            title = { Text(stringResource(R.string.profile_plain_json_export_confirm_title)) },
+            text = { Text(stringResource(R.string.profile_plain_json_export_confirm_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExportConfirmation = false
+                    onExportPlainJson()
+                }) {
+                    Text(stringResource(R.string.profile_plain_json_export_action))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExportConfirmation = false }) {
+                    Text(stringResource(R.string.profile_plain_json_cancel))
+                }
+            },
+        )
+    }
+
+    if (showImportConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showImportConfirmation = false },
+            title = { Text(stringResource(R.string.profile_plain_json_import_confirm_title)) },
+            text = { Text(stringResource(R.string.profile_plain_json_import_confirm_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showImportConfirmation = false
+                    onImportPlainJson()
+                }) {
+                    Text(stringResource(R.string.profile_plain_json_import_action))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showImportConfirmation = false }) {
+                    Text(stringResource(R.string.profile_plain_json_cancel))
+                }
+            },
+        )
     }
 }

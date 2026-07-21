@@ -1,8 +1,11 @@
 package com.woshiwangnima.healthdietpro.model.profile
 
+import com.woshiwangnima.healthdietpro.model.archive.ArchiveSchemaVersion
+
 data class UserProfile(
     val id: String = "",
-    val archiveSchemaVersion: Int = 2,
+    val archiveSchemaVersion: ArchiveSchemaVersion? = null,
+    val archiveAppVersion: String = "",
     val name: String = "",
     val gender: Gender = Gender.MALE,
     val birthday: AppDate? = null,

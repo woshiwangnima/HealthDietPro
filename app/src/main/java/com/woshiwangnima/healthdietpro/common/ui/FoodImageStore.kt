@@ -9,16 +9,33 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheEntry
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheKind
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheRegistry
+import com.woshiwangnima.healthdietpro.common.cache.ClearableMemoryCache
 
-class FoodImageStore(private val context: Context) {
+internal class FoodImageStore(
+    private val context: Context,
+    cacheRegistry: AppCacheRegistry? = null,
+) : ClearableMemoryCache {
     private val cache = LruCache<String, ImageBitmap>(24)
 
-    fun preload(keys: Collection<String>) {
-        keys.distinct().forEach(::load)
+    override val cacheKind = AppCacheKind.FoodImages
+
+    init {
+        cacheRegistry?.register(this)
     }
 
     fun clear() {
         cache.evictAll()
+    }
+
+    override fun clearCache() = clear()
+
+    override fun cacheEntry(): AppCacheEntry {
+        val images = cache.snapshot().values
+        val byteCount = images.sumOf { it.width.toLong() * it.height * 4L }
+        return AppCacheEntry(cacheKind, byteCount, images.size)
     }
 
     fun image(key: String?): ImageBitmap = load(key ?: DEFAULT_KEY)

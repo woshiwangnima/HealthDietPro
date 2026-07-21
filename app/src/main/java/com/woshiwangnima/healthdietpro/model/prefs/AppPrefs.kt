@@ -28,6 +28,7 @@ object AppPrefs {
     private const val KEY_FIRST_DAY_OF_WEEK = "pref_first_day_of_week"
     private const val KEY_TEXT_OVERFLOW = "pref_text_overflow"
     private const val KEY_MARQUEE_SPEED = "pref_marquee_speed"
+    private const val KEY_APP_LANGUAGE = "pref_app_language"
     private val darkModeState = MutableStateFlow("FOLLOW_SYSTEM")
     val darkMode = darkModeState.asStateFlow()
 
@@ -102,6 +103,12 @@ object AppPrefs {
         appPrefs(context).edit().putString(KEY_DARK_MODE, mode).apply()
         darkModeState.value = mode
     }
+
+    fun getAppLanguage(context: Context): String =
+        appPrefs(context).getString(KEY_APP_LANGUAGE, "SYSTEM") ?: "SYSTEM"
+
+    fun setAppLanguage(context: Context, language: String) =
+        appPrefs(context).edit().putString(KEY_APP_LANGUAGE, language).apply()
 
     fun getTextOverflowMode(context: Context): String =
         appPrefs(context).getString(KEY_TEXT_OVERFLOW, "ellipsis") ?: "ellipsis"

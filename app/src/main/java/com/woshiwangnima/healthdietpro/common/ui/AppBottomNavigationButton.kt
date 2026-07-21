@@ -1,6 +1,5 @@
 package com.woshiwangnima.healthdietpro.common.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
@@ -17,31 +16,32 @@ import androidx.compose.ui.res.stringResource
 fun RowScope.AppBottomNavigationButton(
     item: AppBottomNavItem,
     selected: Boolean,
+    enabled: Boolean,
     onClick: () -> Unit,
 ) {
-    val color = if (selected) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
     val title = stringResource(item.titleRes)
 
-    Column(
-        modifier = Modifier
-            .weight(1f)
-            .clickable(onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    AnimatedNavigationItem(
+        selected = selected,
+        enabled = enabled,
+        onClick = onClick,
+        selectedContentColor = MaterialTheme.colorScheme.primary,
+        unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
     ) {
-        Icon(
-            painter = painterResource(item.iconRes),
-            contentDescription = title,
-            tint = color,
-        )
-        Text(
-            text = title,
-            color = color,
-            style = MaterialTheme.typography.labelMedium,
-        )
+        color -> Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                painter = painterResource(item.iconRes),
+                contentDescription = title,
+                tint = color,
+            )
+            Text(
+                text = title,
+                color = color,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
     }
 }

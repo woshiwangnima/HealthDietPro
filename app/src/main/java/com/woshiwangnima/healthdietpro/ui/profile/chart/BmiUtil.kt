@@ -1,6 +1,8 @@
 package com.woshiwangnima.healthdietpro.ui.profile.chart
 
 import android.graphics.Color
+import com.woshiwangnima.healthdietpro.common.range.NumericRangeBand
+import com.woshiwangnima.healthdietpro.common.range.findRangeBand
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.profile.bodyRecordEpochMillis
@@ -33,9 +35,15 @@ object BmiUtil {
         findBmiBand(bmi, bands)?.color ?: Color.TRANSPARENT
 
     fun findBmiBand(bmi: Float, bands: List<BmiBand> = loadBmiBands()): BmiBand? =
-        bands.find {
-            (it.min < 0f || bmi >= it.min) && (it.max == Float.MAX_VALUE || bmi < it.max)
-        }
+        bmi.toDouble().findRangeBand(
+            bands.map { band ->
+                NumericRangeBand(
+                    min = band.min.takeIf { it >= 0f }?.toDouble(),
+                    max = band.max.takeUnless { it == Float.MAX_VALUE }?.toDouble(),
+                    value = band,
+                )
+            },
+        )?.value
 
     fun buildBmiDataPoints(weightRecords: List<BodyRecord>, heightRecords: List<BodyRecord>): List<DataPoint> {
         if (weightRecords.isEmpty() || heightRecords.isEmpty()) return emptyList()

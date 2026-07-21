@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
@@ -62,11 +63,16 @@ import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.FontTokens
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
 import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
-import com.woshiwangnima.healthdietpro.common.ui.AppInfoSection
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
+import com.woshiwangnima.healthdietpro.common.range.NumericRangeBand
 import com.woshiwangnima.healthdietpro.model.food.Food
 import com.woshiwangnima.healthdietpro.model.food.FoodCategories
 import com.woshiwangnima.healthdietpro.model.food.FoodServing
+import com.woshiwangnima.healthdietpro.model.food.GlycemicClassification
+import com.woshiwangnima.healthdietpro.model.food.classifyGlycemicIndex
+import com.woshiwangnima.healthdietpro.model.food.classifyGlycemicLoad
+import com.woshiwangnima.healthdietpro.model.food.glycemicIndexClassificationBands
+import com.woshiwangnima.healthdietpro.model.food.glycemicLoadClassificationBands
 
 @Composable
 internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier = Modifier) {
@@ -91,6 +97,19 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             leadingIcon = { Icon(Icons.Filled.Search, null, modifier = Modifier.size(18.dp)) },
+            trailingIcon = if (state.keyword.isNotBlank()) {
+                {
+                    IconButton(onClick = { viewModel.setKeyword("") }) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = stringResource(R.string.nutrition_search_clear),
+                            modifier = Modifier.size(26.dp),
+                        )
+                    }
+                }
+            } else {
+                null
+            },
             placeholder = { Text(stringResource(R.string.nutrition_search_food), style = TextStyle(fontSize = FontTokens.caption), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.58f)) },
             textStyle = TextStyle(fontSize = FontTokens.caption),
         )
@@ -113,7 +132,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
 
 @Composable
 private fun CategorySidebar(state: NutritionUiState, viewModel: NutritionViewModel) {
-    val children = state.selectedRoot?.let { root -> FoodCategories.children.filter { it.parentTag == root } }.orEmpty()
+    val children = FoodCategories.childrenForRoots(state.selectedRoots)
     Surface(
         modifier = Modifier.width(80.dp).fillMaxHeight(),
         shape = RoundedCornerShape(6.dp),
@@ -144,7 +163,7 @@ private fun CategoryRootList(state: NutritionUiState, viewModel: NutritionViewMo
         item { CompactFilterChip(state.selectedCustomFilter == CustomFoodFilter.MealSet, { viewModel.selectCustomFilter(CustomFoodFilter.MealSet) }, Modifier.fillMaxWidth()) { CategoryLabel(stringResource(R.string.nutrition_custom_meal_set)) } }
         item { Spacer(Modifier.height(10.dp)) }
         items(FoodCategories.roots, key = { it.tag }) { category ->
-            CompactFilterChip(category.tag == state.selectedRoot, { viewModel.selectRoot(category.tag) }, Modifier.fillMaxWidth()) { CategoryLabel(stringResource(category.labelRes)) }
+            CompactFilterChip(category.tag in state.selectedRoots, { viewModel.toggleRoot(category.tag) }, Modifier.fillMaxWidth()) { CategoryLabel(stringResource(category.labelRes)) }
         }
     }
 }
@@ -183,6 +202,16 @@ private fun FoodRow(food: Food, language: String, imageStore: FoodImageStore, on
     val energy = table.nutrients["ENERGY"]?.value ?: 0.0
     val basis = table.basis
     val image = imageStore.image(food.image?.localKey)
+    val categoryLabels = mutableListOf<String>()
+    for (tag in food.categoryTags) {
+        val pathLabels = mutableListOf<String>()
+        for (labelRes in FoodCategories.displayTagPath(tag)) {
+            pathLabels += stringResource(labelRes)
+        }
+        if (pathLabels.isNotEmpty()) {
+            categoryLabels += pathLabels.joinToString(".")
+        }
+    }
     var previewing by remember { mutableStateOf(false) }
     Row(modifier = Modifier.fillMaxWidth().clickable { onClick(food) }.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         FoodImage(image, Modifier.size(64.dp).clickable { previewing = true })
@@ -190,11 +219,13 @@ private fun FoodRow(food: Food, language: String, imageStore: FoodImageStore, on
         Column(modifier = Modifier.weight(1f)) {
             Text(food.displayName(language), style = TextStyle(fontSize = FontTokens.subtitle))
             Text(stringResource(R.string.nutrition_energy_for_basis, energy, basis.value, basis.unitId), style = MaterialTheme.typography.bodyMedium)
-            TextOverflowText(
-                text = food.categoryTags.joinToString(" / "),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            categoryLabels.takeIf { it.isNotEmpty() }?.let { labels ->
+                TextOverflowText(
+                    text = labels.joinToString(" / "),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
@@ -226,7 +257,11 @@ private fun FoodDetailScreen(food: Food, imageStore: FoodImageStore, onBack: () 
     var selectedServingId by remember(food.id) { mutableStateOf(food.servingsOrDefault().first().id) }
     var previewing by remember { mutableStateOf(false) }
     var showHealthMetricsHelp by remember { mutableStateOf(false) }
-    BaseScreen(title = stringResource(R.string.nutrition_food_detail_title), onBack = onBack) { padding ->
+    BaseScreen(
+        title = stringResource(R.string.nutrition_food_detail_title),
+        onBack = onBack,
+        includeNavigationBarPadding = false,
+    ) { padding ->
     Column(Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             FoodImage(imageStore.image(food.image?.localKey), Modifier.size(96.dp).clickable { previewing = true })
@@ -258,8 +293,11 @@ private fun FoodDetailScreen(food: Food, imageStore: FoodImageStore, onBack: () 
             AppDataTable(
                 rows = food.healthMetricRows(),
                 columns = listOf(
-                    AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 110.dp)) { AppDataTableText(stringResource(it.labelRes)) },
-                    AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount)) }, ColumnWidth.Flex(1f, 110.dp)) { AppDataTableText(it.value) },
+                    AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 94.dp)) { AppDataTableText(stringResource(it.labelRes)) },
+                    AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount)) }, ColumnWidth.Flex(0.8f, 74.dp)) { AppDataTableText(it.value) },
+                    AppDataTableColumn("classification", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_classification)) }, ColumnWidth.Flex(0.8f, 74.dp)) {
+                        if (it.classification != null) GlycemicClassificationText(it.classification)
+                    },
                 ),
                 rowKey = { _, row -> row.key },
                 modifier = Modifier.fillMaxWidth().height(154.dp),
@@ -287,13 +325,25 @@ private fun FoodDetailScreen(food: Food, imageStore: FoodImageStore, onBack: () 
     if (showHealthMetricsHelp) {
         AppInfoDialog(
             title = stringResource(R.string.nutrition_health_metrics_help),
-            sections = listOf(
-                AppInfoSection(stringResource(R.string.nutrition_metric_gi), stringResource(R.string.nutrition_metric_gi_help)),
-                AppInfoSection(stringResource(R.string.nutrition_metric_gl), stringResource(R.string.nutrition_metric_gl_help)),
-                AppInfoSection(stringResource(R.string.nutrition_metric_inflammatory_potential), stringResource(R.string.nutrition_metric_inflammatory_potential_help)),
-            ),
             onDismiss = { showHealthMetricsHelp = false },
-        )
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                HealthMetricInfoSection(
+                    title = stringResource(R.string.nutrition_metric_gi),
+                    description = stringResource(R.string.nutrition_metric_gi_help),
+                    bands = glycemicIndexClassificationBands(),
+                )
+                HealthMetricInfoSection(
+                    title = stringResource(R.string.nutrition_metric_gl),
+                    description = stringResource(R.string.nutrition_metric_gl_help),
+                    bands = glycemicLoadClassificationBands(),
+                )
+                HealthMetricInfoSection(
+                    title = stringResource(R.string.nutrition_metric_inflammatory_potential),
+                    description = stringResource(R.string.nutrition_metric_inflammatory_potential_help),
+                )
+            }
+        }
     }
     }
 }
@@ -312,13 +362,81 @@ private data class FoodProfileRow(
     val key: String,
     @param:StringRes val labelRes: Int,
     val value: String,
+    val classification: GlycemicClassification? = null,
 )
 
 private fun Food.healthMetricRows(): List<FoodProfileRow> = listOfNotNull(
-        healthMetrics.glycemicIndex?.let { FoodProfileRow("gi", R.string.nutrition_metric_gi, "${it.value} ${it.unit}") },
-        healthMetrics.glycemicLoadPer100g?.let { FoodProfileRow("gl", R.string.nutrition_metric_gl, "${it.value} ${it.unit}") },
+        healthMetrics.glycemicIndex?.let { FoodProfileRow("gi", R.string.nutrition_metric_gi, "${it.value} ${it.unit}", classifyGlycemicIndex(it.value)) },
+        healthMetrics.glycemicLoadPer100g?.let { FoodProfileRow("gl", R.string.nutrition_metric_gl, "${it.value} ${it.unit}", classifyGlycemicLoad(it.value)) },
         healthMetrics.inflammatoryPotential?.let { FoodProfileRow("inflammatory", R.string.nutrition_metric_inflammatory_potential, "${it.value} ${it.unit}") },
     )
+
+@Composable
+private fun HealthMetricInfoSection(
+    title: String,
+    description: String,
+    bands: List<NumericRangeBand<GlycemicClassification>>? = null,
+) {
+    Column {
+        Text(title, style = MaterialTheme.typography.titleSmall)
+        Text(description, modifier = Modifier.padding(top = 2.dp))
+        bands?.let { MetricClassificationTable(it, Modifier.padding(top = 8.dp)) }
+    }
+}
+
+@Composable
+private fun MetricClassificationTable(
+    bands: List<NumericRangeBand<GlycemicClassification>>,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(6.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+    ) {
+        Column {
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 5.dp)) {
+                Text(stringResource(R.string.nutrition_profile_range), modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.nutrition_profile_classification), modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
+            }
+            bands.forEach { band ->
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(metricRangeText(band), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                    Box(modifier = Modifier.weight(1f)) { GlycemicClassificationText(band.value) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GlycemicClassificationText(classification: GlycemicClassification) {
+    val color = when (classification) {
+        GlycemicClassification.Low -> MaterialTheme.colorScheme.primary
+        GlycemicClassification.Medium -> MaterialTheme.colorScheme.secondary
+        GlycemicClassification.High -> MaterialTheme.colorScheme.error
+    }
+    val labelRes = when (classification) {
+        GlycemicClassification.Low -> R.string.nutrition_classification_low
+        GlycemicClassification.Medium -> R.string.nutrition_classification_medium
+        GlycemicClassification.High -> R.string.nutrition_classification_high
+    }
+    Text(stringResource(labelRes), style = MaterialTheme.typography.bodySmall, color = color)
+}
+
+@Composable
+private fun metricRangeText(band: NumericRangeBand<GlycemicClassification>): String {
+    val min = band.min?.formatMetricThreshold()
+    val max = band.max?.formatMetricThreshold()
+    return when {
+        min == null -> stringResource(R.string.nutrition_metric_range_at_most, requireNotNull(max))
+        max == null -> stringResource(R.string.nutrition_metric_range_more_than, min)
+        else -> stringResource(R.string.nutrition_metric_range_more_than_to_at_most, min, max)
+    }
+}
+
+private fun Double.formatMetricThreshold(): String =
+    if (this % 1.0 == 0.0) toInt().toString() else toString()
 
 private fun Food.nutrientRows(serving: FoodServing): List<FoodProfileRow> {
     return nutrientTable(serving.nutritionTableKey).nutrients.entries.map { (code, amount) ->

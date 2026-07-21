@@ -40,11 +40,19 @@ internal object FoodCategories {
     )
     fun isWithin(tag: String, ancestor: String): Boolean = tag == ancestor || tag.startsWith("$ancestor.")
     fun hasTagWithin(tags: List<String>, ancestor: String): Boolean = tags.any { isWithin(it, ancestor) }
+    fun hasTagWithinAny(tags: List<String>, ancestors: Set<String>): Boolean =
+        ancestors.isEmpty() || ancestors.any { ancestor -> hasTagWithin(tags, ancestor) }
+    fun childrenForRoots(roots: Set<String>): List<FoodCategory> = children.filter { category ->
+        category.parentTag?.let(roots::contains) == true
+    }
+    fun retainChildrenForRoots(selectedChildren: Set<String>, roots: Set<String>): Set<String> =
+        selectedChildren.intersect(childrenForRoots(roots).mapTo(mutableSetOf()) { it.tag })
     fun labelRes(tag: String): Int? = (roots + children).firstOrNull { it.tag == tag }?.labelRes
+    fun displayTagPath(tag: String): List<Int> = buildList {
+        roots.firstOrNull { isWithin(tag, it.tag) }?.let { add(it.labelRes) }
+        labelRes(tag)?.let { if (it !in this) add(it) }
+    }
     fun displayTags(tags: List<String>): List<Int> = tags.flatMap { tag ->
-        buildList {
-            roots.firstOrNull { isWithin(tag, it.tag) }?.let { add(it.labelRes) }
-            labelRes(tag)?.let { if (it !in this) add(it) }
-        }
+        displayTagPath(tag)
     }.distinct()
 }

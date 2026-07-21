@@ -3,7 +3,9 @@ package com.woshiwangnima.healthdietpro.ui.settings
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.woshiwangnima.healthdietpro.HealthDietProApplication
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheRegistry
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import kotlinx.coroutines.Dispatchers
@@ -15,9 +17,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
-class AppSettingsViewModel(application: Application) : AndroidViewModel(application) {
+internal class AppSettingsViewModel(application: Application) : AndroidViewModel(application) {
+    private val cacheRegistry: AppCacheRegistry = (application as HealthDietProApplication).cacheRegistry
 
     private val _uiState = MutableStateFlow(AppSettingsUiState())
     val uiState: StateFlow<AppSettingsUiState> = _uiState.asStateFlow()
@@ -37,52 +39,30 @@ class AppSettingsViewModel(application: Application) : AndroidViewModel(applicat
 
     fun refreshCacheSize() {
         viewModelScope.launch {
-            val text = withContext(Dispatchers.IO) {
-                formatStorageSize(cacheTotalSize())
+            val entries = withContext(Dispatchers.IO) {
+                cacheRegistry.snapshot()
             }
-            _uiState.value = _uiState.value.copy(cacheSizeText = text)
+            _uiState.value = AppSettingsUiState(
+                cacheSizeText = formatStorageSize(entries.sumOf { it.byteCount }),
+                cacheEntries = entries.map { entry ->
+                    CacheEntryUiState(
+                        kind = entry.kind,
+                        sizeText = formatStorageSize(entry.byteCount),
+                        itemCount = entry.itemCount,
+                    )
+                },
+            )
         }
     }
 
     fun clearCache() {
         viewModelScope.launch {
             val freedKb = withContext(Dispatchers.IO) {
-                val app = getApplication<Application>()
-                val before = cacheTotalSize()
-                deleteRecursively(app.cacheDir, app)
-                deleteRecursively(app.codeCacheDir, app)
-                app.externalCacheDir?.let { deleteRecursively(it, app) }
-                (before - cacheTotalSize()) / 1024
+                cacheRegistry.clearAll().releasedDiskBytes / 1024
             }
             val toast = if (freedKb >= 1024) Toast.Mb(freedKb / 1024f) else Toast.Kb(freedKb.toInt())
             _toastMessage.emit(toast)
             refreshCacheSize()
-        }
-    }
-
-    private fun cacheTotalSize(): Long {
-        val app = getApplication<Application>()
-        var total = 0L
-        total += sizeOf(app.cacheDir)
-        total += sizeOf(app.codeCacheDir)
-        app.externalCacheDir?.let { total += sizeOf(it) }
-        return total
-    }
-
-    private fun sizeOf(file: File): Long {
-        if (file.isFile) return file.length()
-        if (file.isDirectory) {
-            var s = 0L
-            file.listFiles()?.forEach { s += sizeOf(it) }
-            return s
-        }
-        return 0
-    }
-
-    private fun deleteRecursively(file: File, app: Application) {
-        if (file.isDirectory) file.listFiles()?.forEach { deleteRecursively(it, app) }
-        if (file != app.cacheDir && file != app.codeCacheDir && file != app.externalCacheDir) {
-            file.delete()
         }
     }
 

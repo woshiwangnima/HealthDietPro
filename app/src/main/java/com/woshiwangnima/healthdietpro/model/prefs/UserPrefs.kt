@@ -2,6 +2,10 @@ package com.woshiwangnima.healthdietpro.model.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.woshiwangnima.healthdietpro.model.archive.ArchiveSchemaVersion
+import com.woshiwangnima.healthdietpro.model.archive.appVersion
+import com.woshiwangnima.healthdietpro.model.archive.archiveSchemaVersionFromLegacy
+import com.woshiwangnima.healthdietpro.model.archive.migrateArchiveSchemaVersion
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 
 /**
@@ -35,6 +39,35 @@ object UserPrefs {
 
     fun forUser(context: Context, uid: String): UserPrefsScope =
         UserPrefsScope.create(context, uid)
+
+    /** 读取指定用户的全部偏好键值，供归档模块编码为明文 JSON。 */
+    internal fun snapshot(context: Context, uid: String): Map<String, Any> =
+        context.getSharedPreferences(UserPrefsScope.fileName(uid), Context.MODE_PRIVATE).all
+            .mapNotNull { (key, value) -> value?.let { key to it } }
+            .toMap()
+
+    /**
+     * 以一个 SharedPreferences 事务替换指定用户的全部偏好。
+     * 归档格式在替换前已经完成校验，写入完成后立即补齐当前归档版本信息。
+     */
+    internal fun replaceAll(context: Context, uid: String, values: Map<String, Any>): Boolean {
+        val scope = UserPrefsScope.create(context, uid)
+        val target = context.getSharedPreferences(UserPrefsScope.fileName(scope.uid), Context.MODE_PRIVATE)
+        val editor = target.edit().clear()
+        values.forEach { (key, value) ->
+            when (value) {
+                is Boolean -> editor.putBoolean(key, value)
+                is Int -> editor.putInt(key, value)
+                is Long -> editor.putLong(key, value)
+                is Float -> editor.putFloat(key, value)
+                is String -> editor.putString(key, value)
+                is Set<*> -> @Suppress("UNCHECKED_CAST") editor.putStringSet(key, value as Set<String>)
+            }
+        }
+        return editor.commit().also { committed ->
+            if (committed) UserPrefsScope.create(context, uid)
+        }
+    }
 
     /** 删除指定用户的 user_prefs_<uid> 文件（删用户时清理）。 */
     fun deleteUserFile(context: Context, uid: String) {
@@ -96,13 +129,18 @@ class UserPrefsScope private constructor(
     companion object {
         private const val FILE_PREFIX = "user_prefs_"
         private const val FALLBACK_UID = "default"
+        private const val KEY_LEGACY_ARCHIVE_SCHEMA_VERSION = "archive_schema_version"
+        private const val KEY_ARCHIVE_SCHEMA_MAJOR = "archive_schema_major"
+        private const val KEY_ARCHIVE_SCHEMA_MINOR = "archive_schema_minor"
+        private const val KEY_ARCHIVE_SCHEMA_PATCH = "archive_schema_patch"
+        private const val KEY_ARCHIVE_APP_VERSION = "archive_app_version"
 
         internal fun fileName(uid: String): String =
             if (uid.isEmpty()) "${FILE_PREFIX}${FALLBACK_UID}" else "${FILE_PREFIX}${uid}"
 
         internal fun create(context: Context, uid: String): UserPrefsScope {
             val sp = context.getSharedPreferences(fileName(uid), Context.MODE_PRIVATE)
-            return UserPrefsScope(context, uid, sp)
+            return UserPrefsScope(context, uid, sp).also { it.migrateArchiveChain() }
         }
     }
 
@@ -122,4 +160,38 @@ class UserPrefsScope private constructor(
     fun putLong(key: String, v: Long) { sp.edit().putLong(key, v).apply() }
 
     fun contains(key: String) = sp.contains(key)
+
+    private fun migrateArchiveChain() {
+        val editor = sp.edit()
+        val storedSchemaVersion = if (
+            sp.contains(KEY_ARCHIVE_SCHEMA_MAJOR) ||
+                sp.contains(KEY_ARCHIVE_SCHEMA_MINOR) ||
+                sp.contains(KEY_ARCHIVE_SCHEMA_PATCH)
+        ) {
+            ArchiveSchemaVersion(
+                major = sp.getInt(KEY_ARCHIVE_SCHEMA_MAJOR, 0),
+                minor = sp.getInt(KEY_ARCHIVE_SCHEMA_MINOR, 0),
+                patch = sp.getInt(KEY_ARCHIVE_SCHEMA_PATCH, 0),
+            )
+        } else {
+            archiveSchemaVersionFromLegacy(
+                if (sp.contains(KEY_LEGACY_ARCHIVE_SCHEMA_VERSION)) {
+                    sp.getInt(KEY_LEGACY_ARCHIVE_SCHEMA_VERSION, 0)
+                } else {
+                    null
+                },
+            )
+        }
+        val schemaVersion = migrateArchiveSchemaVersion(storedSchemaVersion)
+        editor
+            .putInt(KEY_ARCHIVE_SCHEMA_MAJOR, schemaVersion.major)
+            .putInt(KEY_ARCHIVE_SCHEMA_MINOR, schemaVersion.minor)
+            .putInt(KEY_ARCHIVE_SCHEMA_PATCH, schemaVersion.patch)
+            .remove(KEY_LEGACY_ARCHIVE_SCHEMA_VERSION)
+        val installedVersion = appVersion(context)
+        if (sp.getString(KEY_ARCHIVE_APP_VERSION, "") != installedVersion) {
+            editor.putString(KEY_ARCHIVE_APP_VERSION, installedVersion)
+        }
+        editor.apply()
+    }
 }
