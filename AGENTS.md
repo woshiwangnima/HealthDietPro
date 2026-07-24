@@ -44,6 +44,23 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - 静态数据模块只读；所有写操作走存档模块。
 - 每用户隔离状态经 `ProfilePrefs.makeChartStateKey(baseKey)` 构造 `_<userId>` 后缀。
 - 空 `chartStateKey` 不持久化（一次性图表）。
+- 食物三分类（`FoodKind`）：`INGREDIENT`(食材) / `FOOD`(食物) / `DISH`(菜肴)，与 `categoryTags` 正交。设计契约见 `docs/NUTRITION_TABLE_DESIGN.md` §Three-Tier Food Classification。
+- `食材` 营养表恒为 **每 100g 可食部**；可食部比例走结构化 `edibleRatio`（`edibleGrams = purchasedGrams * edibleRatio`），不再靠 `FoodMetric.basis` 文本表达。
+- `食物 = 食材 + 烹饪方式`：`PreparedFood` 只存 `derivedFrom{ingredientId, cookingMethodId}`，营养表**运行时派生**（`NutritionResolver`），JSON 不存派生表；`nutrientOverrides` 仅用于个别营养素手工校正。
+- `菜肴` 营养由组分**运行时求和**，不存表；组分解析必须防环（组分链不得重访同一 id）。
+- `categoryTags` 侧栏只作用于 `食材` / `食物`，`菜肴` 不进分类树（经组分与独立列表发现）；`食材`/`食物` 详情底部展示相关 `菜肴`。
+- 领域模型用 sealed `FoodItem` 层级（`Ingredient`/`PreparedFood`/`Dish`），序列化经 `FoodDto` 边界（`kind` 缺省=`ingredient`），领域类型不可 `@Serializable`。
+- 容器份量（小/中/大 杯·碗·盘·勺）走全局只读注册表 `serving_containers.json`；`grams = capacityMl * fillRatio * densityGramsPerMl`，容器只读、固定容量，不写存档。
+- 自定义 `食材/食物/菜肴` 为**用户级存档**（`UserCustomFoodRepository`，键 `nutrition_custom_foods_v1`，存 `List<FoodDto>`），id 带 `custom:` 前缀；删除用户随 `user_prefs_<uid>` 一并清理。运行时与内置食物合并进同一 `byId` 索引与 `NutritionResolver`。UI 只经 ViewModel 事件读写，不直接写存档。
+- 侧栏「自定义」置顶筛选随 `selectedKind` 切换语义（食材/食物/菜肴各自的自定义）；「添加自定义」入口按当前 `kind` 只显示一个（添加自定义食材/食物/菜肴），置于左列「自定义XX」一级筛选上方且同宽。`菜肴` 界面不显示 `categoryTags` 侧栏。
+- 食材/食物/菜肴用 `FoodKind` 固定色（食材 叶绿 `0xFF43A047`／食物 橙 `0xFFF57C00`／菜肴 番茄红 `0xFFE53935`，配白字）圆角背景包裹**正名**区分，不用名字旁色卡且不依赖主题色（深浅色一致、与绿色主题对比鲜明）；`添加自定义XX` 按钮与 `自定义XX` 一级筛选背景同色。自定义条目正名前置「笔」图标示可编辑。卡片名字行由左至右：笔图标(自定义) + 正名(彩色圆角) + 同字号括号烹饪方式(食物) + 小字号别名(`/` 分隔)。
+- `食材`/`食物`/`菜肴` 分类选择走公共 `common/ui/MultiLevelTagSelector`（多级 Tag、可多选多个），领域侧存 `categoryTags: List<String>`。
+- 自定义食材营养素编辑必须列出 `assets/DRIs/nutrients_meta.json` 全部营养素；仅 `ENERGY/PROTEIN/FAT/CHO` 必填（编辑器分「必填/选填」两段并本地化标注），其余可选填。营养素单位取 `NutrientMeta.baseUnit`。可选营养素折叠展开，避免一次组合 40+ 输入框卡顿。食材 GI/GL 为可选输入。
+- 嵌套于 `MainActivity` Scaffold 内的营养屏（详情/对比/编辑）用 `BaseScreen(includeStatusBarPadding = false)`，避免与父 Scaffold 的 `statusBars` 内边距叠加导致顶栏下移；独立 Activity 屏保持默认 `true`。
+- 详情/对比屏标题随 `FoodKind` 切换；详情右侧图标分两行（自定义时上行 编辑/删除，下行 收藏/对比）。健康指标表恒显示 GI/GL/炎症指数行，缺失填 `-`。
+- 三个自定义编辑器（食材/食物/菜肴）用固定底部保存/取消 + `BackHandler` 未保存二次确认（`EditorScaffold`），内容区 `weight(1f)` 滚动。
+- `食物` 编辑器不手填营养：选来源食材（带一二级 Tag 筛选 + 搜索 `SearchableIngredientPicker`）+ 烹饪方式，营养经 `previewDerived` 实时预览；含可选简介。
+- `菜肴` 扩展元数据（全部可选）：`cuisine` 菜系（`DishTaxonomy.cuisines`）、`dishCategories` 菜品分类、`tastes` 口味多选、`seasons` 季节多选、`techniqueId` 工艺（复用 `CookingMethod`）、`difficulty` 难度、`servesPeople` 份量、`recipeSteps`（`RecipeStep{text, minutes?}` 逐步、显序号、`minutes` 非空则查看时可启动/暂停/清空计时器）、别名。组分区分食材与调味品（`categoryTags` 含 `food.seasoning` 判定，`isSeasoning`）。菜系/分类/口味/季节预定义集中于 `model/food/DishTaxonomy.kt`。
 
 ## 编码规范
 

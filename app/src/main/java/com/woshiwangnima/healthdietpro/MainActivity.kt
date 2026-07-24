@@ -254,7 +254,7 @@ class MainActivity : BaseActivity() {
     private fun MainShell() {
         val nutritionState by nutritionViewModel.state.collectAsState()
         val showBottomNavigation = selectedRoute != ROUTE_NUTRITION ||
-            (nutritionState.selectedFood == null && nutritionState.comparisonReturnTarget == null && nutritionState.managementScreen == null)
+            (nutritionState.selectedFood == null && nutritionState.comparisonReturnTarget == null && nutritionState.editor == null)
         if (showOnboarding) {
             AlertDialog(
                 onDismissRequest = {},

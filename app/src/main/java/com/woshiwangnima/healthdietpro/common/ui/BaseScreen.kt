@@ -23,11 +23,17 @@ fun BaseScreen(
     onBack: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     includeNavigationBarPadding: Boolean = true,
+    includeStatusBarPadding: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
+                windowInsets = if (includeStatusBarPadding) {
+                    TopAppBarDefaults.windowInsets
+                } else {
+                    WindowInsets(0, 0, 0, 0)
+                },
                 title = {
                     Text(
                         title,

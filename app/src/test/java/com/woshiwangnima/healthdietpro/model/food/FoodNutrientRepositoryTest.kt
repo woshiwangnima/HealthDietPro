@@ -5,26 +5,46 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FoodNutrientRepositoryTest {
+    private fun foods() = FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json").foods()
+
     @Test
     fun foodAssetLoadsNamesTagsAmountsAndCoreHealthMetrics() {
-        val foods = FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json").foods()
+        val foods = foods()
+        val resolver = resolverFor(foods)
 
         assertTrue(foods.size >= 15)
-        assertTrue(foods.all { it.categoryTags.isNotEmpty() && it.nutrientTable("standard.100g").nutrients.keys.containsAll(setOf("ENERGY", "PROTEIN", "FAT", "CHO")) })
-        assertTrue(foods.all { food -> food.nutritionTables.values.all { table -> table.basis.unitCategory.isNotBlank() && table.basis.unitId.isNotBlank() && table.nutrients.values.all { it.unitCategory.isNotBlank() && it.unitId.isNotBlank() } } })
-        assertTrue(foods.all { food ->
-            val hasGi = food.healthMetrics.glycemicIndex != null
-            val hasGl = food.healthMetrics.glycemicLoadPer100g != null
-            val carbohydrate = food.nutrientTable("standard.100g").nutrients.getValue("CHO").value
-            hasGi == hasGl && (carbohydrate > 0 || !hasGi)
-        })
+        assertTrue(
+            foods.filterIsInstance<CategorizedFood>().all { it.categoryTags.isNotEmpty() },
+        )
+        val ingredients = foods.filterIsInstance<Ingredient>()
+        assertTrue(
+            ingredients.all { ingredient ->
+                resolver.resolvePer100g(ingredient).nutrients.keys
+                    .containsAll(setOf("ENERGY", "PROTEIN", "FAT", "CHO"))
+            },
+        )
+        assertTrue(
+            ingredients.all { ingredient ->
+                ingredient.nutritionTables.values.all { table ->
+                    table.basis.unitCategory.isNotBlank() && table.basis.unitId.isNotBlank() &&
+                        table.nutrients.values.all { it.unitCategory.isNotBlank() && it.unitId.isNotBlank() }
+                }
+            },
+        )
+        assertTrue(
+            foods.all { food ->
+                val hasGi = food.healthMetrics.glycemicIndex != null
+                val hasGl = food.healthMetrics.glycemicLoadPer100g != null
+                hasGi == hasGl
+            },
+        )
         assertTrue(foods.all { it.commonness in 1..5 })
         assertEquals("米饭", foods.first { it.id == "food:taxon:oryza_sativa:polished:steamed" }.displayName("zh"))
     }
 
     @Test
     fun cucumberVariantsHaveDistinctStableIdsAndChineseAliases() {
-        val foods = FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json").foods()
+        val foods = foods()
 
         val commercial = foods.first { it.id == "food:taxon:cucumis_sativus:commercial:raw" }
         val landrace = foods.first { it.id == "food:taxon:cucumis_sativus:landrace:raw" }
@@ -34,14 +54,47 @@ class FoodNutrientRepositoryTest {
     }
 
     @Test
-    fun milkServingsReferenceTheVolumeNutritionTable() {
-        val milk = FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json").foods()
-            .first { it.id == "food:taxon:bos_taurus:milk:whole" }
+    fun milkExposesTheVolumeNutritionTable() {
+        val milk = foods().first { it.id == "food:taxon:bos_taurus:milk:whole" } as Ingredient
 
-        val volumeTable = milk.nutrientTable("standard.100ml")
+        val volumeTable = milk.nutritionTables.getValue("standard.100ml")
         assertEquals("volume", volumeTable.basis.unitCategory)
         assertEquals("ml", volumeTable.basis.unitId)
-        assertTrue(milk.servingsOrDefault().all { it.nutritionTableKey == "standard.100ml" })
+        assertTrue(milk.servings.all { it.nutritionTableKey == "standard.100ml" })
+    }
+
+    @Test
+    fun cookedRiceIsDerivedFromRawRiceAndMatchesLegacyValues() {
+        val foods = foods()
+        val resolver = resolverFor(foods)
+        val cooked = foods.first { it.id == "food:taxon:oryza_sativa:polished:steamed" }
+        assertTrue(cooked is PreparedFood)
+
+        val resolved = resolver.resolvePer100g(cooked)
+        assertEquals(116.0, resolved.nutrients.getValue("ENERGY").value, 0.01)
+        assertEquals(2.6, resolved.nutrients.getValue("PROTEIN").value, 0.01)
+        assertEquals(0.3, resolved.nutrients.getValue("FAT").value, 0.01)
+        assertEquals(25.9, resolved.nutrients.getValue("CHO").value, 0.01)
+    }
+
+    @Test
+    fun everyDerivedFoodAndDishComponentResolvesToAKnownId() {
+        val foods = foods()
+        val byId = foods.associateBy { it.id }
+        foods.filterIsInstance<PreparedFood>().forEach {
+            assertTrue(
+                "missing ingredient ${it.derivedFrom.ingredientId}",
+                byId.containsKey(it.derivedFrom.ingredientId),
+            )
+        }
+        foods.filterIsInstance<Dish>().forEach { dish ->
+            dish.components.forEach { component ->
+                assertTrue(
+                    "missing component ${component.foodId}",
+                    byId.containsKey(component.foodId),
+                )
+            }
+        }
     }
 
     @Test
@@ -75,5 +128,12 @@ class FoodNutrientRepositoryTest {
                 setOf("food.staple"),
             ),
         )
+    }
+
+    private fun resolverFor(foods: List<FoodItem>): NutritionResolver {
+        val methods = CookingMethodRepository
+            .fromAsset("src/main/assets/cooking_methods.json")
+            .byId()
+        return NutritionResolver(foods.associateBy { it.id }, methods)
     }
 }

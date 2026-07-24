@@ -392,8 +392,15 @@ private fun MedicationRecordScreen(
                 AppDropdownField(
                     label = stringResource(R.string.medication_record_name),
                     value = state.medicationName,
-                    options = catalog.filter { !it.archived || it.id == state.medicationId }.map { item -> AppDropdownOption(item.id, formatMedicationOption(item)) },
+                    options = catalog.filter { !it.archived || it.id == state.medicationId }.map { item ->
+                        AppDropdownOption(
+                            id = item.id,
+                            label = item.name,
+                            secondaryLabel = item.formatSelectionDetails(UnitConverter.getRepository(), java.util.Locale.getDefault(), " / "),
+                        )
+                    },
                     showOptionDividers = true,
+                    largeOptionText = true,
                     onSelect = { option -> catalog.find { it.id == option.id }?.let { item ->
                         val isExpired = item.expiresAt?.let { it < System.currentTimeMillis() } == true
                         val warning = listOfNotNull(if (isExpired) expiredWarning else null, item.sideEffectWarning.takeIf { it.isNotBlank() }).joinToString("\n")
@@ -437,11 +444,6 @@ private fun MedicationRecordScreen(
         AlertDialog(onDismissRequest = { safetyWarning = null }, title = { Text(stringResource(R.string.medication_record_safety_warning)) }, text = { Text(warning) }, confirmButton = { TextButton(onClick = { safetyWarning = null }) { Text(stringResource(R.string.test_access_confirm)) } })
     }
 }
-
-private fun formatMedicationOption(item: MedicationCatalogItem): String = listOf(
-    item.name,
-    item.formatSelectionDetails(UnitConverter.getRepository(), java.util.Locale.getDefault(), " / "),
-).filter { it.isNotBlank() }.joinToString("\n")
 
 @Composable
 private fun CatalogSnapshot(state: MedicationRecordFormState) {

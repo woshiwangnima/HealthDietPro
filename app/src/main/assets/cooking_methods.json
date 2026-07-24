@@ -1,0 +1,205 @@
+{
+  "methods": [
+    {
+      "id": "raw",
+      "labels": { "zh": "生", "en": "Raw" },
+      "yieldFactor": 1.0,
+      "nutrientRetention": {},
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "steamed_grain",
+      "labels": { "zh": "蒸饭", "en": "Steamed (grain)" },
+      "yieldFactor": 3.0,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 1.0,
+        "FAT": 1.0,
+        "CHO": 1.0,
+        "FIBER": 1.0
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "steamed",
+      "labels": { "zh": "蒸", "en": "Steamed" },
+      "yieldFactor": 2.6,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 1.0,
+        "FAT": 1.0,
+        "CHO": 1.0,
+        "FIBER": 1.0
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "boiled",
+      "labels": { "zh": "煮", "en": "Boiled" },
+      "yieldFactor": 2.6,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.95,
+        "FAT": 1.0,
+        "CHO": 1.0,
+        "FIBER": 0.95
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "stir_fried",
+      "labels": { "zh": "炒", "en": "Stir-fried" },
+      "yieldFactor": 0.9,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.95,
+        "FAT": 1.0,
+        "CHO": 0.95,
+        "FIBER": 0.9
+      },
+      "addedPer100gRaw": {
+        "ENERGY": { "value": 90.0, "unitCategory": "energy", "unitId": "kcal" },
+        "FAT": { "value": 10.0, "unitCategory": "weight", "unitId": "g" }
+      }
+    },
+    {
+      "id": "deep_fried",
+      "labels": { "zh": "炸", "en": "Deep-fried" },
+      "yieldFactor": 0.8,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.9,
+        "FAT": 1.0,
+        "CHO": 0.9,
+        "FIBER": 0.85
+      },
+      "addedPer100gRaw": {
+        "ENERGY": { "value": 135.0, "unitCategory": "energy", "unitId": "kcal" },
+        "FAT": { "value": 15.0, "unitCategory": "weight", "unitId": "g" }
+      }
+    },
+    {
+      "id": "grilled",
+      "labels": { "zh": "烤", "en": "Grilled" },
+      "yieldFactor": 0.75,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.9,
+        "FAT": 0.85,
+        "CHO": 0.95,
+        "FIBER": 0.9
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "baked",
+      "labels": { "zh": "焗", "en": "Baked" },
+      "yieldFactor": 0.8,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.92,
+        "FAT": 0.9,
+        "CHO": 0.95,
+        "FIBER": 0.9
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "pan_fried",
+      "labels": { "zh": "煎", "en": "Pan-fried" },
+      "yieldFactor": 0.85,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.92,
+        "FAT": 1.0,
+        "CHO": 0.92,
+        "FIBER": 0.9
+      },
+      "addedPer100gRaw": {
+        "ENERGY": { "value": 45.0, "unitCategory": "energy", "unitId": "kcal" },
+        "FAT": { "value": 5.0, "unitCategory": "weight", "unitId": "g" }
+      }
+    },
+    {
+      "id": "braised",
+      "labels": { "zh": "焖", "en": "Braised" },
+      "yieldFactor": 0.9,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.95,
+        "FAT": 0.95,
+        "CHO": 0.95,
+        "FIBER": 0.9
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "stewed",
+      "labels": { "zh": "炖", "en": "Stewed" },
+      "yieldFactor": 0.95,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.9,
+        "FAT": 0.95,
+        "CHO": 0.95,
+        "FIBER": 0.88
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "cold_mixed",
+      "labels": { "zh": "凉拌", "en": "Cold-mixed" },
+      "yieldFactor": 1.0,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 1.0,
+        "FAT": 1.0,
+        "CHO": 1.0,
+        "FIBER": 1.0
+      },
+      "addedPer100gRaw": {
+        "ENERGY": { "value": 40.0, "unitCategory": "energy", "unitId": "kcal" },
+        "FAT": { "value": 4.0, "unitCategory": "weight", "unitId": "g" }
+      }
+    },
+    {
+      "id": "poached",
+      "labels": { "zh": "汆", "en": "Poached" },
+      "yieldFactor": 0.95,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.95,
+        "FAT": 1.0,
+        "CHO": 0.98,
+        "FIBER": 0.95
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "smoked",
+      "labels": { "zh": "熏", "en": "Smoked" },
+      "yieldFactor": 0.7,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.9,
+        "FAT": 0.85,
+        "CHO": 0.95,
+        "FIBER": 0.9
+      },
+      "addedPer100gRaw": {}
+    },
+    {
+      "id": "pickled",
+      "labels": { "zh": "腌", "en": "Pickled" },
+      "yieldFactor": 0.85,
+      "nutrientRetention": {
+        "ENERGY": 1.0,
+        "PROTEIN": 0.95,
+        "FAT": 1.0,
+        "CHO": 0.95,
+        "FIBER": 0.9
+      },
+      "addedPer100gRaw": {}
+    }
+  ]
+}

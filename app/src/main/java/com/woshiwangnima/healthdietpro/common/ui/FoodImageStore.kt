@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.common.ui
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.util.LruCache
 import androidx.annotation.DrawableRes
@@ -40,11 +41,26 @@ internal class FoodImageStore(
 
     fun image(key: String?): ImageBitmap = load(key ?: DEFAULT_KEY)
 
-    private fun load(key: String): ImageBitmap = cache.get(key) ?: render(resourceFor(key)).also {
+    private fun load(key: String): ImageBitmap = cache.get(key) ?: render(key).also {
         cache.put(key, it)
     }
 
-    private fun render(@DrawableRes resourceId: Int): ImageBitmap {
+    private fun render(key: String): ImageBitmap {
+        if (key.startsWith(USER_KEY_PREFIX)) {
+            userImage(key)?.let { return it.asImageBitmap() }
+        }
+        return renderResource(resourceFor(key))
+    }
+
+    private fun userImage(key: String): Bitmap? {
+        val relativePath = key.removePrefix(USER_KEY_PREFIX)
+        val root = context.filesDir.canonicalFile
+        val imageFile = java.io.File(root, relativePath).canonicalFile
+        return imageFile.takeIf { it.path.startsWith(root.path + java.io.File.separator) && it.isFile }
+            ?.let { BitmapFactory.decodeFile(it.path) }
+    }
+
+    private fun renderResource(@DrawableRes resourceId: Int): ImageBitmap {
         val drawable = requireNotNull(ContextCompat.getDrawable(context, resourceId))
         val bitmap = Bitmap.createBitmap(192, 192, Bitmap.Config.ARGB_8888)
         drawable.setBounds(0, 0, bitmap.width, bitmap.height)
@@ -59,5 +75,6 @@ internal class FoodImageStore(
 
     companion object {
         const val DEFAULT_KEY = "food.illustration.default"
+        private const val USER_KEY_PREFIX = "user:"
     }
 }

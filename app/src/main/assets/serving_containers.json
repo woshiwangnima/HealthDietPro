@@ -1,0 +1,92 @@
+{
+  "containers": [
+    {
+      "id": "cup_small",
+      "category": "cup",
+      "size": "small",
+      "capacityMl": 150.0,
+      "defaultFillRatio": 0.9,
+      "labels": { "zh": "小杯", "en": "Small cup" }
+    },
+    {
+      "id": "cup_medium",
+      "category": "cup",
+      "size": "medium",
+      "capacityMl": 250.0,
+      "defaultFillRatio": 0.9,
+      "labels": { "zh": "中杯", "en": "Medium cup" }
+    },
+    {
+      "id": "cup_large",
+      "category": "cup",
+      "size": "large",
+      "capacityMl": 400.0,
+      "defaultFillRatio": 0.9,
+      "labels": { "zh": "大杯", "en": "Large cup" }
+    },
+    {
+      "id": "bowl_small",
+      "category": "bowl",
+      "size": "small",
+      "capacityMl": 200.0,
+      "defaultFillRatio": 0.8,
+      "labels": { "zh": "小碗", "en": "Small bowl" }
+    },
+    {
+      "id": "bowl_medium",
+      "category": "bowl",
+      "size": "medium",
+      "capacityMl": 350.0,
+      "defaultFillRatio": 0.8,
+      "labels": { "zh": "中碗", "en": "Medium bowl" }
+    },
+    {
+      "id": "bowl_large",
+      "category": "bowl",
+      "size": "large",
+      "capacityMl": 500.0,
+      "defaultFillRatio": 0.8,
+      "labels": { "zh": "大碗", "en": "Large bowl" }
+    },
+    {
+      "id": "plate_small",
+      "category": "plate",
+      "size": "small",
+      "capacityMl": 250.0,
+      "defaultFillRatio": 0.7,
+      "labels": { "zh": "小盘", "en": "Small plate" }
+    },
+    {
+      "id": "plate_medium",
+      "category": "plate",
+      "size": "medium",
+      "capacityMl": 400.0,
+      "defaultFillRatio": 0.7,
+      "labels": { "zh": "中盘", "en": "Medium plate" }
+    },
+    {
+      "id": "plate_large",
+      "category": "plate",
+      "size": "large",
+      "capacityMl": 600.0,
+      "defaultFillRatio": 0.7,
+      "labels": { "zh": "大盘", "en": "Large plate" }
+    },
+    {
+      "id": "spoon_tea",
+      "category": "spoon",
+      "size": "small",
+      "capacityMl": 5.0,
+      "defaultFillRatio": 1.0,
+      "labels": { "zh": "茶匙", "en": "Teaspoon" }
+    },
+    {
+      "id": "spoon_table",
+      "category": "spoon",
+      "size": "large",
+      "capacityMl": 15.0,
+      "defaultFillRatio": 1.0,
+      "labels": { "zh": "汤匙", "en": "Tablespoon" }
+    }
+  ]
+}

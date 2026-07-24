@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 data class AppDropdownOption(
     val id: String,
     val label: String,
+    val secondaryLabel: String? = null,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +40,7 @@ fun AppDropdownField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     showOptionDividers: Boolean = false,
+    largeOptionText: Boolean = false,
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
@@ -66,7 +68,21 @@ fun AppDropdownField(
         ) {
             options.forEachIndexed { index, option ->
                 DropdownMenuItem(
-                    text = { Text(option.label) },
+                    text = {
+                        Column {
+                            Text(
+                                text = option.label,
+                                style = if (largeOptionText) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge,
+                            )
+                            option.secondaryLabel?.takeIf { it.isNotBlank() }?.let { detail ->
+                                Text(
+                                    text = detail,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    },
                     onClick = {
                         expanded = false
                         onSelect(option)

@@ -310,6 +310,8 @@ fun load(context: Context): UserProfile {
         if (user.avatarFileName.isNotEmpty()) {
             File(context.filesDir, "avatars/${user.avatarFileName}").delete()
         }
+        // Custom food cover images are stored in a user-scoped private directory.
+        File(context.filesDir, "food_images/${user.id}").deleteRecursively()
         // Delete per-user settings file (user_prefs_<uid>)
         com.woshiwangnima.healthdietpro.model.prefs.UserPrefs.deleteUserFile(context, user.id)
         // Delete per-user chart/medication prefs (keys ending _${userId}) in both legacy files

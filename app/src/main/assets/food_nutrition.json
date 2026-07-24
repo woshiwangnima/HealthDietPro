@@ -1,7 +1,220 @@
 {
   "foods": [
     {
+      "id": "food:taxon:glycine_max:tofu:soft",
+      "kind": "ingredient",
+      "names": { "zh": ["嫩豆腐", "南豆腐", "石膏豆腐"], "en": ["Soft tofu", "Silken tofu"] },
+      "categoryTags": ["food.soy"],
+      "systemTags": ["common"],
+      "edibleRatio": 1.0,
+      "sources": [{ "dataset": "China Food Composition Tables", "reference": "tofu, soft; per 100 g edible portion" }],
+      "nutrients": {
+        "ENERGY": { "value": 57.0, "unitCategory": "energy", "unitId": "kcal" },
+        "PROTEIN": { "value": 6.2, "unitCategory": "weight", "unitId": "g" },
+        "FAT": { "value": 3.0, "unitCategory": "weight", "unitId": "g" },
+        "CHO": { "value": 1.9, "unitCategory": "weight", "unitId": "g" }
+      },
+      "description": { "zh": "嫩豆腐为大豆磨浆、凝固后形成的高含水豆制品。与北豆腐相比含水量更高、质地更软；营养值应按具体凝固剂和配方核对。", "en": "Soft tofu is a high-moisture soy product made by coagulating soy milk. Its water content and nutrient composition vary with the coagulant and formulation." },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:glycine_max:tofu_skin",
+      "kind": "ingredient",
+      "names": { "zh": ["豆皮", "豆腐皮", "千张"], "en": ["Tofu skin", "Bean curd sheet"] },
+      "categoryTags": ["food.soy"],
+      "systemTags": ["common"],
+      "edibleRatio": 1.0,
+      "sources": [{ "dataset": "China Food Composition Tables", "reference": "bean curd sheet, fresh; per 100 g edible portion" }],
+      "nutrients": {
+        "ENERGY": { "value": 262.0, "unitCategory": "energy", "unitId": "kcal" },
+        "PROTEIN": { "value": 24.6, "unitCategory": "weight", "unitId": "g" },
+        "FAT": { "value": 16.0, "unitCategory": "weight", "unitId": "g" },
+        "CHO": { "value": 4.6, "unitCategory": "weight", "unitId": "g" }
+      },
+      "description": { "zh": "豆腐皮是加热豆浆表面形成的蛋白质和脂质膜制品。名称在地区间可指鲜豆腐皮或薄豆干，购买时应以包装营养标签和含水量为准。", "en": "Tofu skin is the protein- and lipid-rich film formed on heated soy milk. The name can refer to products with different water contents, so package labels should be checked." },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:glycine_max:yuba_dried",
+      "kind": "ingredient",
+      "names": { "zh": ["腐竹", "豆腐竹"], "en": ["Dried yuba", "Dried bean curd sticks"] },
+      "categoryTags": ["food.soy"],
+      "systemTags": ["common"],
+      "edibleRatio": 1.0,
+      "sources": [{ "dataset": "China Food Composition Tables", "reference": "yuba, dried; per 100 g edible portion" }],
+      "nutrients": {
+        "ENERGY": { "value": 459.0, "unitCategory": "energy", "unitId": "kcal" },
+        "PROTEIN": { "value": 44.6, "unitCategory": "weight", "unitId": "g" },
+        "FAT": { "value": 21.7, "unitCategory": "weight", "unitId": "g" },
+        "CHO": { "value": 21.3, "unitCategory": "weight", "unitId": "g" }
+      },
+      "description": { "zh": "腐竹是豆浆加热表面膜干燥后的豆制品，通常按干品计。复水后重量和每 100 克能量密度都会显著变化，记录时应明确干重或熟重。", "en": "Dried yuba is made from dried films formed on heated soy milk. It is normally reported as a dry product; rehydration substantially changes its weight and energy density." },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:sus_scrofa:ribs_raw",
+      "kind": "ingredient",
+      "names": { "zh": ["猪排骨", "肋排"], "en": ["Pork ribs", "Raw pork ribs"] },
+      "categoryTags": ["food.meat_egg", "food.meat_egg.livestock"],
+      "systemTags": ["common"],
+      "edibleRatio": 0.68,
+      "sources": [{ "dataset": "China Food Composition Tables", "reference": "pork ribs, raw; per 100 g edible portion" }],
+      "nutrients": {
+        "ENERGY": { "value": 264.0, "unitCategory": "energy", "unitId": "kcal" },
+        "PROTEIN": { "value": 18.3, "unitCategory": "weight", "unitId": "g" },
+        "FAT": { "value": 20.4, "unitCategory": "weight", "unitId": "g" },
+        "CHO": { "value": 0.0, "unitCategory": "weight", "unitId": "g" }
+      },
+      "description": { "zh": "猪排骨来自家猪（Sus scrofa domesticus）的肋骨部位，含骨比例和可见脂肪差异较大。营养表按可食肉部分计，不等同于带骨购买重量。", "en": "Pork ribs are from the rib region of domestic pig (Sus scrofa domesticus). Bone and visible-fat proportions vary; values are for edible meat rather than purchase weight." },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:sus_scrofa:trotter_raw",
+      "kind": "ingredient",
+      "names": { "zh": ["猪蹄", "猪脚"], "en": ["Pork trotter", "Pig's feet"] },
+      "categoryTags": ["food.meat_egg", "food.meat_egg.livestock"],
+      "systemTags": ["common"],
+      "edibleRatio": 0.52,
+      "sources": [{ "dataset": "China Food Composition Tables", "reference": "pork trotter, raw; per 100 g edible portion" }],
+      "nutrients": {
+        "ENERGY": { "value": 260.0, "unitCategory": "energy", "unitId": "kcal" },
+        "PROTEIN": { "value": 23.6, "unitCategory": "weight", "unitId": "g" },
+        "FAT": { "value": 18.8, "unitCategory": "weight", "unitId": "g" },
+        "CHO": { "value": 0.0, "unitCategory": "weight", "unitId": "g" }
+      },
+      "description": { "zh": "猪蹄来自家猪（Sus scrofa domesticus）的足部，富含结缔组织，同时脂肪含量不低。骨、皮、肉比例会影响可食部和实际营养摄入。", "en": "Pork trotter is the foot of domestic pig (Sus scrofa domesticus). It contains substantial connective tissue as well as fat; edible yield varies with bone, skin, and meat proportions." },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:gallus_gallus:egg:pan_fried",
+      "kind": "food",
+      "names": { "zh": ["煎鸡蛋", "荷包蛋"], "en": ["Pan-fried egg", "Fried egg"] },
+      "categoryTags": ["food.meat_egg.egg"],
+      "systemTags": ["common"],
+      "derivedFrom": { "ingredientId": "food:taxon:gallus_gallus:egg:whole", "cookingMethodId": "pan_fried" },
+      "sources": [{ "dataset": "China Food Composition Tables", "reference": "whole chicken egg; cooking change calculated from pan-frying method" }],
+      "description": { "zh": "煎鸡蛋由全鸡蛋经煎制派生。模型按烹饪方式统一计入吸油和失水参数；实际值受用油量、锅具和熟度影响。", "en": "Pan-fried egg is derived from whole egg. The model applies shared oil-uptake and yield parameters; actual values vary with added oil, cookware, and doneness." },
+      "commonness": 3
+    },
+    {
+      "id": "dish:corn_pork_rib_soup",
+      "kind": "dish",
+      "names": { "zh": ["玉米排骨汤", "玉米炖排骨"], "en": ["Corn and pork rib soup"] },
+      "components": [
+        { "foodId": "food:taxon:sus_scrofa:ribs_raw", "quantity": { "value": 300.0, "unitCategory": "weight", "unitId": "g" } },
+        { "foodId": "food:taxon:zea_mays:boiled", "quantity": { "value": 200.0, "unitCategory": "weight", "unitId": "g" } }
+      ],
+      "systemTags": ["common"],
+      "cuisine": "cuisine.chinese",
+      "dishCategories": ["dishcat.soup"],
+      "tastes": ["taste.light", "taste.umami"],
+      "techniqueId": "stewed",
+      "difficulty": 3,
+      "servesPeople": 3,
+      "recipeSteps": [
+        { "text": "排骨焯水后洗净。", "minutes": 5 },
+        { "text": "加水炖煮至排骨变软。", "minutes": 60 },
+        { "text": "加入玉米继续炖煮，按需要调味。", "minutes": 20 }
+      ],
+      "sources": [{ "dataset": "Recipe composition model", "reference": "nutrition is resolved from listed ingredients; water and optional seasonings are not included" }],
+      "description": { "zh": "玉米排骨汤的营养由列出的排骨和玉米按用量实时求和。汤水、盐和其他未列调味料不计入总量，食用时应按实际可食量记录。", "en": "Nutrition is resolved from the listed ribs and corn. Broth, salt, and unlisted seasonings are excluded; record the actual edible portion consumed." },
+      "commonness": 3
+    },
+    {
+      "id": "dish:braised_pork_trotter",
+      "kind": "dish",
+      "names": { "zh": ["红烧猪脚", "红烧猪蹄"], "en": ["Braised pork trotter"] },
+      "components": [
+        { "foodId": "food:taxon:sus_scrofa:trotter_raw", "quantity": { "value": 500.0, "unitCategory": "weight", "unitId": "g" } }
+      ],
+      "systemTags": ["common"],
+      "cuisine": "cuisine.chinese",
+      "dishCategories": ["dishcat.home"],
+      "tastes": ["taste.salty", "taste.umami"],
+      "techniqueId": "braised",
+      "difficulty": 5,
+      "servesPeople": 3,
+      "recipeSteps": [
+        { "text": "猪蹄焯水后洗净，去除浮沫。", "minutes": 8 },
+        { "text": "加水和常用香辛料小火焖煮至软烂。", "minutes": 90 },
+        { "text": "收汁并按实际用量加入调味料。", "minutes": 15 }
+      ],
+      "sources": [{ "dataset": "Recipe composition model", "reference": "nutrition is resolved from listed pork trotter; sugar, oil, soy sauce, and aromatics are not included" }],
+      "description": { "zh": "红烧猪脚的基础营养由列出的猪蹄实时求和。糖、油、酱油和香辛料尚未列入组分，使用这些配料时应补充记录或建立完整自定义菜谱。", "en": "Base nutrition is resolved from the listed pork trotter. Sugar, oil, soy sauce, and aromatics are not yet components; add them when recording a full recipe." },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:oryza_sativa:polished:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "大米",
+          "白米",
+          "粳米"
+        ],
+        "en": [
+          "White rice, raw",
+          "Polished rice, uncooked"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain"
+      ],
+      "edibleRatio": 1.0,
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "rice, milled, raw (per 100 g edible portion)"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 348.0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 7.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 77.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "生精白米（可食部每 100 g）。蒸煮后吸水约 3 倍成为米饭，营养由烹饪方式运行时派生。",
+        "en": "Raw milled white rice (per 100 g edible portion). Absorbs about 3x water when steamed; cooked nutrition is derived at runtime."
+      },
+      "commonness": 2
+    },
+    {
       "id": "food:taxon:oryza_sativa:polished:steamed",
+      "kind": "food",
       "names": {
         "zh": [
           "米饭",
@@ -16,6 +229,10 @@
       "categoryTags": [
         "food.staple.grain"
       ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:oryza_sativa:polished:raw",
+        "cookingMethodId": "steamed_grain"
+      },
       "healthMetrics": {
         "glycemicIndex": {
           "value": 73.0,
@@ -43,45 +260,9 @@
           "reference": "rice, cooked white"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 116.0,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 2.6,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.3,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 25.9,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FIBER": {
-              "value": 0.3,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
-        "zh": "蒸熟的精白米主食，主要提供碳水化合物；实际升糖反应受品种、米饭软硬和同餐食物影响。",
-        "en": "Cooked polished rice is a carbohydrate-rich staple; glycemic response varies with variety, texture, and the accompanying meal."
+        "zh": "蒸熟的精白米主食，主要提供碳水化合物；营养由生大米经蒸饭派生（吸水约 3 倍）。实际升糖反应受品种、米饭软硬和同餐食物影响。",
+        "en": "Cooked polished rice is a carbohydrate-rich staple derived from raw rice via grain steaming (about 3x water uptake); glycemic response varies with variety, texture, and the accompanying meal."
       },
       "commonness": 3
     },
