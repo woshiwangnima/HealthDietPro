@@ -28,6 +28,7 @@ internal data class ComposeChartState(
 @Serializable
 internal data class ComposeChartSeriesState(
     val colorArgb: Long,
+    val alpha: Float = 1f,
     val lineStyle: String,
     val linePattern: String,
     val pointShape: String,

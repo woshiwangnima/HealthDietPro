@@ -10,6 +10,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,6 +38,7 @@ fun TextDisplaySettingsScreen(onBack: () -> Unit) {
     val fontScale by AppFontScaleState.scale.collectAsState()
     var overflowMode by remember { mutableStateOf(AppPrefs.getTextOverflowMode(context)) }
     var marqueeSpeed by remember { mutableStateOf(AppPrefs.getMarqueeSpeed(context)) }
+    var marqueeIterations by remember { mutableStateOf(AppPrefs.getMarqueeIterations(context).toString()) }
     BaseScreen(title = stringResource(R.string.text_display_settings_title), onBack = onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
@@ -56,8 +60,22 @@ fun TextDisplaySettingsScreen(onBack: () -> Unit) {
                 if (overflowMode == "marquee") {
                     Text("${stringResource(R.string.text_overflow_marquee_speed)}: $marqueeSpeed")
                     Slider(marqueeSpeed.toFloat(), { marqueeSpeed = it.toInt(); AppPrefs.setMarqueeSpeed(context, marqueeSpeed) }, valueRange = 50f..2000f)
+                    OutlinedTextField(
+                        value = marqueeIterations,
+                        onValueChange = { input ->
+                            if (input.all(Char::isDigit)) {
+                                marqueeIterations = input
+                                AppPrefs.setMarqueeIterations(context, input.toIntOrNull() ?: 0)
+                            }
+                        },
+                        label = { Text(stringResource(R.string.text_overflow_marquee_iterations)) },
+                        supportingText = { Text(stringResource(R.string.text_overflow_marquee_iterations_minimum_hint)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
-                TextOverflowText(stringResource(R.string.text_overflow_preview_sample), Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant).padding(12.dp), overflowMode = overflowMode, marqueeSpeedMs = marqueeSpeed)
+                TextOverflowText(stringResource(R.string.text_overflow_preview_sample), Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant).padding(12.dp), overflowMode = overflowMode, marqueeSpeedMs = marqueeSpeed, marqueeIterations = marqueeIterations.toIntOrNull() ?: 0)
             }
         }
     }

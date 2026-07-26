@@ -3,6 +3,7 @@ package com.woshiwangnima.healthdietpro.ui.record
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -48,11 +49,15 @@ import com.woshiwangnima.healthdietpro.common.ui.AppDataTableDeleteAction
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableText
 import com.woshiwangnima.healthdietpro.common.ui.AppFormSubtitle
+import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
+import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ColumnWidth
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDateTimePickerDialog
+import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
@@ -63,6 +68,9 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingAnch
 import com.woshiwangnima.healthdietpro.model.bloodglucose.isValidBloodGlucoseValue
 import com.woshiwangnima.healthdietpro.model.bloodglucose.normalizeBloodGlucoseTimestamp
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartAxisKind
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartCanvasStyle
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartControlLabels
@@ -75,6 +83,7 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -107,6 +116,7 @@ private fun BloodGlucoseScreen(viewModel: BloodGlucoseViewModel, onBack: () -> U
         )
     }
 
+    BackHandler(enabled = showEditor) { showEditor = false }
     if (showEditor) {
         BloodGlucoseEditorScreen(
             record = editingRecord,
@@ -154,13 +164,26 @@ private fun BloodGlucoseChart(
     onChartStateChanged: (com.woshiwangnima.healthdietpro.model.chart.ComposeChartState) -> Unit,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    var selectedDateMillis by rememberSaveable { mutableStateOf(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) }
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    val selectedDate = remember(selectedDateMillis) {
+        Instant.ofEpochMilli(selectedDateMillis).atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+    val dayStart = remember(selectedDate) { selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
+    val nextDayStart = remember(selectedDate) { selectedDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
     val seriesLabel = stringResource(R.string.blood_glucose_value)
+    val delayedSeriesLabel = stringResource(R.string.blood_glucose_delayed_series)
     val unit = stringResource(R.string.blood_glucose_unit)
     val valueWithUnitFormat = stringResource(R.string.blood_glucose_value_with_unit)
-    val data = remember(records) {
-        records.sortedBy { it.timestamp }.map { record ->
+    val data = remember(records, dayStart, nextDayStart) {
+        records.filter { it.timestamp in dayStart until nextDayStart }.sortedBy { it.timestamp }.map { record ->
             DataPoint(record.timestamp, record.valueMmolPerL.toFloat(), formatBloodGlucoseTime(record.timestamp))
         }
+    }
+    val delayedData = remember(records, dayStart) {
+        records.filter { it.timestamp in dayStart - 86_400_000L until dayStart }
+            .sortedBy { it.timestamp }
+            .map { record -> DataPoint(record.timestamp + 86_400_000L, record.valueMmolPerL.toFloat(), formatBloodGlucoseTime(record.timestamp + 86_400_000L)) }
     }
     val series = remember(data, context, seriesLabel) {
         ChartSeries(
@@ -173,8 +196,25 @@ private fun BloodGlucoseChart(
             pointFill = PointFill.FILLED,
         )
     }
-    ComposeChart(
-        spec = ComposeChartSpec(
+    val delayedSeries = remember(delayedData, context, delayedSeriesLabel) {
+        ChartSeries(
+            points = delayedData,
+            label = delayedSeriesLabel,
+            color = ContextCompat.getColor(context, R.color.secondary),
+            lineStyle = LineStyle.STEPPED_FRONT,
+            lineType = LineType.DASHED,
+            pointShape = PointShape.CIRCLE,
+            pointFill = PointFill.HOLLOW,
+        )
+    }
+    Column(Modifier.fillMaxSize()) {
+        AppIconTextButton(
+            text = selectedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+            iconRes = R.drawable.ic_birthday,
+            onClick = { showDatePicker = true },
+        )
+        ComposeChart(
+            spec = ComposeChartSpec(
             title = stringResource(R.string.blood_glucose_title),
             chartStateKey = chartStateKey,
             canvasStyle = ChartCanvasStyle(
@@ -191,15 +231,22 @@ private fun BloodGlucoseChart(
                 yAxisBounds = stringResource(R.string.view_chart_bmi_bounds),
                 fullscreen = stringResource(R.string.view_chart_fullscreen),
             ),
-            series = listOf(series),
+            series = listOf(series, delayedSeries),
             xAxisLabel = stringResource(R.string.chart_axis_time_unit),
             yAxisLabel = stringResource(R.string.blood_glucose_unit),
             titleVisible = false,
         ),
-        chartState = chartState,
-        onChartStateChanged = onChartStateChanged,
-        modifier = Modifier.fillMaxSize(),
-    )
+            chartState = chartState,
+            onChartStateChanged = onChartStateChanged,
+            modifier = Modifier.weight(1f),
+        )
+    }
+    if (showDatePicker) {
+        ComposeDatePickerDialog(selectedDateMillis, { showDatePicker = false }) { selected ->
+            selectedDateMillis = selected.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            showDatePicker = false
+        }
+    }
 }
 
 @Composable
@@ -254,14 +301,18 @@ private fun BloodGlucoseEditorScreen(
     onSave: (BloodGlucoseRecord) -> Unit,
 ) {
     var timestamp by rememberSaveable(record?.id) { mutableStateOf(record?.timestamp ?: normalizeBloodGlucoseTimestamp(System.currentTimeMillis())) }
-    var value by rememberSaveable(record?.id) { mutableStateOf(record?.valueMmolPerL?.toString().orEmpty()) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var unitId by rememberSaveable { mutableStateOf(AppPrefs.getUnit(context, UnitCategoryType.Glucose.id, UnitCategoryType.Glucose.defaultUnitId)) }
+    var value by rememberSaveable(record?.id) { mutableStateOf(record?.valueMmolPerL?.let { UnitConverter.fromBase(UnitCategoryType.Glucose.id, it.toFloat(), unitId).toString() }.orEmpty()) }
     var anchor by rememberSaveable(record?.id) { mutableStateOf(record?.timingAnchor) }
-    var relativeMinutes by rememberSaveable(record?.id) { mutableStateOf(record?.relativeMinutes?.toString().orEmpty()) }
+    var relativeMinutes by rememberSaveable(record?.id) { mutableStateOf(record?.relativeMinutes?.let { kotlin.math.abs(it).toString() }.orEmpty()) }
+    var timingRelation by rememberSaveable(record?.id) { mutableStateOf(record?.relativeMinutes?.timingRelation() ?: BloodGlucoseTimingRelation.At) }
     var note by rememberSaveable(record?.id) { mutableStateOf(record?.note.orEmpty()) }
     var showDateTimePicker by rememberSaveable { mutableStateOf(false) }
-    val validValue = value.toDoubleOrNull()?.takeIf(::isValidBloodGlucoseValue)
+    val validValue = value.toDoubleOrNull()?.let { UnitConverter.toBase(UnitCategoryType.Glucose.id, it.toFloat(), unitId).toDouble() }?.takeIf(::isValidBloodGlucoseValue)
     val invalidValue = value.isNotBlank() && validValue == null
-    val invalidRelativeMinutes = relativeMinutes.isNotBlank() && relativeMinutes.toIntOrNull() == null
+    val invalidRelativeMinutes = timingRelation != BloodGlucoseTimingRelation.At && (relativeMinutes.toIntOrNull()?.let { it > 0 } != true)
+    val glucoseRange = if (unitId == "mg_dl") "20-600 mg/dL" else "1.1-33.3 mmol/L"
 
     BaseScreen(title = stringResource(R.string.blood_glucose_add_title), onBack = onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
@@ -278,18 +329,25 @@ private fun BloodGlucoseEditorScreen(
                     }
                 }
                 item {
-                    OutlinedTextField(
+                    EditorTextField(
                         value = value,
                         onValueChange = { value = it },
-                        label = { Text(stringResource(R.string.blood_glucose_value)) },
-                        suffix = { Text(stringResource(R.string.blood_glucose_unit)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        singleLine = true,
-                        isError = invalidValue,
-                        supportingText = if (invalidValue) {
-                            { Text(stringResource(R.string.blood_glucose_value_invalid)) }
-                        } else {
-                            null
+                        label = stringResource(R.string.blood_glucose_value),
+                        required = true,
+                        numeric = true,
+                        suffix = { Text(glucoseUnitOptions().firstOrNull { it.id == unitId }?.label ?: unitId) },
+                        supportingTextOverride = { Text(if (invalidValue) stringResource(R.string.blood_glucose_value_invalid) else stringResource(R.string.blood_glucose_value_range_example, glucoseRange, if (unitId == "mg_dl") "100" else "5.6")) },
+                    )
+                }
+                item {
+                    AppDropdownField(
+                        label = stringResource(R.string.blood_glucose_unit),
+                        value = glucoseUnitOptions().firstOrNull { it.id == unitId }?.label ?: unitId,
+                        options = glucoseUnitOptions(),
+                        onSelect = { selected ->
+                            value.toDoubleOrNull()?.let { current -> value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, UnitConverter.toBase(UnitCategoryType.Glucose.id, current.toFloat(), unitId), selected.id).toString() }
+                            unitId = selected.id
+                            AppPrefs.setUnit(context, UnitCategoryType.Glucose.id, unitId)
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -304,18 +362,21 @@ private fun BloodGlucoseEditorScreen(
                     }
                 }
                 item {
+                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        BloodGlucoseTimingRelation.entries.forEach { relation ->
+                            FilterChip(selected = timingRelation == relation, onClick = { timingRelation = relation }, label = { Text(stringResource(relation.labelRes())) })
+                        }
+                    }
+                }
+                if (timingRelation != BloodGlucoseTimingRelation.At) item {
                     OutlinedTextField(
                         value = relativeMinutes,
-                        onValueChange = { relativeMinutes = it },
-                        label = { Text(stringResource(R.string.blood_glucose_relative_minutes)) },
+                        onValueChange = { relativeMinutes = it.filter(Char::isDigit) },
+                        label = { Text(stringResource(R.string.blood_glucose_minutes)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
                         isError = invalidRelativeMinutes,
-                        supportingText = if (invalidRelativeMinutes) {
-                            { Text(stringResource(R.string.blood_glucose_relative_minutes_invalid)) }
-                        } else {
-                            null
-                        },
+                        supportingText = if (invalidRelativeMinutes) { { Text(stringResource(R.string.blood_glucose_relative_minutes_invalid)) } } else null,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -334,7 +395,12 @@ private fun BloodGlucoseEditorScreen(
                 text = stringResource(R.string.blood_glucose_save),
                 enabled = validValue != null && !invalidRelativeMinutes,
                 onSave = {
-                    onSave(BloodGlucoseRecord(record?.id ?: UUID.randomUUID().toString(), timestamp, requireNotNull(validValue), anchor, relativeMinutes.toIntOrNull(), note.trim()))
+                    val minutes = when (timingRelation) {
+                        BloodGlucoseTimingRelation.Before -> -requireNotNull(relativeMinutes.toIntOrNull())
+                        BloodGlucoseTimingRelation.After -> requireNotNull(relativeMinutes.toIntOrNull())
+                        BloodGlucoseTimingRelation.At -> 0
+                    }
+                    onSave(BloodGlucoseRecord(record?.id ?: UUID.randomUUID().toString(), timestamp, requireNotNull(validValue), anchor, minutes, note.trim()))
                 },
             )
         }
@@ -348,13 +414,39 @@ private fun BloodGlucoseEditorScreen(
 }
 
 @Composable
+private fun glucoseUnitOptions(): List<AppDropdownOption> = UnitConverter.getRepository()?.getCategory(UnitCategoryType.Glucose.id)?.units
+    ?.filterNot { it.hidden }
+    ?.map { AppDropdownOption(it.id, it.symbol(Locale.getDefault())) }
+    .orEmpty()
+
+@Composable
 private fun BloodGlucoseRecord.periodLabel(): String {
     val anchorText = timingAnchor?.let { stringResource(it.labelRes()) }.orEmpty()
-    val offsetText = relativeMinutes?.let { stringResource(R.string.blood_glucose_relative_minutes_value, it) }.orEmpty()
+    val offsetText = relativeMinutes?.let { minutes ->
+        when (minutes.timingRelation()) {
+            BloodGlucoseTimingRelation.Before -> stringResource(R.string.blood_glucose_period_before, -minutes)
+            BloodGlucoseTimingRelation.After -> stringResource(R.string.blood_glucose_period_after, minutes)
+            BloodGlucoseTimingRelation.At -> stringResource(R.string.blood_glucose_period_at)
+        }
+    }.orEmpty()
     return listOf(anchorText, offsetText)
         .filter { it.isNotEmpty() }
         .joinToString(" ")
         .ifEmpty { stringResource(R.string.blood_glucose_period_none) }
+}
+
+private enum class BloodGlucoseTimingRelation { Before, After, At }
+
+private fun Int.timingRelation(): BloodGlucoseTimingRelation = when {
+    this < 0 -> BloodGlucoseTimingRelation.Before
+    this > 0 -> BloodGlucoseTimingRelation.After
+    else -> BloodGlucoseTimingRelation.At
+}
+
+private fun BloodGlucoseTimingRelation.labelRes(): Int = when (this) {
+    BloodGlucoseTimingRelation.Before -> R.string.blood_glucose_relation_before
+    BloodGlucoseTimingRelation.After -> R.string.blood_glucose_relation_after
+    BloodGlucoseTimingRelation.At -> R.string.blood_glucose_relation_at
 }
 
 private fun BloodGlucoseTimingAnchor.labelRes(): Int = when (this) {

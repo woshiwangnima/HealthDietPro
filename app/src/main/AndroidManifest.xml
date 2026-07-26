@@ -43,6 +43,10 @@
             android:name=".ui.profile.BodyMetricRecordActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.profile.CircumferenceDetailActivity"
+            android:configChanges="orientation|screenSize|uiMode"
+            android:exported="false" />
+        <activity
             android:name=".ui.profile.UserSwitchActivity"
             android:exported="false" />
         <activity

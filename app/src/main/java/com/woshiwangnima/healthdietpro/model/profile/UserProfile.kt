@@ -19,6 +19,7 @@ data class UserProfile(
     val diseaseIds: List<String> = emptyList(),
     val heightRecords: List<BodyRecord> = emptyList(),
     val weightRecords: List<BodyRecord> = emptyList(),
+    val circumferenceRecords: Map<String, List<BodyRecord>> = emptyMap(),
     val avatarFileName: String = ""
 ) {
     val latestHeight: BodyRecord? get() = heightRecords.maxByOrNull { it.date }

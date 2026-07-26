@@ -287,6 +287,7 @@ fun load(context: Context): UserProfile {
             diseaseIds = current?.diseaseIds.orEmpty(),
             heightRecords = current?.heightRecords.orEmpty().map { fixUnit(it, false) },
             weightRecords = current?.weightRecords.orEmpty().map { fixUnit(it, true) },
+            circumferenceRecords = current?.circumferenceRecords.orEmpty().mapValues { (_, records) -> records.map { fixUnit(it, false) } },
             avatarFileName = current?.avatarFileName ?: ""
         )
     }

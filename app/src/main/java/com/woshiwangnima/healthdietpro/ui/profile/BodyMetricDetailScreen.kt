@@ -73,6 +73,7 @@ internal fun BodyMetricDetailScreen(
     onRecordsChanged: (List<BodyRecord>) -> Unit,
     onEditRecord: (Int) -> Unit,
     onBack: () -> Unit,
+    embedded: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(initialTab.coerceIn(0, 1)) }
@@ -83,41 +84,19 @@ internal fun BodyMetricDetailScreen(
             DetailTabItem("1", R.string.detail_tab_data, R.drawable.ic_list),
         )
     }
-    BaseScreen(title = title, onBack = onBack, includeNavigationBarPadding = false) { padding ->
-        Column(
-            modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding),
-        ) {
+    val content: @Composable (Modifier) -> Unit = { contentModifier ->
+        Column(modifier = contentModifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             Box(modifier = Modifier.weight(1f)) {
                 when (selectedTab) {
-                    0 -> BodyMetricChart(
-                        title = title,
-                        unitId = unitId,
-                        category = category,
-                        records = records,
-                        chartState = chartState,
-                        chartStateKey = chartViewModel.chartStateKey,
-                        onChartStateChanged = { chartViewModel.onChartEvent(BaseChartEvent.StateChanged(it)) },
-                    )
-                    1 -> BodyMetricDataPage(
-                        records = records,
-                        isHeight = isHeight,
-                        unitId = unitId,
-                        category = category,
-                        onRecordsChanged = onRecordsChanged,
-                        onEditRecord = onEditRecord,
-                    )
+                    0 -> BodyMetricChart(title, unitId, category, records, chartState, chartViewModel.chartStateKey) { chartViewModel.onChartEvent(BaseChartEvent.StateChanged(it)) }
+                    1 -> BodyMetricDataPage(records, isHeight, unitId, category, onRecordsChanged, onEditRecord)
                 }
             }
-            DetailTabBar(
-                items = tabs,
-                selectedId = selectedTab.toString(),
-                onSelected = { item ->
-                    selectedTab = item.id.toInt()
-                    onTabSelected(selectedTab)
-                },
-            )
+            DetailTabBar(items = tabs, selectedId = selectedTab.toString(), onSelected = { item -> selectedTab = item.id.toInt(); onTabSelected(selectedTab) })
         }
     }
+    if (embedded) content(modifier)
+    else BaseScreen(title = title, onBack = onBack, includeNavigationBarPadding = false) { padding -> content(modifier.padding(padding)) }
 }
 
 @Composable

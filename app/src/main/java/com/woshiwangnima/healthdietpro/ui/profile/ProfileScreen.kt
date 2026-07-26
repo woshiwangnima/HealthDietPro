@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.SettingRow
+import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
+import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
+import com.woshiwangnima.healthdietpro.common.ui.AppCheckboxRow
+import com.woshiwangnima.healthdietpro.common.ui.PlainTextPreviewScreen
 
 @Composable
 internal fun ProfileScreen(
@@ -40,12 +45,13 @@ internal fun ProfileScreen(
     onOpenUserSettings: () -> Unit,
     onEditProfile: () -> Unit,
     onOpenUserSwitch: () -> Unit,
-    onExportPlainJson: () -> Unit,
-    onImportPlainJson: () -> Unit,
+    onArchiveAction: (export: Boolean, encrypted: Boolean, password: String) -> Unit,
+    onArchivePreview: ((String) -> Unit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showExportConfirmation by remember { mutableStateOf(false) }
-    var showImportConfirmation by remember { mutableStateOf(false) }
+    var showArchiveDialog by remember { mutableStateOf(false) }
+    var pendingImport by remember { mutableStateOf<ArchiveRequest?>(null) }
+    var archivePreview by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = modifier
@@ -98,61 +104,53 @@ internal fun ProfileScreen(
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 SettingRow(
-                    title = stringResource(R.string.profile_plain_json_export),
-                    subtitle = stringResource(R.string.profile_plain_json_export_desc),
+                    title = stringResource(R.string.profile_archive_data),
+                    subtitle = stringResource(R.string.profile_archive_data_desc),
                     leadingIconRes = R.drawable.ic_export,
-                    onClick = { showExportConfirmation = true },
-                )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                SettingRow(
-                    title = stringResource(R.string.profile_plain_json_import),
-                    subtitle = stringResource(R.string.profile_plain_json_import_desc),
-                    leadingIconRes = R.drawable.ic_import,
-                    onClick = { showImportConfirmation = true },
+                    onClick = { showArchiveDialog = true },
                 )
             }
         }
     }
 
-    if (showExportConfirmation) {
+    if (showArchiveDialog) {
+        var encrypted by remember { mutableStateOf(false) }
+        var password by remember { mutableStateOf("") }
         AlertDialog(
-            onDismissRequest = { showExportConfirmation = false },
-            title = { Text(stringResource(R.string.profile_plain_json_export_confirm_title)) },
-            text = { Text(stringResource(R.string.profile_plain_json_export_confirm_message)) },
+            onDismissRequest = { showArchiveDialog = false },
+            title = { Text(stringResource(R.string.profile_archive_data)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    AppDropdownField(stringResource(R.string.profile_archive_format), stringResource(R.string.profile_archive_format_json), listOf(AppDropdownOption("json", stringResource(R.string.profile_archive_format_json))), {}, Modifier.fillMaxWidth())
+                    AppDropdownField(stringResource(R.string.profile_archive_compression), stringResource(R.string.profile_archive_compression_gzip_short), listOf(AppDropdownOption("gzip", stringResource(R.string.profile_archive_compression_gzip_short))), {}, Modifier.fillMaxWidth())
+                    AppCheckboxRow(checked = encrypted, label = stringResource(R.string.profile_archive_encrypt), onCheckedChange = { encrypted = it })
+                    if (encrypted) OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text(stringResource(R.string.profile_archive_password)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                    if (!encrypted) Text(stringResource(R.string.profile_archive_unencrypted_warning), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    TextButton(onClick = { onArchivePreview { archivePreview = it; showArchiveDialog = false } }) { Text(stringResource(R.string.profile_archive_preview)) }
+                }
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    showExportConfirmation = false
-                    onExportPlainJson()
-                }) {
-                    Text(stringResource(R.string.profile_plain_json_export_action))
+                Row {
+                    TextButton(onClick = {
+                        if (archivePreview == null) onArchivePreview { archivePreview = it }
+                        else { showArchiveDialog = false; onArchiveAction(true, encrypted, password) }
+                    }, enabled = !encrypted || password.isNotBlank()) { Icon(painterResource(R.drawable.ic_export), null); Text(stringResource(R.string.profile_plain_json_export_action)) }
+                    TextButton(onClick = { showArchiveDialog = false; pendingImport = ArchiveRequest(encrypted, password) }, enabled = !encrypted || password.isNotBlank()) { Icon(painterResource(R.drawable.ic_import), null); Text(stringResource(R.string.profile_plain_json_import_action)) }
                 }
             },
-            dismissButton = {
-                TextButton(onClick = { showExportConfirmation = false }) {
-                    Text(stringResource(R.string.profile_plain_json_cancel))
-                }
-            },
+            dismissButton = { TextButton(onClick = { showArchiveDialog = false }) { Text(stringResource(R.string.profile_plain_json_cancel)) } },
         )
     }
-
-    if (showImportConfirmation) {
+    archivePreview?.let { preview -> PlainTextPreviewScreen(stringResource(R.string.profile_archive_preview), preview, onBack = { archivePreview = null; showArchiveDialog = true }) }
+    pendingImport?.let { request ->
         AlertDialog(
-            onDismissRequest = { showImportConfirmation = false },
+            onDismissRequest = { pendingImport = null },
             title = { Text(stringResource(R.string.profile_plain_json_import_confirm_title)) },
             text = { Text(stringResource(R.string.profile_plain_json_import_confirm_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showImportConfirmation = false
-                    onImportPlainJson()
-                }) {
-                    Text(stringResource(R.string.profile_plain_json_import_action))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showImportConfirmation = false }) {
-                    Text(stringResource(R.string.profile_plain_json_cancel))
-                }
-            },
+            confirmButton = { TextButton(onClick = { pendingImport = null; onArchiveAction(false, request.encrypted, request.password) }) { Text(stringResource(R.string.profile_plain_json_import_action)) } },
+            dismissButton = { TextButton(onClick = { pendingImport = null }) { Text(stringResource(R.string.profile_plain_json_cancel)) } },
         )
     }
 }
+
+private data class ArchiveRequest(val encrypted: Boolean, val password: String)

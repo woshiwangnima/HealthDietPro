@@ -66,6 +66,9 @@ import com.woshiwangnima.healthdietpro.common.ui.ColumnWidth
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.FontTokens
+import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
+import com.woshiwangnima.healthdietpro.common.ui.SearchActivityPanel
+import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
 import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
@@ -153,30 +156,17 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
     val foods = viewModel.filteredFoods(language)
     var addingTag by remember { mutableStateOf(false) }
+    var searchFocused by remember { mutableStateOf(false) }
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val showSidebar = state.selectedKind != FoodKind.DISH
     Column(modifier = modifier.fillMaxSize().padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedTextField(
-            value = state.keyword,
-            onValueChange = viewModel::setKeyword,
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            leadingIcon = { Icon(Icons.Filled.Search, null, modifier = Modifier.size(18.dp)) },
-            trailingIcon = if (state.keyword.isNotBlank()) {
-                {
-                    IconButton(onClick = { viewModel.setKeyword("") }) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = stringResource(R.string.nutrition_search_clear),
-                            modifier = Modifier.size(26.dp),
-                        )
-                    }
-                }
-            } else {
-                null
-            },
-            placeholder = { Text(stringResource(R.string.nutrition_search_food), style = TextStyle(fontSize = FontTokens.caption), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.58f)) },
-            textStyle = TextStyle(fontSize = FontTokens.caption),
-        )
+        FoodSearchField(state.keyword, viewModel::setKeyword, stringResource(R.string.nutrition_search_food), onSearch = { }, onFocusChanged = { searchFocused = it })
+        if (searchFocused && state.keyword.isBlank() && (state.searchHistory.isNotEmpty() || state.recentFoodIds.isNotEmpty())) {
+            val recent = state.recentFoodIds.mapNotNull { id -> viewModel.foodById(id) }.map { food ->
+                RecentSearchItem(food.id, food.displayName(language), when (food.kind) { FoodKind.INGREDIENT -> R.drawable.ic_food_ingredient; FoodKind.FOOD -> R.drawable.ic_nav_nutrition; FoodKind.DISH -> R.drawable.ic_food_dish })
+            }
+            SearchActivityPanel(state.searchHistory, recent, stringResource(R.string.nutrition_search_history), stringResource(R.string.nutrition_click_history), { viewModel.setKeyword(it) }, viewModel::removeSearchHistory, viewModel::clearSearchHistory, { item -> viewModel.foodById(item.id)?.let(viewModel::openFood) }, { item -> viewModel.removeRecentFood(item.id) }, viewModel::clearRecentFoods, { searchFocused = false; focusManager.clearFocus() })
+        }
         KindSegmenter(state.selectedKind, viewModel::selectKind)
         Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             // 左列：由上至下为「添加自定义XX」按钮 + 「自定义XX」与其他一级分类组合区域，同宽。
@@ -209,7 +199,7 @@ private fun KindSegmenter(selected: FoodKind, onSelected: (FoodKind) -> Unit) {
         FoodKind.DISH to R.string.nutrition_kind_dish,
     )
     EqualWidthSegmentedTabs(
-        tabs = kinds.map { EqualWidthTab(it.second) },
+        tabs = kinds.map { (kind, label) -> EqualWidthTab(label, when (kind) { FoodKind.INGREDIENT -> R.drawable.ic_food_ingredient; FoodKind.FOOD -> R.drawable.ic_nav_nutrition; FoodKind.DISH -> R.drawable.ic_food_dish }) },
         selectedIndex = kinds.indexOfFirst { it.first == selected }.coerceAtLeast(0),
         onSelected = { onSelected(kinds[it].first) },
     )
@@ -475,6 +465,7 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
             modifier = Modifier.padding(top = 16.dp),
         )
         if (tab == 0) Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
+            DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_basic_information))
             KindInfoSection(food, viewModel, language, onOpenFood = { viewModel.openFood(it) })
             DetailSectionTitle(R.drawable.ic_chart, stringResource(R.string.nutrition_health_metrics)) {
                 IconButton(onClick = { showHealthMetricsHelp = true }) {
@@ -587,7 +578,7 @@ private fun KindInfoSection(food: FoodItem, viewModel: NutritionViewModel, langu
 
 @Composable
 private fun DishInfoSection(dish: Dish, viewModel: NutritionViewModel, language: String, onOpenFood: (FoodItem) -> Unit) {
-    // 元数据（菜系/口味/份量/季节）
+    // 营养档案仅呈现描述菜肴本身的基础分类信息。
     dish.cuisine?.let { DishTaxonomy.labelRes(it)?.let { res -> InfoLine(stringResource(R.string.nutrition_editor_cuisine), stringResource(res)) } }
     dish.dishCategories.mapNotNull { DishTaxonomy.labelRes(it) }.map { stringResource(it) }.takeIf { it.isNotEmpty() }?.let { labels ->
         InfoLine(stringResource(R.string.nutrition_editor_dish_category), labels.joinToString(" / "))
@@ -598,18 +589,17 @@ private fun DishInfoSection(dish: Dish, viewModel: NutritionViewModel, language:
     dish.seasons.mapNotNull { DishTaxonomy.labelRes(it) }.map { stringResource(it) }.takeIf { it.isNotEmpty() }?.let { labels ->
         InfoLine(stringResource(R.string.nutrition_editor_season), labels.joinToString(" / "))
     }
-    dish.techniqueId?.let { viewModel.cookingMethodFor(it)?.let { m -> InfoLine(stringResource(R.string.nutrition_editor_technique), m.displayLabel(language)) } }
-    // 难度：10 星整数展示
-    dish.difficulty?.let { StarRatingLine(stringResource(R.string.nutrition_dish_difficulty), it) }
-    dish.servesPeople?.let { InfoLine(stringResource(R.string.nutrition_dish_serves), stringResource(R.string.nutrition_dish_serves_value, it)) }
-
 }
 
 /** 菜肴的食材清单与菜谱在「制作步骤」页签中呈现。 */
 @Composable
 private fun DishRecipeSection(dish: Dish, viewModel: NutritionViewModel, language: String, onOpenFood: (FoodItem) -> Unit) {
+    DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_basic_information))
+    dish.techniqueId?.let { viewModel.cookingMethodFor(it)?.let { method -> InfoLine(stringResource(R.string.nutrition_editor_technique), method.displayLabel(language)) } }
+    dish.difficulty?.let { StarRatingLine(stringResource(R.string.nutrition_dish_difficulty), it) }
+    dish.servesPeople?.let { InfoLine(stringResource(R.string.nutrition_dish_serves), stringResource(R.string.nutrition_dish_serves_value, it)) }
     // 食材清单：辅料（调味品或油脂）判定，主料在前、辅料在后。
-    DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_ingredient_list))
+    DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_ingredient_list), Modifier.padding(top = 8.dp))
     val (auxiliary, main) = dish.components.partition { c -> viewModel.foodById(c.foodId)?.let { viewModel.isAuxiliary(it) } == true }
     if (main.isNotEmpty()) {
         Text(stringResource(R.string.nutrition_ingredient_main), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 2.dp))

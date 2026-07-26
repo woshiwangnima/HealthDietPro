@@ -969,6 +969,25 @@
     }
   },
   {
+    "id": "glucose",
+    "baseUnit": "mmol_l",
+    "units": [
+      {
+        "id": "mmol_l",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": { "zh": { "symbol": "mmol/L" }, "en": { "symbol": "mmol/L" } }
+      },
+      {
+        "id": "mg_dl",
+        "toBase": 0.0555,
+        "hidden": false,
+        "i18n": { "zh": { "symbol": "mg/dL" }, "en": { "symbol": "mg/dL" } }
+      }
+    ],
+    "i18n": { "zh": { "label": "血糖浓度" }, "en": { "label": "Blood glucose" } }
+  },
+  {
     "id": "storage",
     "baseUnit": "b",
     "units": [

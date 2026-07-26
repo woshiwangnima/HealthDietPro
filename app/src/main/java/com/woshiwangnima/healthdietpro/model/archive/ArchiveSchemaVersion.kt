@@ -40,7 +40,8 @@ data class ArchiveSchemaVersion(
         val LegacyV1 = ArchiveSchemaVersion(0, 0, 1)
         val LegacyV2 = ArchiveSchemaVersion(0, 0, 2)
         val LegacyV3 = ArchiveSchemaVersion(0, 0, 3)
-        val Current = ArchiveSchemaVersion(1, 0, 0)
+        val CircumferenceRecords = ArchiveSchemaVersion(1, 0, 1)
+        val Current = CircumferenceRecords
     }
 }
 
@@ -60,6 +61,7 @@ internal fun migrateArchiveSchemaVersion(
     if (migrated < ArchiveSchemaVersion.LegacyV2) migrated = ArchiveSchemaVersion.LegacyV2
     if (migrated < ArchiveSchemaVersion.LegacyV3) migrated = ArchiveSchemaVersion.LegacyV3
     if (migrated < ArchiveSchemaVersion.Current) migrated = ArchiveSchemaVersion.Current
+    if (migrated < ArchiveSchemaVersion.CircumferenceRecords) migrated = ArchiveSchemaVersion.CircumferenceRecords
     return migrated
 }
 

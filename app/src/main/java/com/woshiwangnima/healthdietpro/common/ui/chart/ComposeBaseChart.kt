@@ -38,6 +38,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
@@ -170,6 +171,7 @@ internal enum class ComposeChartAxisWindowMode {
 @Immutable
 internal data class ComposeChartSeriesStyle(
     val color: Color,
+    val alpha: Float = 1f,
     val lineStyle: ComposeChartLineStyle = ComposeChartLineStyle.Linear,
     val linePattern: ComposeChartLinePattern = ComposeChartLinePattern.Solid,
     val pointShape: ComposeChartPointShape = ComposeChartPointShape.Circle,
@@ -473,6 +475,7 @@ private fun ChartSurface(
                 seriesStyles = seriesStyles.mapValues { (_, style) ->
                     ComposeChartSeriesState(
                         colorArgb = style.color.value.toLong(),
+                        alpha = style.alpha,
                         lineStyle = style.lineStyle.name,
                         linePattern = style.linePattern.name,
                         pointShape = style.pointShape.name,
@@ -486,7 +489,7 @@ private fun ChartSurface(
         series = spec.series.map {
             val style = seriesStyles[it.id] ?: it.toSeriesStyle()
             it.copy(
-                color = style.color,
+                color = style.color.copy(alpha = style.alpha),
                 lineStyle = style.lineStyle,
                 linePattern = style.linePattern,
                 pointShape = style.pointShape,
@@ -1106,6 +1109,12 @@ private fun SeriesStyleDialog(
                         }
                     }
                 }
+                Text(stringResource(R.string.compose_chart_series_opacity, (style.alpha * 100).roundToInt()))
+                Slider(
+                    value = style.alpha,
+                    onValueChange = { onStyleChange(style.copy(alpha = it)) },
+                    valueRange = 0.1f..1f,
+                )
                 ChartDropdown(
                     label = stringResource(R.string.view_chart_line_style),
                     value = style.lineStyle.styleLabel(),
@@ -2362,6 +2371,7 @@ private fun Double.isFiniteValue(): Boolean = !isNaN() && !isInfinite()
 private fun ComposeChartSeriesState.toComposeStyle(): ComposeChartSeriesStyle =
     ComposeChartSeriesStyle(
         color = Color(colorArgb.toULong()),
+        alpha = alpha.coerceIn(0.1f, 1f),
         lineStyle = ComposeChartLineStyle.entries.firstOrNull { it.name == lineStyle } ?: ComposeChartLineStyle.Linear,
         linePattern = ComposeChartLinePattern.entries.firstOrNull { it.name == linePattern } ?: ComposeChartLinePattern.Solid,
         pointShape = ComposeChartPointShape.entries.firstOrNull { it.name == pointShape } ?: ComposeChartPointShape.Circle,

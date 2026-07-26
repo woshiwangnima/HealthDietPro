@@ -57,6 +57,7 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - `食材`/`食物`/`菜肴` 分类选择走公共 `common/ui/MultiLevelTagSelector`（多级 Tag、可多选多个），领域侧存 `categoryTags: List<String>`。
 - 自定义食材营养素编辑必须列出 `assets/DRIs/nutrients_meta.json` 全部营养素；仅 `ENERGY/PROTEIN/FAT/CHO` 必填（编辑器分「必填/选填」两段并本地化标注），其余可选填。营养素单位取 `NutrientMeta.baseUnit`。可选营养素折叠展开，避免一次组合 40+ 输入框卡顿。食材 GI/GL 为可选输入。
 - 嵌套于 `MainActivity` Scaffold 内的营养屏（详情/对比/编辑）用 `BaseScreen(includeStatusBarPadding = false)`，避免与父 Scaffold 的 `statusBars` 内边距叠加导致顶栏下移；独立 Activity 屏保持默认 `true`。
+- 所有嵌套于 `MainActivity` Scaffold 的新 `BaseScreen`（包括预览、工具和二级界面）同样必须传入 `includeStatusBarPadding = false`；仅独立 Activity 使用默认状态栏内边距，避免返回图标与一级标题整体下移。
 - 详情/对比屏标题随 `FoodKind` 切换；详情右侧图标分两行（自定义时上行 编辑/删除，下行 收藏/对比）。健康指标表恒显示 GI/GL/炎症指数行，缺失填 `-`。
 - 三个自定义编辑器（食材/食物/菜肴）用固定底部保存/取消 + `BackHandler` 未保存二次确认（`EditorScaffold`），内容区 `weight(1f)` 滚动。
 - `食物` 编辑器不手填营养：选来源食材（带一二级 Tag 筛选 + 搜索 `SearchableIngredientPicker`）+ 烹饪方式，营养经 `previewDerived` 实时预览；含可选简介。

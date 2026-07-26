@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
@@ -20,6 +21,9 @@ internal fun TestGmScreen(
     onAddHeightRecord: () -> Unit,
     onAddWeightRecord: () -> Unit,
     onAddMedicationRecord: () -> Unit,
+    onAddNutritionFoods: () -> Unit,
+    onAddYesterdayGlucose: () -> Unit,
+    onAddTodayGlucose: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -32,5 +36,8 @@ internal fun TestGmScreen(
         AppIconTextButton("添加测试身高记录", R.drawable.ic_add, onAddHeightRecord, Modifier.fillMaxWidth())
         AppIconTextButton("添加测试体重记录", R.drawable.ic_add, onAddWeightRecord, Modifier.fillMaxWidth())
         AppIconTextButton("添加测试用药记录", R.drawable.ic_add, onAddMedicationRecord, Modifier.fillMaxWidth())
+        AppIconTextButton(stringResource(R.string.test_gm_add_nutrition), R.drawable.ic_add, onAddNutritionFoods, Modifier.fillMaxWidth())
+        AppIconTextButton(stringResource(R.string.test_gm_add_yesterday_glucose), R.drawable.ic_add, onAddYesterdayGlucose, Modifier.fillMaxWidth())
+        AppIconTextButton(stringResource(R.string.test_gm_add_today_glucose), R.drawable.ic_add, onAddTodayGlucose, Modifier.fillMaxWidth())
     } }
 }

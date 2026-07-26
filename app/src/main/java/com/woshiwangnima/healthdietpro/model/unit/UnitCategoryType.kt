@@ -8,6 +8,7 @@ enum class UnitCategoryType(val id: String, val defaultUnitId: String) {
     Density("density", "g_ml"),
     Time("time", "s"),
     Energy("energy", "kcal"),
+    Glucose("glucose", "mmol_l"),
     Storage("storage", "b");
 
     companion object {

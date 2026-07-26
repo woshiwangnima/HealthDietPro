@@ -6,6 +6,10 @@ import com.woshiwangnima.healthdietpro.R
 
 data class RecordUiState(
     val sections: List<RecordSectionUiState> = emptyList(),
+    val query: String = "",
+    val submittedQuery: String = "",
+    val searchHistory: List<String> = emptyList(),
+    val recentActionIds: List<RecordActionId> = emptyList(),
 )
 
 data class RecordSectionUiState(
@@ -19,6 +23,9 @@ data class RecordActionItemUiState(
     @param:StringRes val titleRes: Int,
     @param:DrawableRes val iconRes: Int,
     val enabled: Boolean,
+    val searchAliasRes: List<Int> = emptyList(),
+    val latestTimestamp: Long? = null,
+    val latestValue: String? = null,
 )
 
 enum class RecordActionId {
@@ -45,7 +52,7 @@ internal fun defaultRecordSections(): List<RecordSectionUiState> = listOf(
             RecordActionItemUiState(RecordActionId.Height, R.string.record_action_height, R.drawable.ic_height, true),
             RecordActionItemUiState(RecordActionId.Weight, R.string.record_action_weight, R.drawable.ic_weight, true),
             RecordActionItemUiState(RecordActionId.BloodGlucose, R.string.record_action_blood_glucose, R.drawable.ic_blood_glucose, true),
-            RecordActionItemUiState(RecordActionId.Waist, R.string.record_action_waist, R.drawable.ic_placeholder, false),
+            RecordActionItemUiState(RecordActionId.Waist, R.string.record_action_waist, R.drawable.ic_circumference, true, listOf(R.string.record_search_alias_circumference)),
             RecordActionItemUiState(RecordActionId.Period, R.string.record_action_period, R.drawable.ic_placeholder, false),
         ),
     ),

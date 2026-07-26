@@ -45,7 +45,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.common.ui.EditorSectionTitle
+import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
+import com.woshiwangnima.healthdietpro.common.ui.ExpandableEditorSection
+import com.woshiwangnima.healthdietpro.common.ui.FoodCategoryFilterRows
+import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
+import com.woshiwangnima.healthdietpro.common.ui.LazyOptionalFields
 import com.woshiwangnima.healthdietpro.common.ui.MultiLevelTagSelector
+import com.woshiwangnima.healthdietpro.common.ui.NumericInputRange
 import com.woshiwangnima.healthdietpro.common.ui.TagNode
 import com.woshiwangnima.healthdietpro.model.food.DishComponentDto
 import com.woshiwangnima.healthdietpro.model.food.DishTaxonomy
@@ -199,23 +206,6 @@ private fun EditorScaffold(
     }
 }
 
-@Composable
-private fun EditorField(label: String, value: String, onChange: (String) -> Unit, numeric: Boolean = false, singleLine: Boolean = true) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onChange,
-        label = { Text(label) },
-        singleLine = singleLine,
-        keyboardOptions = if (numeric) KeyboardOptions(keyboardType = KeyboardType.Decimal) else KeyboardOptions.Default,
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
-
-@Composable
-private fun SectionHeader(text: String) {
-    Text(text, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 4.dp))
-}
-
 /** 用公共多级 Tag 选择器选分类，可多选多个多级 Tag。 */
 @Composable
 private fun CategoryTagSelector(selected: List<String>, onChange: (List<String>) -> Unit) {
@@ -270,6 +260,7 @@ private fun IngredientEditor(existing: Ingredient?, editingId: String?, viewMode
     var description by remember { mutableStateOf(existing?.displayDescription(language).orEmpty()) }
     var gi by remember { mutableStateOf(existing?.healthMetrics?.glycemicIndex?.value?.toString().orEmpty()) }
     var gl by remember { mutableStateOf(existing?.healthMetrics?.glycemicLoadPer100g?.value?.toString().orEmpty()) }
+    var inflammation by remember { mutableStateOf(existing?.healthMetrics?.inflammatoryPotential?.value?.toString().orEmpty()) }
     val metas = remember { viewModel.nutrientMetas() }
     val values = remember {
         mutableStateMapOf<String, String>().apply {
@@ -277,7 +268,6 @@ private fun IngredientEditor(existing: Ingredient?, editingId: String?, viewMode
         }
     }
     var dirty by remember { mutableStateOf(false) }
-    var optionalExpanded by remember { mutableStateOf(false) }
     val required = remember(metas) { metas.filter { it.isRequired } }
     val optional = remember(metas) { metas.filterNot { it.isRequired } }
 
@@ -285,7 +275,9 @@ private fun IngredientEditor(existing: Ingredient?, editingId: String?, viewMode
 
     EditorScaffold(
         dirty = dirty,
-        canSave = name.isNotBlank() && required.all { values[it.code]?.toDoubleOrNull() != null },
+        canSave = name.isNotBlank() && required.all { values[it.code]?.toDoubleOrNull()?.let { value -> value >= 0.0 } == true } &&
+            NumericInputRange(0.0, 100.0).accepts(edible) && NumericInputRange(0.0, 100.0).accepts(gi) &&
+            NumericInputRange(0.0).accepts(gl),
         onExit = viewModel::closeEditor,
         onSave = {
             val nutrients = buildMap {
@@ -298,6 +290,7 @@ private fun IngredientEditor(existing: Ingredient?, editingId: String?, viewMode
             val health = FoodHealthMetricsDto(
                 glycemicIndex = gi.toDoubleOrNull()?.let { FoodMetricDto(it, "GI") },
                 glycemicLoadPer100g = gl.toDoubleOrNull()?.let { FoodMetricDto(it, "GL") },
+                inflammatoryPotential = inflammation.toDoubleOrNull()?.let { FoodMetricDto(it, "DII") },
             )
             viewModel.saveCustomFood(
                 FoodDto(
@@ -316,49 +309,42 @@ private fun IngredientEditor(existing: Ingredient?, editingId: String?, viewMode
             )
         },
     ) {
-        SectionHeader(stringResource(R.string.nutrition_editor_section_required))
-        EditorField(stringResource(R.string.nutrition_editor_name) + " *", name, { name = it; markDirty() })
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_identity))
+        EditorTextField(stringResource(R.string.nutrition_editor_name), name, { name = it; markDirty() }, required = true)
+        AliasEditor(aliases) { markDirty() }
+        CategoryTagSelector(categoryTags) { categoryTags.clear(); categoryTags.addAll(it); markDirty() }
+
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_nutrition))
         required.forEach { meta ->
             NutrientField(meta, values[meta.code].orEmpty(), required = true) { values[meta.code] = it; markDirty() }
         }
-
-        SectionHeader(stringResource(R.string.nutrition_editor_section_optional))
-        AliasEditor(aliases) { markDirty() }
-        CategoryTagSelector(categoryTags) { categoryTags.clear(); categoryTags.addAll(it); markDirty() }
-        EditorField(stringResource(R.string.nutrition_editor_edible_ratio), edible, { edible = it; markDirty() }, numeric = true)
-        EditorField(stringResource(R.string.nutrition_editor_gi), gi, { gi = it; markDirty() }, numeric = true)
-        EditorField(stringResource(R.string.nutrition_editor_gl), gl, { gl = it; markDirty() }, numeric = true)
-        EditorField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, singleLine = false)
-
-        // 可选营养素折叠，避免一次性组合 40+ 输入框造成卡顿。
-        Surface(
-            modifier = Modifier.fillMaxWidth().clickable { optionalExpanded = !optionalExpanded },
-            shape = RoundedCornerShape(6.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-        ) {
-            Text(
-                stringResource(R.string.nutrition_editor_optional_nutrients),
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
-                style = MaterialTheme.typography.titleSmall,
-            )
-        }
-        if (optionalExpanded) {
-            optional.forEach { meta ->
+        ExpandableEditorSection(stringResource(R.string.nutrition_editor_optional_nutrients)) {
+            LazyOptionalFields(optional, { it.code }) { meta ->
                 NutrientField(meta, values[meta.code].orEmpty(), required = false) { values[meta.code] = it; markDirty() }
             }
         }
+
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_health))
+        EditorTextField(stringResource(R.string.nutrition_editor_edible_ratio), edible, { edible = it; markDirty() }, numeric = true, range = NumericInputRange(0.0, 100.0))
+        EditorTextField(stringResource(R.string.nutrition_editor_gi), gi, { gi = it; markDirty() }, numeric = true, range = NumericInputRange(0.0, 100.0))
+        EditorTextField(stringResource(R.string.nutrition_editor_gl), gl, { gl = it; markDirty() }, numeric = true, range = NumericInputRange(0.0))
+        EditorTextField(stringResource(R.string.nutrition_metric_inflammatory_potential), inflammation, { inflammation = it; markDirty() }, numeric = true)
+
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_description))
+        EditorTextField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, showRequirementMarker = false, singleLine = false)
     }
 }
 
 @Composable
 private fun NutrientField(meta: NutrientMeta, value: String, required: Boolean, onChange: (String) -> Unit) {
     val language = LocaleLanguage()
-    val suffix = if (required) " *" else ""
-    EditorField(
-        label = "${meta.displayName(language)} (${meta.baseUnit}/100g)$suffix",
+    EditorTextField(
+        label = "${meta.displayName(language)} (${meta.baseUnit}/100g)",
         value = value,
-        onChange = onChange,
+        onValueChange = onChange,
+        required = required,
         numeric = true,
+        range = NumericInputRange(0.0),
     )
 }
 
@@ -400,13 +386,18 @@ private fun FoodEditor(existing: PreparedFood?, editingId: String?, viewModel: N
             )
         },
     ) {
-        SectionHeader(stringResource(R.string.nutrition_editor_section_required))
-        EditorField(stringResource(R.string.nutrition_editor_name) + " *", name, { name = it; markDirty() })
-        Text(stringResource(R.string.nutrition_editor_source_ingredient) + " *", style = MaterialTheme.typography.labelMedium)
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_identity))
+        EditorTextField(stringResource(R.string.nutrition_editor_name), name, { name = it; markDirty() }, required = true)
+        AliasEditor(aliases) { markDirty() }
+        CategoryTagSelector(categoryTags) { categoryTags.clear(); categoryTags.addAll(it); markDirty() }
+        EditorTextField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, showRequirementMarker = false, singleLine = false)
+
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_derivation))
+        Text(stringResource(R.string.nutrition_editor_source_ingredient), style = MaterialTheme.typography.labelMedium)
         OutlinedButton(onClick = { selectingIngredient = true }, modifier = Modifier.fillMaxWidth()) {
             Text(ingredientId?.let { viewModel.foodById(it)?.displayName(language) } ?: stringResource(R.string.nutrition_editor_select_ingredient))
         }
-        Text(stringResource(R.string.nutrition_editor_cooking_method) + " *", style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_cooking_method), style = MaterialTheme.typography.labelMedium)
         // 烹饪方式标签为本地化字符串（非资源 id），直接渲染。
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             methods.forEach { m ->
@@ -417,7 +408,7 @@ private fun FoodEditor(existing: PreparedFood?, editingId: String?, viewModel: N
         // 运行时派生的营养素预览
         Text(stringResource(R.string.nutrition_editor_ratio_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (preview != null) {
-            SectionHeader(stringResource(R.string.nutrition_editor_computed_nutrients))
+            EditorSectionTitle(stringResource(R.string.nutrition_editor_computed_nutrients))
             Surface(shape = RoundedCornerShape(6.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     listOf("ENERGY", "PROTEIN", "FAT", "CHO", "FIBER").forEach { code ->
@@ -432,10 +423,6 @@ private fun FoodEditor(existing: PreparedFood?, editingId: String?, viewModel: N
             }
         }
 
-        SectionHeader(stringResource(R.string.nutrition_editor_section_optional))
-        AliasEditor(aliases) { markDirty() }
-        CategoryTagSelector(categoryTags) { categoryTags.clear(); categoryTags.addAll(it); markDirty() }
-        EditorField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, singleLine = false)
     }
     if (selectingIngredient) {
         IngredientPickerDialog(
@@ -462,26 +449,14 @@ private fun IngredientPickerDialog(
     var keyword by remember { mutableStateOf("") }
     var selectedRoot by remember { mutableStateOf<String?>(null) }
     var selectedChild by remember { mutableStateOf<String?>(null) }
-    val children = selectedRoot?.let { FoodCategories.childrenForRoots(setOf(it)) }.orEmpty()
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                OutlinedTextField(value = keyword, onValueChange = { keyword = it }, label = { Text(stringResource(R.string.nutrition_editor_search_ingredient)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    FoodCategories.roots.forEach { root ->
-                        FilterChip(selected = selectedRoot == root.tag, onClick = { selectedRoot = if (selectedRoot == root.tag) null else root.tag; selectedChild = null }, label = { Text(stringResource(root.labelRes)) })
-                    }
-                }
-                if (children.isNotEmpty()) {
-                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        children.forEach { child ->
-                            FilterChip(selected = selectedChild == child.tag, onClick = { selectedChild = if (selectedChild == child.tag) null else child.tag }, label = { Text(stringResource(child.labelRes)) })
-                        }
-                    }
-                }
+                FoodSearchField(keyword, { keyword = it }, stringResource(R.string.nutrition_editor_search_ingredient))
+                FoodCategoryFilterRows(selectedRoot, selectedChild, { root -> selectedRoot = root; selectedChild = null }, { selectedChild = it })
                 val filtered = ingredients.filter { ing ->
                     val kw = keyword.trim().lowercase()
                     val matchesKw = kw.isEmpty() || ing.searchableNames().any { it.lowercase().contains(kw) }
@@ -549,7 +524,8 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
 
     EditorScaffold(
         dirty = dirty,
-        canSave = name.isNotBlank() && components.isNotEmpty() && components.all { it.grams.toDoubleOrNull() != null },
+        canSave = name.isNotBlank() && components.isNotEmpty() && components.all { it.grams.toDoubleOrNull()?.let { grams -> grams > 0.0 } == true } &&
+            NumericInputRange(1.0).accepts(serves),
         onExit = viewModel::closeEditor,
         onSave = {
             viewModel.saveCustomFood(
@@ -575,9 +551,13 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
             )
         },
     ) {
-        SectionHeader(stringResource(R.string.nutrition_editor_section_required))
-        EditorField(stringResource(R.string.nutrition_editor_name) + " *", name, { name = it; markDirty() })
-        Text(stringResource(R.string.nutrition_ingredient_list) + " *", style = MaterialTheme.typography.labelMedium)
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_identity))
+        EditorTextField(stringResource(R.string.nutrition_editor_name), name, { name = it; markDirty() }, required = true)
+        AliasEditor(aliases) { markDirty() }
+        EditorTextField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, showRequirementMarker = false, singleLine = false)
+
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_components))
+        Text(stringResource(R.string.nutrition_ingredient_list), style = MaterialTheme.typography.labelMedium)
         components.forEachIndexed { index, draft ->
             val item = viewModel.foodById(draft.foodId)
             val label = item?.displayName(language) ?: draft.foodId
@@ -591,6 +571,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
                     value = draft.grams,
                     onValueChange = { components[index] = draft.copy(grams = it); markDirty() },
                     label = { Text(stringResource(R.string.nutrition_editor_component_grams)) },
+                    isError = draft.grams.toDoubleOrNull()?.let { it <= 0.0 } != false,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.width(120.dp),
@@ -602,9 +583,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
             Text(stringResource(R.string.nutrition_editor_add_ingredient))
         }
 
-        SectionHeader(stringResource(R.string.nutrition_editor_section_optional))
-        AliasEditor(aliases) { markDirty() }
-        EditorField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, singleLine = false)
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_presentation))
 
         // 封面图（可选）
         Text(stringResource(R.string.nutrition_editor_image), style = MaterialTheme.typography.labelMedium)
@@ -615,6 +594,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
             }
         }
 
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_dish_profile))
         Text(stringResource(R.string.nutrition_editor_cuisine), style = MaterialTheme.typography.labelMedium)
         // 菜系多级选择（中餐可只选一级）
         val resources = context.resources
@@ -639,9 +619,10 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
         // 难度：10 星整数选择
         Text(stringResource(R.string.nutrition_editor_difficulty), style = MaterialTheme.typography.labelMedium)
         StarRatingPicker(difficulty) { difficulty = it; markDirty() }
-        EditorField(stringResource(R.string.nutrition_editor_serves), serves, { serves = it; markDirty() }, numeric = true)
+        EditorTextField(stringResource(R.string.nutrition_editor_serves), serves, { serves = it; markDirty() }, numeric = true, range = NumericInputRange(1.0))
 
         // 制作教程/菜谱，逐步（可选每步分钟）
+        EditorSectionTitle(stringResource(R.string.nutrition_editor_section_recipe))
         Text(stringResource(R.string.nutrition_editor_recipe), style = MaterialTheme.typography.labelMedium)
         steps.forEachIndexed { index, step ->
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {

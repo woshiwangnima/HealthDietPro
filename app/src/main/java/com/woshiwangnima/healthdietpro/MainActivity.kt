@@ -40,10 +40,23 @@ import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
 import com.woshiwangnima.healthdietpro.model.archive.PlainUserArchiveRepository
+import com.woshiwangnima.healthdietpro.model.archive.SensitiveArchiveCodec
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
+import com.woshiwangnima.healthdietpro.model.food.DishComponentDto
+import com.woshiwangnima.healthdietpro.model.food.FoodAmountDto
+import com.woshiwangnima.healthdietpro.model.food.FoodDerivationDto
+import com.woshiwangnima.healthdietpro.model.food.FoodDto
+import com.woshiwangnima.healthdietpro.model.food.FoodHealthMetricsDto
+import com.woshiwangnima.healthdietpro.model.food.FoodMetricDto
+import com.woshiwangnima.healthdietpro.model.food.FoodNutrientTableDto
+import com.woshiwangnima.healthdietpro.model.food.FoodQuantityDto
+import com.woshiwangnima.healthdietpro.model.food.RecipeStepDto
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRepository
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingAnchor
 import com.woshiwangnima.healthdietpro.ui.nutrition.NutritionScreen
 import com.woshiwangnima.healthdietpro.ui.nutrition.NutritionViewModel
 import com.woshiwangnima.healthdietpro.ui.profile.BmiDetailActivity
@@ -54,6 +67,7 @@ import com.woshiwangnima.healthdietpro.ui.profile.ProfileAvatarBitmapCache
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileUserInfoViewModel
 import com.woshiwangnima.healthdietpro.ui.profile.UserSwitchActivity
 import com.woshiwangnima.healthdietpro.ui.profile.WeightDetailActivity
+import com.woshiwangnima.healthdietpro.ui.profile.CircumferenceDetailActivity
 import com.woshiwangnima.healthdietpro.ui.record.MedicationListActivity
 import com.woshiwangnima.healthdietpro.ui.record.BloodGlucoseActivity
 import com.woshiwangnima.healthdietpro.ui.record.RecordActionId
@@ -114,6 +128,9 @@ class MainActivity : BaseActivity() {
     private val pagePreloader = PagePreloader()
     private val plainUserArchiveRepository by lazy { PlainUserArchiveRepository(this) }
     private var pendingPlainArchiveContent: String? = null
+    private var pendingEncryptedArchive: ByteArray? = null
+    private var pendingArchivePassword: CharArray? = null
+    private var pendingArchiveEncryptedImport = false
 
     private val onboardingLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -127,6 +144,7 @@ class MainActivity : BaseActivity() {
         ActivityResultContracts.StartActivityForResult(),
     ) {
         profileViewModel.refresh()
+        recordViewModel.refresh()
     }
 
     private val userSwitchLauncher = registerForActivityResult(
@@ -134,6 +152,7 @@ class MainActivity : BaseActivity() {
     ) {
         profileViewModel.refresh()
         nutritionViewModel.refreshUser()
+        recordViewModel.refresh()
     }
 
     private val settingsLauncher = registerForActivityResult(
@@ -148,6 +167,7 @@ class MainActivity : BaseActivity() {
         val records = result.bodyRecordsResult() ?: return@registerForActivityResult
         ProfilePrefs.save(this, ProfilePrefs.load(this).copy(heightRecords = records))
         profileViewModel.refresh()
+        recordViewModel.refresh()
     }
 
     private val weightDetailLauncher = registerForActivityResult(
@@ -156,19 +176,34 @@ class MainActivity : BaseActivity() {
         val records = result.bodyRecordsResult() ?: return@registerForActivityResult
         ProfilePrefs.save(this, ProfilePrefs.load(this).copy(weightRecords = records))
         profileViewModel.refresh()
+        recordViewModel.refresh()
+    }
+    private val circumferenceDetailLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        @Suppress("DEPRECATION")
+        val records = CircumferenceDetailActivity.readRecords(result.data?.getSerializableExtra(CircumferenceDetailActivity.EXTRA_RECORDS))
+        if (records.isEmpty() && result.data?.hasExtra(CircumferenceDetailActivity.EXTRA_RECORDS) != true) return@registerForActivityResult
+        ProfilePrefs.save(this, ProfilePrefs.load(this).copy(circumferenceRecords = records))
+        profileViewModel.refresh()
+        recordViewModel.refresh()
     }
 
     private val plainJsonExportLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/json"),
     ) { uri ->
         val archiveContent = pendingPlainArchiveContent
+        val encryptedArchive = pendingEncryptedArchive
         pendingPlainArchiveContent = null
-        if (uri == null || archiveContent == null) return@registerForActivityResult
+        pendingEncryptedArchive = null
+        if (uri == null || (archiveContent == null && encryptedArchive == null)) return@registerForActivityResult
         lifecycleScope.launch {
             val saved = withContext(Dispatchers.IO) {
                 runCatching {
-                    checkNotNull(contentResolver.openOutputStream(uri)).bufferedWriter(Charsets.UTF_8).use {
-                        it.write(archiveContent)
+                    checkNotNull(contentResolver.openOutputStream(uri)).use { output ->
+                        if (encryptedArchive != null) output.write(encryptedArchive)
+                        else output.bufferedWriter(Charsets.UTF_8).use { it.write(requireNotNull(archiveContent)) }
                     }
                 }
             }
@@ -183,12 +218,21 @@ class MainActivity : BaseActivity() {
     private val plainJsonImportLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument(),
     ) { uri ->
-        if (uri == null) return@registerForActivityResult
+        if (uri == null) {
+            pendingArchivePassword?.fill('\u0000')
+            pendingArchivePassword = null
+            pendingArchiveEncryptedImport = false
+            return@registerForActivityResult
+        }
         lifecycleScope.launch {
             val imported = withContext(Dispatchers.IO) {
                 runCatching {
-                    checkNotNull(contentResolver.openInputStream(uri)).bufferedReader(Charsets.UTF_8).use {
-                        it.readText()
+                    checkNotNull(contentResolver.openInputStream(uri)).use { input ->
+                        if (pendingArchiveEncryptedImport) {
+                            SensitiveArchiveCodec().decryptAndDecompress(input.readBytes(), requireNotNull(pendingArchivePassword))
+                        } else {
+                            input.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                        }
                     }
                 }.fold(
                     onSuccess = plainUserArchiveRepository::importIntoCurrentUser,
@@ -199,7 +243,11 @@ class MainActivity : BaseActivity() {
                 profileAvatarBitmapCache.clearCache()
                 profileViewModel.refresh()
                 nutritionViewModel.refreshUser()
+                recordViewModel.refresh()
             }
+            pendingArchivePassword?.fill('\u0000')
+            pendingArchivePassword = null
+            pendingArchiveEncryptedImport = false
             Toast.makeText(
                 this@MainActivity,
                 if (imported.isSuccess) R.string.profile_plain_json_import_success else R.string.profile_plain_json_operation_failed,
@@ -243,6 +291,7 @@ class MainActivity : BaseActivity() {
         } catch (_: Exception) {
         }
         profileViewModel.refresh()
+        recordViewModel.refresh()
     }
 
     override fun onDestroy() {
@@ -310,6 +359,13 @@ class MainActivity : BaseActivity() {
                     RecordScreen(
                         uiState = uiState,
                         onActionClick = ::handleRecordAction,
+                        onQueryChange = recordViewModel::setQuery,
+                        onSubmitQuery = recordViewModel::submitQuery,
+                        onRemoveSearchHistory = recordViewModel::removeSearchHistory,
+                        onClearSearchHistory = recordViewModel::clearSearchHistory,
+                        onOpenRecentAction = ::handleRecordAction,
+                        onRemoveRecentAction = recordViewModel::removeRecentAction,
+                        onClearRecentActions = recordViewModel::clearRecentActions,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -332,10 +388,8 @@ class MainActivity : BaseActivity() {
                         onOpenUserSwitch = {
                             userSwitchLauncher.launch(Intent(this@MainActivity, UserSwitchActivity::class.java))
                         },
-                        onExportPlainJson = ::exportPlainJsonArchive,
-                        onImportPlainJson = {
-                            plainJsonImportLauncher.launch(arrayOf("application/json", "text/plain"))
-                        },
+                        onArchiveAction = ::handleArchiveAction,
+                        onArchivePreview = ::previewArchive,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -344,7 +398,7 @@ class MainActivity : BaseActivity() {
                     if (isVerified) {
                         when (testPage) {
                             TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, Modifier.fillMaxSize())
-                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
+                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                             TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
                             TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
                         }
@@ -421,6 +475,39 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private fun handleArchiveAction(export: Boolean, encrypted: Boolean, password: String) {
+        if (!export) {
+            pendingArchiveEncryptedImport = encrypted
+            pendingArchivePassword = password.toCharArray()
+            plainJsonImportLauncher.launch(arrayOf("application/json", "application/octet-stream", "text/plain"))
+            return
+        }
+        lifecycleScope.launch {
+            val archive = withContext(Dispatchers.IO) { plainUserArchiveRepository.exportCurrentUser() }
+            archive.onSuccess { json ->
+                if (encrypted) {
+                    val passwordChars = password.toCharArray()
+                    pendingEncryptedArchive = try {
+                        SensitiveArchiveCodec().encryptAndCompress(json, passwordChars)
+                    } finally {
+                        passwordChars.fill('\u0000')
+                    }
+                    plainJsonExportLauncher.launch("health-diet-pro-user.hdp")
+                } else {
+                    pendingPlainArchiveContent = json
+                    plainJsonExportLauncher.launch("health-diet-pro-user.json")
+                }
+            }.onFailure { Toast.makeText(this@MainActivity, R.string.profile_plain_json_operation_failed, Toast.LENGTH_SHORT).show() }
+        }
+    }
+
+    private fun previewArchive(onPreview: (String) -> Unit) {
+        lifecycleScope.launch {
+            val archive = withContext(Dispatchers.IO) { plainUserArchiveRepository.exportCurrentUser() }
+            archive.onSuccess(onPreview).onFailure { Toast.makeText(this@MainActivity, R.string.profile_plain_json_operation_failed, Toast.LENGTH_SHORT).show() }
+        }
+    }
+
     private fun addTestWeightRecord() = addTestBodyRecord(isWeight = true)
 
     private fun addTestBodyRecord(isWeight: Boolean) {
@@ -429,6 +516,7 @@ class MainActivity : BaseActivity() {
             date = java.time.LocalDate.now().toString(),
             value = if (isWeight) 67.5f else 170f,
             unit = if (isWeight) "kg" else "cm",
+            recordedAtMillis = System.currentTimeMillis(),
         )
         val updated = if (isWeight) {
             profile.copy(weightRecords = (profile.weightRecords + record).sortedBy { it.date })
@@ -437,6 +525,7 @@ class MainActivity : BaseActivity() {
         }
         ProfilePrefs.save(this, updated)
         profileViewModel.refresh()
+        recordViewModel.refresh()
         Toast.makeText(this, if (isWeight) R.string.test_gm_weight_added else R.string.test_gm_height_added, Toast.LENGTH_SHORT).show()
     }
 
@@ -465,16 +554,85 @@ class MainActivity : BaseActivity() {
             manufacturer = item.manufacturer,
             medicationImagePaths = item.imagePaths,
         ))
+        recordViewModel.refresh()
         Toast.makeText(this, R.string.test_gm_medication_added, Toast.LENGTH_SHORT).show()
     }
 
+    private fun addTestNutritionFoods() {
+        val ingredientId = "custom:test_ingredient"
+        nutritionViewModel.addTestFoods(listOf(
+            FoodDto(
+                id = ingredientId,
+                kind = "ingredient",
+                names = mapOf("zh" to listOf("测试西兰花"), "en" to listOf("Test broccoli")),
+                categoryTags = listOf("food.vegetable"),
+                nutritionTables = mapOf("standard.100g_edible" to FoodNutrientTableDto(
+                    FoodQuantityDto(100.0, "weight", "g"),
+                    mapOf(
+                        "ENERGY" to FoodAmountDto(34.0, "energy", "kcal"),
+                        "PROTEIN" to FoodAmountDto(2.8, "weight", "g"),
+                        "FAT" to FoodAmountDto(0.4, "weight", "g"),
+                        "CHO" to FoodAmountDto(6.6, "weight", "g"),
+                    ),
+                )),
+                healthMetrics = FoodHealthMetricsDto(
+                    glycemicIndex = FoodMetricDto(15.0, "GI"),
+                    glycemicLoadPer100g = FoodMetricDto(1.0, "GL"),
+                    inflammatoryPotential = FoodMetricDto(-0.4, "DII"),
+                ),
+            ),
+            FoodDto(
+                id = "custom:test_food",
+                kind = "food",
+                names = mapOf("zh" to listOf("测试蒸西兰花"), "en" to listOf("Test steamed broccoli")),
+                categoryTags = listOf("food.vegetable"),
+                derivedFrom = FoodDerivationDto(ingredientId, "steamed"),
+            ),
+            FoodDto(
+                id = "custom:test_dish",
+                kind = "dish",
+                names = mapOf("zh" to listOf("测试西兰花拼盘"), "en" to listOf("Test broccoli platter")),
+                components = listOf(DishComponentDto(ingredientId, FoodQuantityDto(200.0, "weight", "g"))),
+                cuisine = "chinese",
+                servesPeople = 2,
+                recipeSteps = listOf(RecipeStepDto("清洗并蒸熟测试西兰花", 8)),
+            ),
+        ))
+        Toast.makeText(this, R.string.test_gm_nutrition_added, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun addYesterdayGlucoseSeries() = addTestGlucoseSeries(daysAgo = 1, messageRes = R.string.test_gm_yesterday_glucose_added)
+    private fun addTodayGlucoseSeries() = addTestGlucoseSeries(daysAgo = 0, messageRes = R.string.test_gm_today_glucose_added)
+
+    private fun addTestGlucoseSeries(daysAgo: Long, messageRes: Int) {
+        ProfilePrefs.createDefaultIfEmpty(this)
+        val dayStart = java.time.LocalDate.now().minusDays(daysAgo).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val repository = BloodGlucoseRepository.fromContext(this)
+        val prefix = "test_glucose_$daysAgo"
+        val random = kotlin.random.Random(System.nanoTime())
+        val records = repository.load().filterNot { it.id.startsWith(prefix) } + (0 until 288).map { index ->
+            val minutes = index * 5
+            val hour = minutes / 60.0
+            val mealResponse = listOf(8.0, 13.0, 19.0).sumOf { mealHour ->
+                2.4 * kotlin.math.exp(-((hour - mealHour) * (hour - mealHour)) / 1.8)
+            }
+            val circadian = 0.35 * kotlin.math.sin((hour - 5.0) * Math.PI / 12.0)
+            val value = ((5.25 + mealResponse + circadian + random.nextDouble(-0.28, 0.28)) * 10.0).toInt() / 10.0
+            BloodGlucoseRecord("${prefix}_$index", dayStart + minutes * 60_000L, value, null, 0, "test")
+        }
+        repository.save(records)
+        recordViewModel.refresh()
+        Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
+    }
+
     private fun handleRecordAction(actionId: RecordActionId) {
+        recordViewModel.recordActionOpened(actionId)
         when (actionId) {
             RecordActionId.Height -> openHeightDetail()
             RecordActionId.Weight -> openWeightDetail()
             RecordActionId.BloodGlucose -> startActivity(Intent(this, BloodGlucoseActivity::class.java))
             RecordActionId.Medication -> startActivity(Intent(this, MedicationListActivity::class.java))
-            RecordActionId.Waist,
+            RecordActionId.Waist -> openCircumferenceDetail()
             RecordActionId.Period,
             RecordActionId.Diet,
             RecordActionId.Water,
@@ -500,6 +658,13 @@ class MainActivity : BaseActivity() {
         weightDetailLauncher.launch(Intent(this, WeightDetailActivity::class.java).apply {
             putExtra("records", ArrayList(profile.weightRecords))
             putExtra("unit", AppPrefs.getUnit(this@MainActivity, UnitCategoryType.Weight.id, UnitCategoryType.Weight.defaultUnitId))
+        })
+    }
+
+    private fun openCircumferenceDetail() {
+        val profile = ProfilePrefs.load(this)
+        circumferenceDetailLauncher.launch(Intent(this, CircumferenceDetailActivity::class.java).apply {
+            putExtra(CircumferenceDetailActivity.EXTRA_RECORDS, java.util.HashMap(profile.circumferenceRecords.mapValues { ArrayList(it.value) }))
         })
     }
 

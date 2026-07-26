@@ -56,6 +56,7 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
     private var editing: BodyRecord? = null
     private var form by mutableStateOf(BodyMetricRecordForm())
     private var originalForm = BodyMetricRecordForm()
+    private var customMetricTitle: String? = null
 
     override fun getTitleText(): String = getString(titleRes())
 
@@ -65,14 +66,15 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
         unitId = intent.getStringExtra(EXTRA_UNIT_ID) ?: if (isHeight) "cm" else "kg"
         category = intent.getStringExtra(EXTRA_CATEGORY) ?: if (isHeight) "length" else "weight"
         position = intent.getIntExtra(EXTRA_POSITION, -1)
+        customMetricTitle = intent.getStringExtra(EXTRA_CUSTOM_METRIC_TITLE)
         @Suppress("DEPRECATION")
         editing = intent.getSerializableExtra(EXTRA_RECORD) as? BodyRecord
         form = initialForm()
         originalForm = form
         setContent {
             HealthDietProTheme {
-                BaseScreen(title = stringResource(titleRes()), onBack = ::requestFormExit) { padding ->
-                    BodyMetricRecordScreen(form, padding, isHeight, category, ::updateForm, ::saveRecord)
+                BaseScreen(title = customMetricTitle ?: stringResource(titleRes()), onBack = ::requestFormExit) { padding ->
+                    BodyMetricRecordScreen(form, padding, isHeight, category, customMetricTitle, ::updateForm, ::saveRecord)
                 }
                 DiscardChangesConfirmation()
             }
@@ -103,7 +105,7 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
                     Activity.RESULT_OK,
                     Intent()
                         .putExtra(EXTRA_POSITION, position)
-                        .putExtra(EXTRA_RECORD, BodyRecord(form.date, UnitConverter.toBase(category, value, form.unitId), form.unitId)),
+                        .putExtra(EXTRA_RECORD, BodyRecord(form.date, UnitConverter.toBase(category, value, form.unitId), form.unitId, bodyRecordEpochMillis(form.date))),
                 )
                 finish()
             }
@@ -127,6 +129,7 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
         const val EXTRA_CATEGORY = "category"
         const val EXTRA_POSITION = "position"
         const val EXTRA_RECORD = "record"
+        const val EXTRA_CUSTOM_METRIC_TITLE = "custom_metric_title"
     }
 }
 
@@ -142,6 +145,7 @@ private fun BodyMetricRecordScreen(
     contentPadding: PaddingValues,
     isHeight: Boolean,
     category: String,
+    customMetricTitle: String?,
     onFormChange: (BodyMetricRecordForm) -> Unit,
     onSave: () -> Unit,
 ) {
@@ -155,7 +159,7 @@ private fun BodyMetricRecordScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                AppFormSubtitle(stringResource(if (isHeight) R.string.body_record_height_help else R.string.body_record_weight_help, form.unitId))
+                AppFormSubtitle(customMetricTitle ?: stringResource(if (isHeight) R.string.body_record_height_help else R.string.body_record_weight_help, form.unitId))
             }
             item {
                 Text(stringResource(R.string.body_record_time), style = MaterialTheme.typography.titleSmall)
@@ -198,7 +202,8 @@ private fun BodyMetricRecordScreen(
             }
         }
         FormSaveBar(
-            text = stringResource(if (isHeight) R.string.body_record_save_height else R.string.body_record_save_weight),
+            text = customMetricTitle?.let { stringResource(R.string.body_record_save_metric, it) }
+                ?: stringResource(if (isHeight) R.string.body_record_save_height else R.string.body_record_save_weight),
             enabled = form.value.toFloatOrNull()?.let { it > 0f } == true,
             onSave = onSave,
         )
@@ -217,7 +222,7 @@ private fun BodyMetricRecordScreen(
 
 private fun bodyMetricUnitOptions(category: String, isChineseLocale: Boolean): List<AppDropdownOption> {
     val ids = when {
-        isChineseLocale && category == "length" -> listOf("cm", "m")
+        isChineseLocale && category == "length" -> listOf("cm", "mm", "m", "chi", "cun", "in")
         isChineseLocale -> listOf("jin", "kg")
         category == "length" -> listOf("cm", "m", "ft", "in")
         else -> listOf("kg", "lb")

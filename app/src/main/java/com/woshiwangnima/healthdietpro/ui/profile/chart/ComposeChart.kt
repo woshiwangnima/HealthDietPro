@@ -13,6 +13,10 @@ import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeChartAxisSpec
 import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeChartPoint
 import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeChartRangeBand
 import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeChartSeries
+import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeChartLinePattern
+import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeChartLineStyle
+import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeChartPointFill
+import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeChartPointShape
 import com.woshiwangnima.healthdietpro.common.ui.chart.ChartDataSeries
 import com.woshiwangnima.healthdietpro.common.ui.chart.NumericChartTickPolicy
 import com.woshiwangnima.healthdietpro.common.ui.chart.TimeChartTickPolicy
@@ -66,6 +70,10 @@ internal fun ComposeChart(
                         ComposeChartPoint(point.timestamp.toDouble(), point.value.toDouble(), point.dateLabel)
                     },
                     color = Color(series.color),
+                    lineStyle = series.lineStyle.toComposeLineStyle(),
+                    linePattern = series.lineType.toComposeLinePattern(),
+                    pointShape = series.pointShape.toComposePointShape(),
+                    pointFill = series.pointFill.toComposePointFill(),
                 )
             },
             yBands = style.yAxisBands.map { band ->
@@ -90,6 +98,35 @@ internal fun ComposeChart(
         onChartStateChanged = onChartStateChanged,
         modifier = modifier,
     )
+}
+
+private fun LineStyle.toComposeLineStyle(): ComposeChartLineStyle = when (this) {
+    LineStyle.LINEAR -> ComposeChartLineStyle.Linear
+    LineStyle.BEZIER -> ComposeChartLineStyle.Bezier
+    LineStyle.SPLINE -> ComposeChartLineStyle.Spline
+    LineStyle.CATMULL_ROM -> ComposeChartLineStyle.CatmullRom
+    LineStyle.MONOTONE -> ComposeChartLineStyle.Monotone
+    LineStyle.STEPPED_FRONT -> ComposeChartLineStyle.SteppedFront
+    LineStyle.STEPPED_BACK -> ComposeChartLineStyle.SteppedBack
+}
+
+private fun LineType.toComposeLinePattern(): ComposeChartLinePattern = when (this) {
+    LineType.SOLID -> ComposeChartLinePattern.Solid
+    LineType.DASHED -> ComposeChartLinePattern.Dashed
+    LineType.DOTTED -> ComposeChartLinePattern.Dotted
+}
+
+private fun PointShape.toComposePointShape(): ComposeChartPointShape = when (this) {
+    PointShape.CIRCLE -> ComposeChartPointShape.Circle
+    PointShape.TRIANGLE -> ComposeChartPointShape.Triangle
+    PointShape.SQUARE -> ComposeChartPointShape.Square
+    PointShape.DIAMOND -> ComposeChartPointShape.Diamond
+    PointShape.CROSS -> ComposeChartPointShape.Cross
+}
+
+private fun PointFill.toComposePointFill(): ComposeChartPointFill = when (this) {
+    PointFill.FILLED -> ComposeChartPointFill.Filled
+    PointFill.HOLLOW -> ComposeChartPointFill.Hollow
 }
 
 internal fun ChartDataSeries.toChartSeries(
