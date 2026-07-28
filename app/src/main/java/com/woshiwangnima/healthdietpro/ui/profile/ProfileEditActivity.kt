@@ -70,6 +70,7 @@ import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.ui.AppTextIconButton
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.disease.AnatomicalTrait
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.AppDate
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
@@ -153,7 +154,7 @@ class ProfileEditActivity : DirtyFormActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        diseaseRepo = DiseaseRepository(this)
+        diseaseRepo = DiseaseRepository.fromContext(this)
         diseaseRepo.loadAll()
         provinceRepo = ProvinceRepository.fromContext(this)
         regionRepo = RegionRepository.fromContext(this)
@@ -173,7 +174,7 @@ class ProfileEditActivity : DirtyFormActivity() {
                         selectedGender = it
                         selectedDiseaseIds.removeAll { id ->
                             diseaseRepo.loadAll().none { disease ->
-                                disease.id == id && (disease.gender?.contains(selectedGender.name) ?: true)
+                                disease.id == id && disease.applicability.allows(selectedGender.anatomicalTraits())
                             }
                         }
                         refreshUiState()
@@ -432,12 +433,12 @@ class ProfileEditActivity : DirtyFormActivity() {
 
     private fun showDiseasePicker() {
         dismissCurrentDialog()
-        val diseases = diseaseRepo.getSorted(selectedRegion.provinceCode.ifEmpty { null })
+        val diseases = diseaseRepo.loadAll()
         val enabled = BooleanArray(diseases.size) { i ->
-            diseases[i].gender?.contains(selectedGender.name) ?: true
+            diseases[i].applicability.allows(selectedGender.anatomicalTraits())
         }
         selectedDiseaseIds.removeAll { id ->
-            diseases.none { it.id == id && (it.gender?.contains(selectedGender.name) ?: true) }
+            diseases.none { it.id == id && it.applicability.allows(selectedGender.anatomicalTraits()) }
         }
         dialogState = ProfileEditDialogState.DiseasePicker(
             items = diseases.mapIndexed { index, disease ->
@@ -954,4 +955,9 @@ private fun ProfileClickableField(
 private fun Gender.displayText(): String = when (this) {
     Gender.MALE -> stringResource(R.string.profile_gender_male)
     Gender.FEMALE -> stringResource(R.string.profile_gender_female)
+}
+
+private fun Gender.anatomicalTraits(): Set<AnatomicalTrait> = when (this) {
+    Gender.MALE -> setOf(AnatomicalTrait.TESTES)
+    Gender.FEMALE -> setOf(AnatomicalTrait.OVARIES)
 }

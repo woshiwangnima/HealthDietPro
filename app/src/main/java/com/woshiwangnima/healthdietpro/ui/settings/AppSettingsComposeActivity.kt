@@ -33,12 +33,10 @@ class AppSettingsComposeActivity : ComponentActivity() {
                             },
                             onOpenTextDisplay = { route = SettingsRoute.TextDisplay },
                             onOpenLanguage = { route = SettingsRoute.Language },
-                            onOpenDisclaimer = { route = SettingsRoute.Disclaimer },
                             onOpenAbout = { route = SettingsRoute.About },
                         )
                         SettingsRoute.TextDisplay -> TextDisplaySettingsScreen { route = SettingsRoute.Root }
                         SettingsRoute.Language -> LanguageSettingsScreen { route = SettingsRoute.Root }
-                        SettingsRoute.Disclaimer -> DisclaimerScreen { route = SettingsRoute.Root }
                         SettingsRoute.About -> AboutScreen { route = SettingsRoute.Root }
                     }
                 }
@@ -51,6 +49,5 @@ private enum class SettingsRoute {
     Root,
     TextDisplay,
     Language,
-    Disclaimer,
     About,
 }

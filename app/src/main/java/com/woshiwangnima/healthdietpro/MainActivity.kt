@@ -42,8 +42,11 @@ import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
 import com.woshiwangnima.healthdietpro.model.archive.PlainUserArchiveRepository
 import com.woshiwangnima.healthdietpro.model.archive.SensitiveArchiveCodec
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
+import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import com.woshiwangnima.healthdietpro.model.profile.formatBodyRecordDateTime
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.model.food.DishComponentDto
 import com.woshiwangnima.healthdietpro.model.food.FoodAmountDto
@@ -398,7 +401,7 @@ class MainActivity : BaseActivity() {
                     if (isVerified) {
                         when (testPage) {
                             TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, Modifier.fillMaxSize())
-                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
+                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTestSearchHistories, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                             TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
                             TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
                         }
@@ -455,7 +458,7 @@ class MainActivity : BaseActivity() {
         switchTab(routeBeforeTest)
     }
 
-    private fun addTestHeightRecord() = addTestBodyRecord(isWeight = false)
+    private fun addTestHeightRecord(count: Int) = addTestBodyRecords(isWeight = false, count = count)
 
     private fun exportPlainJsonArchive() {
         lifecycleScope.launch {
@@ -508,20 +511,25 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun addTestWeightRecord() = addTestBodyRecord(isWeight = true)
+    private fun addTestWeightRecord(count: Int) = addTestBodyRecords(isWeight = true, count = count)
 
-    private fun addTestBodyRecord(isWeight: Boolean) {
+    private fun addTestBodyRecords(isWeight: Boolean, count: Int) {
         val profile = ProfilePrefs.createDefaultIfEmpty(this)
-        val record = BodyRecord(
-            date = java.time.LocalDate.now().toString(),
-            value = if (isWeight) 67.5f else 170f,
-            unit = if (isWeight) "kg" else "cm",
-            recordedAtMillis = System.currentTimeMillis(),
-        )
+        val random = kotlin.random.Random(System.nanoTime())
+        val now = System.currentTimeMillis()
+        val records = List(count) {
+            val timestamp = now - random.nextLong(TEST_DATA_RANGE_MILLIS)
+            BodyRecord(
+                date = formatBodyRecordDateTime(java.time.Instant.ofEpochMilli(timestamp).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()),
+                value = if (isWeight) random.nextDouble(52.0, 82.0).toFloat() else random.nextDouble(150.0, 185.0).toFloat(),
+                unit = if (isWeight) "kg" else "cm",
+                recordedAtMillis = timestamp,
+            )
+        }
         val updated = if (isWeight) {
-            profile.copy(weightRecords = (profile.weightRecords + record).sortedBy { it.date })
+            profile.copy(weightRecords = (profile.weightRecords + records).sortedBy { it.recordedAtMillis })
         } else {
-            profile.copy(heightRecords = (profile.heightRecords + record).sortedBy { it.date })
+            profile.copy(heightRecords = (profile.heightRecords + records).sortedBy { it.recordedAtMillis })
         }
         ProfilePrefs.save(this, updated)
         profileViewModel.refresh()
@@ -529,42 +537,47 @@ class MainActivity : BaseActivity() {
         Toast.makeText(this, if (isWeight) R.string.test_gm_weight_added else R.string.test_gm_height_added, Toast.LENGTH_SHORT).show()
     }
 
-    private fun addTestMedicationRecord() {
+    private fun addTestMedicationRecord(count: Int) {
         ProfilePrefs.createDefaultIfEmpty(this)
-        val catalogId = "test_medication"
-        val catalog = MedicationPrefs.getCatalog(this)
-        val item = catalog.find { it.id == catalogId } ?: MedicationCatalogItem(
-            id = catalogId,
-            name = getString(R.string.test_gm_medication_name),
-            defaultDoseValue = 1f,
-            defaultDoseUnit = getString(R.string.test_gm_medication_unit),
-            defaultMethod = getString(R.string.test_gm_medication_method),
-        ).also { MedicationPrefs.upsertCatalogItem(this, it) }
-        MedicationPrefs.addRecord(this, MedicationRecord(
-            id = "test_${System.currentTimeMillis()}",
-            timestamp = System.currentTimeMillis(),
-            medicationName = item.name,
-            medicationId = item.id,
-            doseValue = item.defaultDoseValue,
-            doseUnit = item.defaultDoseUnit,
-            specValue = item.specValue,
-            specUnitCategory = item.specUnitCategory,
-            specUnitId = item.specUnitId,
-            method = item.defaultMethod,
-            manufacturer = item.manufacturer,
-            medicationImagePaths = item.imagePaths,
-        ))
+        val random = kotlin.random.Random(System.nanoTime())
+        val now = System.currentTimeMillis()
+        repeat(count) { index ->
+            val item = MedicationCatalogItem(
+                id = "test_medication_${now}_$index",
+                name = "测试药品 ${random.nextInt(100, 1000)}",
+                defaultDoseValue = random.nextInt(1, 3).toFloat(),
+                defaultDoseUnit = getString(R.string.test_gm_medication_unit),
+                defaultMethod = getString(R.string.test_gm_medication_method),
+            )
+            MedicationPrefs.upsertCatalogItem(this, item)
+            MedicationPrefs.addRecord(this, MedicationRecord(
+                id = "test_${now}_$index",
+                timestamp = now - random.nextLong(TEST_DATA_RANGE_MILLIS),
+                medicationName = item.name,
+                medicationId = item.id,
+                doseValue = item.defaultDoseValue,
+                doseUnit = item.defaultDoseUnit,
+                specValue = item.specValue,
+                specUnitCategory = item.specUnitCategory,
+                specUnitId = item.specUnitId,
+                method = item.defaultMethod,
+            ))
+        }
         recordViewModel.refresh()
         Toast.makeText(this, R.string.test_gm_medication_added, Toast.LENGTH_SHORT).show()
     }
 
-    private fun addTestNutritionFoods() {
-        val ingredientId = "custom:test_ingredient"
-        nutritionViewModel.addTestFoods(listOf(
-            FoodDto(
+    private fun addTestNutritionFoods(count: Int) {
+        ProfilePrefs.createDefaultIfEmpty(this)
+        val random = kotlin.random.Random(System.nanoTime())
+        val dtos = List(count) { index ->
+            val suffix = "${System.currentTimeMillis()}_${random.nextInt(10_000, 100_000)}_$index"
+            val ingredientId = "custom:test_ingredient_$suffix"
+            listOf(
+                FoodDto(
                 id = ingredientId,
                 kind = "ingredient",
-                names = mapOf("zh" to listOf("测试西兰花"), "en" to listOf("Test broccoli")),
+                names = mapOf("zh" to listOf("测试食材 ${index + 1}"), "en" to listOf("Test ingredient ${index + 1}")),
                 categoryTags = listOf("food.vegetable"),
                 nutritionTables = mapOf("standard.100g_edible" to FoodNutrientTableDto(
                     FoodQuantityDto(100.0, "weight", "g"),
@@ -580,45 +593,62 @@ class MainActivity : BaseActivity() {
                     glycemicLoadPer100g = FoodMetricDto(1.0, "GL"),
                     inflammatoryPotential = FoodMetricDto(-0.4, "DII"),
                 ),
-            ),
-            FoodDto(
-                id = "custom:test_food",
+                ),
+                FoodDto(
+                id = "custom:test_food_$suffix",
                 kind = "food",
-                names = mapOf("zh" to listOf("测试蒸西兰花"), "en" to listOf("Test steamed broccoli")),
+                names = mapOf("zh" to listOf("测试食物 ${index + 1}"), "en" to listOf("Test food ${index + 1}")),
                 categoryTags = listOf("food.vegetable"),
                 derivedFrom = FoodDerivationDto(ingredientId, "steamed"),
-            ),
-            FoodDto(
-                id = "custom:test_dish",
+                ),
+                FoodDto(
+                id = "custom:test_dish_$suffix",
                 kind = "dish",
-                names = mapOf("zh" to listOf("测试西兰花拼盘"), "en" to listOf("Test broccoli platter")),
+                names = mapOf("zh" to listOf("测试菜肴 ${index + 1}"), "en" to listOf("Test dish ${index + 1}")),
                 components = listOf(DishComponentDto(ingredientId, FoodQuantityDto(200.0, "weight", "g"))),
                 cuisine = "chinese",
                 servesPeople = 2,
-                recipeSteps = listOf(RecipeStepDto("清洗并蒸熟测试西兰花", 8)),
-            ),
-        ))
+                recipeSteps = listOf(RecipeStepDto("清洗并蒸熟测试食材", random.nextInt(5, 21))),
+                ),
+            )
+        }.flatten()
+        nutritionViewModel.addTestFoods(dtos)
         Toast.makeText(this, R.string.test_gm_nutrition_added, Toast.LENGTH_SHORT).show()
     }
 
-    private fun addYesterdayGlucoseSeries() = addTestGlucoseSeries(daysAgo = 1, messageRes = R.string.test_gm_yesterday_glucose_added)
-    private fun addTodayGlucoseSeries() = addTestGlucoseSeries(daysAgo = 0, messageRes = R.string.test_gm_today_glucose_added)
+    private fun addTestSearchHistories(count: Int) {
+        ProfilePrefs.createDefaultIfEmpty(this)
+        val random = kotlin.random.Random(System.nanoTime())
+        val entries = buildSet {
+            while (size < count) add("测试搜索词 ${random.nextInt(1000, 10_000)}")
+        }.toList()
+        val encoded = serializeSearchHistory(entries)
+        UserPrefs.current(this).apply {
+            putString("record_search_history_v1", encoded)
+            putString("nutrition_search_history_v1", encoded)
+        }
+        recordViewModel.refresh()
+        nutritionViewModel.refreshUser()
+        Toast.makeText(this, "已为当前用户添加 $count 条随机搜索历史", Toast.LENGTH_SHORT).show()
+    }
 
-    private fun addTestGlucoseSeries(daysAgo: Long, messageRes: Int) {
+    private fun addYesterdayGlucoseSeries(count: Int) = addTestGlucoseSeries(daysAgo = 1, count = count, messageRes = R.string.test_gm_yesterday_glucose_added)
+    private fun addTodayGlucoseSeries(count: Int) = addTestGlucoseSeries(daysAgo = 0, count = count, messageRes = R.string.test_gm_today_glucose_added)
+
+    private fun addTestGlucoseSeries(daysAgo: Long, count: Int, messageRes: Int) {
         ProfilePrefs.createDefaultIfEmpty(this)
         val dayStart = java.time.LocalDate.now().minusDays(daysAgo).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
         val repository = BloodGlucoseRepository.fromContext(this)
-        val prefix = "test_glucose_$daysAgo"
         val random = kotlin.random.Random(System.nanoTime())
-        val records = repository.load().filterNot { it.id.startsWith(prefix) } + (0 until 288).map { index ->
-            val minutes = index * 5
+        val records = repository.load() + (0 until count).map { index ->
+            val minutes = random.nextInt(24 * 60)
             val hour = minutes / 60.0
             val mealResponse = listOf(8.0, 13.0, 19.0).sumOf { mealHour ->
                 2.4 * kotlin.math.exp(-((hour - mealHour) * (hour - mealHour)) / 1.8)
             }
             val circadian = 0.35 * kotlin.math.sin((hour - 5.0) * Math.PI / 12.0)
             val value = ((5.25 + mealResponse + circadian + random.nextDouble(-0.28, 0.28)) * 10.0).toInt() / 10.0
-            BloodGlucoseRecord("${prefix}_$index", dayStart + minutes * 60_000L, value, null, 0, "test")
+            BloodGlucoseRecord("test_glucose_${daysAgo}_${System.nanoTime()}_$index", dayStart + minutes * 60_000L, value, null, 0, "test")
         }
         repository.save(records)
         recordViewModel.refresh()
@@ -700,6 +730,7 @@ class MainActivity : BaseActivity() {
     private companion object {
         const val MAIN_NAV_KEY = "main_nav"
         const val BACK_EXIT_WINDOW_MS = 2_000L
+        const val TEST_DATA_RANGE_MILLIS = 90L * 24 * 60 * 60 * 1_000
         const val ROUTE_NUTRITION = "nutrition"
         const val ROUTE_RECORD = "record"
         const val ROUTE_PROFILE = "profile"

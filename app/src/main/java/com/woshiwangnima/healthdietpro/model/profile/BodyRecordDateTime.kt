@@ -13,7 +13,7 @@ fun parseBodyRecordDateTime(value: String): LocalDateTime {
     return runCatching {
         LocalDateTime.parse(value, BodyRecordDateTimeFormatter)
     }.getOrElse {
-        LocalDate.parse(value.take(10), BodyRecordDateFormatter).atStartOfDay()
+        LocalDate.parse(value, BodyRecordDateFormatter).atStartOfDay()
     }
 }
 
@@ -25,3 +25,17 @@ fun formatBodyRecordDisplayDateTime(value: String): String =
 
 fun bodyRecordEpochMillis(value: String): Long =
     parseBodyRecordDateTime(value).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+/** Upgrades legacy date-only records to the start of their recorded day. */
+internal fun migrateBodyRecordDateTime(record: BodyRecord): BodyRecord {
+    val wasDateOnly = record.date.length == 10
+    val date = formatBodyRecordDateTime(parseBodyRecordDateTime(record.date))
+    val timestamp = if (wasDateOnly || record.recordedAtMillis <= 0L) {
+        bodyRecordEpochMillis(date)
+    } else {
+        record.recordedAtMillis
+    }
+    return if (record.date == date && record.recordedAtMillis == timestamp) record else {
+        record.copy(date = date, recordedAtMillis = timestamp)
+    }
+}

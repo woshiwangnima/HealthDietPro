@@ -85,6 +85,15 @@ object ProfilePrefs {
     private fun migrateArchiveChain(user: UserProfile, context: Context): UserProfile {
         var migrated = user
         val schemaVersion = migrateArchiveSchemaVersion(migrated.archiveSchemaVersion)
+        if (migrated.archiveSchemaVersion == null || migrated.archiveSchemaVersion < ArchiveSchemaVersion.BodyRecordDateTime) {
+            migrated = migrated.copy(
+                heightRecords = migrated.heightRecords.map(::migrateBodyRecordDateTime),
+                weightRecords = migrated.weightRecords.map(::migrateBodyRecordDateTime),
+                circumferenceRecords = migrated.circumferenceRecords.mapValues { (_, records) ->
+                    records.map(::migrateBodyRecordDateTime)
+                },
+            )
+        }
         if (migrated.archiveSchemaVersion != schemaVersion) {
             migrated = migrated.copy(archiveSchemaVersion = schemaVersion)
         }
@@ -329,7 +338,10 @@ fun load(context: Context): UserProfile {
 
     fun createDefaultIfEmpty(context: Context): UserProfile {
         val users = loadUserMap(context)
-        if (users.isNotEmpty()) return users.first()
+        if (users.isNotEmpty()) {
+            val currentUserId = getCurrentUserId(context)
+            return users.firstOrNull { it.id == currentUserId } ?: users.first()
+        }
         val profile = load(context).copy(id = genId())
         save(context, profile)
         return profile

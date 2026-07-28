@@ -60,7 +60,7 @@ private fun CommonUiCategoryList(
     onBack: () -> Unit,
     modifier: Modifier,
 ) {
-    BaseScreen(title = "通用UI功能测试", onBack = onBack) { padding -> Column(
+    BaseScreen(title = "通用UI功能测试", onBack = onBack, includeStatusBarPadding = false) { padding -> Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(padding).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -78,7 +78,7 @@ private fun CommonUiVariantScreen(category: CommonUiTestCategory, onBack: () -> 
     var selectedOption by remember { mutableStateOf("默认选项") }
     var showConfirm by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf(0) }
-    BaseScreen(title = "${category.chineseName}配置测试", onBack = onBack) { padding -> Column(
+    BaseScreen(title = "${category.chineseName}配置测试", onBack = onBack, includeStatusBarPadding = false) { padding -> Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(padding).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -106,9 +106,9 @@ private fun CommonUiVariantScreen(category: CommonUiTestCategory, onBack: () -> 
                 Text("选择不同标签以查看滑动指示条和文字颜色动画。")
                 EqualWidthSegmentedTabs(
                     tabs = listOf(
-                        EqualWidthTab(R.string.nutrition_tab_profile),
-                        EqualWidthTab(R.string.nutrition_tab_ranking),
-                        EqualWidthTab(R.string.nutrition_tab_estimate),
+                        EqualWidthTab.text("概览"),
+                        EqualWidthTab.text("排行"),
+                        EqualWidthTab.text("估算"),
                     ),
                     selectedIndex = selectedTab,
                     onSelected = { selectedTab = it },

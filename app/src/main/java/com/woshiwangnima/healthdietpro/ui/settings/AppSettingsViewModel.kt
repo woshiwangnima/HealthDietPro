@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.HealthDietProApplication
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.cache.AppCacheRegistry
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +70,9 @@ internal class AppSettingsViewModel(application: Application) : AndroidViewModel
     private fun formatStorageSize(bytes: Long): String {
         val repo = UnitConverter.getRepository() ?: return formatLegacy(bytes)
         val storage = repo.getCategory(UnitCategoryType.Storage.id) ?: return formatLegacy(bytes)
-        val best = storage.units.lastOrNull { bytes >= it.toBase }
+        val preferredUnitId = AppPrefs.getUnit(getApplication(), UnitCategoryType.Storage.id, storage.baseUnit)
+        val best = storage.units.firstOrNull { it.id == preferredUnitId }
+            ?: storage.units.lastOrNull { bytes >= it.toBase }
             ?: storage.units.firstOrNull()
             ?: return formatLegacy(bytes)
         val converted = UnitConverter.fromBase(UnitCategoryType.Storage.id, bytes.toFloat(), best.id)

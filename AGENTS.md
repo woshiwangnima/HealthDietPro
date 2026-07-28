@@ -1,6 +1,6 @@
 # AGENTS.md
 
-HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 模块。完整设计见 `README.md` 与 `docs/DESIGN.md`。本文件只列硬约束与验证命令。
+HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 模块。完整设计见 `README.md` 与 `docs/DESIGN.md`。本文件只列硬约束。
 
 ## 技术栈
 
@@ -44,6 +44,12 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - 静态数据模块只读；所有写操作走存档模块。
 - 每用户隔离状态经 `ProfilePrefs.makeChartStateKey(baseKey)` 构造 `_<userId>` 后缀。
 - 空 `chartStateKey` 不持久化（一次性图表）。
+- 疾病与健康状况静态目录仅由 `DiseaseRepository` 读取；`diseases.json` 的 `categories`、`departments`、`sources` 为全局注册表，条目只能引用稳定 ID，不得内联重复的科室或分类对象。
+- 疾病条目必须声明 `clinicalKind`、至少一个 `categoryIds`、一个或多个 `careDepartmentIds`、来源 ID、中英文正名/医学简介，以及一个或多个带映射关系的 ICD-11 引用。ICD-11 引用的 `release` 必须与其目录来源记录的 `version` 一致；分类编码仅供检索参考，不能作为诊断结论。
+- 疾病搜索必须覆盖稳定 ID、ICD-11 编码、请求语言的正名和别名；分类/病程/科室查询均通过 Repository，不允许 UI 扫描 JSON。
+- 疾病适用性使用 `SexApplicability.requiredAnatomicalTraits`，不得以性别身份字符串决定医学适用条件。现有用户 `Gender` 是过渡映射；扩展用户性别系统时必须保持疾病稳定 ID 和适用性模型兼容。
+- 疾病营养建议仅使用 `INCREASE`、`FREE`、`LIMIT`、`STRICT_LIMIT`、`FORBID` 五级标识，供食材/食物/菜肴营养素标注；不得表述为诊断或个体化治疗处方。
+- 不保存或展示缺少可核验来源、年份和人群口径的地区患病率；疾病目录不含地区患病率字段或地区排序。
 - 食物三分类（`FoodKind`）：`INGREDIENT`(食材) / `FOOD`(食物) / `DISH`(菜肴)，与 `categoryTags` 正交。设计契约见 `docs/NUTRITION_TABLE_DESIGN.md` §Three-Tier Food Classification。
 - `食材` 营养表恒为 **每 100g 可食部**；可食部比例走结构化 `edibleRatio`（`edibleGrams = purchasedGrams * edibleRatio`），不再靠 `FoodMetric.basis` 文本表达。
 - `食物 = 食材 + 烹饪方式`：`PreparedFood` 只存 `derivedFrom{ingredientId, cookingMethodId}`，营养表**运行时派生**（`NutritionResolver`），JSON 不存派生表；`nutrientOverrides` 仅用于个别营养素手工校正。
@@ -71,6 +77,12 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - 公开 API 优先 `internal`，仅跨模块必需时 `public`。
 - 不加注释除非必要。
 
+## 临时测试界面
+
+- `ui/test/` 下的测试界面仅供开发验证，功能开发完成后删除。
+- 测试界面不要求本地化，可直接使用硬编码测试文案；正式业务界面仍必须遵守三套资源本地化规范。
+- 测试数据必须仍通过当前用户的存档入口写入，禁止绕过用户隔离或写入静态数据模块。
+
 ## Compose 设置行 / 可点击条目规范
 
 迁移到 Compose 的设置类屏（`AppSettingsScreen` / `PreferencesScreen` / 后续所有列表式可点击条目）必须遵守：
@@ -83,40 +95,6 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - **本地化**：所有文本必须走 `stringResource` + `values/` `values-en/` `values-zh/` 三套，禁止 Composable 内硬编码中文字面量。
 - **防呆确认**：破坏性 / 不可逆动作（清除缓存、删除用户等）点击后必须先弹 `AlertDialog` 二次确认，禁止直接执行。
 - **复用**：通过 `common/ui/SettingRow.kt` 的 `SettingRow` Composable 统一渲染，新增条目优先复用而非另造。
-
-## 测试要求
-
-- 纯算法（`BmiUtil` / `ChartMath` / `PointInPolygon`）与 Repository（`fromAsset` 入口）必须有 JVM 单测，无 Android 依赖。
-- 新增纯逻辑（算法 / Repository 查询）必须配单测。
-- 验证不变量：`BodyRecord` 基准单位、`deleteUser` 级联完整性、`UnitConverter` 双向换算闭环。
-
-## 验证命令
-
-```bash
-./gradlew assembleDebug      # 构建
-./gradlew test               # JVM 单测
-./gradlew lint               # Android lint
-./gradlew installDebug       # 安装
-```
-
-Windows / OpenCode 环境若 `JAVA_HOME` 未设置，使用 Android Studio 自带 JBR，仅在当前命令进程内设置环境变量，不修改系统环境：
-
-```powershell
-$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat assembleDebug
-$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat test
-$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat lint
-$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat installDebug
-```
-
-同一工作区不得并行运行 Gradle（包括把 `test` 与 `lint` 同时启动）。并发 Kotlin 编译会争用 `app/build/kotlin/.../cacheable` 增量缓存，触发 daemon 的 `Storage ... is already registered` 回退编译并显著卡顿。验证时按顺序执行，先用 `--stop` 清理遗留 daemon：
-
-```powershell
-$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat --stop
-$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat test
-$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; .\gradlew.bat lint
-```
-
-完成任何改动后必须跑 `test` + `lint`；无法确定命令时问用户并写回本文件。
 
 ## Compose 迁移规则
 

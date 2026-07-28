@@ -34,7 +34,6 @@ internal fun AppSettingsScreen(
     onBack: () -> Unit,
     onOpenTextDisplay: () -> Unit,
     onOpenLanguage: () -> Unit,
-    onOpenDisclaimer: () -> Unit,
     onOpenAbout: () -> Unit,
     viewModel: AppSettingsViewModel = viewModel(),
 ) {
@@ -181,16 +180,9 @@ internal fun AppSettingsScreen(
             )
             HorizontalDivider()
             SettingRow(
-                title = stringResource(R.string.settings_disclaimer),
-                subtitle = stringResource(R.string.settings_disclaimer_desc),
-                leadingIconRes = R.drawable.ic_help,
-                onClick = onOpenDisclaimer,
-            )
-            HorizontalDivider()
-            SettingRow(
                 title = stringResource(R.string.settings_about),
                 subtitle = stringResource(R.string.settings_about_desc),
-                leadingIconRes = R.drawable.ic_settings,
+                leadingIconRes = R.drawable.ic_info,
                 onClick = onOpenAbout,
             )
         }

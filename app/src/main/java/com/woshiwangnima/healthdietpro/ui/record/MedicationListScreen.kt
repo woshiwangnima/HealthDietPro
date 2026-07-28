@@ -243,12 +243,17 @@ private fun MedicationRecordTable(
             AppDataTableColumn<MedicationRecord>(
                 key = "time",
                 header = { AppDataTableHeaderText(stringResource(R.string.medication_record_time)) },
-                width = ColumnWidth.Fixed(136.dp),
-            ) { record -> AppDataTableText(formatDateTime(record.timestamp)) },
+                width = ColumnWidth.Fixed(112.dp),
+            ) { record ->
+                Text(
+                    text = formatDateTime(record.timestamp),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            },
             AppDataTableColumn<MedicationRecord>(
                 key = "name",
                 header = { AppDataTableHeaderText(stringResource(R.string.medication_record_name)) },
-                width = ColumnWidth.Flex(weight = 1.4f, min = 160.dp, max = 260.dp),
+                width = ColumnWidth.Flex(weight = 1.6f, min = 184.dp, max = 300.dp),
             ) { record -> AppDataTableText(record.medicationName, overflow = column.overflow) },
             AppDataTableColumn<MedicationRecord>(
                 key = "dose",
@@ -271,19 +276,21 @@ private fun MedicationRecordTable(
             compactAt = 600.dp,
             compactHeader = {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    AppDataTableHeaderText(stringResource(R.string.medication_record_time), Modifier.width(132.dp))
+                    AppDataTableHeaderText(stringResource(R.string.medication_record_time), Modifier.width(108.dp))
                     AppDataTableHeaderText(stringResource(R.string.medication_record_name), Modifier.weight(1f))
                     AppDataTableHeaderText(stringResource(R.string.medication_record_actions))
                 }
             },
             compactRow = { record -> CompactMedicationRow(record, onDelete) },
         ),
-        actionsWidth = 104.dp,
+        actionsWidth = 76.dp,
         actionsHeader = { AppDataTableHeaderText(stringResource(R.string.medication_record_actions)) },
         rowActions = { record ->
             AppDataTableDeleteAction(
                 text = stringResource(R.string.body_record_delete),
                 onClick = { onDelete(record) },
+                iconSize = 14.dp,
+                textStyle = MaterialTheme.typography.labelSmall,
             )
         },
         onRowClick = onEdit,
@@ -294,28 +301,33 @@ private fun MedicationRecordTable(
 private fun CompactMedicationRow(record: MedicationRecord, onDelete: (MedicationRecord) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            AppDataTableText(
+            Text(
                 text = formatDateTime(record.timestamp),
+                modifier = Modifier.width(108.dp),
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.width(132.dp),
+                maxLines = 1,
             )
             AppDataTableText(record.medicationName, modifier = Modifier.weight(1f))
             AppDataTableDeleteAction(
                 text = stringResource(R.string.body_record_delete),
                 onClick = { onDelete(record) },
+                iconSize = 14.dp,
+                textStyle = MaterialTheme.typography.labelSmall,
             )
         }
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Spacer(modifier = Modifier.width(132.dp))
-            AppDataTableText(
+            Spacer(modifier = Modifier.width(108.dp))
+            Text(
                 text = listOf(formatDose(record), record.method).filter { it.isNotBlank() }.joinToString(" / "),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         formatFeeling(record).takeIf { it.isNotBlank() }?.let { feeling ->
             Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.width(132.dp))
+                Spacer(modifier = Modifier.width(108.dp))
                 AppDataTableText(
                     text = feeling,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

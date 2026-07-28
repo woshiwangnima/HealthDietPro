@@ -9,7 +9,7 @@ class RecordViewModelTest {
 
     @Test
     fun `initial state exposes record sections and enabled actions`() {
-        val state = RecordViewModel().uiState.value
+        val sections = defaultRecordSections()
 
         assertEquals(
             listOf(
@@ -19,7 +19,7 @@ class RecordViewModelTest {
                 RecordActionId.Waist,
                 RecordActionId.Period,
             ),
-            state.sections[0].items.map { it.id },
+            sections[0].items.map { it.id },
         )
         assertEquals(
             listOf(
@@ -31,14 +31,14 @@ class RecordViewModelTest {
                 RecordActionId.Medication,
                 RecordActionId.Habit,
             ),
-            state.sections[1].items.map { it.id },
+            sections[1].items.map { it.id },
         )
-        assertEquals(listOf(RecordActionId.Feeling), state.sections[2].items.map { it.id })
+        assertEquals(listOf(RecordActionId.Feeling), sections[2].items.map { it.id })
 
-        assertTrue(state.sections[0].items.first { it.id == RecordActionId.Height }.enabled)
-        assertTrue(state.sections[0].items.first { it.id == RecordActionId.Weight }.enabled)
-        assertTrue(state.sections[0].items.first { it.id == RecordActionId.BloodGlucose }.enabled)
-        assertTrue(state.sections[1].items.first { it.id == RecordActionId.Medication }.enabled)
-        assertFalse(state.sections[1].items.first { it.id == RecordActionId.Diet }.enabled)
+        assertTrue(sections[0].items.first { it.id == RecordActionId.Height }.enabled)
+        assertTrue(sections[0].items.first { it.id == RecordActionId.Weight }.enabled)
+        assertTrue(sections[0].items.first { it.id == RecordActionId.BloodGlucose }.enabled)
+        assertTrue(sections[1].items.first { it.id == RecordActionId.Medication }.enabled)
+        assertFalse(sections[1].items.first { it.id == RecordActionId.Diet }.enabled)
     }
 }

@@ -1,6 +1,7 @@
 package com.woshiwangnima.healthdietpro.ui.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -427,29 +428,45 @@ private fun BmiDataPage(
             columns = listOf(
                 AppDataTableColumn<DataPoint>(
                     key = "date",
-                    header = { AppDataTableHeaderText(stringResource(R.string.body_record_date)) },
-                    width = ColumnWidth.Fixed(120.dp),
+                    header = { AppDataTableHeaderText(stringResource(R.string.body_record_table_time)) },
+                    width = ColumnWidth.Fixed(156.dp),
                 ) { point ->
-                    AppDataTableText(point.dateLabel)
+                    AppDataTableText(formatBmiRecordTime(point.timestamp))
                 },
                 AppDataTableColumn<DataPoint>(
                     key = "bmi",
                     header = { AppDataTableHeaderText(stringResource(R.string.bmi_title)) },
                     width = ColumnWidth.Fixed(112.dp),
                 ) { point ->
-                    AppDataTableText("%.1f".format(point.value))
+                    BmiDataChip("%.1f".format(point.value), point.value)
                 },
                 AppDataTableColumn<DataPoint>(
                     key = "category",
                     header = { AppDataTableHeaderText(stringResource(R.string.bmi_reference_category)) },
                     width = ColumnWidth.Flex(weight = 1f, min = 120.dp),
                 ) { point ->
-                    AppDataTableText(bmiLabel(point.value, labels))
+                    BmiDataChip(bmiLabel(point.value, labels), point.value)
                 },
             ),
         )
     }
 }
+
+@Composable
+private fun BmiDataChip(text: String, bmi: Float) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = Color(BmiUtil.getBmiColor(bmi)).copy(alpha = 1f),
+        modifier = Modifier
+            .background(Color(BmiUtil.getBmiColor(bmi)).copy(alpha = 0.18f), RoundedCornerShape(4.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp),
+    )
+}
+
+private fun formatBmiRecordTime(timestamp: Long): String =
+    LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault())
+        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
 
 private fun BmiUtil.BmiBand.rangeText(): String = when {
     min < 0f -> "< ${max.formatBmiBoundary()}"

@@ -124,7 +124,7 @@ internal class ProfileUserInfoViewModel(
 
     private fun resolveDiseaseText(profile: UserProfile): String {
         if (profile.diseaseIds.isEmpty()) return ""
-        val diseases = DiseaseRepository(getApplication()).loadAll()
+        val diseases = DiseaseRepository.fromContext(getApplication()).loadAll()
         val locale = Locale.getDefault()
         return profile.diseaseIds.joinToString("、") { id ->
             diseases.find { it.id == id }?.displayName(locale) ?: id

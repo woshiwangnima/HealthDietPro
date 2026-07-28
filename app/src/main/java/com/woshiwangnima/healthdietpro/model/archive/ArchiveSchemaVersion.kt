@@ -41,7 +41,8 @@ data class ArchiveSchemaVersion(
         val LegacyV2 = ArchiveSchemaVersion(0, 0, 2)
         val LegacyV3 = ArchiveSchemaVersion(0, 0, 3)
         val CircumferenceRecords = ArchiveSchemaVersion(1, 0, 1)
-        val Current = CircumferenceRecords
+        val BodyRecordDateTime = ArchiveSchemaVersion(1, 0, 2)
+        val Current = BodyRecordDateTime
     }
 }
 
@@ -60,8 +61,8 @@ internal fun migrateArchiveSchemaVersion(
     if (migrated < ArchiveSchemaVersion.LegacyV1) migrated = ArchiveSchemaVersion.LegacyV1
     if (migrated < ArchiveSchemaVersion.LegacyV2) migrated = ArchiveSchemaVersion.LegacyV2
     if (migrated < ArchiveSchemaVersion.LegacyV3) migrated = ArchiveSchemaVersion.LegacyV3
-    if (migrated < ArchiveSchemaVersion.Current) migrated = ArchiveSchemaVersion.Current
     if (migrated < ArchiveSchemaVersion.CircumferenceRecords) migrated = ArchiveSchemaVersion.CircumferenceRecords
+    if (migrated < ArchiveSchemaVersion.BodyRecordDateTime) migrated = ArchiveSchemaVersion.BodyRecordDateTime
     return migrated
 }
 

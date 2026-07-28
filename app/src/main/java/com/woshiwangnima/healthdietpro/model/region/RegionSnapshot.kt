@@ -3,7 +3,7 @@ package com.woshiwangnima.healthdietpro.model.region
 /**
  * 用户存盘的完整地区信息：经纬度 + 三级行政区划。
  * 旧字段 `province` 在 [com.woshiwangnima.healthdietpro.model.profile.UserProfile] 仍存
- * 2 位省代码用于疾病 prevalence；新数据通过本扩展字段补全省/市/县三级 + 坐标。
+ * 新数据通过本扩展字段补全省/市/县三级 + 坐标。
  */
 data class RegionSnapshot(
     val lng: Double = 0.0,

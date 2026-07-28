@@ -11,8 +11,8 @@ class BodyRecordSerializationTest {
     @Test
     fun javaSerializationPreservesBaseValueAndSelectedUnit() {
         val records = arrayListOf(
-            BodyRecord("2026-07-19 08:30", 170.18f, "m"),
-            BodyRecord("2026-07-19 08:30", 68.04f, "lb"),
+            BodyRecord("2026-07-19 08:30", 170.18f, "m", 1_784_447_400_000),
+            BodyRecord("2026-07-19 08:30", 68.04f, "lb", 1_784_447_400_000),
         )
 
         val bytes = ByteArrayOutputStream().use { output ->

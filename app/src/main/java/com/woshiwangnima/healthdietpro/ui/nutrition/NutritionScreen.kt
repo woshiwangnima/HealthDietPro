@@ -159,16 +159,25 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
     var searchFocused by remember { mutableStateOf(false) }
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val showSidebar = state.selectedKind != FoodKind.DISH
-    Column(modifier = modifier.fillMaxSize().padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    val showSearchActivity = searchFocused && state.keyword.isBlank() &&
+        (state.searchHistory.isNotEmpty() || state.recentFoodIds.isNotEmpty())
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val contentModifier = if (showSearchActivity) {
+        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(10.dp)
+    } else {
+        modifier.fillMaxSize().padding(10.dp)
+    }
+    Column(modifier = contentModifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         FoodSearchField(state.keyword, viewModel::setKeyword, stringResource(R.string.nutrition_search_food), onSearch = { }, onFocusChanged = { searchFocused = it })
-        if (searchFocused && state.keyword.isBlank() && (state.searchHistory.isNotEmpty() || state.recentFoodIds.isNotEmpty())) {
+        if (showSearchActivity) {
             val recent = state.recentFoodIds.mapNotNull { id -> viewModel.foodById(id) }.map { food ->
                 RecentSearchItem(food.id, food.displayName(language), when (food.kind) { FoodKind.INGREDIENT -> R.drawable.ic_food_ingredient; FoodKind.FOOD -> R.drawable.ic_nav_nutrition; FoodKind.DISH -> R.drawable.ic_food_dish })
             }
             SearchActivityPanel(state.searchHistory, recent, stringResource(R.string.nutrition_search_history), stringResource(R.string.nutrition_click_history), { viewModel.setKeyword(it) }, viewModel::removeSearchHistory, viewModel::clearSearchHistory, { item -> viewModel.foodById(item.id)?.let(viewModel::openFood) }, { item -> viewModel.removeRecentFood(item.id) }, viewModel::clearRecentFoods, { searchFocused = false; focusManager.clearFocus() })
         }
         KindSegmenter(state.selectedKind, viewModel::selectKind)
-        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        val browseAreaModifier = if (showSearchActivity) Modifier.height(screenHeight) else Modifier.weight(1f)
+        Row(modifier = browseAreaModifier, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             // 左列：由上至下为「添加自定义XX」按钮 + 「自定义XX」与其他一级分类组合区域，同宽。
             if (showSidebar) {
                 Column(modifier = Modifier.width(80.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -482,6 +491,8 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
                     },
                 ),
                 rowKey = { _, row -> row.key },
+                showRowNumber = false,
+                showPager = false,
                 modifier = Modifier.fillMaxWidth().height(154.dp),
             )
             DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_nutrients), Modifier.padding(top = 12.dp))
@@ -498,6 +509,8 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
                     AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount)) }, ColumnWidth.Flex(1f, 110.dp)) { AppDataTableText(it.value) },
                 ),
                 rowKey = { _, row -> row.key },
+                showRowNumber = false,
+                showPager = false,
                 modifier = Modifier.fillMaxWidth().height(240.dp),
             )
             if (relatedDishes.isNotEmpty()) {

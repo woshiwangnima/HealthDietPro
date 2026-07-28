@@ -228,7 +228,7 @@ private fun BodyMetricRecordTable(
             rows = rows,
             rowKey = { _, row -> row.sourceIndex },
             columns = listOf(
-                AppDataTableColumn("time", { AppDataTableHeaderText(stringResource(R.string.body_record_time)) }, ColumnWidth.Fixed(156.dp)) { AppDataTableText(formatBodyRecordDisplayDateTime(it.record.date)) },
+                AppDataTableColumn("time", { AppDataTableHeaderText(stringResource(R.string.body_record_table_time)) }, ColumnWidth.Fixed(156.dp)) { AppDataTableText(it.record.date) },
                 AppDataTableColumn("value", { AppDataTableHeaderText(stringResource(R.string.body_record_value)) }, ColumnWidth.Fixed(120.dp)) { AppDataTableText("%.1f".format(UnitConverter.fromBase(category, it.record.value, unitId))) },
                 AppDataTableColumn("unit", { AppDataTableHeaderText(stringResource(R.string.body_record_unit)) }, ColumnWidth.Fixed(96.dp)) { AppDataTableText(unitId) },
             ),

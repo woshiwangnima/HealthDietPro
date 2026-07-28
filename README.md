@@ -40,7 +40,7 @@
 |------|------|----------|------|
 | **单位切换** | 7 类 76 单位基准↔用户单位换算与本地化格式（含 ft/in）+ 单位选择 | `UnitConverter` | 已实现 |
 | **GPS 定位** | 无 GMS 单次定位（4s 超时、权限预检、最后已知兜底） | `CurrentLocationProvider` | 已实现（协程化为迁移项） |
-| **疾病系统** | 疾病 UI（选择 + 地区患病率 + 营养建议渲染）+ 性别过滤；模型/数据在静态数据模块 | 疾病 UI（原 `NutritionFragment` stub） | 模型已实现+单测；UI 待实现 |
+| **疾病与健康状况系统** | 静态目录、ICD-11 映射、分类、适用性、就诊科室、代码/本地化名称检索及营养规则 | `DiseaseRepository`、疾病目录 UI（待建） | 目录模型与查询已实现；UI 待实现 |
 | **个人信息** | 体征记录与详情，3 小模块：**身高** / **体重** / **BMI** | `Height/Weight/BmiDetailActivity`、`BmiUtil`、`BmiReferenceView`、`BmiCalculatorView` | 已实现（XML，待 Compose） |
 | **营养表系统** | 食物分类树 + 营养表浏览 + 每日饮食记录与摄入汇总 + 自定义食物 + 营养目标 + OCR/扫码 | 待建 | 待实现（绿地） |
 
@@ -72,8 +72,7 @@
 ### 跨模块依赖
 
 ```
-静态数据只读 ◀── 单位切换 / 疾病系统 / 个人信息 / 营养表系统 / 图表渲染
-GPS 定位 ──▶ 静态数据（地区 resolve） ──▶ 疾病系统（省份码→患病率）
+静态数据只读 ◀── 单位切换 / 疾病与健康状况 / 个人信息 / 营养表系统 / 图表渲染
 疾病系统（营养素+建议） ──▶ 营养表系统（摄入对照）
 图表渲染 ◀── 个人信息 / 营养表系统
 存档模块 ◀── 个人信息 / 界面模块 / Tab 控件
@@ -87,7 +86,7 @@ GPS 定位 ──▶ 静态数据（地区 resolve） ──▶ 疾病系统（�
 | 资源 | 内容 |
 |------|------|
 | `units.json` | 7 类共 76 个单位（长度/质量/体积/密度/时间/能量/存储），基准单位 cm、kg、l、g_ml、s、kcal、b |
-| `diseases.json` | 12 种疾病（高血压、2 型糖尿病、血脂异常、PCOS 仅女性、脂肪肝、冠心病、慢性肾病、OSA、骨关节炎、高尿酸血症、甲状腺功能减退、偏头痛），含地区患病率与营养建议 |
+| `diseases.json` | 12 条疾病与健康状况目录；全局分类、就诊科室和来源注册表，条目含中英文正名/别名/医学简介、ICD-11 映射、病程、适用性与五级营养规则 |
 | `provinces.json` | 34 省简化边界矩形 + 质心 |
 | `regions.json` | ~136 行市/区质心（无省级） |
 | `chart_time_config.json` | 时间范围 / 间隔 / 自动间隔阈值规则 |
@@ -120,8 +119,14 @@ Repository 模式：按需求懒加载、内存缓存，查找通过预建索引
 ### GPS 定位模块
 无 GMS 单次 GPS 定位：优先 `GPS_PROVIDER` → 次选 `NETWORK_PROVIDER` → 兜底 `PASSIVE_PROVIDER.getLastKnownLocation`，4 秒超时 + consumed guard 防双触发，权限预检 + `SecurityException` 兜底。
 
-### 疾病系统模块
-12 疾病按地区患病率降序排序（`DiseaseRepository.getSorted`，省份缺失按全国平均回退），性别过滤适用性（如 PCOS 仅女性）。**疾病→营养建议 UI 待实现**：疾病选择 + 患病率展示 + 营养建议渲染（原 `NutritionFragment` stub）。
+### 疾病与健康状况系统模块
+`diseases.json` 是只读目录包络，包含全局 `categories`、`departments`、`sources` 与疾病条目；科室和分类由稳定 ID 引用，避免条目内重复的多语言对象。条目通过 `clinicalKind` 区分疾病、综合征、风险状态和检验异常，保留既有稳定 ID 以兼容用户疾病史存档。
+
+`DiseaseRepository` 懒加载并预建 ID 索引，提供 `findById`、`findByIcd11Code`、`search(query, locale)`、`getByCategory`、`getByCourse` 和 `getByDepartment`。搜索覆盖稳定 ID、ICD-11 编码、当前本地化正名及其别名；目前无地区患病率字段或地区排序逻辑。
+
+ICD-11 映射以 WHO MMS `2025-01` 为固定版本，每条允许多个映射并以 `PRIMARY`、`BROADER_TERM`、`DIFFERENTIAL` 标示关系；映射仅为分类和检索参考，不能用于诊断。性别适用性不绑定用户性别身份，使用生理相关 `AnatomicalTrait` 条件（例如 PCOS 要求 `OVARIES`）；现有资料页的二元 `Gender` 仅是过渡映射，后续扩展用户性别系统时不改变疾病资产。
+
+营养建议保持 `INCREASE`、`FREE`、`LIMIT`、`STRICT_LIMIT`、`FORBID` 五级简单规则，供营养表按食材/食物/菜肴的营养素标注使用，不构成个体化饮食处方。疾病目录、详情、分类筛选和营养建议渲染 UI 待实现。
 
 ### 个人信息模块
 - **身高 / 体重**：详情双 Tab（图表/数据），`ToggleBar` 共享控件，记录增删改通过 `onRecordsChanged` 回流，保存前 `UnitConverter.toBase` 保证存档恒为基础单位。
@@ -188,7 +193,7 @@ app/src/main/java/com/woshiwangnima/healthdietpro/
 
 ### 待实现
 
-- [ ] **疾病系统** UI（疾病选择 + 患病率 + 营养建议渲染）
+- [ ] **疾病与健康状况系统** UI（目录、代码/本地化名称搜索、分类筛选、详情与营养建议渲染）
 - [ ] **营养表系统**：食物分类树 + 营养表浏览 + 每日饮食记录 + 自定义食物 + 营养目标 + OCR/扫码
 - [ ] **多层 Tag**：GameplayTag 式层级标签系统
 - [ ] `MultiLevelTabCoordinator` 与 `RecordHistory` 在生产屏接入

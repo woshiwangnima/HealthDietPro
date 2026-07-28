@@ -32,7 +32,6 @@ class ComposePreviewActivity : ComponentActivity() {
                             onBack = { navController.popBackStack() },
                             onOpenTextDisplay = { },
                             onOpenLanguage = { },
-                            onOpenDisclaimer = { },
                             onOpenAbout = { },
                         )
                     }

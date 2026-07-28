@@ -23,7 +23,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-data class EqualWidthTab(@param:StringRes val titleRes: Int, @param:DrawableRes val iconRes: Int? = null)
+data class EqualWidthTab(
+    @param:StringRes val titleRes: Int,
+    @param:DrawableRes val iconRes: Int? = null,
+    val title: String? = null,
+) {
+    companion object {
+        fun text(title: String, @DrawableRes iconRes: Int? = null) = EqualWidthTab(0, iconRes, title)
+    }
+}
 
 @Composable
 fun EqualWidthSegmentedTabs(
@@ -56,7 +64,12 @@ fun EqualWidthSegmentedTabs(
             ) { contentColor ->
                 Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                     tab.iconRes?.let { Icon(painterResource(it), null, modifier = Modifier.size(16.dp), tint = contentColor) }
-                    Text(text = stringResource(tab.titleRes), textAlign = TextAlign.Center, style = MaterialTheme.typography.labelLarge, color = contentColor)
+                    Text(
+                        text = tab.title ?: stringResource(tab.titleRes),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = contentColor,
+                    )
                 }
             }
         }

@@ -28,6 +28,8 @@ import com.woshiwangnima.healthdietpro.model.food.UserFoodTag
 import com.woshiwangnima.healthdietpro.model.food.UserFoodTagRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
+import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
+import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -100,7 +102,12 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
                 containers = loadedContainers
                 nutrientMetas = metas
                 rebuild(customs)
-                _state.value = _state.value.copy(foods = foodsById.values.toList(), userTags = tags, searchHistory = loadSearchHistory())
+                _state.value = _state.value.copy(
+                    foods = foodsById.values.toList(),
+                    userTags = tags,
+                    searchHistory = loadSearchHistory(),
+                    recentFoodIds = loadRecentFoodIds(),
+                )
             }
         }
     }
@@ -167,16 +174,21 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     fun removeSearchHistory(value: String) {
         val history = _state.value.searchHistory - value
         _state.value = _state.value.copy(searchHistory = history)
-        UserPrefs.current(getApplication()).putString(NUTRITION_SEARCH_HISTORY_KEY, history.joinToString(HISTORY_SEPARATOR))
+        saveSearchHistory(history)
     }
     fun clearSearchHistory() {
         _state.value = _state.value.copy(searchHistory = emptyList())
-        UserPrefs.current(getApplication()).putString(NUTRITION_SEARCH_HISTORY_KEY, "")
+        saveSearchHistory(emptyList())
     }
     fun removeRecentFood(id: String) {
-        _state.value = _state.value.let { it.copy(recentFoodIds = it.recentFoodIds - id) }
+        val recent = _state.value.recentFoodIds - id
+        _state.value = _state.value.copy(recentFoodIds = recent)
+        saveRecentFoodIds(recent)
     }
-    fun clearRecentFoods() { _state.value = _state.value.copy(recentFoodIds = emptyList()) }
+    fun clearRecentFoods() {
+        _state.value = _state.value.copy(recentFoodIds = emptyList())
+        saveRecentFoodIds(emptyList())
+    }
     fun toggleRoot(tag: String) {
         val state = _state.value
         val selectedRoots = state.selectedRoots.toggle(tag)
@@ -231,15 +243,20 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
                     userTags = tags,
                     selectedUserTags = emptySet(),
                     searchHistory = loadSearchHistory(),
+                    recentFoodIds = loadRecentFoodIds(),
                 )
             }
         }
     }
     fun openFood(food: FoodItem) {
         val keyword = _state.value.keyword.trim()
-        val history = if (keyword.isBlank()) _state.value.searchHistory else (listOf(keyword) + _state.value.searchHistory.filterNot { it.equals(keyword, true) }).take(12)
-        _state.value = _state.value.copy(selectedFood = food, comparisonReturnTarget = null, searchHistory = history, recentFoodIds = (listOf(food.id) + _state.value.recentFoodIds.filterNot { it == food.id }).take(6))
-        if (keyword.isNotBlank()) UserPrefs.current(getApplication()).putString(NUTRITION_SEARCH_HISTORY_KEY, history.joinToString(HISTORY_SEPARATOR))
+        val history = if (keyword.isBlank()) _state.value.searchHistory else {
+            (listOf(keyword) + _state.value.searchHistory.filterNot { it.equals(keyword, true) })
+        }
+        val recent = (listOf(food.id) + _state.value.recentFoodIds.filterNot { it == food.id }).take(6)
+        _state.value = _state.value.copy(selectedFood = food, comparisonReturnTarget = null, searchHistory = history, recentFoodIds = recent)
+        if (keyword.isNotBlank()) saveSearchHistory(history)
+        saveRecentFoodIds(recent)
     }
     fun closeFood() { _state.value = _state.value.copy(selectedFood = null) }
     fun openComparison(from: NutritionDestination) { _state.value = _state.value.copy(comparisonReturnTarget = from) }
@@ -271,7 +288,16 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
 
     /** Test-only convenience entry point that writes the normal per-user custom-food archive. */
     fun addTestFoods(dtos: List<FoodDto>) {
-        dtos.forEach(::saveCustomFood)
+        val currentUserId = ProfilePrefs.getCurrentUserId(getApplication())
+        val targetRepository = UserCustomFoodRepository.fromContext(getApplication())
+        val updated = dtos.fold(targetRepository.loadDtos()) { foods, dto ->
+            foods.filterNot { it.id == dto.id } + dto
+        }
+        targetRepository.save(updated)
+        userId = currentUserId
+        customRepository = targetRepository
+        rebuild(updated.map { it.toDomain() })
+        _state.value = _state.value.copy(foods = foodsById.values.toList())
     }
 
     fun deleteCustomFood(id: String) {
@@ -346,9 +372,20 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     }.sortedWith(compareByDescending<FoodItem> { it.commonness }.thenBy { it.displayName(language) })
 
     private fun Set<String>.toggle(value: String) = if (value in this) this - value else this + value
-    private fun loadSearchHistory(): List<String> = UserPrefs.current(getApplication()).getString(NUTRITION_SEARCH_HISTORY_KEY, "").split(HISTORY_SEPARATOR).filter { it.isNotBlank() }
+    private fun loadSearchHistory(): List<String> = deserializeSearchHistory(
+        UserPrefs.current(getApplication()).getString(NUTRITION_SEARCH_HISTORY_KEY, "[]"),
+    )
+    private fun loadRecentFoodIds(): List<String> = deserializeSearchHistory(
+        UserPrefs.current(getApplication()).getString(NUTRITION_RECENT_FOODS_KEY, "[]"),
+    ).filter { it in foodsById }
+    private fun saveSearchHistory(history: List<String>) {
+        UserPrefs.current(getApplication()).putString(NUTRITION_SEARCH_HISTORY_KEY, serializeSearchHistory(history))
+    }
+    private fun saveRecentFoodIds(ids: List<String>) {
+        UserPrefs.current(getApplication()).putString(NUTRITION_RECENT_FOODS_KEY, serializeSearchHistory(ids))
+    }
     private companion object {
         const val NUTRITION_SEARCH_HISTORY_KEY = "nutrition_search_history_v1"
-        const val HISTORY_SEPARATOR = "\u001F"
+        const val NUTRITION_RECENT_FOODS_KEY = "nutrition_recent_foods_v1"
     }
 }

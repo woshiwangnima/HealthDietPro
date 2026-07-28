@@ -1,7 +1,8 @@
 package com.woshiwangnima.healthdietpro.common.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +65,8 @@ sealed interface ColumnWidth {
         val max: Dp = Dp.Infinity,
     ) : ColumnWidth
 }
+
+private fun Set<Int>.toggle(value: Int): Set<Int> = if (value in this) this - value else this + value
 
 enum class ColumnOverflow {
     Clip,
@@ -109,24 +118,47 @@ fun <T> AppDataTable(
     actionsHeader: @Composable (() -> Unit)? = null,
     rowActions: (@Composable AppDataTableRowScope<T>.(T) -> Unit)? = null,
     onRowClick: ((T) -> Unit)? = null,
+    showRowNumber: Boolean = true,
+    showPager: Boolean = true,
+    initialRowsPerPage: Int = 20,
+    selectionEnabled: Boolean = false,
+    onEditSelected: ((List<T>) -> Unit)? = null,
     style: AppDataTableStyle = AppDataTableStyle(),
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+    var rowsPerPageText by remember { mutableStateOf(initialRowsPerPage.coerceAtLeast(1).toString()) }
+    var rowsPerPage by remember { mutableIntStateOf(initialRowsPerPage.coerceAtLeast(1)) }
+    var currentPage by remember { mutableIntStateOf(0) }
+    var selectedRows by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    val pageCount = ((rows.size + rowsPerPage - 1) / rowsPerPage).coerceAtLeast(1)
+    LaunchedEffect(rows.size, rowsPerPage) {
+        currentPage = currentPage.coerceIn(0, pageCount - 1)
+        selectedRows = selectedRows.filterTo(linkedSetOf()) { it in rows.indices }
+    }
+    val pageStart = currentPage * rowsPerPage
+    val pageRows = rows.drop(pageStart).take(rowsPerPage).mapIndexed { index, row -> IndexedValue(pageStart + index, row) }
+    val enableSelection = selectionEnabled && onEditSelected != null
+
+    Column(modifier = modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.weight(1f)) {
         if (
             layoutPolicy is AppDataTableLayoutPolicy.Responsive &&
             maxWidth < layoutPolicy.compactAt
         ) {
             CompactDataTable(
-                rows = rows,
+                rows = pageRows,
                 rowKey = rowKey,
                 onRowClick = onRowClick,
+                showRowNumber = showRowNumber,
+                selectionEnabled = enableSelection,
+                selectedRows = selectedRows,
+                onToggleSelection = { index -> selectedRows = selectedRows.toggle(index) },
                 compactHeader = layoutPolicy.compactHeader,
                 compactRow = layoutPolicy.compactRow,
                 style = style,
             )
         } else {
             HorizontalDataTable(
-                rows = rows,
+                rows = pageRows,
                 columns = columns,
                 rowKey = rowKey,
                 maxWidth = maxWidth,
@@ -135,7 +167,30 @@ fun <T> AppDataTable(
                 actionsHeader = actionsHeader,
                 rowActions = rowActions,
                 onRowClick = onRowClick,
+                showRowNumber = showRowNumber,
+                selectionEnabled = enableSelection,
+                selectedRows = selectedRows,
+                onToggleSelection = { index -> selectedRows = selectedRows.toggle(index) },
                 style = style,
+            )
+        }
+    }
+        if (showPager) {
+            DataTablePager(
+                totalRows = rows.size,
+                rowsPerPageText = rowsPerPageText,
+                currentPage = currentPage,
+                pageCount = pageCount,
+                selectedCount = selectedRows.size,
+                onRowsPerPageChange = { value ->
+                    if (value.all(Char::isDigit)) {
+                        rowsPerPageText = value
+                        value.toIntOrNull()?.takeIf { it > 0 }?.let { rowsPerPage = it }
+                    }
+                },
+                onPageChange = { currentPage = it.coerceIn(0, pageCount - 1) },
+                onEditSelected = onEditSelected?.let { edit -> { edit(selectedRows.sorted().map(rows::get)) } },
+                onClearSelection = { selectedRows = emptySet() },
             )
         }
     }
@@ -194,8 +249,9 @@ fun AppDataTableText(
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun <T> HorizontalDataTable(
-    rows: List<T>,
+    rows: List<IndexedValue<T>>,
     columns: List<AppDataTableColumn<T>>,
     rowKey: ((Int, T) -> Any)?,
     maxWidth: Dp,
@@ -204,12 +260,17 @@ private fun <T> HorizontalDataTable(
     actionsHeader: @Composable (() -> Unit)?,
     rowActions: (@Composable AppDataTableRowScope<T>.(T) -> Unit)?,
     onRowClick: ((T) -> Unit)?,
+    showRowNumber: Boolean,
+    selectionEnabled: Boolean,
+    selectedRows: Set<Int>,
+    onToggleSelection: (Int) -> Unit,
     style: AppDataTableStyle,
 ) {
     val horizontalScroll = rememberScrollState()
     val hasActions = rowActions != null
     val widths = calculateColumnWidths(columns, maxWidth, if (hasActions) actionsWidth else 0.dp)
-    val contentWidth = (widths.fold(0.dp) { acc, width -> acc + width } + if (hasActions) actionsWidth else 0.dp)
+    val sequenceWidth = if (showRowNumber) 48.dp else 0.dp
+    val contentWidth = (sequenceWidth + widths.fold(0.dp) { acc, width -> acc + width } + if (hasActions) actionsWidth else 0.dp)
         .coerceAtLeast(maxWidth)
         .coerceAtLeast(minTableWidth)
     val rowEven = MaterialTheme.colorScheme.surface
@@ -240,6 +301,11 @@ private fun <T> HorizontalDataTable(
                     .padding(vertical = style.headerVerticalPadding),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (showRowNumber) {
+                    Box(Modifier.width(sequenceWidth).padding(horizontal = style.cellHorizontalPadding), contentAlignment = Alignment.Center) {
+                        AppDataTableHeaderText("#")
+                    }
+                }
                 columns.forEachIndexed { index, column ->
                     HeaderCell(column = column, width = widths[index], style = style)
                 }
@@ -267,10 +333,16 @@ private fun <T> HorizontalDataTable(
                 key = if (rowKey == null) {
                     null
                 } else {
-                    { index, row -> rowKey(index, row) }
+                    { _, row -> rowKey(row.index, row.value) }
                 },
-            ) { index, row ->
-                val bg = if (index % 2 == 0) rowEven else rowOdd
+            ) { _, indexedRow ->
+                val rowIndex = indexedRow.index
+                val row = indexedRow.value
+                val bg = when {
+                    rowIndex in selectedRows -> MaterialTheme.colorScheme.primaryContainer
+                    rowIndex % 2 == 0 -> rowEven
+                    else -> rowOdd
+                }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -280,16 +352,27 @@ private fun <T> HorizontalDataTable(
                     Row(
                         modifier = Modifier
                             .width(contentWidth)
-                            .then(if (onRowClick == null) Modifier else Modifier.clickable { onRowClick(row) })
+                            .combinedClickable(
+                                onClick = {
+                                    if (selectionEnabled && selectedRows.isNotEmpty()) onToggleSelection(rowIndex)
+                                    else onRowClick?.invoke(row)
+                                },
+                                onLongClick = if (selectionEnabled) ({ onToggleSelection(rowIndex) }) else null,
+                            )
                             .padding(vertical = style.rowVerticalPadding),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        if (showRowNumber) {
+                            Box(Modifier.width(sequenceWidth).padding(horizontal = style.cellHorizontalPadding), contentAlignment = Alignment.Center) {
+                                AppDataTableText((rowIndex + 1).toString())
+                            }
+                        }
                         columns.forEachIndexed { columnIndex, column ->
                             Cell(
                                 column = column,
                                 width = widths[columnIndex],
                                 row = row,
-                                rowIndex = index,
+                                rowIndex = rowIndex,
                                 style = style,
                             )
                         }
@@ -301,7 +384,7 @@ private fun <T> HorizontalDataTable(
                                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                val scope = AppDataTableRowScope(row, index)
+                                val scope = AppDataTableRowScope(row, rowIndex)
                                 rowActions?.invoke(scope, row)
                             }
                         }
@@ -353,10 +436,15 @@ private fun HorizontalScrollHandle(
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun <T> CompactDataTable(
-    rows: List<T>,
+    rows: List<IndexedValue<T>>,
     rowKey: ((Int, T) -> Any)?,
     onRowClick: ((T) -> Unit)?,
+    showRowNumber: Boolean,
+    selectionEnabled: Boolean,
+    selectedRows: Set<Int>,
+    onToggleSelection: (Int) -> Unit,
     compactHeader: (@Composable () -> Unit)?,
     compactRow: @Composable AppDataTableRowScope<T>.(T) -> Unit,
     style: AppDataTableStyle,
@@ -373,33 +461,62 @@ private fun <T> CompactDataTable(
                         .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f))
                         .padding(horizontal = style.cellHorizontalPadding, vertical = style.headerVerticalPadding),
                 ) {
-                    compactHeader()
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (showRowNumber) {
+                            Box(Modifier.width(COMPACT_SEQUENCE_WIDTH), contentAlignment = Alignment.Center) {
+                                AppDataTableHeaderText("#")
+                            }
+                        }
+                        Box(Modifier.weight(1f)) { compactHeader() }
+                    }
                 }
             }
         }
         itemsIndexed(
             items = rows,
-            key = if (rowKey == null) {
-                null
-            } else {
-                { index, row -> rowKey(index, row) }
+                key = if (rowKey == null) {
+                    null
+                } else {
+                    { _, row -> rowKey(row.index, row.value) }
             },
-        ) { index, row ->
-            val bg = if (index % 2 == 0) rowEven else rowOdd
-            Column(
+        ) { _, indexedRow ->
+            val rowIndex = indexedRow.index
+            val row = indexedRow.value
+            val bg = when {
+                rowIndex in selectedRows -> MaterialTheme.colorScheme.primaryContainer
+                rowIndex % 2 == 0 -> rowEven
+                else -> rowOdd
+            }
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(bg)
-                    .then(if (onRowClick == null) Modifier else Modifier.clickable { onRowClick(row) })
+                    .combinedClickable(
+                        onClick = {
+                            if (selectionEnabled && selectedRows.isNotEmpty()) onToggleSelection(rowIndex)
+                            else onRowClick?.invoke(row)
+                        },
+                        onLongClick = if (selectionEnabled) ({ onToggleSelection(rowIndex) }) else null,
+                    )
                     .padding(horizontal = style.cellHorizontalPadding, vertical = style.rowVerticalPadding),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                val scope = AppDataTableRowScope(row, index)
-                compactRow.invoke(scope, row)
+                if (showRowNumber) {
+                            Box(Modifier.width(COMPACT_SEQUENCE_WIDTH), contentAlignment = Alignment.Center) {
+                        AppDataTableText((rowIndex + 1).toString())
+                    }
+                }
+                Column(Modifier.weight(1f)) {
+                    val scope = AppDataTableRowScope(row, rowIndex)
+                    compactRow.invoke(scope, row)
+                }
             }
             Divider(border = border, style = style)
         }
     }
 }
+
+private val COMPACT_SEQUENCE_WIDTH = 36.dp
 
 @Composable
 private fun <T> HeaderCell(

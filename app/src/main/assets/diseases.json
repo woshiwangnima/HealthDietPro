@@ -1,258 +1,111 @@
-[
-  {
-    "id": "hypertension",
-    "i18n": {
-      "zh": { "label": "高血压" },
-      "en": { "label": "Hypertension" }
+{
+  "schemaVersion": 1,
+  "categories": [
+    { "id": "endocrine_metabolic", "i18n": { "zh": "内分泌与代谢", "en": "Endocrine and metabolic" } },
+    { "id": "circulatory", "i18n": { "zh": "循环系统", "en": "Circulatory system" } },
+    { "id": "digestive", "i18n": { "zh": "消化系统", "en": "Digestive system" } },
+    { "id": "genitourinary", "i18n": { "zh": "泌尿生殖系统", "en": "Genitourinary system" } },
+    { "id": "sleep", "i18n": { "zh": "睡眠觉醒", "en": "Sleep-wake" } },
+    { "id": "musculoskeletal", "i18n": { "zh": "肌肉骨骼", "en": "Musculoskeletal" } },
+    { "id": "nervous_system", "i18n": { "zh": "神经系统", "en": "Nervous system" } },
+    { "id": "sexual_health", "i18n": { "zh": "性健康", "en": "Sexual health" } }
+  ],
+  "departments": [
+    { "id": "cardiology", "i18n": { "zh": "心血管内科", "en": "Cardiology" } },
+    { "id": "general_medicine", "i18n": { "zh": "全科医学科", "en": "General practice" } },
+    { "id": "endocrinology", "i18n": { "zh": "内分泌科", "en": "Endocrinology" } },
+    { "id": "nutrition", "i18n": { "zh": "临床营养科", "en": "Clinical nutrition" } },
+    { "id": "gynecology", "i18n": { "zh": "妇科", "en": "Gynecology" } },
+    { "id": "reproductive_medicine", "i18n": { "zh": "生殖医学科", "en": "Reproductive medicine" } },
+    { "id": "hepatology", "i18n": { "zh": "肝病科", "en": "Hepatology" } },
+    { "id": "gastroenterology", "i18n": { "zh": "消化内科", "en": "Gastroenterology" } },
+    { "id": "cardiothoracic_surgery", "i18n": { "zh": "心脏大血管外科", "en": "Cardiothoracic surgery" } },
+    { "id": "nephrology", "i18n": { "zh": "肾内科", "en": "Nephrology" } },
+    { "id": "urology", "i18n": { "zh": "泌尿外科", "en": "Urology" } },
+    { "id": "sleep_medicine", "i18n": { "zh": "睡眠医学科", "en": "Sleep medicine" } },
+    { "id": "respiratory_medicine", "i18n": { "zh": "呼吸与危重症医学科", "en": "Respiratory medicine" } },
+    { "id": "otolaryngology", "i18n": { "zh": "耳鼻咽喉科", "en": "Otolaryngology" } },
+    { "id": "orthopedics", "i18n": { "zh": "骨科", "en": "Orthopedics" } },
+    { "id": "rheumatology", "i18n": { "zh": "风湿免疫科", "en": "Rheumatology" } },
+    { "id": "rehabilitation", "i18n": { "zh": "康复医学科", "en": "Rehabilitation medicine" } },
+    { "id": "neurology", "i18n": { "zh": "神经内科", "en": "Neurology" } },
+    { "id": "headache_clinic", "i18n": { "zh": "头痛门诊", "en": "Headache clinic" } }
+  ],
+  "sources": [
+    { "id": "who_icd11_2025", "title": { "zh": "WHO ICD-11 死亡和疾病统计版", "en": "WHO ICD-11 for Mortality and Morbidity Statistics" }, "url": "https://icd.who.int/browse11/l-m/en", "version": "2025-01", "accessedOn": "2026-07-28" }
+  ],
+  "diseases": [
+    {
+      "id": "hypertension", "clinicalKind": "DISEASE", "categoryIds": ["circulatory"], "course": "CHRONIC", "careDepartmentIds": ["cardiology", "general_medicine"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "高血压", "aliases": ["原发性高血压"], "description": "以体循环动脉血压持续升高为特征的慢性心血管疾病。诊断、危险分层和药物调整应由医疗专业人员结合规范血压测量及靶器官风险评估完成。" }, "en": { "label": "Hypertension", "aliases": ["Essential hypertension"], "description": "A chronic cardiovascular condition characterized by persistently elevated systemic arterial blood pressure. Diagnosis, risk stratification, and treatment adjustment require standardized measurements and clinical assessment." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "11", "chapterTitle": { "zh": "循环系统疾病", "en": "Diseases of the circulatory system" }, "blockCode": "BA00-BA04", "code": "BA00", "title": { "zh": "原发性高血压", "en": "Essential hypertension" } }],
+      "nutrientRecommendations": [{ "nutrientId": "sodium", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "potassium", "recommendation": "INCREASE" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }, { "nutrientId": "saturated_fat", "recommendation": "LIMIT" }]
     },
-    "prevalence": {
-      "11": 0.278, "12": 0.314, "13": 0.295, "14": 0.283, "15": 0.301,
-      "21": 0.287, "22": 0.275, "23": 0.292, "31": 0.291, "32": 0.268,
-      "33": 0.252, "34": 0.271, "35": 0.248, "36": 0.259, "37": 0.286,
-      "41": 0.278, "42": 0.264, "43": 0.255, "44": 0.235, "45": 0.242,
-      "46": 0.238, "50": 0.281, "51": 0.261, "52": 0.253, "53": 0.248,
-      "54": 0.221, "61": 0.276, "62": 0.271, "63": 0.265, "64": 0.278,
-      "65": 0.259, "71": 0.245, "81": 0.241, "82": 0.239
+    {
+      "id": "type2_diabetes", "clinicalKind": "DISEASE", "categoryIds": ["endocrine_metabolic"], "course": "CHRONIC", "careDepartmentIds": ["endocrinology", "general_medicine", "nutrition"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "2型糖尿病", "aliases": ["2型DM"], "description": "以胰岛素抵抗和胰岛素分泌相对不足导致的慢性高血糖为主要特征。需要长期监测血糖及并发症风险，并在医生和营养专业人员指导下进行生活方式和药物管理。" }, "en": { "label": "Type 2 Diabetes", "aliases": ["Type 2 diabetes mellitus", "T2DM"], "description": "A chronic hyperglycemic disorder mainly characterized by insulin resistance and relative insulin secretory deficiency. Long-term glucose and complication-risk monitoring, lifestyle care, and medicines require professional guidance." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "05", "chapterTitle": { "zh": "内分泌、营养或代谢疾病", "en": "Endocrine, nutritional or metabolic diseases" }, "blockCode": "5A10-5A1Z", "code": "5A11", "title": { "zh": "2型糖尿病", "en": "Type 2 diabetes mellitus" } }],
+      "nutrientRecommendations": [{ "nutrientId": "carbohydrate", "recommendation": "LIMIT" }, { "nutrientId": "sugar", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }]
     },
-    "nutrientRecommendations": [
-      { "nutrientId": "sodium", "recommendation": "STRICT_LIMIT" },
-      { "nutrientId": "potassium", "recommendation": "INCREASE" },
-      { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" },
-      { "nutrientId": "saturated_fat", "recommendation": "LIMIT" }
-    ]
-  },
-  {
-    "id": "type2_diabetes",
-    "i18n": {
-      "zh": { "label": "2型糖尿病" },
-      "en": { "label": "Type 2 Diabetes" }
+    {
+      "id": "dyslipidemia", "clinicalKind": "RISK_STATE", "categoryIds": ["endocrine_metabolic", "circulatory"], "course": "CHRONIC", "careDepartmentIds": ["endocrinology", "cardiology"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "血脂异常", "aliases": ["高脂血症"], "description": "指血浆脂质或脂蛋白水平异常，包括胆固醇、甘油三酯升高或高密度脂蛋白胆固醇降低等表型。应结合整体动脉粥样硬化性心血管风险决定干预方案。" }, "en": { "label": "Dyslipidemia", "aliases": ["Hyperlipidemia"], "description": "Abnormal plasma lipid or lipoprotein levels, including elevated cholesterol or triglycerides and low HDL cholesterol. Management should be based on overall atherosclerotic cardiovascular risk." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "05", "chapterTitle": { "zh": "内分泌、营养或代谢疾病", "en": "Endocrine, nutritional or metabolic diseases" }, "blockCode": "5C80-5C8Z", "code": "5C80", "title": { "zh": "脂蛋白代谢障碍", "en": "Disorders of lipoprotein metabolism" } }],
+      "nutrientRecommendations": [{ "nutrientId": "saturated_fat", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "cholesterol", "recommendation": "LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }]
     },
-    "prevalence": {
-      "11": 0.112, "12": 0.121, "13": 0.118, "14": 0.109, "15": 0.115,
-      "21": 0.124, "22": 0.117, "23": 0.119, "31": 0.125, "32": 0.121,
-      "33": 0.108, "34": 0.106, "35": 0.102, "36": 0.104, "37": 0.128,
-      "41": 0.115, "42": 0.111, "43": 0.098, "44": 0.095, "45": 0.091,
-      "46": 0.089, "50": 0.113, "51": 0.108, "52": 0.096, "53": 0.092,
-      "54": 0.078, "61": 0.116, "62": 0.108, "63": 0.102, "64": 0.109,
-      "65": 0.098, "71": 0.105, "81": 0.112, "82": 0.108
+    {
+      "id": "pcos", "clinicalKind": "SYNDROME", "categoryIds": ["sexual_health", "endocrine_metabolic"], "applicability": { "requiredAnatomicalTraits": ["OVARIES"] }, "course": "CHRONIC", "careDepartmentIds": ["gynecology", "endocrinology", "reproductive_medicine"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "多囊卵巢综合征", "aliases": ["PCOS"], "description": "育龄女性常见的内分泌与代谢综合征，可表现为排卵障碍、高雄激素表现和多囊卵巢形态。诊断需排除其他病因，并由妇科或内分泌专科综合评估。" }, "en": { "label": "Polycystic Ovary Syndrome", "aliases": ["PCOS"], "description": "A common endocrine-metabolic syndrome in reproductive-age women that may involve ovulatory dysfunction, hyperandrogenism, and polycystic ovarian morphology. Diagnosis requires exclusion of alternative causes and specialist assessment." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "17", "chapterTitle": { "zh": "性健康相关状况", "en": "Conditions related to sexual health" }, "blockCode": "GA34", "code": "GA34.2", "title": { "zh": "多囊卵巢综合征", "en": "Polycystic ovarian syndrome" } }],
+      "nutrientRecommendations": [{ "nutrientId": "carbohydrate", "recommendation": "LIMIT" }, { "nutrientId": "sugar", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "saturated_fat", "recommendation": "LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }]
     },
-    "nutrientRecommendations": [
-      { "nutrientId": "carbohydrate", "recommendation": "LIMIT" },
-      { "nutrientId": "sugar", "recommendation": "STRICT_LIMIT" },
-      { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }
-    ]
-  },
-  {
-    "id": "dyslipidemia",
-    "i18n": {
-      "zh": { "label": "血脂异常" },
-      "en": { "label": "Dyslipidemia" }
+    {
+      "id": "fatty_liver", "clinicalKind": "DISEASE", "categoryIds": ["digestive", "endocrine_metabolic"], "course": "CHRONIC", "careDepartmentIds": ["hepatology", "gastroenterology", "endocrinology"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "代谢功能障碍相关脂肪性肝病", "aliases": ["脂肪肝", "MASLD", "非酒精性脂肪性肝病"], "description": "指肝细胞脂肪变并伴代谢风险因素的脂肪性肝病。酒精相关及其他病因的脂肪性肝病应另行诊断和编码。" }, "en": { "label": "Metabolic Dysfunction-Associated Steatotic Liver Disease", "aliases": ["MASLD", "Fatty liver", "Nonalcoholic fatty liver disease"], "description": "Steatotic liver disease with hepatic steatosis and metabolic risk factors. Alcohol-related and other causes of steatotic liver disease require separate diagnosis and coding." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "13", "chapterTitle": { "zh": "消化系统疾病", "en": "Diseases of the digestive system" }, "blockCode": "DB92", "code": "DB92.0", "title": { "zh": "非酒精性脂肪性肝病", "en": "Nonalcoholic fatty liver disease" }, "mappingType": "BROADER_TERM" }],
+      "nutrientRecommendations": [{ "nutrientId": "energy", "recommendation": "LIMIT" }, { "nutrientId": "saturated_fat", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "sugar", "recommendation": "LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }]
     },
-    "prevalence": {
-      "11": 0.421, "12": 0.412, "13": 0.408, "14": 0.395, "15": 0.418,
-      "21": 0.435, "22": 0.422, "23": 0.428, "31": 0.415, "32": 0.401,
-      "33": 0.388, "34": 0.392, "35": 0.381, "36": 0.385, "37": 0.419,
-      "41": 0.398, "42": 0.391, "43": 0.378, "44": 0.365, "45": 0.371,
-      "46": 0.362, "50": 0.402, "51": 0.392, "52": 0.382, "53": 0.375,
-      "54": 0.348, "61": 0.405, "62": 0.395, "63": 0.388, "64": 0.401,
-      "65": 0.385, "71": 0.378, "81": 0.382, "82": 0.375
+    {
+      "id": "coronary_heart_disease", "clinicalKind": "DISEASE", "categoryIds": ["circulatory"], "course": "CHRONIC", "careDepartmentIds": ["cardiology", "cardiothoracic_surgery"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "冠状动脉粥样硬化性心脏病", "aliases": ["冠心病", "CHD"], "description": "通常由冠状动脉粥样硬化导致心肌供血不足。胸痛、呼吸困难或疑似急性冠脉综合征时应立即急诊评估，不能仅依靠饮食建议处理。" }, "en": { "label": "Coronary Heart Disease", "aliases": ["CHD", "Chronic ischaemic heart disease"], "description": "Commonly results from coronary atherosclerosis and inadequate myocardial blood supply. Chest pain, breathlessness, or suspected acute coronary syndrome requires immediate emergency assessment, not dietary advice alone." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "11", "chapterTitle": { "zh": "循环系统疾病", "en": "Diseases of the circulatory system" }, "blockCode": "BA80-BA8Z", "code": "BA80", "title": { "zh": "慢性缺血性心脏病", "en": "Chronic ischaemic heart disease" } }],
+      "nutrientRecommendations": [{ "nutrientId": "saturated_fat", "recommendation": "FORBID" }, { "nutrientId": "cholesterol", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "sodium", "recommendation": "LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }, { "nutrientId": "potassium", "recommendation": "INCREASE" }]
     },
-    "nutrientRecommendations": [
-      { "nutrientId": "saturated_fat", "recommendation": "STRICT_LIMIT" },
-      { "nutrientId": "cholesterol", "recommendation": "LIMIT" },
-      { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }
-    ]
-  },
-  {
-    "id": "pcos",
-    "i18n": {
-      "zh": { "label": "多囊卵巢综合征" },
-      "en": { "label": "Polycystic Ovary Syndrome" }
+    {
+      "id": "chronic_kidney_disease", "clinicalKind": "DISEASE", "categoryIds": ["genitourinary"], "course": "CHRONIC", "careDepartmentIds": ["nephrology", "urology"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "慢性肾病", "aliases": ["CKD"], "description": "指肾脏结构或功能异常持续至少三个月并影响健康的状态。分期、蛋白质和电解质限制须根据估算肾小球滤过率、尿蛋白和合并症由肾内科个体化制定。" }, "en": { "label": "Chronic Kidney Disease", "aliases": ["CKD"], "description": "A condition of kidney structure or function abnormality persisting for at least three months with health implications. Staging and protein or electrolyte restrictions must be individualized by nephrology using eGFR, albuminuria, and comorbidity data." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "16", "chapterTitle": { "zh": "泌尿生殖系统疾病", "en": "Diseases of the genitourinary system" }, "blockCode": "GB60-GB61", "code": "GB60", "title": { "zh": "慢性肾病", "en": "Chronic kidney disease" } }],
+      "nutrientRecommendations": [{ "nutrientId": "sodium", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "potassium", "recommendation": "LIMIT" }, { "nutrientId": "protein", "recommendation": "LIMIT" }]
     },
-    "gender": ["FEMALE"],
-    "prevalence": {
-      "11": 0.081, "12": 0.079, "13": 0.076, "14": 0.074, "15": 0.078,
-      "21": 0.083, "22": 0.077, "23": 0.079, "31": 0.089, "32": 0.085,
-      "33": 0.086, "34": 0.081, "35": 0.082, "36": 0.076, "37": 0.079,
-      "41": 0.075, "42": 0.078, "43": 0.077, "44": 0.083, "45": 0.079,
-      "46": 0.076, "50": 0.082, "51": 0.081, "52": 0.076, "53": 0.074,
-      "54": 0.062, "61": 0.078, "62": 0.075, "63": 0.072, "64": 0.076,
-      "65": 0.074, "71": 0.081, "81": 0.085, "82": 0.082
+    {
+      "id": "osa", "clinicalKind": "DISEASE", "categoryIds": ["sleep"], "course": "CHRONIC", "careDepartmentIds": ["sleep_medicine", "respiratory_medicine", "otolaryngology"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "阻塞性睡眠呼吸暂停", "aliases": ["OSA", "阻塞性睡眠呼吸暂停低通气综合征"], "description": "睡眠中反复发生上气道塌陷，导致呼吸暂停或低通气、间歇性低氧和睡眠片段化。确诊通常依赖睡眠监测。" }, "en": { "label": "Obstructive Sleep Apnoea", "aliases": ["OSA"], "description": "Recurrent upper-airway collapse during sleep causes apnoea or hypopnoea, intermittent hypoxaemia, and sleep fragmentation. Diagnosis usually requires sleep testing." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "07", "chapterTitle": { "zh": "睡眠觉醒障碍", "en": "Sleep-wake disorders" }, "blockCode": "7A40", "code": "7A40.0", "title": { "zh": "阻塞性睡眠呼吸暂停", "en": "Obstructive sleep apnoea" } }],
+      "nutrientRecommendations": [{ "nutrientId": "energy", "recommendation": "LIMIT" }, { "nutrientId": "saturated_fat", "recommendation": "LIMIT" }, { "nutrientId": "sugar", "recommendation": "LIMIT" }]
     },
-    "nutrientRecommendations": [
-      { "nutrientId": "carbohydrate", "recommendation": "LIMIT" },
-      { "nutrientId": "sugar", "recommendation": "STRICT_LIMIT" },
-      { "nutrientId": "saturated_fat", "recommendation": "LIMIT" },
-      { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }
-    ]
-  },
-  {
-    "id": "fatty_liver",
-    "i18n": {
-      "zh": { "label": "脂肪肝" },
-      "en": { "label": "Fatty Liver" }
+    {
+      "id": "osteoarthritis", "clinicalKind": "DISEASE", "categoryIds": ["musculoskeletal"], "course": "CHRONIC", "careDepartmentIds": ["orthopedics", "rheumatology", "rehabilitation"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "骨关节炎", "aliases": ["OA"], "description": "以关节软骨退变、骨重塑和疼痛功能受限为主要表现的慢性关节疾病，常累及膝、髋、手等关节。" }, "en": { "label": "Osteoarthritis", "aliases": ["OA"], "description": "A chronic joint disease marked by cartilage degeneration, bone remodeling, pain, and functional limitation, often affecting the knee, hip, or hand." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "15", "chapterTitle": { "zh": "肌肉骨骼系统或结缔组织疾病", "en": "Diseases of the musculoskeletal system or connective tissue" }, "blockCode": "FA00-FA0Z", "code": "FA00", "title": { "zh": "骨关节炎", "en": "Osteoarthritis" } }],
+      "nutrientRecommendations": [{ "nutrientId": "calcium", "recommendation": "INCREASE" }, { "nutrientId": "energy", "recommendation": "LIMIT" }]
     },
-    "prevalence": {
-      "11": 0.312, "12": 0.305, "13": 0.298, "14": 0.287, "15": 0.308,
-      "21": 0.325, "22": 0.312, "23": 0.318, "31": 0.335, "32": 0.315,
-      "33": 0.321, "34": 0.308, "35": 0.295, "36": 0.289, "37": 0.309,
-      "41": 0.291, "42": 0.288, "43": 0.275, "44": 0.268, "45": 0.271,
-      "46": 0.258, "50": 0.315, "51": 0.302, "52": 0.285, "53": 0.275,
-      "54": 0.242, "61": 0.295, "62": 0.288, "63": 0.278, "64": 0.292,
-      "65": 0.281, "71": 0.285, "81": 0.291, "82": 0.282
+    {
+      "id": "hyperuricemia", "clinicalKind": "LABORATORY_ABNORMALITY", "categoryIds": ["endocrine_metabolic"], "course": "CHRONIC", "careDepartmentIds": ["rheumatology", "nephrology", "endocrinology"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "高尿酸血症", "aliases": ["高尿酸"], "description": "指血尿酸水平升高，是痛风和尿酸性肾结石的风险因素，但并非所有患者都会发生痛风。" }, "en": { "label": "Hyperuricaemia", "aliases": ["Hyperuricemia"], "description": "Elevated serum urate is a risk factor for gout and uric-acid stones, but not every person develops gout." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "05", "chapterTitle": { "zh": "内分泌、营养或代谢疾病", "en": "Endocrine, nutritional or metabolic diseases" }, "blockCode": "5C56", "code": "5C56.0", "title": { "zh": "高尿酸血症", "en": "Hyperuricaemia" } }],
+      "nutrientRecommendations": [{ "nutrientId": "protein", "recommendation": "LIMIT" }, { "nutrientId": "energy", "recommendation": "LIMIT" }, { "nutrientId": "sugar", "recommendation": "LIMIT" }]
     },
-    "nutrientRecommendations": [
-      { "nutrientId": "energy", "recommendation": "LIMIT" },
-      { "nutrientId": "saturated_fat", "recommendation": "STRICT_LIMIT" },
-      { "nutrientId": "sugar", "recommendation": "LIMIT" },
-      { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }
-    ]
-  },
-  {
-    "id": "coronary_heart_disease",
-    "i18n": {
-      "zh": { "label": "冠心病" },
-      "en": { "label": "Coronary Heart Disease" }
+    {
+      "id": "hypothyroidism", "clinicalKind": "DISEASE", "categoryIds": ["endocrine_metabolic"], "course": "CHRONIC", "careDepartmentIds": ["endocrinology", "general_medicine"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "甲状腺功能减退症", "aliases": ["甲减"], "description": "甲状腺激素分泌不足导致的内分泌疾病，可出现乏力、怕冷、体重变化等非特异症状。" }, "en": { "label": "Hypothyroidism", "aliases": ["Underactive thyroid"], "description": "An endocrine disorder caused by insufficient thyroid-hormone production and potentially associated with nonspecific symptoms such as fatigue, cold intolerance, and weight change." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "05", "chapterTitle": { "zh": "内分泌、营养或代谢疾病", "en": "Endocrine, nutritional or metabolic diseases" }, "blockCode": "5A00-5A0Z", "code": "5A00", "title": { "zh": "甲状腺功能减退症", "en": "Hypothyroidism" } }],
+      "nutrientRecommendations": [{ "nutrientId": "dietary_fiber", "recommendation": "FREE" }, { "nutrientId": "calcium", "recommendation": "INCREASE" }, { "nutrientId": "iron", "recommendation": "INCREASE" }]
     },
-    "prevalence": {
-      "11": 0.112, "12": 0.118, "13": 0.108, "14": 0.102, "15": 0.115,
-      "21": 0.125, "22": 0.115, "23": 0.121, "31": 0.108, "32": 0.098,
-      "33": 0.091, "34": 0.095, "35": 0.087, "36": 0.089, "37": 0.115,
-      "41": 0.105, "42": 0.096, "43": 0.088, "44": 0.078, "45": 0.081,
-      "46": 0.074, "50": 0.102, "51": 0.095, "52": 0.085, "53": 0.081,
-      "54": 0.068, "61": 0.105, "62": 0.098, "63": 0.092, "64": 0.101,
-      "65": 0.091, "71": 0.089, "81": 0.083, "82": 0.081
-    },
-    "nutrientRecommendations": [
-      { "nutrientId": "saturated_fat", "recommendation": "FORBID" },
-      { "nutrientId": "cholesterol", "recommendation": "STRICT_LIMIT" },
-      { "nutrientId": "sodium", "recommendation": "LIMIT" },
-      { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" },
-      { "nutrientId": "potassium", "recommendation": "INCREASE" }
-    ]
-  },
-  {
-    "id": "chronic_kidney_disease",
-    "i18n": {
-      "zh": { "label": "慢性肾病" },
-      "en": { "label": "Chronic Kidney Disease" }
-    },
-    "prevalence": {
-      "11": 0.112, "12": 0.108, "13": 0.115, "14": 0.109, "15": 0.118,
-      "21": 0.121, "22": 0.114, "23": 0.116, "31": 0.105, "32": 0.109,
-      "33": 0.098, "34": 0.102, "35": 0.095, "36": 0.099, "37": 0.115,
-      "41": 0.108, "42": 0.104, "43": 0.096, "44": 0.091, "45": 0.094,
-      "46": 0.088, "50": 0.106, "51": 0.101, "52": 0.095, "53": 0.091,
-      "54": 0.082, "61": 0.108, "62": 0.102, "63": 0.096, "64": 0.104,
-      "65": 0.095, "71": 0.098, "81": 0.093, "82": 0.091
-    },
-    "nutrientRecommendations": [
-      { "nutrientId": "sodium", "recommendation": "STRICT_LIMIT" },
-      { "nutrientId": "potassium", "recommendation": "LIMIT" },
-      { "nutrientId": "protein", "recommendation": "LIMIT" }
-    ]
-  },
-  {
-    "id": "osa",
-    "i18n": {
-      "zh": { "label": "阻塞性睡眠呼吸暂停" },
-      "en": { "label": "Obstructive Sleep Apnea" }
-    },
-    "prevalence": {
-      "11": 0.052, "12": 0.049, "13": 0.048, "14": 0.045, "15": 0.051,
-      "21": 0.055, "22": 0.051, "23": 0.053, "31": 0.058, "32": 0.052,
-      "33": 0.054, "34": 0.049, "35": 0.046, "36": 0.044, "37": 0.051,
-      "41": 0.048, "42": 0.047, "43": 0.043, "44": 0.042, "45": 0.041,
-      "46": 0.038, "50": 0.056, "51": 0.051, "52": 0.045, "53": 0.042,
-      "54": 0.035, "61": 0.048, "62": 0.045, "63": 0.041, "64": 0.046,
-      "65": 0.043, "71": 0.046, "81": 0.049, "82": 0.045
-    },
-    "nutrientRecommendations": [
-      { "nutrientId": "energy", "recommendation": "LIMIT" },
-      { "nutrientId": "saturated_fat", "recommendation": "LIMIT" },
-      { "nutrientId": "sugar", "recommendation": "LIMIT" }
-    ]
-  },
-  {
-    "id": "osteoarthritis",
-    "i18n": {
-      "zh": { "label": "负重关节炎" },
-      "en": { "label": "Osteoarthritis" }
-    },
-    "prevalence": {
-      "11": 0.082, "12": 0.079, "13": 0.085, "14": 0.081, "15": 0.088,
-      "21": 0.092, "22": 0.086, "23": 0.089, "31": 0.078, "32": 0.075,
-      "33": 0.072, "34": 0.076, "35": 0.069, "36": 0.071, "37": 0.084,
-      "41": 0.079, "42": 0.074, "43": 0.068, "44": 0.062, "45": 0.065,
-      "46": 0.058, "50": 0.081, "51": 0.076, "52": 0.069, "53": 0.065,
-      "54": 0.052, "61": 0.078, "62": 0.075, "63": 0.071, "64": 0.076,
-      "65": 0.069, "71": 0.072, "81": 0.068, "82": 0.066
-    },
-    "nutrientRecommendations": [
-      { "nutrientId": "calcium", "recommendation": "INCREASE" },
-      { "nutrientId": "energy", "recommendation": "LIMIT" }
-    ]
-  },
-  {
-    "id": "hyperuricemia",
-    "i18n": {
-      "zh": { "label": "高尿酸" },
-      "en": { "label": "Hyperuricemia" }
-    },
-    "prevalence": {
-      "11": 0.148, "12": 0.142, "13": 0.138, "14": 0.131, "15": 0.141,
-      "21": 0.155, "22": 0.145, "23": 0.151, "31": 0.168, "32": 0.158,
-      "33": 0.165, "34": 0.149, "35": 0.171, "36": 0.138, "37": 0.152,
-      "41": 0.135, "42": 0.141, "43": 0.145, "44": 0.178, "45": 0.168,
-      "46": 0.172, "50": 0.152, "51": 0.148, "52": 0.142, "53": 0.138,
-      "54": 0.112, "61": 0.135, "62": 0.128, "63": 0.121, "64": 0.132,
-      "65": 0.125, "71": 0.161, "81": 0.172, "82": 0.165
-    },
-    "nutrientRecommendations": [
-      { "nutrientId": "protein", "recommendation": "LIMIT" },
-      { "nutrientId": "energy", "recommendation": "LIMIT" },
-      { "nutrientId": "sugar", "recommendation": "LIMIT" }
-    ]
-  },
-  {
-    "id": "hypothyroidism",
-    "i18n": {
-      "zh": { "label": "甲减" },
-      "en": { "label": "Hypothyroidism" }
-    },
-    "prevalence": {
-      "11": 0.135, "12": 0.128, "13": 0.125, "14": 0.121, "15": 0.131,
-      "21": 0.138, "22": 0.142, "23": 0.145, "31": 0.142, "32": 0.131,
-      "33": 0.128, "34": 0.121, "35": 0.125, "36": 0.118, "37": 0.128,
-      "41": 0.119, "42": 0.122, "43": 0.125, "44": 0.132, "45": 0.128,
-      "46": 0.121, "50": 0.129, "51": 0.135, "52": 0.138, "53": 0.131,
-      "54": 0.148, "61": 0.125, "62": 0.121, "63": 0.132, "64": 0.125,
-      "65": 0.131, "71": 0.124, "81": 0.121, "82": 0.118
-    },
-    "nutrientRecommendations": [
-      { "nutrientId": "dietary_fiber", "recommendation": "FREE" },
-      { "nutrientId": "calcium", "recommendation": "INCREASE" },
-      { "nutrientId": "iron", "recommendation": "INCREASE" }
-    ]
-  },
-  {
-    "id": "migraine",
-    "i18n": {
-      "zh": { "label": "偏头痛" },
-      "en": { "label": "Migraine" }
-    },
-    "prevalence": {
-      "11": 0.098, "12": 0.092, "13": 0.089, "14": 0.085, "15": 0.091,
-      "21": 0.095, "22": 0.091, "23": 0.093, "31": 0.105, "32": 0.098,
-      "33": 0.101, "34": 0.092, "35": 0.095, "36": 0.088, "37": 0.091,
-      "41": 0.085, "42": 0.088, "43": 0.091, "44": 0.098, "45": 0.092,
-      "46": 0.085, "50": 0.096, "51": 0.099, "52": 0.092, "53": 0.088,
-      "54": 0.075, "61": 0.091, "62": 0.088, "63": 0.082, "64": 0.089,
-      "65": 0.085, "71": 0.092, "81": 0.099, "82": 0.095
-    },
-    "nutrientRecommendations": [
-      { "nutrientId": "sodium", "recommendation": "FREE" },
-      { "nutrientId": "saturated_fat", "recommendation": "FREE" }
-    ]
-  }
-]
+    {
+      "id": "migraine", "clinicalKind": "DISEASE", "categoryIds": ["nervous_system"], "course": "EPISODIC", "careDepartmentIds": ["neurology", "headache_clinic"], "sourceIds": ["who_icd11_2025"],
+      "i18n": { "zh": { "label": "偏头痛", "aliases": [], "description": "常表现为反复发作的中重度头痛，可伴恶心、畏光、畏声或先兆。首次或突发的剧烈头痛、神经功能异常等危险信号需要及时急诊评估。" }, "en": { "label": "Migraine", "aliases": [], "description": "A recurrent moderate-to-severe headache disorder that may include nausea, photophobia, phonophobia, or aura. A first or sudden severe headache or focal neurological symptoms warrants urgent assessment." } },
+      "icd11References": [{ "release": "2025-01", "chapterCode": "08", "chapterTitle": { "zh": "神经系统疾病", "en": "Diseases of the nervous system" }, "blockCode": "8A80-8A8Z", "code": "8A80", "title": { "zh": "偏头痛", "en": "Migraine" } }],
+      "nutrientRecommendations": [{ "nutrientId": "sodium", "recommendation": "FREE" }, { "nutrientId": "saturated_fat", "recommendation": "FREE" }]
+    }
+  ]
+}
