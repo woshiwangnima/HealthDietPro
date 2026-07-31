@@ -18,6 +18,7 @@ class DiseaseRepository private constructor(
     private var diseasesById: Map<String, Disease>? = null
     private var categoriesById: Map<String, DiseaseCategory>? = null
     private var departmentsById: Map<String, CareDepartment>? = null
+    private var searchTermsByDiseaseId: Map<String, Set<String>>? = null
 
     fun loadAll(): List<Disease> {
         return loadCatalog().diseases
@@ -31,6 +32,16 @@ class DiseaseRepository private constructor(
             diseasesById = catalog.diseases.associateBy { it.id }
             categoriesById = catalog.categories.associateBy { it.id }
             departmentsById = catalog.departments.associateBy { it.id }
+            searchTermsByDiseaseId = catalog.diseases.associate { disease ->
+                disease.id to buildSet {
+                    add(disease.id.normalizeQuery())
+                    disease.icd11References.forEach { add(it.code.normalizeQuery()) }
+                    disease.i18n.values.forEach { localized ->
+                        add(localized.label.normalizeQuery())
+                        localized.aliases.forEach { add(it.normalizeQuery()) }
+                    }
+                }
+            }
         }
     }
 
@@ -50,14 +61,9 @@ class DiseaseRepository private constructor(
     fun search(query: String, locale: Locale = Locale.getDefault()): List<Disease> {
         val normalized = query.normalizeQuery()
         if (normalized.isEmpty()) return loadAll()
+        loadCatalog()
         return loadAll().filter { disease ->
-            disease.id.normalizeQuery().contains(normalized) ||
-                disease.icd11References.any { reference ->
-                    reference.code.normalizeQuery().contains(normalized)
-                } ||
-                disease.localizedSearchTerms(locale).any { term ->
-                    term.normalizeQuery().contains(normalized)
-                }
+            searchTermsByDiseaseId!![disease.id].orEmpty().any { it.contains(normalized) }
         }
     }
 
@@ -70,6 +76,9 @@ class DiseaseRepository private constructor(
     fun getByDepartment(departmentId: String): List<Disease> =
         loadAll().filter { departmentId in it.careDepartmentIds }
 
+    fun relatedToMetric(metric: HealthMetricKind): List<Disease> =
+        loadAll().filter { disease -> disease.metricReferences.any { it.metric == metric } }
+
     fun findCategoryById(id: String): DiseaseCategory? {
         loadCatalog()
         return categoriesById!![id]
@@ -78,12 +87,6 @@ class DiseaseRepository private constructor(
     fun findDepartmentById(id: String): CareDepartment? {
         loadCatalog()
         return departmentsById!![id]
-    }
-
-    private fun Disease.localizedSearchTerms(locale: Locale): List<String> {
-        val language = locale.language
-        val selected = i18n[language] ?: i18n["zh"] ?: i18n.values.firstOrNull()
-        return selected?.let { listOf(it.label) + it.aliases }.orEmpty()
     }
 
     companion object {

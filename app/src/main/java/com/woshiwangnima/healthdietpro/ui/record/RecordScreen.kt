@@ -38,6 +38,7 @@ import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
 fun RecordScreen(
     uiState: RecordUiState,
     onActionClick: (RecordActionId) -> Unit,
+    onAddActionClick: (RecordActionId) -> Unit,
     onQueryChange: (String) -> Unit,
     onSubmitQuery: (String) -> Unit,
     onRemoveSearchHistory: (String) -> Unit,
@@ -89,6 +90,7 @@ fun RecordScreen(
                             enabled = item.enabled,
                             summary = item.latestTimestamp?.let { timestamp -> stringResource(com.woshiwangnima.healthdietpro.R.string.record_latest_summary, relativeTime(timestamp), item.latestValue.orEmpty()) } ?: stringResource(com.woshiwangnima.healthdietpro.R.string.record_no_data),
                             onClick = { onActionClick(item.id) },
+                            onAddClick = item.id.takeIf { it in quickAddActionIds }?.let { actionId -> { onAddActionClick(actionId) } },
                             modifier = Modifier.weight(1f),
                         )
                     }
@@ -97,6 +99,15 @@ fun RecordScreen(
         }
     }
 }
+
+private val quickAddActionIds = setOf(
+    RecordActionId.Height,
+    RecordActionId.Weight,
+    RecordActionId.BloodGlucose,
+    RecordActionId.BloodPressure,
+    RecordActionId.Waist,
+    RecordActionId.Medication,
+)
 
 @Composable
 private fun relativeTime(timestamp: Long): String {

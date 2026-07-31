@@ -1,4 +1,4 @@
-package com.woshiwangnima.healthdietpro.ui.profile
+﻿package com.woshiwangnima.healthdietpro.ui.profile
 
 import android.Manifest
 import android.content.Intent
@@ -70,7 +70,6 @@ import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.ui.AppTextIconButton
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
-import com.woshiwangnima.healthdietpro.model.disease.AnatomicalTrait
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.AppDate
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
@@ -172,17 +171,11 @@ class ProfileEditActivity : DirtyFormActivity() {
                     },
                     onGenderSelect = {
                         selectedGender = it
-                        selectedDiseaseIds.removeAll { id ->
-                            diseaseRepo.loadAll().none { disease ->
-                                disease.id == id && disease.applicability.allows(selectedGender.anatomicalTraits())
-                            }
-                        }
                         refreshUiState()
                     },
                     onAvatarClick = { avatarPickerLauncher.launch("image/*") },
                     onBirthdayClick = { showBirthdayPicker() },
                     onRegionClick = { showRegionChoiceSheet() },
-                    onDiseaseClick = { showDiseasePicker() },
                     onHeightClick = { openHeightDetail() },
                     onWeightClick = { openWeightDetail() },
                     onBmiClick = { startActivity(Intent(this, BmiDetailActivity::class.java)) },
@@ -232,7 +225,6 @@ class ProfileEditActivity : DirtyFormActivity() {
             selectedGender = selectedGender,
             birthdayText = selectedBirthday?.date ?: getString(R.string.profile_edit_choose),
             regionText = selectedRegion.takeIf { !it.isEmpty() }?.display() ?: getString(R.string.profile_edit_choose),
-            diseaseText = diseaseDisplayText(),
             heightText = latestHeight?.let { "%.1f cm".format(it.value) } ?: getString(R.string.profile_edit_no_record),
             weightText = latestWeight?.let { "%.1f kg".format(it.value) } ?: getString(R.string.profile_edit_no_record),
             bmiText = if (bmi > 0f) "%.1f %s".format(bmi, BmiUtil.getBmiLabel(bmi)) else getString(R.string.profile_edit_no_record),
@@ -241,14 +233,6 @@ class ProfileEditActivity : DirtyFormActivity() {
             avatarInitial = profileName.firstOrNull()?.toString() ?: "?",
             saveEnabled = hasChanges(),
         )
-    }
-
-    private fun diseaseDisplayText(): String {
-        if (selectedDiseaseIds.isEmpty()) return getString(R.string.profile_edit_none)
-        val diseases = diseaseRepo.loadAll()
-        return selectedDiseaseIds.joinToString("、") { id ->
-            diseases.find { it.id == id }?.displayName(Locale.getDefault()) ?: id
-        }
     }
 
     private fun avatarFilePath(): String? =
@@ -435,10 +419,10 @@ class ProfileEditActivity : DirtyFormActivity() {
         dismissCurrentDialog()
         val diseases = diseaseRepo.loadAll()
         val enabled = BooleanArray(diseases.size) { i ->
-            diseases[i].applicability.allows(selectedGender.anatomicalTraits())
+            diseases[i].applicability.allows(selectedGender)
         }
         selectedDiseaseIds.removeAll { id ->
-            diseases.none { it.id == id && it.applicability.allows(selectedGender.anatomicalTraits()) }
+            diseases.none { it.id == id && it.applicability.allows(selectedGender) }
         }
         dialogState = ProfileEditDialogState.DiseasePicker(
             items = diseases.mapIndexed { index, disease ->
@@ -575,7 +559,6 @@ private fun ProfileEditScreen(
     onAvatarClick: () -> Unit,
     onBirthdayClick: () -> Unit,
     onRegionClick: () -> Unit,
-    onDiseaseClick: () -> Unit,
     onHeightClick: () -> Unit,
     onWeightClick: () -> Unit,
     onBmiClick: () -> Unit,
@@ -627,7 +610,6 @@ private fun ProfileEditScreen(
                 }
                 item { ProfileClickableField(stringResource(R.string.profile_edit_birthday), state.birthdayText, onBirthdayClick) }
                 item { ProfileClickableField(stringResource(R.string.profile_edit_region), state.regionText, onRegionClick) }
-                item { ProfileClickableField(stringResource(R.string.profile_edit_disease), state.diseaseText, onDiseaseClick) }
                 item {
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
@@ -957,7 +939,3 @@ private fun Gender.displayText(): String = when (this) {
     Gender.FEMALE -> stringResource(R.string.profile_gender_female)
 }
 
-private fun Gender.anatomicalTraits(): Set<AnatomicalTrait> = when (this) {
-    Gender.MALE -> setOf(AnatomicalTrait.TESTES)
-    Gender.FEMALE -> setOf(AnatomicalTrait.OVARIES)
-}

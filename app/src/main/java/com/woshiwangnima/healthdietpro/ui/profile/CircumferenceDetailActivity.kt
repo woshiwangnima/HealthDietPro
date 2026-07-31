@@ -21,6 +21,7 @@ import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 
@@ -37,6 +38,7 @@ class CircumferenceDetailActivity : BaseActivity() {
     private var recordsByMetric by mutableStateOf<Map<String, List<BodyRecord>>>(emptyMap())
     private var selectedMetric by mutableIntStateOf(0)
     private var editorMetric: CircumferenceMetric? = null
+    private var selectingMetricForNewRecord = false
     private val recordEditor = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val metric = editorMetric ?: return@registerForActivityResult
         if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
@@ -51,20 +53,25 @@ class CircumferenceDetailActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         @Suppress("DEPRECATION")
         recordsByMetric = readRecords(intent.getSerializableExtra(EXTRA_RECORDS))
+        selectingMetricForNewRecord = intent.getBooleanExtra(EXTRA_SELECT_METRIC_FOR_NEW_RECORD, false)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) { override fun handleOnBackPressed() = saveAndFinish() })
         setContent {
             HealthDietProTheme {
-                BaseScreen(title = getString(R.string.circumference_title), onBack = ::saveAndFinish, includeNavigationBarPadding = false) { padding ->
-                    val metric = CircumferenceMetric.entries[selectedMetric]
-                    Column(Modifier.fillMaxSize().padding(padding)) {
-                        EqualWidthSegmentedTabs(CircumferenceMetric.entries.map { EqualWidthTab(it.titleRes) }, selectedMetric, { selectedMetric = it })
-                        val chart = androidx.lifecycle.viewmodel.compose.viewModel<CircumferenceChartViewModel>()
-                        BodyMetricDetailScreen(
-                            title = getString(metric.titleRes), isHeight = true, unitId = "cm", category = UnitCategoryType.Length.id,
-                            records = recordsByMetric[metric.id].orEmpty(), initialTab = 0, chartViewModel = chart,
-                            onTabSelected = {}, onRecordsChanged = { recordsByMetric = recordsByMetric + (metric.id to it) },
-                            onEditRecord = { position -> openEditor(metric, position) }, onBack = ::saveAndFinish, embedded = true, modifier = Modifier.weight(1f),
-                        )
+                if (selectingMetricForNewRecord) {
+                    CircumferenceMetricPicker(onBack = ::saveAndFinish, onMetricSelected = { metric -> openEditor(metric, -1) })
+                } else {
+                    BaseScreen(title = getString(R.string.circumference_title), onBack = ::saveAndFinish, includeNavigationBarPadding = false) { padding ->
+                        val metric = CircumferenceMetric.entries[selectedMetric]
+                        Column(Modifier.fillMaxSize().padding(padding)) {
+                            EqualWidthSegmentedTabs(CircumferenceMetric.entries.map { EqualWidthTab(it.titleRes) }, selectedMetric, { selectedMetric = it })
+                            val chart = androidx.lifecycle.viewmodel.compose.viewModel<CircumferenceChartViewModel>()
+                            BodyMetricDetailScreen(
+                                title = getString(metric.titleRes), isHeight = true, unitId = "cm", category = UnitCategoryType.Length.id,
+                                records = recordsByMetric[metric.id].orEmpty(), initialTab = 0, chartViewModel = chart,
+                                onTabSelected = {}, onRecordsChanged = { recordsByMetric = recordsByMetric + (metric.id to it) },
+                                onEditRecord = { position -> openEditor(metric, position) }, onBack = ::saveAndFinish, embedded = true, modifier = Modifier.weight(1f),
+                            )
+                        }
                     }
                 }
             }
@@ -90,6 +97,7 @@ class CircumferenceDetailActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_RECORDS = "circumference_records"
+        const val EXTRA_SELECT_METRIC_FOR_NEW_RECORD = "select_metric_for_new_record"
 
         /** Validates the serialized map boundary without an unchecked generic cast. */
         fun readRecords(value: java.io.Serializable?): Map<String, List<BodyRecord>> = (value as? Map<*, *>)
@@ -100,6 +108,25 @@ class CircumferenceDetailActivity : BaseActivity() {
             }
             ?.toMap()
             .orEmpty()
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun CircumferenceMetricPicker(
+    onBack: () -> Unit,
+    onMetricSelected: (CircumferenceMetric) -> Unit,
+) {
+    BaseScreen(title = androidx.compose.ui.res.stringResource(R.string.circumference_title), onBack = onBack) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            CircumferenceMetric.entries.forEach { metric ->
+                SettingRow(
+                    title = androidx.compose.ui.res.stringResource(metric.titleRes),
+                    subtitle = "",
+                    leadingIconRes = R.drawable.ic_circumference,
+                    onClick = { onMetricSelected(metric) },
+                )
+            }
+        }
     }
 }
 

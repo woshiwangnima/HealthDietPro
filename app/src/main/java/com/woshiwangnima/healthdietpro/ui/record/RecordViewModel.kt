@@ -3,11 +3,19 @@ package com.woshiwangnima.healthdietpro.ui.record
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRepository
+import com.woshiwangnima.healthdietpro.model.bloodpressure.BloodPressureRepository
+import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
+import com.woshiwangnima.healthdietpro.model.disease.UserCustomDisease
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
+import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
+import com.woshiwangnima.healthdietpro.util.UnitConverter
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,12 +67,30 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
         val context = getApplication<Application>()
         val profile = ProfilePrefs.load(context)
         val glucose = BloodGlucoseRepository.fromContext(context).load().maxByOrNull { it.timestamp }
+        val bloodPressure = BloodPressureRepository.fromContext(context).load().maxByOrNull { it.timestamp }
+        val latestDisease = UserDiseaseRecordRepository.fromContext(context).load().maxByOrNull { it.updatedAt }
+        val customDiseases = UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy(UserCustomDisease::id)
+        val diseaseCatalog = DiseaseRepository.fromContext(context)
+        val pressureUnitId = AppPrefs.getUnit(context, UnitCategoryType.Pressure.id, UnitCategoryType.Pressure.defaultUnitId)
+        val pressureUnit = UnitConverter.getRepository()?.getUnit(UnitCategoryType.Pressure.id, pressureUnitId)
+            ?.symbol(Locale.getDefault()) ?: pressureUnitId
         val medication = MedicationPrefs.getRecords(context).maxByOrNull { it.timestamp }
         val circumference = profile.circumferenceRecords.values.flatten().maxByOrNull { it.recordedAtMillis }
         val latest = mapOf(
             RecordActionId.Height to profile.heightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} cm") },
             RecordActionId.Weight to profile.weightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} kg") },
             RecordActionId.BloodGlucose to glucose?.let { RecordLatest(it.timestamp, "${it.valueMmolPerL} mmol/L") },
+            RecordActionId.BloodPressure to bloodPressure?.let {
+                val systolic = UnitConverter.fromBase(UnitCategoryType.Pressure.id, it.systolicMmhg, pressureUnitId)
+                val diastolic = UnitConverter.fromBase(UnitCategoryType.Pressure.id, it.diastolicMmhg, pressureUnitId)
+                val precision = if (pressureUnitId == "kpa") "%.1f/%.1f %s" else "%.0f/%.0f %s"
+                RecordLatest(it.timestamp, String.format(Locale.getDefault(), precision, systolic, diastolic, pressureUnit))
+            },
+            RecordActionId.Disease to latestDisease?.let { record ->
+                val name = record.disease.curatedDiseaseId?.let { diseaseCatalog.findById(it)?.displayName(Locale.getDefault()) }
+                    ?: record.disease.customDiseaseId?.let { customDiseases[it]?.name }.orEmpty()
+                RecordLatest(record.updatedAt, name)
+            },
             RecordActionId.Medication to medication?.let { RecordLatest(it.timestamp, "${it.medicationName} ${it.doseValue} ${it.doseUnit}") },
             RecordActionId.Waist to circumference?.let { RecordLatest(it.recordedAtMillis, "${it.value} cm") },
         )

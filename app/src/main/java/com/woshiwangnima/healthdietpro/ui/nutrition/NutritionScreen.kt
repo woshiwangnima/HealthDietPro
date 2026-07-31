@@ -72,7 +72,7 @@ import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
 import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
-import com.woshiwangnima.healthdietpro.common.range.NumericRangeBand
+import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.Dish
 import com.woshiwangnima.healthdietpro.model.food.DishTaxonomy
@@ -827,7 +827,7 @@ private fun FoodItem.healthMetricRows(noData: String): List<FoodProfileRow> = li
 private fun HealthMetricInfoSection(
     title: String,
     description: String,
-    bands: List<NumericRangeBand<GlycemicClassification>>? = null,
+    bands: List<RangeBand<Double, GlycemicClassification>>? = null,
 ) {
     Column {
         Text(title, style = MaterialTheme.typography.titleSmall)
@@ -838,7 +838,7 @@ private fun HealthMetricInfoSection(
 
 @Composable
 private fun MetricClassificationTable(
-    bands: List<NumericRangeBand<GlycemicClassification>>,
+    bands: List<RangeBand<Double, GlycemicClassification>>,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -877,7 +877,7 @@ private fun GlycemicClassificationText(classification: GlycemicClassification) {
 }
 
 @Composable
-private fun metricRangeText(band: NumericRangeBand<GlycemicClassification>): String {
+private fun metricRangeText(band: RangeBand<Double, GlycemicClassification>): String {
     val min = band.min?.formatMetricThreshold()
     val max = band.max?.formatMetricThreshold()
     return when {

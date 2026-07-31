@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -25,6 +27,7 @@ fun ActionGridItem(
     enabled: Boolean,
     summary: String,
     onClick: () -> Unit,
+    onAddClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val alpha = if (enabled) 1f else 0.45f
@@ -47,6 +50,16 @@ fun ActionGridItem(
                     modifier = Modifier.weight(1f).padding(start = 8.dp),
                     maxLines = 1,
                 )
+                onAddClick?.let { onAdd ->
+                    IconButton(onClick = onAdd, modifier = Modifier.size(30.dp)) {
+                        Icon(
+                            painter = painterResource(com.woshiwangnima.healthdietpro.R.drawable.ic_add),
+                            contentDescription = stringResource(com.woshiwangnima.healthdietpro.R.string.record_add_action, title),
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
             }
             TextOverflowText(text = summary, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth(), maxLines = 1)
         }

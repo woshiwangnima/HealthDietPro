@@ -63,6 +63,7 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingAnch
 import com.woshiwangnima.healthdietpro.ui.nutrition.NutritionScreen
 import com.woshiwangnima.healthdietpro.ui.nutrition.NutritionViewModel
 import com.woshiwangnima.healthdietpro.ui.profile.BmiDetailActivity
+import com.woshiwangnima.healthdietpro.ui.profile.BodyMetricRecordActivity
 import com.woshiwangnima.healthdietpro.ui.profile.HeightDetailActivity
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileEditActivity
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileScreen
@@ -72,7 +73,10 @@ import com.woshiwangnima.healthdietpro.ui.profile.UserSwitchActivity
 import com.woshiwangnima.healthdietpro.ui.profile.WeightDetailActivity
 import com.woshiwangnima.healthdietpro.ui.profile.CircumferenceDetailActivity
 import com.woshiwangnima.healthdietpro.ui.record.MedicationListActivity
+import com.woshiwangnima.healthdietpro.ui.record.MedicationRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.BloodGlucoseActivity
+import com.woshiwangnima.healthdietpro.ui.record.BloodPressureActivity
+import com.woshiwangnima.healthdietpro.ui.record.DiseaseRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.RecordActionId
 import com.woshiwangnima.healthdietpro.ui.record.RecordScreen
 import com.woshiwangnima.healthdietpro.ui.record.RecordViewModel
@@ -180,6 +184,24 @@ class MainActivity : BaseActivity() {
         ProfilePrefs.save(this, ProfilePrefs.load(this).copy(weightRecords = records))
         profileViewModel.refresh()
         recordViewModel.refresh()
+    }
+    private val heightRecordLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        result.bodyRecordResult()?.let { record ->
+            ProfilePrefs.save(this, ProfilePrefs.load(this).copy(heightRecords = ProfilePrefs.load(this).heightRecords + record))
+            profileViewModel.refresh()
+            recordViewModel.refresh()
+        }
+    }
+    private val weightRecordLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        result.bodyRecordResult()?.let { record ->
+            ProfilePrefs.save(this, ProfilePrefs.load(this).copy(weightRecords = ProfilePrefs.load(this).weightRecords + record))
+            profileViewModel.refresh()
+            recordViewModel.refresh()
+        }
     }
     private val circumferenceDetailLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -362,6 +384,7 @@ class MainActivity : BaseActivity() {
                     RecordScreen(
                         uiState = uiState,
                         onActionClick = ::handleRecordAction,
+                        onAddActionClick = ::handleRecordAddAction,
                         onQueryChange = recordViewModel::setQuery,
                         onSubmitQuery = recordViewModel::submitQuery,
                         onRemoveSearchHistory = recordViewModel::removeSearchHistory,
@@ -661,6 +684,8 @@ class MainActivity : BaseActivity() {
             RecordActionId.Height -> openHeightDetail()
             RecordActionId.Weight -> openWeightDetail()
             RecordActionId.BloodGlucose -> startActivity(Intent(this, BloodGlucoseActivity::class.java))
+            RecordActionId.BloodPressure -> startActivity(Intent(this, BloodPressureActivity::class.java))
+            RecordActionId.Disease -> startActivity(Intent(this, DiseaseRecordActivity::class.java))
             RecordActionId.Medication -> startActivity(Intent(this, MedicationListActivity::class.java))
             RecordActionId.Waist -> openCircumferenceDetail()
             RecordActionId.Period,
@@ -673,6 +698,37 @@ class MainActivity : BaseActivity() {
             RecordActionId.Feeling,
             -> Unit
         }
+    }
+
+    private fun handleRecordAddAction(actionId: RecordActionId) {
+        recordViewModel.recordActionOpened(actionId)
+        when (actionId) {
+            RecordActionId.Height -> openBodyMetricEditor(isHeight = true)
+            RecordActionId.Weight -> openBodyMetricEditor(isHeight = false)
+            RecordActionId.BloodGlucose -> startActivity(Intent(this, BloodGlucoseActivity::class.java).putExtra(BloodGlucoseActivity.EXTRA_OPEN_EDITOR, true))
+            RecordActionId.BloodPressure -> startActivity(Intent(this, BloodPressureActivity::class.java).putExtra(BloodPressureActivity.EXTRA_OPEN_EDITOR, true))
+            RecordActionId.Waist -> openCircumferenceDetail(selectMetricForNewRecord = true)
+            RecordActionId.Medication -> openMedicationRecord()
+            else -> Unit
+        }
+    }
+
+    private fun openBodyMetricEditor(isHeight: Boolean) {
+        val category = if (isHeight) UnitCategoryType.Length else UnitCategoryType.Weight
+        val unit = AppPrefs.getUnit(this, category.id, category.defaultUnitId)
+        val intent = Intent(this, BodyMetricRecordActivity::class.java)
+            .putExtra(BodyMetricRecordActivity.EXTRA_IS_HEIGHT, isHeight)
+            .putExtra(BodyMetricRecordActivity.EXTRA_UNIT_ID, unit)
+            .putExtra(BodyMetricRecordActivity.EXTRA_CATEGORY, category.id)
+        if (isHeight) heightRecordLauncher.launch(intent) else weightRecordLauncher.launch(intent)
+    }
+
+    private fun openMedicationRecord() {
+        if (MedicationPrefs.getCatalog(this).isEmpty()) {
+            Toast.makeText(this, R.string.medication_catalog_empty, Toast.LENGTH_SHORT).show()
+            return
+        }
+        startActivity(Intent(this, MedicationRecordActivity::class.java))
     }
 
     private fun openHeightDetail() {
@@ -691,10 +747,11 @@ class MainActivity : BaseActivity() {
         })
     }
 
-    private fun openCircumferenceDetail() {
+    private fun openCircumferenceDetail(selectMetricForNewRecord: Boolean = false) {
         val profile = ProfilePrefs.load(this)
         circumferenceDetailLauncher.launch(Intent(this, CircumferenceDetailActivity::class.java).apply {
             putExtra(CircumferenceDetailActivity.EXTRA_RECORDS, java.util.HashMap(profile.circumferenceRecords.mapValues { ArrayList(it.value) }))
+            putExtra(CircumferenceDetailActivity.EXTRA_SELECT_METRIC_FOR_NEW_RECORD, selectMetricForNewRecord)
         })
     }
 
@@ -702,6 +759,12 @@ class MainActivity : BaseActivity() {
     private fun androidx.activity.result.ActivityResult.bodyRecordsResult(): List<BodyRecord>? {
         if (resultCode != RESULT_OK) return null
         return data?.getSerializableExtra("records", ArrayList::class.java) as? ArrayList<BodyRecord>
+    }
+
+    @Suppress("DEPRECATION")
+    private fun androidx.activity.result.ActivityResult.bodyRecordResult(): BodyRecord? {
+        if (resultCode != RESULT_OK) return null
+        return data?.getSerializableExtra(BodyMetricRecordActivity.EXTRA_RECORD) as? BodyRecord
     }
 
     private fun applyTestSoftInputMode() {

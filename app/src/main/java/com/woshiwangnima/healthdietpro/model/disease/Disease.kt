@@ -1,6 +1,7 @@
-package com.woshiwangnima.healthdietpro.model.disease
+﻿package com.woshiwangnima.healthdietpro.model.disease
 
 import com.woshiwangnima.healthdietpro.model.i18n.localizedI18nValue
+import com.woshiwangnima.healthdietpro.model.profile.Gender
 import kotlinx.serialization.Serializable
 import java.util.Locale
 
@@ -16,6 +17,7 @@ data class Disease(
     val course: DiseaseCourse = DiseaseCourse.UNSPECIFIED,
     val careDepartmentIds: List<String> = emptyList(),
     val sourceIds: List<String> = emptyList(),
+    val metricReferences: List<DiseaseMetricReference> = emptyList(),
 ) {
     fun displayName(locale: Locale = Locale.getDefault()): String {
         return localizedI18nValue(i18n, locale) { it.label } ?: id
@@ -44,6 +46,7 @@ data class Icd11Reference(
 enum class Icd11MappingType {
     PRIMARY,
     BROADER_TERM,
+    NARROWER_TERM,
     DIFFERENTIAL,
 }
 
@@ -62,6 +65,19 @@ enum class DiseaseCourse {
     EPISODIC,
     UNSPECIFIED,
 }
+
+@Serializable
+enum class HealthMetricKind {
+    BLOOD_GLUCOSE,
+    BLOOD_PRESSURE,
+}
+
+/** Read-only educational link; it does not change measurement rules or reminders. */
+@Serializable
+data class DiseaseMetricReference(
+    val metric: HealthMetricKind,
+    val sourceId: String,
+)
 
 @Serializable
 data class DiseaseCategory(
@@ -85,10 +101,14 @@ data class CareDepartment(
 
 @Serializable
 data class SexApplicability(
+    val applicableGenders: List<Gender> = emptyList(),
     val requiredAnatomicalTraits: List<AnatomicalTrait> = emptyList(),
 ) {
+    fun allows(gender: Gender): Boolean = applicableGenders.isEmpty() || gender in applicableGenders
+
+    @Deprecated("Use gender applicability")
     fun allows(anatomicalTraits: Set<AnatomicalTrait>): Boolean =
-        anatomicalTraits.containsAll(requiredAnatomicalTraits)
+        requiredAnatomicalTraits.isEmpty() || anatomicalTraits.containsAll(requiredAnatomicalTraits)
 }
 
 @Serializable
@@ -114,3 +134,7 @@ data class DiseaseCatalog(
     val sources: List<DiseaseSource>,
     val diseases: List<Disease>,
 )
+
+
+
+

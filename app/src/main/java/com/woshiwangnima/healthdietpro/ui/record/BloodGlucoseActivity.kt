@@ -1,9 +1,11 @@
 package com.woshiwangnima.healthdietpro.ui.record
 
 import android.os.Bundle
+import android.Manifest
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.activity.compose.BackHandler
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,11 +21,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,10 +45,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.activity.compose.rememberLauncherForActivityResult
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
@@ -52,6 +62,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AppFormSubtitle
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.AppNumericStepperField
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
@@ -62,14 +73,21 @@ import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.SettingRow
+import com.woshiwangnima.healthdietpro.common.range.UnitRange
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartEvent
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingAnchor
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseDiabetesType
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseAlertMode
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseReminderSettings
 import com.woshiwangnima.healthdietpro.model.bloodglucose.isValidBloodGlucoseValue
 import com.woshiwangnima.healthdietpro.model.bloodglucose.normalizeBloodGlucoseTimestamp
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
+import com.woshiwangnima.healthdietpro.model.unit.UnitStepMode
+import com.woshiwangnima.healthdietpro.model.unit.stepSpec
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartAxisKind
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartCanvasStyle
@@ -90,25 +108,38 @@ import java.util.UUID
 import java.util.Locale
 
 class BloodGlucoseActivity : BaseActivity() {
+    companion object {
+        const val EXTRA_OPEN_EDITOR = "open_editor"
+    }
+
     private val viewModel: BloodGlucoseViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             HealthDietProTheme {
-                BloodGlucoseScreen(viewModel = viewModel, onBack = ::finish)
+                BloodGlucoseScreen(
+                    viewModel = viewModel,
+                    onBack = ::finish,
+                    openEditorInitially = intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false),
+                )
             }
         }
     }
 }
 
 @Composable
-private fun BloodGlucoseScreen(viewModel: BloodGlucoseViewModel, onBack: () -> Unit) {
+private fun BloodGlucoseScreen(
+    viewModel: BloodGlucoseViewModel,
+    onBack: () -> Unit,
+    openEditorInitially: Boolean,
+) {
     val records by viewModel.records.collectAsStateWithLifecycle()
     val chartState by viewModel.chartState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var editingRecord by remember { mutableStateOf<BloodGlucoseRecord?>(null) }
-    var showEditor by remember { mutableStateOf(false) }
+    var showEditor by remember { mutableStateOf(openEditorInitially) }
+    var route by rememberSaveable { mutableStateOf(BloodGlucoseRoute.Records) }
     val tabs = remember {
         listOf(
             DetailTabItem("chart", R.string.detail_tab_chart, R.drawable.ic_chart),
@@ -116,11 +147,13 @@ private fun BloodGlucoseScreen(viewModel: BloodGlucoseViewModel, onBack: () -> U
         )
     }
 
-    BackHandler(enabled = showEditor) { showEditor = false }
+    BackHandler(enabled = showEditor) {
+        if (openEditorInitially) onBack() else showEditor = false
+    }
     if (showEditor) {
         BloodGlucoseEditorScreen(
             record = editingRecord,
-            onBack = { showEditor = false },
+            onBack = { if (openEditorInitially) onBack() else showEditor = false },
             onSave = { record ->
                 viewModel.upsert(record)
                 showEditor = false
@@ -128,8 +161,47 @@ private fun BloodGlucoseScreen(viewModel: BloodGlucoseViewModel, onBack: () -> U
         )
         return
     }
+    BackHandler(enabled = route != BloodGlucoseRoute.Records) {
+        route = when (route) {
+            BloodGlucoseRoute.Targets -> BloodGlucoseRoute.Settings
+            BloodGlucoseRoute.Reminders -> BloodGlucoseRoute.Settings
+            BloodGlucoseRoute.Settings, BloodGlucoseRoute.Records -> BloodGlucoseRoute.Records
+        }
+    }
 
-    BaseScreen(title = stringResource(R.string.blood_glucose_title), onBack = onBack, includeNavigationBarPadding = false) { padding ->
+    if (route == BloodGlucoseRoute.Settings) {
+        BloodGlucoseSettingsScreen(onBack = { route = BloodGlucoseRoute.Records }, onOpenTargets = { route = BloodGlucoseRoute.Targets }, onOpenReminders = { route = BloodGlucoseRoute.Reminders })
+        return
+    }
+    if (route == BloodGlucoseRoute.Targets) {
+        val diabetesType by viewModel.diabetesType.collectAsStateWithLifecycle()
+        BloodGlucoseTargetRangeScreen(
+            diabetesType = diabetesType,
+            onBack = { route = BloodGlucoseRoute.Settings },
+            onSelectDiabetesType = viewModel::setDiabetesType,
+        )
+        return
+    }
+    if (route == BloodGlucoseRoute.Reminders) {
+        val reminderSettings by viewModel.reminderSettings.collectAsStateWithLifecycle()
+        BloodGlucoseReminderSettingsScreen(
+            settings = reminderSettings,
+            onBack = { route = BloodGlucoseRoute.Settings },
+            onSettingsChange = viewModel::setReminderSettings,
+        )
+        return
+    }
+
+    BaseScreen(
+        title = stringResource(R.string.blood_glucose_title),
+        onBack = onBack,
+        includeNavigationBarPadding = false,
+        actions = {
+            IconButton(onClick = { route = BloodGlucoseRoute.Settings }) {
+                Icon(painterResource(R.drawable.ic_settings), contentDescription = stringResource(R.string.blood_glucose_settings_title))
+            }
+        },
+    ) { padding ->
         Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
             AnimatedPageContent(
                 targetState = selectedTab,
@@ -154,6 +226,281 @@ private fun BloodGlucoseScreen(viewModel: BloodGlucoseViewModel, onBack: () -> U
             }
         }
     }
+}
+
+private enum class BloodGlucoseRoute { Records, Settings, Targets, Reminders }
+
+@Composable
+private fun BloodGlucoseSettingsScreen(onBack: () -> Unit, onOpenTargets: () -> Unit, onOpenReminders: () -> Unit) {
+    BaseScreen(title = stringResource(R.string.blood_glucose_settings_title), onBack = onBack) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            SettingRow(
+                title = stringResource(R.string.blood_glucose_target_range_settings),
+                subtitle = stringResource(R.string.blood_glucose_target_range_settings_desc),
+                leadingIconRes = R.drawable.ic_blood_glucose,
+                onClick = onOpenTargets,
+            )
+            HorizontalDivider()
+            SettingRow(
+                title = stringResource(R.string.blood_glucose_reminder_settings),
+                subtitle = stringResource(R.string.blood_glucose_reminder_settings_desc),
+                leadingIconRes = R.drawable.ic_notification,
+                onClick = onOpenReminders,
+            )
+            HorizontalDivider()
+            SettingRow(
+                title = stringResource(R.string.blood_glucose_do_not_disturb_settings),
+                subtitle = stringResource(R.string.blood_glucose_do_not_disturb_settings_desc),
+                leadingIconRes = R.drawable.ic_do_not_disturb,
+                onClick = {},
+            )
+        }
+    }
+}
+
+@Composable
+private fun BloodGlucoseReminderSettingsScreen(
+    settings: BloodGlucoseReminderSettings,
+    onBack: () -> Unit,
+    onSettingsChange: (BloodGlucoseReminderSettings) -> Unit,
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    val unitId = AppPrefs.getUnit(context, UnitCategoryType.Glucose.id, UnitCategoryType.Glucose.defaultUnitId)
+    val unitLabel = glucoseUnitOptions().firstOrNull { it.id == unitId }?.label ?: unitId
+    val glucoseStep = UnitCategoryType.Glucose.stepSpec(unitId).valueFor(UnitStepMode.Normal)
+    fun update(next: BloodGlucoseReminderSettings) = onSettingsChange(next)
+    fun requestPermissionWhenEnabled(enabled: Boolean) {
+        if (enabled && android.os.Build.VERSION.SDK_INT >= 33 && androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+    BaseScreen(title = stringResource(R.string.blood_glucose_reminder_settings), onBack = onBack) { padding ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(padding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            item {
+                BloodGlucoseReminderCard {
+                    BloodGlucoseReminderToggle(stringResource(R.string.blood_glucose_alert_high_enabled), settings.highEnabled) {
+                        requestPermissionWhenEnabled(it); update(settings.copy(highEnabled = it))
+                    }
+                    AppNumericStepperField(
+                        label = stringResource(R.string.blood_glucose_alert_high_threshold),
+                        value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, settings.highThresholdMmolPerL, unitId),
+                        unit = unitLabel,
+                        step = glucoseStep,
+                        onValueChange = { update(settings.copy(highThresholdMmolPerL = UnitConverter.toBase(UnitCategoryType.Glucose.id, it, unitId))) },
+                    )
+                }
+            }
+            item {
+                BloodGlucoseReminderCard {
+                    BloodGlucoseReminderToggle(stringResource(R.string.blood_glucose_alert_low_enabled), settings.lowEnabled) {
+                        requestPermissionWhenEnabled(it); update(settings.copy(lowEnabled = it))
+                    }
+                    AppNumericStepperField(
+                        label = stringResource(R.string.blood_glucose_alert_low_threshold),
+                        value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, settings.lowThresholdMmolPerL, unitId),
+                        unit = unitLabel,
+                        step = glucoseStep,
+                        onValueChange = { update(settings.copy(lowThresholdMmolPerL = UnitConverter.toBase(UnitCategoryType.Glucose.id, it, unitId))) },
+                    )
+                }
+            }
+            item {
+                BloodGlucoseReminderCard {
+                    BloodGlucoseReminderToggle(stringResource(R.string.blood_glucose_alert_emergency_low_enabled), settings.emergencyLowEnabled) {
+                        requestPermissionWhenEnabled(it); update(settings.copy(emergencyLowEnabled = it))
+                    }
+                    AppNumericStepperField(
+                        label = stringResource(R.string.blood_glucose_alert_emergency_low_threshold),
+                        value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, settings.emergencyLowThresholdMmolPerL, unitId),
+                        unit = unitLabel,
+                        step = glucoseStep,
+                        onValueChange = { update(settings.copy(emergencyLowThresholdMmolPerL = UnitConverter.toBase(UnitCategoryType.Glucose.id, it, unitId))) },
+                    )
+                }
+            }
+            item {
+                BloodGlucoseTrendReminderSection(
+                    toggleTitle = stringResource(R.string.blood_glucose_alert_rising_title),
+                    enabled = settings.risingEnabled,
+                    mode = settings.risingMode,
+                    intervalMinutes = UnitConverter.fromBase(UnitCategoryType.Time.id, settings.risingReminderIntervalSeconds.toFloat(), "min").toInt(),
+                    durationSeconds = settings.risingAlertDurationSeconds,
+                    onEnabledChange = { requestPermissionWhenEnabled(it); update(settings.copy(risingEnabled = it)) },
+                    onModeChange = { update(settings.copy(risingMode = it)) },
+                    onIntervalChange = { update(settings.copy(risingReminderIntervalSeconds = UnitConverter.toBase(UnitCategoryType.Time.id, it.toFloat(), "min").toInt())) },
+                    onDurationChange = { update(settings.copy(risingAlertDurationSeconds = it)) },
+                )
+            }
+            item {
+                BloodGlucoseTrendReminderSection(
+                    toggleTitle = stringResource(R.string.blood_glucose_alert_falling_title),
+                    enabled = settings.fallingEnabled,
+                    mode = settings.fallingMode,
+                    intervalMinutes = UnitConverter.fromBase(UnitCategoryType.Time.id, settings.fallingReminderIntervalSeconds.toFloat(), "min").toInt(),
+                    durationSeconds = settings.fallingAlertDurationSeconds,
+                    onEnabledChange = { requestPermissionWhenEnabled(it); update(settings.copy(fallingEnabled = it)) },
+                    onModeChange = { update(settings.copy(fallingMode = it)) },
+                    onIntervalChange = { update(settings.copy(fallingReminderIntervalSeconds = UnitConverter.toBase(UnitCategoryType.Time.id, it.toFloat(), "min").toInt())) },
+                    onDurationChange = { update(settings.copy(fallingAlertDurationSeconds = it)) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BloodGlucoseReminderCard(content: @Composable () -> Unit) {
+    androidx.compose.material3.Surface(
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun BloodGlucoseReminderSection(content: @Composable () -> Unit) {
+    BloodGlucoseReminderCard {
+        content()
+    }
+}
+
+@Composable
+private fun BloodGlucoseReminderToggle(title: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+@Composable
+private fun BloodGlucoseTrendReminderSection(
+    toggleTitle: String,
+    enabled: Boolean,
+    mode: BloodGlucoseAlertMode,
+    intervalMinutes: Int,
+    durationSeconds: Int,
+    onEnabledChange: (Boolean) -> Unit,
+    onModeChange: (BloodGlucoseAlertMode) -> Unit,
+    onIntervalChange: (Int) -> Unit,
+    onDurationChange: (Int) -> Unit,
+) {
+    BloodGlucoseReminderSection {
+        BloodGlucoseReminderToggle(toggleTitle, enabled, onEnabledChange)
+        AppDropdownField(
+            label = stringResource(R.string.blood_glucose_alert_mode),
+            value = stringResource(mode.labelRes()),
+            options = BloodGlucoseAlertMode.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
+            onSelect = { onModeChange(BloodGlucoseAlertMode.valueOf(it.id)) },
+        )
+        AppNumericStepperField(stringResource(R.string.blood_glucose_alert_interval), intervalMinutes.toFloat(), stringResource(R.string.blood_glucose_minutes), UnitCategoryType.Time.stepSpec("min").valueFor(UnitStepMode.Normal), onValueChange = { onIntervalChange(it.toInt().coerceAtLeast(1)) })
+        AppNumericStepperField(stringResource(R.string.blood_glucose_alert_duration), durationSeconds.toFloat(), stringResource(R.string.blood_glucose_seconds), 1f, onValueChange = { onDurationChange(it.toInt().coerceAtLeast(1)) })
+    }
+}
+
+@Composable
+private fun BloodGlucoseAlertMode.labelRes(): Int = when (this) {
+    BloodGlucoseAlertMode.Sound -> R.string.blood_glucose_alert_mode_sound
+    BloodGlucoseAlertMode.Vibration -> R.string.blood_glucose_alert_mode_vibration
+    BloodGlucoseAlertMode.SoundAndVibration -> R.string.blood_glucose_alert_mode_sound_and_vibration
+}
+
+@Composable
+private fun BloodGlucoseTargetRangeScreen(
+    diabetesType: BloodGlucoseDiabetesType,
+    onBack: () -> Unit,
+    onSelectDiabetesType: (BloodGlucoseDiabetesType) -> Unit,
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val unitId = AppPrefs.getUnit(context, UnitCategoryType.Glucose.id, UnitCategoryType.Glucose.defaultUnitId)
+    val unitLabel = glucoseUnitOptions().firstOrNull { it.id == unitId }?.label ?: unitId
+    var showTypePicker by remember { mutableStateOf(false) }
+    val targetRange = diabetesType.targetRange(unitId)
+    BaseScreen(title = stringResource(R.string.blood_glucose_target_range_settings), onBack = onBack) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            SettingRow(
+                title = stringResource(R.string.blood_glucose_diabetes_type),
+                subtitle = stringResource(R.string.blood_glucose_diabetes_type_desc),
+                leadingIconRes = R.drawable.ic_medical_history,
+                trailingValue = stringResource(diabetesType.labelRes()),
+                onClick = { showTypePicker = true },
+            )
+            HorizontalDivider()
+            SettingRow(
+                title = stringResource(R.string.blood_glucose_target_range),
+                subtitle = stringResource(R.string.blood_glucose_target_range_desc),
+                leadingIconRes = R.drawable.ic_blood_glucose,
+                trailingValue = bloodGlucoseTargetRangeText(targetRange, unitLabel),
+                onClick = {},
+                clickable = false,
+            )
+            HorizontalDivider()
+            Text(
+                text = stringResource(R.string.blood_glucose_target_range_recommendations),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            )
+            AppDataTable(
+                rows = BloodGlucoseDiabetesType.entries.toList(),
+                rowKey = { _, type -> type.name },
+                columns = listOf(
+                    AppDataTableColumn("type", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_diabetes_type)) }, ColumnWidth.Fixed(180.dp)) { AppDataTableText(stringResource(it.labelRes())) },
+                    AppDataTableColumn("range", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_target_range)) }, ColumnWidth.Fixed(160.dp)) { AppDataTableText(bloodGlucoseTargetRangeText(it.targetRange(unitId), unitLabel)) },
+                ),
+                showRowNumber = false,
+                showPager = false,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+    if (showTypePicker) {
+        BackHandler { showTypePicker = false }
+        AlertDialog(
+            onDismissRequest = { showTypePicker = false },
+            title = { Text(stringResource(R.string.blood_glucose_diabetes_type)) },
+            text = {
+                LazyColumn {
+                    items(BloodGlucoseDiabetesType.entries.size) { index ->
+                        val type = BloodGlucoseDiabetesType.entries[index]
+                        Row(
+                            modifier = Modifier.fillMaxWidth().then(if (type.available) Modifier.clickable { onSelectDiabetesType(type); showTypePicker = false } else Modifier).padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(selected = type == diabetesType, onClick = null, enabled = type.available)
+                            Column(Modifier.padding(start = 8.dp)) {
+                                Text(stringResource(type.labelRes()), color = if (type.available) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
+                                if (!type.available) Text(stringResource(R.string.blood_glucose_diabetes_type_unavailable), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showTypePicker = false }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } },
+        )
+    }
+}
+
+@Composable
+private fun BloodGlucoseDiabetesType.labelRes(): Int = when (this) {
+    BloodGlucoseDiabetesType.Normal -> R.string.blood_glucose_diabetes_type_normal
+    BloodGlucoseDiabetesType.Type1 -> R.string.blood_glucose_diabetes_type_type_1
+    BloodGlucoseDiabetesType.Type2 -> R.string.blood_glucose_diabetes_type_type_2
+    BloodGlucoseDiabetesType.Gestational -> R.string.blood_glucose_diabetes_type_gestational
+    BloodGlucoseDiabetesType.Other -> R.string.blood_glucose_diabetes_type_other
+}
+
+private fun bloodGlucoseTargetRangeText(range: UnitRange<Float>, unitLabel: String): String {
+    val min = requireNotNull(range.min)
+    val max = requireNotNull(range.max)
+    return String.format(Locale.getDefault(), "%.1f-%.1f %s", min, max, unitLabel)
 }
 
 @Composable

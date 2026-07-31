@@ -113,6 +113,13 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - 同一页面的图表/数据等二级内容切换复用上述标准或共享导航动画组件；动画必须在浅色和深色主题下均保持可辨识的前景与背景对比。
 - 预加载与切换动画不得改变现有单向数据流：UI 只触发 ViewModel 的幂等预热入口，状态仍由 `StateFlow` 回流。
 
+## Compose 页面返回
+
+- 一个 Activity 内通过 Compose 状态呈现的二级/三级页面必须同时处理顶部返回按钮和系统返回手势/按键；禁止只给 `BaseScreen.onBack` 赋值。
+- 页面状态不是根页面时，使用 `BackHandler(enabled = true)` 按完整层级逐级回退，例如 `详情 -> 设置 -> 列表`，而不是直接退出 Activity 或跳回根页。
+- 弹窗、选择器、编辑器等暂态 UI 的 `BackHandler` 优先级必须高于页面路由：系统返回先关闭暂态 UI，再返回上一级页面。
+- 页面路由的 `BackHandler` 必须在实际渲染该路由分支前保持组合，避免因提前 `return` 导致系统返回未注册。
+
 ## 工作流
 
 - 不主动 commit / push（除非明确要求）。

@@ -3,6 +3,7 @@ package com.woshiwangnima.healthdietpro.ui.record
 import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -57,14 +58,23 @@ class MedicationListActivity : BaseActivity() {
                 )
             }
         }
+        if (intent.getBooleanExtra(EXTRA_OPEN_RECORD, false)) openRecord(null)
     }
 
     private fun openRecord(record: MedicationRecord?) {
+        if (record == null && MedicationPrefs.getCatalog(this).isEmpty()) {
+            Toast.makeText(this, R.string.medication_catalog_empty, Toast.LENGTH_SHORT).show()
+            return
+        }
         medicationLauncher.launch(
             Intent(this, MedicationRecordActivity::class.java).apply {
                 record?.let { putExtra(MedicationRecordActivity.EXTRA_RECORD_ID, it.id) }
             },
         )
+    }
+
+    companion object {
+        const val EXTRA_OPEN_RECORD = "open_record"
     }
 
     private fun openCatalogItem(item: MedicationCatalogItem?) {
@@ -93,6 +103,7 @@ private fun MedicationListRoute(
         onBack = onBack,
         onTabSelected = viewModel::selectTab,
         onAddRecord = onAddRecord,
+        canAddRecord = uiState.catalog.isNotEmpty(),
         onEditRecord = onEditRecord,
         onDeleteRecord = viewModel::deleteRecord,
         onAddCatalogItem = onAddCatalogItem,

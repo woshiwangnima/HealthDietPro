@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
@@ -55,6 +56,7 @@ internal fun MedicationListScreen(
     onBack: () -> Unit,
     onTabSelected: (Int) -> Unit,
     onAddRecord: () -> Unit,
+    canAddRecord: Boolean,
     onEditRecord: (MedicationRecord) -> Unit,
     onDeleteRecord: (MedicationRecord) -> Unit,
     onAddCatalogItem: () -> Unit,
@@ -82,6 +84,7 @@ internal fun MedicationListScreen(
                     1 -> MedicationRecordsPage(
                         records = uiState.records,
                         onAdd = onAddRecord,
+                        canAdd = canAddRecord,
                         onEdit = onEditRecord,
                         onDelete = onDeleteRecord,
                     )
@@ -169,6 +172,7 @@ private fun MedicationReminderPage() {
 private fun MedicationRecordsPage(
     records: List<MedicationRecord>,
     onAdd: () -> Unit,
+    canAdd: Boolean,
     onEdit: (MedicationRecord) -> Unit,
     onDelete: (MedicationRecord) -> Unit,
 ) {
@@ -212,6 +216,7 @@ private fun MedicationRecordsPage(
                 text = stringResource(R.string.medication_record_add),
                 iconRes = R.drawable.ic_add,
                 onClick = onAdd,
+                modifier = Modifier.alpha(if (canAdd) 1f else 0.45f),
             )
         }
         if (records.isEmpty()) {

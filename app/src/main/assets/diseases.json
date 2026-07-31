@@ -1,111 +1,1640 @@
 {
   "schemaVersion": 1,
   "categories": [
-    { "id": "endocrine_metabolic", "i18n": { "zh": "内分泌与代谢", "en": "Endocrine and metabolic" } },
-    { "id": "circulatory", "i18n": { "zh": "循环系统", "en": "Circulatory system" } },
-    { "id": "digestive", "i18n": { "zh": "消化系统", "en": "Digestive system" } },
-    { "id": "genitourinary", "i18n": { "zh": "泌尿生殖系统", "en": "Genitourinary system" } },
-    { "id": "sleep", "i18n": { "zh": "睡眠觉醒", "en": "Sleep-wake" } },
-    { "id": "musculoskeletal", "i18n": { "zh": "肌肉骨骼", "en": "Musculoskeletal" } },
-    { "id": "nervous_system", "i18n": { "zh": "神经系统", "en": "Nervous system" } },
-    { "id": "sexual_health", "i18n": { "zh": "性健康", "en": "Sexual health" } }
+    {
+      "id": "endocrine_metabolic",
+      "i18n": {
+        "zh": "内分泌与代谢",
+        "en": "Endocrine and metabolic"
+      }
+    },
+    {
+      "id": "circulatory",
+      "i18n": {
+        "zh": "循环系统",
+        "en": "Circulatory system"
+      }
+    },
+    {
+      "id": "digestive",
+      "i18n": {
+        "zh": "消化系统",
+        "en": "Digestive system"
+      }
+    },
+    {
+      "id": "genitourinary",
+      "i18n": {
+        "zh": "泌尿生殖系统",
+        "en": "Genitourinary system"
+      }
+    },
+    {
+      "id": "sleep",
+      "i18n": {
+        "zh": "睡眠觉醒",
+        "en": "Sleep-wake"
+      }
+    },
+    {
+      "id": "musculoskeletal",
+      "i18n": {
+        "zh": "肌肉骨骼",
+        "en": "Musculoskeletal"
+      }
+    },
+    {
+      "id": "nervous_system",
+      "i18n": {
+        "zh": "神经系统",
+        "en": "Nervous system"
+      }
+    },
+    {
+      "id": "sexual_health",
+      "i18n": {
+        "zh": "性健康",
+        "en": "Sexual health"
+      }
+    },
+    {
+      "id": "neoplasms",
+      "i18n": {
+        "zh": "肿瘤",
+        "en": "Neoplasms"
+      }
+    }
   ],
   "departments": [
-    { "id": "cardiology", "i18n": { "zh": "心血管内科", "en": "Cardiology" } },
-    { "id": "general_medicine", "i18n": { "zh": "全科医学科", "en": "General practice" } },
-    { "id": "endocrinology", "i18n": { "zh": "内分泌科", "en": "Endocrinology" } },
-    { "id": "nutrition", "i18n": { "zh": "临床营养科", "en": "Clinical nutrition" } },
-    { "id": "gynecology", "i18n": { "zh": "妇科", "en": "Gynecology" } },
-    { "id": "reproductive_medicine", "i18n": { "zh": "生殖医学科", "en": "Reproductive medicine" } },
-    { "id": "hepatology", "i18n": { "zh": "肝病科", "en": "Hepatology" } },
-    { "id": "gastroenterology", "i18n": { "zh": "消化内科", "en": "Gastroenterology" } },
-    { "id": "cardiothoracic_surgery", "i18n": { "zh": "心脏大血管外科", "en": "Cardiothoracic surgery" } },
-    { "id": "nephrology", "i18n": { "zh": "肾内科", "en": "Nephrology" } },
-    { "id": "urology", "i18n": { "zh": "泌尿外科", "en": "Urology" } },
-    { "id": "sleep_medicine", "i18n": { "zh": "睡眠医学科", "en": "Sleep medicine" } },
-    { "id": "respiratory_medicine", "i18n": { "zh": "呼吸与危重症医学科", "en": "Respiratory medicine" } },
-    { "id": "otolaryngology", "i18n": { "zh": "耳鼻咽喉科", "en": "Otolaryngology" } },
-    { "id": "orthopedics", "i18n": { "zh": "骨科", "en": "Orthopedics" } },
-    { "id": "rheumatology", "i18n": { "zh": "风湿免疫科", "en": "Rheumatology" } },
-    { "id": "rehabilitation", "i18n": { "zh": "康复医学科", "en": "Rehabilitation medicine" } },
-    { "id": "neurology", "i18n": { "zh": "神经内科", "en": "Neurology" } },
-    { "id": "headache_clinic", "i18n": { "zh": "头痛门诊", "en": "Headache clinic" } }
+    {
+      "id": "cardiology",
+      "i18n": {
+        "zh": "心血管内科",
+        "en": "Cardiology"
+      }
+    },
+    {
+      "id": "general_medicine",
+      "i18n": {
+        "zh": "全科医学科",
+        "en": "General practice"
+      }
+    },
+    {
+      "id": "endocrinology",
+      "i18n": {
+        "zh": "内分泌科",
+        "en": "Endocrinology"
+      }
+    },
+    {
+      "id": "nutrition",
+      "i18n": {
+        "zh": "临床营养科",
+        "en": "Clinical nutrition"
+      }
+    },
+    {
+      "id": "gynecology",
+      "i18n": {
+        "zh": "妇科",
+        "en": "Gynecology"
+      }
+    },
+    {
+      "id": "reproductive_medicine",
+      "i18n": {
+        "zh": "生殖医学科",
+        "en": "Reproductive medicine"
+      }
+    },
+    {
+      "id": "hepatology",
+      "i18n": {
+        "zh": "肝病科",
+        "en": "Hepatology"
+      }
+    },
+    {
+      "id": "gastroenterology",
+      "i18n": {
+        "zh": "消化内科",
+        "en": "Gastroenterology"
+      }
+    },
+    {
+      "id": "cardiothoracic_surgery",
+      "i18n": {
+        "zh": "心脏大血管外科",
+        "en": "Cardiothoracic surgery"
+      }
+    },
+    {
+      "id": "nephrology",
+      "i18n": {
+        "zh": "肾内科",
+        "en": "Nephrology"
+      }
+    },
+    {
+      "id": "urology",
+      "i18n": {
+        "zh": "泌尿外科",
+        "en": "Urology"
+      }
+    },
+    {
+      "id": "sleep_medicine",
+      "i18n": {
+        "zh": "睡眠医学科",
+        "en": "Sleep medicine"
+      }
+    },
+    {
+      "id": "respiratory_medicine",
+      "i18n": {
+        "zh": "呼吸与危重症医学科",
+        "en": "Respiratory medicine"
+      }
+    },
+    {
+      "id": "otolaryngology",
+      "i18n": {
+        "zh": "耳鼻咽喉科",
+        "en": "Otolaryngology"
+      }
+    },
+    {
+      "id": "orthopedics",
+      "i18n": {
+        "zh": "骨科",
+        "en": "Orthopedics"
+      }
+    },
+    {
+      "id": "rheumatology",
+      "i18n": {
+        "zh": "风湿免疫科",
+        "en": "Rheumatology"
+      }
+    },
+    {
+      "id": "rehabilitation",
+      "i18n": {
+        "zh": "康复医学科",
+        "en": "Rehabilitation medicine"
+      }
+    },
+    {
+      "id": "neurology",
+      "i18n": {
+        "zh": "神经内科",
+        "en": "Neurology"
+      }
+    },
+    {
+      "id": "headache_clinic",
+      "i18n": {
+        "zh": "头痛门诊",
+        "en": "Headache clinic"
+      }
+    },
+    {
+      "id": "pediatric_cardiology",
+      "i18n": {
+        "zh": "小儿心脏科",
+        "en": "Pediatric cardiology"
+      }
+    },
+    {
+      "id": "oncology",
+      "i18n": {
+        "zh": "肿瘤科",
+        "en": "Oncology"
+      }
+    },
+    {
+      "id": "breast_surgery",
+      "i18n": {
+        "zh": "乳腺外科",
+        "en": "Breast surgery"
+      }
+    },
+    {
+      "id": "vascular_surgery",
+      "i18n": {
+        "zh": "血管外科",
+        "en": "Vascular surgery"
+      }
+    }
   ],
   "sources": [
-    { "id": "who_icd11_2025", "title": { "zh": "WHO ICD-11 死亡和疾病统计版", "en": "WHO ICD-11 for Mortality and Morbidity Statistics" }, "url": "https://icd.who.int/browse11/l-m/en", "version": "2025-01", "accessedOn": "2026-07-28" }
+    {
+      "id": "who_icd11_2025",
+      "title": {
+        "zh": "WHO ICD-11 死亡和疾病统计版",
+        "en": "WHO ICD-11 for Mortality and Morbidity Statistics"
+      },
+      "url": "https://icd.who.int/browse11/l-m/en",
+      "version": "2025-01",
+      "accessedOn": "2026-07-28"
+    }
   ],
   "diseases": [
     {
-      "id": "hypertension", "clinicalKind": "DISEASE", "categoryIds": ["circulatory"], "course": "CHRONIC", "careDepartmentIds": ["cardiology", "general_medicine"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "高血压", "aliases": ["原发性高血压"], "description": "以体循环动脉血压持续升高为特征的慢性心血管疾病。诊断、危险分层和药物调整应由医疗专业人员结合规范血压测量及靶器官风险评估完成。" }, "en": { "label": "Hypertension", "aliases": ["Essential hypertension"], "description": "A chronic cardiovascular condition characterized by persistently elevated systemic arterial blood pressure. Diagnosis, risk stratification, and treatment adjustment require standardized measurements and clinical assessment." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "11", "chapterTitle": { "zh": "循环系统疾病", "en": "Diseases of the circulatory system" }, "blockCode": "BA00-BA04", "code": "BA00", "title": { "zh": "原发性高血压", "en": "Essential hypertension" } }],
-      "nutrientRecommendations": [{ "nutrientId": "sodium", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "potassium", "recommendation": "INCREASE" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }, { "nutrientId": "saturated_fat", "recommendation": "LIMIT" }]
+      "id": "hypertension",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "circulatory"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "cardiology",
+        "general_medicine"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "高血压",
+          "aliases": [
+            "原发性高血压"
+          ],
+          "description": "以体循环动脉血压持续升高为特征的慢性心血管疾病。诊断、危险分层和药物调整应由医疗专业人员结合规范血压测量及靶器官风险评估完成。"
+        },
+        "en": {
+          "label": "Hypertension",
+          "aliases": [
+            "Essential hypertension"
+          ],
+          "description": "A chronic cardiovascular condition characterized by persistently elevated systemic arterial blood pressure. Diagnosis, risk stratification, and treatment adjustment require standardized measurements and clinical assessment."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "11",
+          "chapterTitle": {
+            "zh": "循环系统疾病",
+            "en": "Diseases of the circulatory system"
+          },
+          "blockCode": "BA00-BA04",
+          "code": "BA00",
+          "title": {
+            "zh": "原发性高血压",
+            "en": "Essential hypertension"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "sodium",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "potassium",
+          "recommendation": "INCREASE"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        },
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "LIMIT"
+        }
+      ]
     },
     {
-      "id": "type2_diabetes", "clinicalKind": "DISEASE", "categoryIds": ["endocrine_metabolic"], "course": "CHRONIC", "careDepartmentIds": ["endocrinology", "general_medicine", "nutrition"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "2型糖尿病", "aliases": ["2型DM"], "description": "以胰岛素抵抗和胰岛素分泌相对不足导致的慢性高血糖为主要特征。需要长期监测血糖及并发症风险，并在医生和营养专业人员指导下进行生活方式和药物管理。" }, "en": { "label": "Type 2 Diabetes", "aliases": ["Type 2 diabetes mellitus", "T2DM"], "description": "A chronic hyperglycemic disorder mainly characterized by insulin resistance and relative insulin secretory deficiency. Long-term glucose and complication-risk monitoring, lifestyle care, and medicines require professional guidance." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "05", "chapterTitle": { "zh": "内分泌、营养或代谢疾病", "en": "Endocrine, nutritional or metabolic diseases" }, "blockCode": "5A10-5A1Z", "code": "5A11", "title": { "zh": "2型糖尿病", "en": "Type 2 diabetes mellitus" } }],
-      "nutrientRecommendations": [{ "nutrientId": "carbohydrate", "recommendation": "LIMIT" }, { "nutrientId": "sugar", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }]
+      "id": "type1_diabetes",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "endocrine_metabolic"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "endocrinology",
+        "general_medicine",
+        "nutrition"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "1型糖尿病",
+          "aliases": [
+            "1型DM",
+            "胰岛素依赖型糖尿病"
+          ],
+          "description": "因自身免疫破坏胰岛β细胞导致胰岛素绝对缺乏的慢性高血糖状态。需终身依赖外源性胰岛素治疗，并需在专业指导下进行血糖监测、营养管理和并发症筛查。"
+        },
+        "en": {
+          "label": "Type 1 Diabetes Mellitus",
+          "aliases": [
+            "T1DM",
+            "Insulin-dependent diabetes"
+          ],
+          "description": "A chronic hyperglycaemic state resulting from autoimmune destruction of pancreatic beta cells, leading to absolute insulin deficiency. Requires lifelong exogenous insulin therapy, with professional guidance on glucose monitoring, nutritional management, and complication screening."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "05",
+          "chapterTitle": {
+            "zh": "内分泌、营养或代谢疾病",
+            "en": "Endocrine, nutritional or metabolic diseases"
+          },
+          "blockCode": "5A10-5A1Z",
+          "code": "5A10",
+          "title": {
+            "zh": "1型糖尿病",
+            "en": "Type 1 diabetes mellitus"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "carbohydrate",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "sugar",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        }
+      ]
     },
     {
-      "id": "dyslipidemia", "clinicalKind": "RISK_STATE", "categoryIds": ["endocrine_metabolic", "circulatory"], "course": "CHRONIC", "careDepartmentIds": ["endocrinology", "cardiology"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "血脂异常", "aliases": ["高脂血症"], "description": "指血浆脂质或脂蛋白水平异常，包括胆固醇、甘油三酯升高或高密度脂蛋白胆固醇降低等表型。应结合整体动脉粥样硬化性心血管风险决定干预方案。" }, "en": { "label": "Dyslipidemia", "aliases": ["Hyperlipidemia"], "description": "Abnormal plasma lipid or lipoprotein levels, including elevated cholesterol or triglycerides and low HDL cholesterol. Management should be based on overall atherosclerotic cardiovascular risk." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "05", "chapterTitle": { "zh": "内分泌、营养或代谢疾病", "en": "Endocrine, nutritional or metabolic diseases" }, "blockCode": "5C80-5C8Z", "code": "5C80", "title": { "zh": "脂蛋白代谢障碍", "en": "Disorders of lipoprotein metabolism" } }],
-      "nutrientRecommendations": [{ "nutrientId": "saturated_fat", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "cholesterol", "recommendation": "LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }]
+      "id": "type2_diabetes",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "endocrine_metabolic"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "endocrinology",
+        "general_medicine",
+        "nutrition"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "2型糖尿病",
+          "aliases": [
+            "2型DM"
+          ],
+          "description": "以胰岛素抵抗和胰岛素分泌相对不足导致的慢性高血糖为主要特征。需要长期监测血糖及并发症风险，并在医生和营养专业人员指导下进行生活方式和药物管理。"
+        },
+        "en": {
+          "label": "Type 2 Diabetes",
+          "aliases": [
+            "Type 2 diabetes mellitus",
+            "T2DM"
+          ],
+          "description": "A chronic hyperglycemic disorder mainly characterized by insulin resistance and relative insulin secretory deficiency. Long-term glucose and complication-risk monitoring, lifestyle care, and medicines require professional guidance."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "05",
+          "chapterTitle": {
+            "zh": "内分泌、营养或代谢疾病",
+            "en": "Endocrine, nutritional or metabolic diseases"
+          },
+          "blockCode": "5A10-5A1Z",
+          "code": "5A11",
+          "title": {
+            "zh": "2型糖尿病",
+            "en": "Type 2 diabetes mellitus"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "carbohydrate",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "sugar",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        }
+      ]
     },
     {
-      "id": "pcos", "clinicalKind": "SYNDROME", "categoryIds": ["sexual_health", "endocrine_metabolic"], "applicability": { "requiredAnatomicalTraits": ["OVARIES"] }, "course": "CHRONIC", "careDepartmentIds": ["gynecology", "endocrinology", "reproductive_medicine"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "多囊卵巢综合征", "aliases": ["PCOS"], "description": "育龄女性常见的内分泌与代谢综合征，可表现为排卵障碍、高雄激素表现和多囊卵巢形态。诊断需排除其他病因，并由妇科或内分泌专科综合评估。" }, "en": { "label": "Polycystic Ovary Syndrome", "aliases": ["PCOS"], "description": "A common endocrine-metabolic syndrome in reproductive-age women that may involve ovulatory dysfunction, hyperandrogenism, and polycystic ovarian morphology. Diagnosis requires exclusion of alternative causes and specialist assessment." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "17", "chapterTitle": { "zh": "性健康相关状况", "en": "Conditions related to sexual health" }, "blockCode": "GA34", "code": "GA34.2", "title": { "zh": "多囊卵巢综合征", "en": "Polycystic ovarian syndrome" } }],
-      "nutrientRecommendations": [{ "nutrientId": "carbohydrate", "recommendation": "LIMIT" }, { "nutrientId": "sugar", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "saturated_fat", "recommendation": "LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }]
+      "id": "gestational_diabetes",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "endocrine_metabolic"
+      ],
+      "applicability": {
+        "requiredPhysiologicalStates": [
+          "PREGNANT"
+        ]
+      },
+      "course": "EPISODIC",
+      "careDepartmentIds": [
+        "endocrinology",
+        "gynecology",
+        "nutrition"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "妊娠期糖尿病",
+          "aliases": [
+            "GDM"
+          ],
+          "description": "妊娠期间首次发现或发生的糖耐量异常，通常在妊娠中晚期诊断。需通过饮食调整、血糖监测和必要时的胰岛素治疗来管理，以降低母婴并发症风险。"
+        },
+        "en": {
+          "label": "Gestational Diabetes Mellitus",
+          "aliases": [
+            "GDM"
+          ],
+          "description": "Glucose intolerance first recognised or occurring during pregnancy, usually diagnosed in the second or third trimester. Management includes dietary adjustment, blood glucose monitoring, and insulin therapy if necessary to reduce maternal and neonatal complications."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "18",
+          "chapterTitle": {
+            "zh": "妊娠、分娩或产褥期",
+            "en": "Pregnancy, childbirth or the puerperium"
+          },
+          "blockCode": "JA60-JA6Z",
+          "code": "JA63",
+          "title": {
+            "zh": "妊娠期糖尿病",
+            "en": "Gestational diabetes mellitus"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "carbohydrate",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "sugar",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        }
+      ]
     },
     {
-      "id": "fatty_liver", "clinicalKind": "DISEASE", "categoryIds": ["digestive", "endocrine_metabolic"], "course": "CHRONIC", "careDepartmentIds": ["hepatology", "gastroenterology", "endocrinology"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "代谢功能障碍相关脂肪性肝病", "aliases": ["脂肪肝", "MASLD", "非酒精性脂肪性肝病"], "description": "指肝细胞脂肪变并伴代谢风险因素的脂肪性肝病。酒精相关及其他病因的脂肪性肝病应另行诊断和编码。" }, "en": { "label": "Metabolic Dysfunction-Associated Steatotic Liver Disease", "aliases": ["MASLD", "Fatty liver", "Nonalcoholic fatty liver disease"], "description": "Steatotic liver disease with hepatic steatosis and metabolic risk factors. Alcohol-related and other causes of steatotic liver disease require separate diagnosis and coding." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "13", "chapterTitle": { "zh": "消化系统疾病", "en": "Diseases of the digestive system" }, "blockCode": "DB92", "code": "DB92.0", "title": { "zh": "非酒精性脂肪性肝病", "en": "Nonalcoholic fatty liver disease" }, "mappingType": "BROADER_TERM" }],
-      "nutrientRecommendations": [{ "nutrientId": "energy", "recommendation": "LIMIT" }, { "nutrientId": "saturated_fat", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "sugar", "recommendation": "LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }]
+      "id": "dyslipidemia",
+      "clinicalKind": "RISK_STATE",
+      "categoryIds": [
+        "endocrine_metabolic",
+        "circulatory"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "endocrinology",
+        "cardiology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "血脂异常",
+          "aliases": [
+            "高脂血症"
+          ],
+          "description": "指血浆脂质或脂蛋白水平异常，包括胆固醇、甘油三酯升高或高密度脂蛋白胆固醇降低等表型。应结合整体动脉粥样硬化性心血管风险决定干预方案。"
+        },
+        "en": {
+          "label": "Dyslipidemia",
+          "aliases": [
+            "Hyperlipidemia"
+          ],
+          "description": "Abnormal plasma lipid or lipoprotein levels, including elevated cholesterol or triglycerides and low HDL cholesterol. Management should be based on overall atherosclerotic cardiovascular risk."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "05",
+          "chapterTitle": {
+            "zh": "内分泌、营养或代谢疾病",
+            "en": "Endocrine, nutritional or metabolic diseases"
+          },
+          "blockCode": "5C80-5C8Z",
+          "code": "5C80",
+          "title": {
+            "zh": "脂蛋白代谢障碍",
+            "en": "Disorders of lipoprotein metabolism"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "cholesterol",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        }
+      ]
     },
     {
-      "id": "coronary_heart_disease", "clinicalKind": "DISEASE", "categoryIds": ["circulatory"], "course": "CHRONIC", "careDepartmentIds": ["cardiology", "cardiothoracic_surgery"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "冠状动脉粥样硬化性心脏病", "aliases": ["冠心病", "CHD"], "description": "通常由冠状动脉粥样硬化导致心肌供血不足。胸痛、呼吸困难或疑似急性冠脉综合征时应立即急诊评估，不能仅依靠饮食建议处理。" }, "en": { "label": "Coronary Heart Disease", "aliases": ["CHD", "Chronic ischaemic heart disease"], "description": "Commonly results from coronary atherosclerosis and inadequate myocardial blood supply. Chest pain, breathlessness, or suspected acute coronary syndrome requires immediate emergency assessment, not dietary advice alone." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "11", "chapterTitle": { "zh": "循环系统疾病", "en": "Diseases of the circulatory system" }, "blockCode": "BA80-BA8Z", "code": "BA80", "title": { "zh": "慢性缺血性心脏病", "en": "Chronic ischaemic heart disease" } }],
-      "nutrientRecommendations": [{ "nutrientId": "saturated_fat", "recommendation": "FORBID" }, { "nutrientId": "cholesterol", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "sodium", "recommendation": "LIMIT" }, { "nutrientId": "dietary_fiber", "recommendation": "INCREASE" }, { "nutrientId": "potassium", "recommendation": "INCREASE" }]
+      "id": "pcos",
+      "clinicalKind": "SYNDROME",
+      "categoryIds": [
+        "sexual_health",
+        "endocrine_metabolic"
+      ],
+      "applicability": {
+        "requiredAnatomicalTraits": [
+          "OVARIES"
+        ]
+      },
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "gynecology",
+        "endocrinology",
+        "reproductive_medicine"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "多囊卵巢综合征",
+          "aliases": [
+            "PCOS"
+          ],
+          "description": "育龄女性常见的内分泌与代谢综合征，可表现为排卵障碍、高雄激素表现和多囊卵巢形态。诊断需排除其他病因，并由妇科或内分泌专科综合评估。"
+        },
+        "en": {
+          "label": "Polycystic Ovary Syndrome",
+          "aliases": [
+            "PCOS"
+          ],
+          "description": "A common endocrine-metabolic syndrome in reproductive-age women that may involve ovulatory dysfunction, hyperandrogenism, and polycystic ovarian morphology. Diagnosis requires exclusion of alternative causes and specialist assessment."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "17",
+          "chapterTitle": {
+            "zh": "性健康相关状况",
+            "en": "Conditions related to sexual health"
+          },
+          "blockCode": "GA34",
+          "code": "GA34.2",
+          "title": {
+            "zh": "多囊卵巢综合征",
+            "en": "Polycystic ovarian syndrome"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "carbohydrate",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "sugar",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        }
+      ]
     },
     {
-      "id": "chronic_kidney_disease", "clinicalKind": "DISEASE", "categoryIds": ["genitourinary"], "course": "CHRONIC", "careDepartmentIds": ["nephrology", "urology"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "慢性肾病", "aliases": ["CKD"], "description": "指肾脏结构或功能异常持续至少三个月并影响健康的状态。分期、蛋白质和电解质限制须根据估算肾小球滤过率、尿蛋白和合并症由肾内科个体化制定。" }, "en": { "label": "Chronic Kidney Disease", "aliases": ["CKD"], "description": "A condition of kidney structure or function abnormality persisting for at least three months with health implications. Staging and protein or electrolyte restrictions must be individualized by nephrology using eGFR, albuminuria, and comorbidity data." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "16", "chapterTitle": { "zh": "泌尿生殖系统疾病", "en": "Diseases of the genitourinary system" }, "blockCode": "GB60-GB61", "code": "GB60", "title": { "zh": "慢性肾病", "en": "Chronic kidney disease" } }],
-      "nutrientRecommendations": [{ "nutrientId": "sodium", "recommendation": "STRICT_LIMIT" }, { "nutrientId": "potassium", "recommendation": "LIMIT" }, { "nutrientId": "protein", "recommendation": "LIMIT" }]
+      "id": "fatty_liver",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "digestive",
+        "endocrine_metabolic"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "hepatology",
+        "gastroenterology",
+        "endocrinology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "代谢功能障碍相关脂肪性肝病",
+          "aliases": [
+            "脂肪肝",
+            "MASLD",
+            "非酒精性脂肪性肝病"
+          ],
+          "description": "指肝细胞脂肪变并伴代谢风险因素的脂肪性肝病。酒精相关及其他病因的脂肪性肝病应另行诊断和编码。"
+        },
+        "en": {
+          "label": "Metabolic Dysfunction-Associated Steatotic Liver Disease",
+          "aliases": [
+            "MASLD",
+            "Fatty liver",
+            "Nonalcoholic fatty liver disease"
+          ],
+          "description": "Steatotic liver disease with hepatic steatosis and metabolic risk factors. Alcohol-related and other causes of steatotic liver disease require separate diagnosis and coding."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "13",
+          "chapterTitle": {
+            "zh": "消化系统疾病",
+            "en": "Diseases of the digestive system"
+          },
+          "blockCode": "DB92",
+          "code": "DB92.0",
+          "title": {
+            "zh": "非酒精性脂肪性肝病",
+            "en": "Nonalcoholic fatty liver disease"
+          },
+          "mappingType": "BROADER_TERM"
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "energy",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "sugar",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        }
+      ]
     },
     {
-      "id": "osa", "clinicalKind": "DISEASE", "categoryIds": ["sleep"], "course": "CHRONIC", "careDepartmentIds": ["sleep_medicine", "respiratory_medicine", "otolaryngology"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "阻塞性睡眠呼吸暂停", "aliases": ["OSA", "阻塞性睡眠呼吸暂停低通气综合征"], "description": "睡眠中反复发生上气道塌陷，导致呼吸暂停或低通气、间歇性低氧和睡眠片段化。确诊通常依赖睡眠监测。" }, "en": { "label": "Obstructive Sleep Apnoea", "aliases": ["OSA"], "description": "Recurrent upper-airway collapse during sleep causes apnoea or hypopnoea, intermittent hypoxaemia, and sleep fragmentation. Diagnosis usually requires sleep testing." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "07", "chapterTitle": { "zh": "睡眠觉醒障碍", "en": "Sleep-wake disorders" }, "blockCode": "7A40", "code": "7A40.0", "title": { "zh": "阻塞性睡眠呼吸暂停", "en": "Obstructive sleep apnoea" } }],
-      "nutrientRecommendations": [{ "nutrientId": "energy", "recommendation": "LIMIT" }, { "nutrientId": "saturated_fat", "recommendation": "LIMIT" }, { "nutrientId": "sugar", "recommendation": "LIMIT" }]
+      "id": "coronary_heart_disease",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "circulatory"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "cardiology",
+        "cardiothoracic_surgery"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "冠状动脉粥样硬化性心脏病",
+          "aliases": [
+            "冠心病",
+            "CHD"
+          ],
+          "description": "通常由冠状动脉粥样硬化导致心肌供血不足。胸痛、呼吸困难或疑似急性冠脉综合征时应立即急诊评估，不能仅依靠饮食建议处理。"
+        },
+        "en": {
+          "label": "Coronary Heart Disease",
+          "aliases": [
+            "CHD",
+            "Chronic ischaemic heart disease"
+          ],
+          "description": "Commonly results from coronary atherosclerosis and inadequate myocardial blood supply. Chest pain, breathlessness, or suspected acute coronary syndrome requires immediate emergency assessment, not dietary advice alone."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "11",
+          "chapterTitle": {
+            "zh": "循环系统疾病",
+            "en": "Diseases of the circulatory system"
+          },
+          "blockCode": "BA80-BA8Z",
+          "code": "BA80",
+          "title": {
+            "zh": "慢性缺血性心脏病",
+            "en": "Chronic ischaemic heart disease"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "FORBID"
+        },
+        {
+          "nutrientId": "cholesterol",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "sodium",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        },
+        {
+          "nutrientId": "potassium",
+          "recommendation": "INCREASE"
+        }
+      ]
     },
     {
-      "id": "osteoarthritis", "clinicalKind": "DISEASE", "categoryIds": ["musculoskeletal"], "course": "CHRONIC", "careDepartmentIds": ["orthopedics", "rheumatology", "rehabilitation"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "骨关节炎", "aliases": ["OA"], "description": "以关节软骨退变、骨重塑和疼痛功能受限为主要表现的慢性关节疾病，常累及膝、髋、手等关节。" }, "en": { "label": "Osteoarthritis", "aliases": ["OA"], "description": "A chronic joint disease marked by cartilage degeneration, bone remodeling, pain, and functional limitation, often affecting the knee, hip, or hand." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "15", "chapterTitle": { "zh": "肌肉骨骼系统或结缔组织疾病", "en": "Diseases of the musculoskeletal system or connective tissue" }, "blockCode": "FA00-FA0Z", "code": "FA00", "title": { "zh": "骨关节炎", "en": "Osteoarthritis" } }],
-      "nutrientRecommendations": [{ "nutrientId": "calcium", "recommendation": "INCREASE" }, { "nutrientId": "energy", "recommendation": "LIMIT" }]
+      "id": "chronic_kidney_disease",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "genitourinary"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "nephrology",
+        "urology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "慢性肾病",
+          "aliases": [
+            "CKD"
+          ],
+          "description": "指肾脏结构或功能异常持续至少三个月并影响健康的状态。分期、蛋白质和电解质限制须根据估算肾小球滤过率、尿蛋白和合并症由肾内科个体化制定。"
+        },
+        "en": {
+          "label": "Chronic Kidney Disease",
+          "aliases": [
+            "CKD"
+          ],
+          "description": "A condition of kidney structure or function abnormality persisting for at least three months with health implications. Staging and protein or electrolyte restrictions must be individualized by nephrology using eGFR, albuminuria, and comorbidity data."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "16",
+          "chapterTitle": {
+            "zh": "泌尿生殖系统疾病",
+            "en": "Diseases of the genitourinary system"
+          },
+          "blockCode": "GB60-GB61",
+          "code": "GB60",
+          "title": {
+            "zh": "慢性肾病",
+            "en": "Chronic kidney disease"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "sodium",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "potassium",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "protein",
+          "recommendation": "LIMIT"
+        }
+      ]
     },
     {
-      "id": "hyperuricemia", "clinicalKind": "LABORATORY_ABNORMALITY", "categoryIds": ["endocrine_metabolic"], "course": "CHRONIC", "careDepartmentIds": ["rheumatology", "nephrology", "endocrinology"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "高尿酸血症", "aliases": ["高尿酸"], "description": "指血尿酸水平升高，是痛风和尿酸性肾结石的风险因素，但并非所有患者都会发生痛风。" }, "en": { "label": "Hyperuricaemia", "aliases": ["Hyperuricemia"], "description": "Elevated serum urate is a risk factor for gout and uric-acid stones, but not every person develops gout." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "05", "chapterTitle": { "zh": "内分泌、营养或代谢疾病", "en": "Endocrine, nutritional or metabolic diseases" }, "blockCode": "5C56", "code": "5C56.0", "title": { "zh": "高尿酸血症", "en": "Hyperuricaemia" } }],
-      "nutrientRecommendations": [{ "nutrientId": "protein", "recommendation": "LIMIT" }, { "nutrientId": "energy", "recommendation": "LIMIT" }, { "nutrientId": "sugar", "recommendation": "LIMIT" }]
+      "id": "osa",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "sleep"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "sleep_medicine",
+        "respiratory_medicine",
+        "otolaryngology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "阻塞性睡眠呼吸暂停",
+          "aliases": [
+            "OSA",
+            "阻塞性睡眠呼吸暂停低通气综合征"
+          ],
+          "description": "睡眠中反复发生上气道塌陷，导致呼吸暂停或低通气、间歇性低氧和睡眠片段化。确诊通常依赖睡眠监测。"
+        },
+        "en": {
+          "label": "Obstructive Sleep Apnoea",
+          "aliases": [
+            "OSA"
+          ],
+          "description": "Recurrent upper-airway collapse during sleep causes apnoea or hypopnoea, intermittent hypoxaemia, and sleep fragmentation. Diagnosis usually requires sleep testing."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "07",
+          "chapterTitle": {
+            "zh": "睡眠觉醒障碍",
+            "en": "Sleep-wake disorders"
+          },
+          "blockCode": "7A40",
+          "code": "7A40.0",
+          "title": {
+            "zh": "阻塞性睡眠呼吸暂停",
+            "en": "Obstructive sleep apnoea"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "energy",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "sugar",
+          "recommendation": "LIMIT"
+        }
+      ]
     },
     {
-      "id": "hypothyroidism", "clinicalKind": "DISEASE", "categoryIds": ["endocrine_metabolic"], "course": "CHRONIC", "careDepartmentIds": ["endocrinology", "general_medicine"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "甲状腺功能减退症", "aliases": ["甲减"], "description": "甲状腺激素分泌不足导致的内分泌疾病，可出现乏力、怕冷、体重变化等非特异症状。" }, "en": { "label": "Hypothyroidism", "aliases": ["Underactive thyroid"], "description": "An endocrine disorder caused by insufficient thyroid-hormone production and potentially associated with nonspecific symptoms such as fatigue, cold intolerance, and weight change." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "05", "chapterTitle": { "zh": "内分泌、营养或代谢疾病", "en": "Endocrine, nutritional or metabolic diseases" }, "blockCode": "5A00-5A0Z", "code": "5A00", "title": { "zh": "甲状腺功能减退症", "en": "Hypothyroidism" } }],
-      "nutrientRecommendations": [{ "nutrientId": "dietary_fiber", "recommendation": "FREE" }, { "nutrientId": "calcium", "recommendation": "INCREASE" }, { "nutrientId": "iron", "recommendation": "INCREASE" }]
+      "id": "osteoarthritis",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "musculoskeletal"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "orthopedics",
+        "rheumatology",
+        "rehabilitation"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "骨关节炎",
+          "aliases": [
+            "OA"
+          ],
+          "description": "以关节软骨退变、骨重塑和疼痛功能受限为主要表现的慢性关节疾病，常累及膝、髋、手等关节。"
+        },
+        "en": {
+          "label": "Osteoarthritis",
+          "aliases": [
+            "OA"
+          ],
+          "description": "A chronic joint disease marked by cartilage degeneration, bone remodeling, pain, and functional limitation, often affecting the knee, hip, or hand."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "15",
+          "chapterTitle": {
+            "zh": "肌肉骨骼系统或结缔组织疾病",
+            "en": "Diseases of the musculoskeletal system or connective tissue"
+          },
+          "blockCode": "FA00-FA0Z",
+          "code": "FA00",
+          "title": {
+            "zh": "骨关节炎",
+            "en": "Osteoarthritis"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "calcium",
+          "recommendation": "INCREASE"
+        },
+        {
+          "nutrientId": "energy",
+          "recommendation": "LIMIT"
+        }
+      ]
     },
     {
-      "id": "migraine", "clinicalKind": "DISEASE", "categoryIds": ["nervous_system"], "course": "EPISODIC", "careDepartmentIds": ["neurology", "headache_clinic"], "sourceIds": ["who_icd11_2025"],
-      "i18n": { "zh": { "label": "偏头痛", "aliases": [], "description": "常表现为反复发作的中重度头痛，可伴恶心、畏光、畏声或先兆。首次或突发的剧烈头痛、神经功能异常等危险信号需要及时急诊评估。" }, "en": { "label": "Migraine", "aliases": [], "description": "A recurrent moderate-to-severe headache disorder that may include nausea, photophobia, phonophobia, or aura. A first or sudden severe headache or focal neurological symptoms warrants urgent assessment." } },
-      "icd11References": [{ "release": "2025-01", "chapterCode": "08", "chapterTitle": { "zh": "神经系统疾病", "en": "Diseases of the nervous system" }, "blockCode": "8A80-8A8Z", "code": "8A80", "title": { "zh": "偏头痛", "en": "Migraine" } }],
-      "nutrientRecommendations": [{ "nutrientId": "sodium", "recommendation": "FREE" }, { "nutrientId": "saturated_fat", "recommendation": "FREE" }]
+      "id": "hyperuricemia",
+      "clinicalKind": "LABORATORY_ABNORMALITY",
+      "categoryIds": [
+        "endocrine_metabolic"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "rheumatology",
+        "nephrology",
+        "endocrinology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "高尿酸血症",
+          "aliases": [
+            "高尿酸"
+          ],
+          "description": "指血尿酸水平升高，是痛风和尿酸性肾结石的风险因素，但并非所有患者都会发生痛风。"
+        },
+        "en": {
+          "label": "Hyperuricaemia",
+          "aliases": [
+            "Hyperuricemia"
+          ],
+          "description": "Elevated serum urate is a risk factor for gout and uric-acid stones, but not every person develops gout."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "05",
+          "chapterTitle": {
+            "zh": "内分泌、营养或代谢疾病",
+            "en": "Endocrine, nutritional or metabolic diseases"
+          },
+          "blockCode": "5C56",
+          "code": "5C56.0",
+          "title": {
+            "zh": "高尿酸血症",
+            "en": "Hyperuricaemia"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "protein",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "energy",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "sugar",
+          "recommendation": "LIMIT"
+        }
+      ]
+    },
+    {
+      "id": "hypothyroidism",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "endocrine_metabolic"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "endocrinology",
+        "general_medicine"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "甲状腺功能减退症",
+          "aliases": [
+            "甲减"
+          ],
+          "description": "甲状腺激素分泌不足导致的内分泌疾病，可出现乏力、怕冷、体重变化等非特异症状。"
+        },
+        "en": {
+          "label": "Hypothyroidism",
+          "aliases": [
+            "Underactive thyroid"
+          ],
+          "description": "An endocrine disorder caused by insufficient thyroid-hormone production and potentially associated with nonspecific symptoms such as fatigue, cold intolerance, and weight change."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "05",
+          "chapterTitle": {
+            "zh": "内分泌、营养或代谢疾病",
+            "en": "Endocrine, nutritional or metabolic diseases"
+          },
+          "blockCode": "5A00-5A0Z",
+          "code": "5A00",
+          "title": {
+            "zh": "甲状腺功能减退症",
+            "en": "Hypothyroidism"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "FREE"
+        },
+        {
+          "nutrientId": "calcium",
+          "recommendation": "INCREASE"
+        },
+        {
+          "nutrientId": "iron",
+          "recommendation": "INCREASE"
+        }
+      ]
+    },
+    {
+      "id": "migraine",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "nervous_system"
+      ],
+      "course": "EPISODIC",
+      "careDepartmentIds": [
+        "neurology",
+        "headache_clinic"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "偏头痛",
+          "aliases": [],
+          "description": "常表现为反复发作的中重度头痛，可伴恶心、畏光、畏声或先兆。首次或突发的剧烈头痛、神经功能异常等危险信号需要及时急诊评估。"
+        },
+        "en": {
+          "label": "Migraine",
+          "aliases": [],
+          "description": "A recurrent moderate-to-severe headache disorder that may include nausea, photophobia, phonophobia, or aura. A first or sudden severe headache or focal neurological symptoms warrants urgent assessment."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "08",
+          "chapterTitle": {
+            "zh": "神经系统疾病",
+            "en": "Diseases of the nervous system"
+          },
+          "blockCode": "8A80-8A8Z",
+          "code": "8A80",
+          "title": {
+            "zh": "偏头痛",
+            "en": "Migraine"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "sodium",
+          "recommendation": "FREE"
+        },
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "FREE"
+        }
+      ]
+    },
+    {
+      "id": "atrial_septal_defect",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "circulatory"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "cardiology",
+        "cardiothoracic_surgery",
+        "pediatric_cardiology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "房间隔缺损",
+          "aliases": [
+            "房缺",
+            "ASD"
+          ],
+          "description": "一种先天性心脏畸形，指心房之间存在异常交通（缺损）。缺损类型、大小和血流动力学影响各异，需由心脏专科根据超声心动图等检查评估，部分患者可能需要介入或外科治疗。"
+        },
+        "en": {
+          "label": "Atrial Septal Defect",
+          "aliases": [
+            "ASD"
+          ],
+          "description": "A congenital cardiac malformation in which there is an abnormal communication (defect) between the atrial chambers. The type, size, and hemodynamic impact of the defect vary; specialist cardiac assessment with echocardiography is required, and some cases may need interventional or surgical treatment."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "20",
+          "chapterTitle": {
+            "zh": "发育异常",
+            "en": "Developmental anomalies"
+          },
+          "blockCode": "LA80-LA8Z",
+          "code": "LA8E",
+          "title": {
+            "zh": "房间隔先天性异常",
+            "en": "Congenital anomaly of atrial septum"
+          },
+          "mappingType": "BROADER_TERM"
+        },
+        {
+          "release": "2025-01",
+          "chapterCode": "20",
+          "chapterTitle": {
+            "zh": "发育异常",
+            "en": "Developmental anomalies"
+          },
+          "blockCode": "LA80-LA8Z",
+          "code": "LA8E.1",
+          "title": {
+            "zh": "卵圆窝内房间隔缺损",
+            "en": "Atrial septal defect within oval fossa"
+          },
+          "mappingType": "NARROWER_TERM"
+        }
+      ],
+      "nutrientRecommendations": []
+    },
+    {
+      "id": "breast_cancer",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "neoplasms"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "oncology",
+        "breast_surgery",
+        "general_medicine"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "乳腺癌",
+          "aliases": [
+            "乳癌"
+          ],
+          "description": "起源于乳腺组织的恶性肿瘤，绝大多数为癌。治疗方案（手术、放疗、化疗、内分泌治疗、靶向治疗等）需由多学科团队根据病理分型、分期和患者状况个体化制定。"
+        },
+        "en": {
+          "label": "Breast Cancer",
+          "aliases": [
+            "Carcinoma of breast"
+          ],
+          "description": "A malignant neoplasm originating from breast tissue, the vast majority being carcinomas. Treatment (surgery, radiotherapy, chemotherapy, endocrine therapy, targeted therapy, etc.) requires a multidisciplinary approach based on pathological subtype, stage, and patient condition."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "02",
+          "chapterTitle": {
+            "zh": "肿瘤",
+            "en": "Neoplasms"
+          },
+          "blockCode": "2C60-2C6Z",
+          "code": "2C61",
+          "title": {
+            "zh": "乳腺浸润性癌",
+            "en": "Invasive carcinoma of breast"
+          },
+          "mappingType": "BROADER_TERM"
+        },
+        {
+          "release": "2025-01",
+          "chapterCode": "02",
+          "chapterTitle": {
+            "zh": "肿瘤",
+            "en": "Neoplasms"
+          },
+          "blockCode": "2C60-2C6Z",
+          "code": "2C61.0",
+          "title": {
+            "zh": "乳腺浸润性导管癌",
+            "en": "Invasive ductal carcinoma of breast"
+          },
+          "mappingType": "NARROWER_TERM"
+        }
+      ],
+      "nutrientRecommendations": []
+    },
+    {
+      "id": "atherosclerosis",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "circulatory"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "cardiology",
+        "vascular_surgery",
+        "general_medicine"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "动脉粥样硬化",
+          "aliases": [
+            "血管粥样硬化",
+            "粥样硬化"
+          ],
+          "description": "一种慢性动脉疾病，特征为脂质、炎症细胞等物质在动脉内膜下沉积形成斑块，导致动脉壁增厚、僵硬和管腔狭窄。可累及全身各部位动脉，是冠心病、脑卒中和外周动脉疾病的主要病因。"
+        },
+        "en": {
+          "label": "Atherosclerosis",
+          "aliases": [
+            "Atherosclerotic vascular disease"
+          ],
+          "description": "A chronic arterial disease characterized by the deposition of lipids, inflammatory cells, and other substances beneath the intima, forming plaques that lead to thickening, stiffening, and narrowing of arterial walls. It can affect arteries throughout the body and is the leading cause of coronary heart disease, stroke, and peripheral arterial disease."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "11",
+          "chapterTitle": {
+            "zh": "循环系统疾病",
+            "en": "Diseases of the circulatory system"
+          },
+          "blockCode": "BD40",
+          "code": "BD40",
+          "title": {
+            "zh": "动脉粥样硬化性慢性动脉闭塞性疾病",
+            "en": "Atherosclerotic chronic arterial occlusive disease"
+          },
+          "mappingType": "BROADER_TERM"
+        },
+        {
+          "release": "2025-01",
+          "chapterCode": "11",
+          "chapterTitle": {
+            "zh": "循环系统疾病",
+            "en": "Diseases of the circulatory system"
+          },
+          "blockCode": "BA50-BA5Z",
+          "code": "BA52",
+          "title": {
+            "zh": "冠状动脉粥样硬化",
+            "en": "Coronary atherosclerosis"
+          },
+          "mappingType": "NARROWER_TERM"
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "cholesterol",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        },
+        {
+          "nutrientId": "sodium",
+          "recommendation": "LIMIT"
+        }
+      ]
+    },
+    {
+      "id": "ischaemic_stroke",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "nervous_system"
+      ],
+      "course": "EPISODIC",
+      "careDepartmentIds": [
+        "neurology",
+        "general_medicine"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "缺血性脑卒中",
+          "aliases": [
+            "脑梗死",
+            "脑梗塞"
+          ],
+          "description": "因脑部血流供应中断（多为血栓或栓塞）导致脑组织缺血、缺氧性坏死。表现为突发的神经功能缺损，如偏瘫、失语、意识障碍等，属于急危重症，需立即急诊救治。"
+        },
+        "en": {
+          "label": "Ischaemic Stroke",
+          "aliases": [
+            "Cerebral infarction",
+            "Brain attack"
+          ],
+          "description": "Necrosis of brain tissue due to interruption of blood supply (usually by thrombosis or embolism), resulting in sudden neurological deficits such as hemiparesis, aphasia, or impaired consciousness. It is a medical emergency requiring immediate care."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "08",
+          "chapterTitle": {
+            "zh": "神经系统疾病",
+            "en": "Diseases of the nervous system"
+          },
+          "blockCode": "8B10-8B1Z",
+          "code": "8B11",
+          "title": {
+            "zh": "缺血性脑卒中",
+            "en": "Ischaemic stroke"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "sodium",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "saturated_fat",
+          "recommendation": "STRICT_LIMIT"
+        },
+        {
+          "nutrientId": "dietary_fiber",
+          "recommendation": "INCREASE"
+        },
+        {
+          "nutrientId": "potassium",
+          "recommendation": "INCREASE"
+        }
+      ]
+    },
+    {
+      "id": "peptic_ulcer",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "digestive"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "gastroenterology",
+        "general_medicine"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "消化性溃疡",
+          "aliases": [
+            "胃溃疡",
+            "十二指肠溃疡"
+          ],
+          "description": "指胃或十二指肠黏膜发生的局限性缺损，常与幽门螺杆菌感染、非甾体抗炎药使用等因素相关。典型表现为上腹痛、腹胀或出血，需由消化专科进行内镜评估和病因治疗。"
+        },
+        "en": {
+          "label": "Peptic Ulcer",
+          "aliases": [
+            "Gastric ulcer",
+            "Duodenal ulcer"
+          ],
+          "description": "A localised defect in the gastric or duodenal mucosa, often associated with Helicobacter pylori infection or NSAID use. Typical presentations include epigastric pain, bloating, or bleeding; endoscopic evaluation and aetiological treatment by a gastroenterologist are required."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "13",
+          "chapterTitle": {
+            "zh": "消化系统疾病",
+            "en": "Diseases of the digestive system"
+          },
+          "blockCode": "DA60-DA6Z",
+          "code": "DA61",
+          "title": {
+            "zh": "消化性溃疡",
+            "en": "Peptic ulcer"
+          }
+        }
+      ],
+      "nutrientRecommendations": []
+    },
+    {
+      "id": "urinary_tract_infection",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "genitourinary"
+      ],
+      "course": "EPISODIC",
+      "careDepartmentIds": [
+        "nephrology",
+        "urology",
+        "gynecology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "尿路感染",
+          "aliases": [
+            "UTI",
+            "泌尿道感染"
+          ],
+          "description": "由病原微生物（多为细菌）侵入尿路引起的感染性疾病，可累及膀胱（膀胱炎）、肾脏（肾盂肾炎）或尿道。症状包括尿频、尿急、尿痛等，需根据感染部位和严重程度进行抗感染治疗。"
+        },
+        "en": {
+          "label": "Urinary Tract Infection",
+          "aliases": [
+            "UTI"
+          ],
+          "description": "An infectious disease caused by pathogenic microorganisms (usually bacteria) invading the urinary tract, which may involve the bladder (cystitis), kidneys (pyelonephritis), or urethra. Symptoms include frequency, urgency, and dysuria; treatment depends on the site and severity."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "16",
+          "chapterTitle": {
+            "zh": "泌尿生殖系统疾病",
+            "en": "Diseases of the genitourinary system"
+          },
+          "blockCode": "GC00-GC0Z",
+          "code": "GC08",
+          "title": {
+            "zh": "尿路感染",
+            "en": "Urinary tract infection"
+          }
+        }
+      ],
+      "nutrientRecommendations": []
+    },
+    {
+      "id": "lumbar_disc_herniation",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "musculoskeletal"
+      ],
+      "course": "CHRONIC",
+      "careDepartmentIds": [
+        "orthopedics",
+        "rehabilitation",
+        "neurology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "腰椎间盘突出症",
+          "aliases": [
+            "腰椎间盘脱出",
+            "腰突"
+          ],
+          "description": "指腰椎间盘纤维环破裂，髓核组织突出压迫神经根或脊髓，导致腰痛、坐骨神经痛或下肢感觉运动障碍。需由骨科或康复科评估，轻者保守治疗，重者可能需手术干预。"
+        },
+        "en": {
+          "label": "Lumbar Disc Herniation",
+          "aliases": [
+            "Lumbar disc prolapse",
+            "Herniated intervertebral disc"
+          ],
+          "description": "Rupture of the annulus fibrosus of a lumbar disc with protrusion of the nucleus pulposus compressing nerve roots or the spinal cord, causing low back pain, sciatica, or sensorimotor deficits in the lower limbs. Assessment by orthopaedics or rehabilitation is required; conservative care for mild cases, surgery for severe cases."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "15",
+          "chapterTitle": {
+            "zh": "肌肉骨骼系统或结缔组织疾病",
+            "en": "Diseases of the musculoskeletal system or connective tissue"
+          },
+          "blockCode": "FA80-FA8Z",
+          "code": "FA83",
+          "title": {
+            "zh": "腰椎间盘突出",
+            "en": "Lumbar disc herniation"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "calcium",
+          "recommendation": "INCREASE"
+        }
+      ]
+    },
+    {
+      "id": "kidney_stone",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "genitourinary"
+      ],
+      "course": "EPISODIC",
+      "careDepartmentIds": [
+        "nephrology",
+        "urology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "肾结石",
+          "aliases": [
+            "肾石病",
+            "肾结石病"
+          ],
+          "description": "位于肾脏、肾盏或肾盂内的尿路结石。可由脱水、尿量减少或钙、草酸盐等矿物质排泄增加等原因引起。可表现为血尿、排尿困难或胁腹部、下腹部、腹股沟区疼痛。"
+        },
+        "en": {
+          "label": "Calculus of Kidney",
+          "aliases": [
+            "Kidney stone",
+            "Nephrolithiasis",
+            "Renal calculus"
+          ],
+          "description": "Urinary calculi located in the kidney, in renal calyces, or in the renal pelvis. It may be caused by dehydration, decreased urine volume, or increased excretion of minerals such as calcium and oxalate. It may present with haematuria, dysuria, or pain in the flank, lower abdomen, or groin."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "16",
+          "chapterTitle": {
+            "zh": "泌尿生殖系统疾病",
+            "en": "Diseases of the genitourinary system"
+          },
+          "blockCode": "GB70-GB7Z",
+          "code": "GB70.0",
+          "title": {
+            "zh": "肾结石",
+            "en": "Calculus of kidney"
+          }
+        }
+      ],
+      "nutrientRecommendations": [
+        {
+          "nutrientId": "calcium",
+          "recommendation": "INCREASE"
+        },
+        {
+          "nutrientId": "sodium",
+          "recommendation": "LIMIT"
+        },
+        {
+          "nutrientId": "protein",
+          "recommendation": "LIMIT"
+        }
+      ]
     }
   ]
 }

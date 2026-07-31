@@ -1,6 +1,8 @@
 package com.woshiwangnima.healthdietpro.ui.settings
 
 import android.content.Intent
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
@@ -18,10 +20,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.cache.AppCacheKind
@@ -42,6 +47,7 @@ internal fun AppSettingsScreen(
     var showClearCacheConfirm by remember { mutableStateOf(false) }
     var firstDayOfWeek by remember { mutableStateOf(com.woshiwangnima.healthdietpro.model.prefs.AppPrefs.getFirstDayOfWeek(context)) }
     var darkMode by remember { mutableStateOf(com.woshiwangnima.healthdietpro.model.prefs.AppPrefs.getDarkMode(context)) }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     val toastMbTemplate = stringResource(R.string.settings_cache_cleared_mb)
     val toastKbTemplate = stringResource(R.string.settings_cache_cleared_kb)
@@ -110,7 +116,11 @@ internal fun AppSettingsScreen(
                 title = stringResource(R.string.settings_message_notification),
                 subtitle = stringResource(R.string.settings_message_notification_desc),
                 leadingIconRes = R.drawable.ic_notification,
-                onClick = {
+                onClick = notificationClick@{
+                    if (android.os.Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        return@notificationClick
+                    }
                     val uid = try {
                         context.packageManager.getApplicationInfo(context.packageName, 0).uid
                     } catch (_: Exception) {

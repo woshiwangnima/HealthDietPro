@@ -988,6 +988,34 @@
     "i18n": { "zh": { "label": "血糖浓度" }, "en": { "label": "Blood glucose" } }
   },
   {
+    "id": "pressure",
+    "baseUnit": "mmhg",
+    "units": [
+      {
+        "id": "mmhg",
+        "toBase": 1.0,
+        "hidden": false,
+        "i18n": {
+          "zh": { "symbol": "mmHg" },
+          "en": { "symbol": "mmHg" }
+        }
+      },
+      {
+        "id": "kpa",
+        "toBase": 7.50062,
+        "hidden": false,
+        "i18n": {
+          "zh": { "symbol": "kPa" },
+          "en": { "symbol": "kPa" }
+        }
+      }
+    ],
+    "i18n": {
+      "zh": { "label": "压力" },
+      "en": { "label": "Pressure" }
+    }
+  },
+  {
     "id": "storage",
     "baseUnit": "b",
     "units": [

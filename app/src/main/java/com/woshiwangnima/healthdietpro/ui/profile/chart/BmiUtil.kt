@@ -1,7 +1,7 @@
 package com.woshiwangnima.healthdietpro.ui.profile.chart
 
 import android.graphics.Color
-import com.woshiwangnima.healthdietpro.common.range.NumericRangeBand
+import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.common.range.findRangeBand
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
@@ -37,7 +37,7 @@ object BmiUtil {
     fun findBmiBand(bmi: Float, bands: List<BmiBand> = loadBmiBands()): BmiBand? =
         bmi.toDouble().findRangeBand(
             bands.map { band ->
-                NumericRangeBand(
+                RangeBand(
                     min = band.min.takeIf { it >= 0f }?.toDouble(),
                     max = band.max.takeUnless { it == Float.MAX_VALUE }?.toDouble(),
                     value = band,

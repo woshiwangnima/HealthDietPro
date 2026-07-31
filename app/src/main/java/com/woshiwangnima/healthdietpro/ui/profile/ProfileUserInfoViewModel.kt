@@ -5,7 +5,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseHistoryType
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseRecordStatus
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
@@ -123,11 +126,17 @@ internal class ProfileUserInfoViewModel(
     }
 
     private fun resolveDiseaseText(profile: UserProfile): String {
-        if (profile.diseaseIds.isEmpty()) return ""
-        val diseases = DiseaseRepository.fromContext(getApplication()).loadAll()
-        val locale = Locale.getDefault()
-        return profile.diseaseIds.joinToString("、") { id ->
-            diseases.find { it.id == id }?.displayName(locale) ?: id
+        val repository = UserDiseaseRecordRepository.fromContext(getApplication())
+        val records = repository.load().filter {
+            it.historyType == DiseaseHistoryType.SELF && it.status == DiseaseRecordStatus.ACTIVE
         }
+        if (records.isEmpty()) return ""
+        val diseases = DiseaseRepository.fromContext(getApplication()).loadAll().associateBy { it.id }
+        val customDiseases = repository.loadCustomDiseases().associateBy { it.id }
+        val locale = Locale.getDefault()
+        return records.mapNotNull { record ->
+            record.disease.curatedDiseaseId?.let { diseases[it]?.displayName(locale) }
+                ?: record.disease.customDiseaseId?.let { customDiseases[it]?.name }
+        }.joinToString("、")
     }
 }
