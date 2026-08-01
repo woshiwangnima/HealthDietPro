@@ -139,6 +139,33 @@ class NutritionResolverTest {
         val resolved = resolver.resolvePer100g(dish)
         // rice 116*2 + veg 20*1 = 252
         assertEquals(252.0, resolved.nutrients.getValue("ENERGY").value, 0.0001)
+        assertEquals(300.0, resolved.basis.value, 0.0001)
+    }
+
+    @Test
+    fun dishCalculatesCarbohydrateWeightedGiAndGl() {
+        val highGi = riceRaw.copy(healthMetrics = FoodHealthMetrics(glycemicIndex = FoodMetric(70.0, "GI")))
+        val lowGi = Ingredient(
+            id = "ing:beans",
+            names = mapOf("en" to listOf("Beans")),
+            categoryTags = listOf("food.soy"),
+            nutritionTables = mapOf(TABLE_STANDARD_100G to FoodNutrientTable(
+                FoodQuantity(100.0, "weight", "g"),
+                mapOf("CHO" to FoodAmount(10.0, "weight", "g")),
+            )),
+            healthMetrics = FoodHealthMetrics(glycemicIndex = FoodMetric(30.0, "GI")),
+        )
+        val dish = Dish(
+            id = "dish:mixed",
+            names = mapOf("en" to listOf("Mixed")),
+            components = listOf(
+                DishComponent(highGi.id, FoodQuantity(100.0, "weight", "g")),
+                DishComponent(lowGi.id, FoodQuantity(100.0, "weight", "g")),
+            ),
+        )
+        val resolved = NutritionResolver(listOf(highGi, lowGi, dish).associateBy { it.id }, emptyMap()).resolvePer100g(dish)
+        assertEquals(65.439, resolved.healthMetrics.glycemicIndex?.value ?: 0.0, 0.0001)
+        assertEquals(57.39, resolved.healthMetrics.glycemicLoadPer100g?.value ?: 0.0, 0.0001)
     }
 
     @Test

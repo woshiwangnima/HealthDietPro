@@ -3,144 +3,487 @@
     {
       "id": "food:taxon:glycine_max:tofu:soft",
       "kind": "ingredient",
-      "names": { "zh": ["嫩豆腐", "南豆腐", "石膏豆腐"], "en": ["Soft tofu", "Silken tofu"] },
-      "categoryTags": ["food.soy"],
-      "systemTags": ["common"],
-      "edibleRatio": 1.0,
-      "sources": [{ "dataset": "China Food Composition Tables", "reference": "tofu, soft; per 100 g edible portion" }],
-      "nutrients": {
-        "ENERGY": { "value": 57.0, "unitCategory": "energy", "unitId": "kcal" },
-        "PROTEIN": { "value": 6.2, "unitCategory": "weight", "unitId": "g" },
-        "FAT": { "value": 3.0, "unitCategory": "weight", "unitId": "g" },
-        "CHO": { "value": 1.9, "unitCategory": "weight", "unitId": "g" }
+      "names": {
+        "zh": [
+          "嫩豆腐",
+          "南豆腐",
+          "石膏豆腐"
+        ],
+        "en": [
+          "Soft tofu",
+          "Silken tofu"
+        ]
       },
-      "description": { "zh": "嫩豆腐为大豆磨浆、凝固后形成的高含水豆制品。与北豆腐相比含水量更高、质地更软；营养值应按具体凝固剂和配方核对。", "en": "Soft tofu is a high-moisture soy product made by coagulating soy milk. Its water content and nutrient composition vary with the coagulant and formulation." },
-      "commonness": 3
+      "categoryTags": [
+        "food.soy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "tofu, soft; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "嫩豆腐为大豆磨浆、凝固后形成的高含水豆制品。与北豆腐相比含水量更高、质地更软；营养值应按具体凝固剂和配方核对。",
+        "en": "Soft tofu is a high-moisture soy product made by coagulating soy milk. Its water content and nutrient composition vary with the coagulant and formulation."
+      },
+      "commonness": 3,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 57,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 6.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      }
     },
     {
       "id": "food:taxon:glycine_max:tofu_skin",
       "kind": "ingredient",
-      "names": { "zh": ["豆皮", "豆腐皮", "千张"], "en": ["Tofu skin", "Bean curd sheet"] },
-      "categoryTags": ["food.soy"],
-      "systemTags": ["common"],
-      "edibleRatio": 1.0,
-      "sources": [{ "dataset": "China Food Composition Tables", "reference": "bean curd sheet, fresh; per 100 g edible portion" }],
-      "nutrients": {
-        "ENERGY": { "value": 262.0, "unitCategory": "energy", "unitId": "kcal" },
-        "PROTEIN": { "value": 24.6, "unitCategory": "weight", "unitId": "g" },
-        "FAT": { "value": 16.0, "unitCategory": "weight", "unitId": "g" },
-        "CHO": { "value": 4.6, "unitCategory": "weight", "unitId": "g" }
+      "names": {
+        "zh": [
+          "豆皮",
+          "豆腐皮",
+          "千张"
+        ],
+        "en": [
+          "Tofu skin",
+          "Bean curd sheet"
+        ]
       },
-      "description": { "zh": "豆腐皮是加热豆浆表面形成的蛋白质和脂质膜制品。名称在地区间可指鲜豆腐皮或薄豆干，购买时应以包装营养标签和含水量为准。", "en": "Tofu skin is the protein- and lipid-rich film formed on heated soy milk. The name can refer to products with different water contents, so package labels should be checked." },
-      "commonness": 3
+      "categoryTags": [
+        "food.soy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "bean curd sheet, fresh; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "豆腐皮是加热豆浆表面形成的蛋白质和脂质膜制品。名称在地区间可指鲜豆腐皮或薄豆干，购买时应以包装营养标签和含水量为准。",
+        "en": "Tofu skin is the protein- and lipid-rich film formed on heated soy milk. The name can refer to products with different water contents, so package labels should be checked."
+      },
+      "commonness": 3,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 262,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 24.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 16,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      }
     },
     {
       "id": "food:taxon:glycine_max:yuba_dried",
       "kind": "ingredient",
-      "names": { "zh": ["腐竹", "豆腐竹"], "en": ["Dried yuba", "Dried bean curd sticks"] },
-      "categoryTags": ["food.soy"],
-      "systemTags": ["common"],
-      "edibleRatio": 1.0,
-      "sources": [{ "dataset": "China Food Composition Tables", "reference": "yuba, dried; per 100 g edible portion" }],
-      "nutrients": {
-        "ENERGY": { "value": 459.0, "unitCategory": "energy", "unitId": "kcal" },
-        "PROTEIN": { "value": 44.6, "unitCategory": "weight", "unitId": "g" },
-        "FAT": { "value": 21.7, "unitCategory": "weight", "unitId": "g" },
-        "CHO": { "value": 21.3, "unitCategory": "weight", "unitId": "g" }
+      "names": {
+        "zh": [
+          "腐竹",
+          "豆腐竹"
+        ],
+        "en": [
+          "Dried yuba",
+          "Dried bean curd sticks"
+        ]
       },
-      "description": { "zh": "腐竹是豆浆加热表面膜干燥后的豆制品，通常按干品计。复水后重量和每 100 克能量密度都会显著变化，记录时应明确干重或熟重。", "en": "Dried yuba is made from dried films formed on heated soy milk. It is normally reported as a dry product; rehydration substantially changes its weight and energy density." },
-      "commonness": 3
+      "categoryTags": [
+        "food.soy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "yuba, dried; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "腐竹是豆浆加热表面膜干燥后的豆制品，通常按干品计。复水后重量和每 100 克能量密度都会显著变化，记录时应明确干重或熟重。",
+        "en": "Dried yuba is made from dried films formed on heated soy milk. It is normally reported as a dry product; rehydration substantially changes its weight and energy density."
+      },
+      "commonness": 3,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 459,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 44.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 21.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 21.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      }
     },
     {
       "id": "food:taxon:sus_scrofa:ribs_raw",
       "kind": "ingredient",
-      "names": { "zh": ["猪排骨", "肋排"], "en": ["Pork ribs", "Raw pork ribs"] },
-      "categoryTags": ["food.meat_egg", "food.meat_egg.livestock"],
-      "systemTags": ["common"],
-      "edibleRatio": 0.68,
-      "sources": [{ "dataset": "China Food Composition Tables", "reference": "pork ribs, raw; per 100 g edible portion" }],
-      "nutrients": {
-        "ENERGY": { "value": 264.0, "unitCategory": "energy", "unitId": "kcal" },
-        "PROTEIN": { "value": 18.3, "unitCategory": "weight", "unitId": "g" },
-        "FAT": { "value": 20.4, "unitCategory": "weight", "unitId": "g" },
-        "CHO": { "value": 0.0, "unitCategory": "weight", "unitId": "g" }
+      "names": {
+        "zh": [
+          "猪排骨",
+          "肋排"
+        ],
+        "en": [
+          "Pork ribs",
+          "Raw pork ribs"
+        ]
       },
-      "description": { "zh": "猪排骨来自家猪（Sus scrofa domesticus）的肋骨部位，含骨比例和可见脂肪差异较大。营养表按可食肉部分计，不等同于带骨购买重量。", "en": "Pork ribs are from the rib region of domestic pig (Sus scrofa domesticus). Bone and visible-fat proportions vary; values are for edible meat rather than purchase weight." },
-      "commonness": 3
+      "categoryTags": [
+        "food.meat_egg",
+        "food.meat_egg.livestock"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.68,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "pork ribs, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "猪排骨来自家猪（Sus scrofa domesticus）的肋骨部位，含骨比例和可见脂肪差异较大。营养表按可食肉部分计，不等同于带骨购买重量。",
+        "en": "Pork ribs are from the rib region of domestic pig (Sus scrofa domesticus). Bone and visible-fat proportions vary; values are for edible meat rather than purchase weight."
+      },
+      "commonness": 3,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 264,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 18.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 20.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      }
     },
     {
       "id": "food:taxon:sus_scrofa:trotter_raw",
       "kind": "ingredient",
-      "names": { "zh": ["猪蹄", "猪脚"], "en": ["Pork trotter", "Pig's feet"] },
-      "categoryTags": ["food.meat_egg", "food.meat_egg.livestock"],
-      "systemTags": ["common"],
-      "edibleRatio": 0.52,
-      "sources": [{ "dataset": "China Food Composition Tables", "reference": "pork trotter, raw; per 100 g edible portion" }],
-      "nutrients": {
-        "ENERGY": { "value": 260.0, "unitCategory": "energy", "unitId": "kcal" },
-        "PROTEIN": { "value": 23.6, "unitCategory": "weight", "unitId": "g" },
-        "FAT": { "value": 18.8, "unitCategory": "weight", "unitId": "g" },
-        "CHO": { "value": 0.0, "unitCategory": "weight", "unitId": "g" }
+      "names": {
+        "zh": [
+          "猪蹄",
+          "猪脚"
+        ],
+        "en": [
+          "Pork trotter",
+          "Pig's feet"
+        ]
       },
-      "description": { "zh": "猪蹄来自家猪（Sus scrofa domesticus）的足部，富含结缔组织，同时脂肪含量不低。骨、皮、肉比例会影响可食部和实际营养摄入。", "en": "Pork trotter is the foot of domestic pig (Sus scrofa domesticus). It contains substantial connective tissue as well as fat; edible yield varies with bone, skin, and meat proportions." },
-      "commonness": 3
+      "categoryTags": [
+        "food.meat_egg",
+        "food.meat_egg.livestock"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.52,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "pork trotter, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "猪蹄来自家猪（Sus scrofa domesticus）的足部，富含结缔组织，同时脂肪含量不低。骨、皮、肉比例会影响可食部和实际营养摄入。",
+        "en": "Pork trotter is the foot of domestic pig (Sus scrofa domesticus). It contains substantial connective tissue as well as fat; edible yield varies with bone, skin, and meat proportions."
+      },
+      "commonness": 3,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 260,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 23.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 18.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      }
     },
     {
       "id": "food:taxon:gallus_gallus:egg:pan_fried",
       "kind": "food",
-      "names": { "zh": ["煎鸡蛋", "荷包蛋"], "en": ["Pan-fried egg", "Fried egg"] },
-      "categoryTags": ["food.meat_egg.egg"],
-      "systemTags": ["common"],
-      "derivedFrom": { "ingredientId": "food:taxon:gallus_gallus:egg:whole", "cookingMethodId": "pan_fried" },
-      "sources": [{ "dataset": "China Food Composition Tables", "reference": "whole chicken egg; cooking change calculated from pan-frying method" }],
-      "description": { "zh": "煎鸡蛋由全鸡蛋经煎制派生。模型按烹饪方式统一计入吸油和失水参数；实际值受用油量、锅具和熟度影响。", "en": "Pan-fried egg is derived from whole egg. The model applies shared oil-uptake and yield parameters; actual values vary with added oil, cookware, and doneness." },
+      "names": {
+        "zh": [
+          "煎鸡蛋",
+          "荷包蛋"
+        ],
+        "en": [
+          "Pan-fried egg",
+          "Fried egg"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg.egg"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:gallus_gallus:egg:whole",
+        "cookingMethodId": "pan_fried"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "whole chicken egg; cooking change calculated from pan-frying method"
+        }
+      ],
+      "description": {
+        "zh": "煎鸡蛋由全鸡蛋经煎制派生。模型按烹饪方式统一计入吸油和失水参数；实际值受用油量、锅具和熟度影响。",
+        "en": "Pan-fried egg is derived from whole egg. The model applies shared oil-uptake and yield parameters; actual values vary with added oil, cookware, and doneness."
+      },
       "commonness": 3
     },
     {
       "id": "dish:corn_pork_rib_soup",
       "kind": "dish",
-      "names": { "zh": ["玉米排骨汤", "玉米炖排骨"], "en": ["Corn and pork rib soup"] },
+      "names": {
+        "zh": [
+          "玉米排骨汤",
+          "玉米炖排骨"
+        ],
+        "en": [
+          "Corn and pork rib soup"
+        ]
+      },
       "components": [
-        { "foodId": "food:taxon:sus_scrofa:ribs_raw", "quantity": { "value": 300.0, "unitCategory": "weight", "unitId": "g" } },
-        { "foodId": "food:taxon:zea_mays:boiled", "quantity": { "value": 200.0, "unitCategory": "weight", "unitId": "g" } }
+        {
+          "foodId": "food:taxon:sus_scrofa:ribs_raw",
+          "quantity": {
+            "value": 300,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:zea_mays:boiled",
+          "quantity": {
+            "value": 200,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
       ],
-      "systemTags": ["common"],
+      "systemTags": [
+        "common"
+      ],
       "cuisine": "cuisine.chinese",
-      "dishCategories": ["dishcat.soup"],
-      "tastes": ["taste.light", "taste.umami"],
+      "dishCategories": [
+        "dishcat.soup"
+      ],
+      "tastes": [
+        "taste.light",
+        "taste.umami"
+      ],
       "techniqueId": "stewed",
       "difficulty": 3,
       "servesPeople": 3,
       "recipeSteps": [
-        { "text": "排骨焯水后洗净。", "minutes": 5 },
-        { "text": "加水炖煮至排骨变软。", "minutes": 60 },
-        { "text": "加入玉米继续炖煮，按需要调味。", "minutes": 20 }
+        {
+          "text": "排骨焯水后洗净。",
+          "minutes": 5
+        },
+        {
+          "text": "加水炖煮至排骨变软。",
+          "minutes": 60
+        },
+        {
+          "text": "加入玉米继续炖煮，按需要调味。",
+          "minutes": 20
+        }
       ],
-      "sources": [{ "dataset": "Recipe composition model", "reference": "nutrition is resolved from listed ingredients; water and optional seasonings are not included" }],
-      "description": { "zh": "玉米排骨汤的营养由列出的排骨和玉米按用量实时求和。汤水、盐和其他未列调味料不计入总量，食用时应按实际可食量记录。", "en": "Nutrition is resolved from the listed ribs and corn. Broth, salt, and unlisted seasonings are excluded; record the actual edible portion consumed." },
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition is resolved from listed ingredients; water and optional seasonings are not included"
+        }
+      ],
+      "description": {
+        "zh": "玉米排骨汤的营养由列出的排骨和玉米按用量实时求和。汤水、盐和其他未列调味料不计入总量，食用时应按实际可食量记录。",
+        "en": "Nutrition is resolved from the listed ribs and corn. Broth, salt, and unlisted seasonings are excluded; record the actual edible portion consumed."
+      },
       "commonness": 3
     },
     {
       "id": "dish:braised_pork_trotter",
       "kind": "dish",
-      "names": { "zh": ["红烧猪脚", "红烧猪蹄"], "en": ["Braised pork trotter"] },
+      "names": {
+        "zh": [
+          "红烧猪脚",
+          "红烧猪蹄"
+        ],
+        "en": [
+          "Braised pork trotter"
+        ]
+      },
       "components": [
-        { "foodId": "food:taxon:sus_scrofa:trotter_raw", "quantity": { "value": 500.0, "unitCategory": "weight", "unitId": "g" } }
+        {
+          "foodId": "food:taxon:sus_scrofa:trotter_raw",
+          "quantity": {
+            "value": 500,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
       ],
-      "systemTags": ["common"],
+      "systemTags": [
+        "common"
+      ],
       "cuisine": "cuisine.chinese",
-      "dishCategories": ["dishcat.home"],
-      "tastes": ["taste.salty", "taste.umami"],
+      "dishCategories": [
+        "dishcat.home"
+      ],
+      "tastes": [
+        "taste.salty",
+        "taste.umami"
+      ],
       "techniqueId": "braised",
       "difficulty": 5,
       "servesPeople": 3,
       "recipeSteps": [
-        { "text": "猪蹄焯水后洗净，去除浮沫。", "minutes": 8 },
-        { "text": "加水和常用香辛料小火焖煮至软烂。", "minutes": 90 },
-        { "text": "收汁并按实际用量加入调味料。", "minutes": 15 }
+        {
+          "text": "猪蹄焯水后洗净，去除浮沫。",
+          "minutes": 8
+        },
+        {
+          "text": "加水和常用香辛料小火焖煮至软烂。",
+          "minutes": 90
+        },
+        {
+          "text": "收汁并按实际用量加入调味料。",
+          "minutes": 15
+        }
       ],
-      "sources": [{ "dataset": "Recipe composition model", "reference": "nutrition is resolved from listed pork trotter; sugar, oil, soy sauce, and aromatics are not included" }],
-      "description": { "zh": "红烧猪脚的基础营养由列出的猪蹄实时求和。糖、油、酱油和香辛料尚未列入组分，使用这些配料时应补充记录或建立完整自定义菜谱。", "en": "Base nutrition is resolved from the listed pork trotter. Sugar, oil, soy sauce, and aromatics are not yet components; add them when recording a full recipe." },
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition is resolved from listed pork trotter; sugar, oil, soy sauce, and aromatics are not included"
+        }
+      ],
+      "description": {
+        "zh": "红烧猪脚的基础营养由列出的猪蹄实时求和。糖、油、酱油和香辛料尚未列入组分，使用这些配料时应补充记录或建立完整自定义菜谱。",
+        "en": "Base nutrition is resolved from the listed pork trotter. Sugar, oil, soy sauce, and aromatics are not yet components; add them when recording a full recipe."
+      },
       "commonness": 3
     },
     {
@@ -160,7 +503,7 @@
       "categoryTags": [
         "food.staple.grain"
       ],
-      "edibleRatio": 1.0,
+      "edibleRatio": 1,
       "image": {
         "attribution": "Wikimedia Commons"
       },
@@ -173,13 +516,13 @@
       "nutritionTables": {
         "standard.100g_edible": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 348.0,
+              "value": 348,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -235,7 +578,7 @@
       },
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 73.0,
+          "value": 73,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
@@ -285,7 +628,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 50.0,
+          "value": 50,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
@@ -310,47 +653,16 @@
           "reference": "brown rice, cooked"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 111.0,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 2.6,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.9,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 23.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FIBER": {
-              "value": 1.8,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "保留麸皮和胚芽的熟糙米，膳食纤维通常高于精白米；烹调软硬会影响消化速度。",
         "en": "Cooked brown rice retains bran and germ and typically provides more dietary fiber than polished rice; cooking texture affects digestion."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:oryza_sativa:wholegrain:raw",
+        "cookingMethodId": "steamed_grain"
+      }
     },
     {
       "id": "food:taxon:avena_sativa:rolled:dry",
@@ -371,7 +683,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 55.0,
+          "value": 55,
           "unit": "GI",
           "note": "rolled oats; preparation changes GI"
         },
@@ -401,18 +713,18 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 367.0,
+              "value": 367,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
             "PROTEIN": {
-              "value": 15.0,
+              "value": 15,
               "unitCategory": "weight",
               "unitId": "g"
             },
@@ -438,7 +750,8 @@
         "zh": "压片燕麦属于全谷物，可提供可溶性膳食纤维；加糖、煮制时间和冲泡方式会改变实际能量和升糖反应。",
         "en": "Rolled oats are a whole grain and provide soluble fiber; added sugar and preparation affect actual energy and glycemic response."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:solanum_tuberosum:boiled",
@@ -459,7 +772,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 78.0,
+          "value": 78,
           "unit": "GI",
           "note": "boiled; variety and cooling change GI"
         },
@@ -485,47 +798,16 @@
           "reference": "potato, boiled"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 76.0,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 2.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.1,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 17.8,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FIBER": {
-              "value": 1.2,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "煮马铃薯是富含淀粉的薯类食物；品种、熟化程度及冷却后再食用都会影响血糖反应。",
         "en": "Boiled potato is a starchy tuber; variety, doneness, and cooling before eating affect glycemic response."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:solanum_tuberosum:raw",
+        "cookingMethodId": "boiled"
+      }
     },
     {
       "id": "food:taxon:cucumis_sativus:commercial:raw",
@@ -545,7 +827,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 15.0,
+          "value": 15,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
@@ -573,13 +855,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 15.0,
+              "value": 15,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -610,7 +892,8 @@
         "zh": "生黄瓜含水量高、能量密度低，适合作为蔬菜搭配；应注意清洗和可食部分。",
         "en": "Raw cucumber has high water content and low energy density; use it as part of a varied vegetable intake and wash before eating."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:cucumis_sativus:landrace:raw",
@@ -630,7 +913,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 15.0,
+          "value": 15,
           "unit": "GI",
           "note": "proxy from raw cucumber; cultivar-specific measurement unavailable"
         },
@@ -657,13 +940,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 16.0,
+              "value": 16,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -694,7 +977,8 @@
         "zh": "露地或地方品系黄瓜的外观和风味可能不同；营养值采用同类生黄瓜数据，品种间会有自然差异。",
         "en": "Field or landrace cucumber may differ in appearance and flavor; values use raw cucumber data because cultivar composition naturally varies."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:solanum_lycopersicum:raw",
@@ -715,7 +999,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 15.0,
+          "value": 15,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
@@ -743,13 +1027,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 20.0,
+              "value": 20,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -764,7 +1048,7 @@
               "unitId": "g"
             },
             "CHO": {
-              "value": 4.0,
+              "value": 4,
               "unitCategory": "weight",
               "unitId": "g"
             },
@@ -780,7 +1064,8 @@
         "zh": "生番茄可同时作为蔬菜或水果食用，含有类胡萝卜素等植物化学物；成熟度和加工方式会影响成分利用。",
         "en": "Raw tomato may be eaten as a vegetable or fruit and contains carotenoids; ripeness and processing affect nutrient availability."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:brassica_oleracea:broccoli:raw",
@@ -800,7 +1085,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 10.0,
+          "value": 10,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
@@ -824,13 +1109,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 36.0,
+              "value": 36,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -861,7 +1146,8 @@
         "zh": "西兰花属于十字花科蔬菜，含维生素和多种植物化学物；烹调时间会影响部分热敏营养素。",
         "en": "Broccoli is a cruciferous vegetable with vitamins and phytochemicals; cooking duration affects some heat-sensitive nutrients."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:malus_domestica:raw",
@@ -881,7 +1167,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 36.0,
+          "value": 36,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
@@ -901,7 +1187,7 @@
             "en": "100 g"
           },
           "nutritionTableKey": "standard.100g",
-          "ratioToTable": 1.0
+          "ratioToTable": 1
         },
         {
           "id": "small",
@@ -947,13 +1233,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 53.0,
+              "value": 53,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -984,7 +1270,8 @@
         "zh": "带皮鲜苹果提供水分和膳食纤维；大小、品种和可食比例不同，单个重量仅为估算。",
         "en": "Raw apple with peel provides water and dietary fiber; fruit size, cultivar, and edible yield vary, so per-fruit portions are estimates."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:musa_acuminata:ripe:raw",
@@ -1004,7 +1291,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 51.0,
+          "value": 51,
           "unit": "GI",
           "note": "ripeness changes GI"
         },
@@ -1033,13 +1320,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 93.0,
+              "value": 93,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -1054,7 +1341,7 @@
               "unitId": "g"
             },
             "CHO": {
-              "value": 22.0,
+              "value": 22,
               "unitCategory": "weight",
               "unitId": "g"
             },
@@ -1070,7 +1357,8 @@
         "zh": "成熟香蕉提供碳水化合物和钾；成熟度越高，糖和淀粉的比例及升糖反应可能变化。",
         "en": "Ripe banana provides carbohydrate and potassium; ripeness changes the balance of sugars and starch and may alter glycemic response."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:glycine_max:tofu:firm",
@@ -1090,7 +1378,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 15.0,
+          "value": 15,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
@@ -1114,13 +1402,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 81.0,
+              "value": 81,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -1151,7 +1439,8 @@
         "zh": "北豆腐以大豆为原料，是植物蛋白来源；凝固剂和含水量会使不同产品的营养值不同。",
         "en": "Firm tofu is a soy-based source of plant protein; coagulant choice and water content cause product-to-product variation."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:gallus_gallus:egg:whole",
@@ -1171,11 +1460,11 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 0.0,
+          "value": 0,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
-          "value": 0.0,
+          "value": 0,
           "unit": "GL"
         },
         "inflammatoryPotential": {
@@ -1195,13 +1484,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 144.0,
+              "value": 144,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -1227,7 +1516,8 @@
         "zh": "全鸡蛋提供优质蛋白质和脂溶性营养素；烹调用油和调味会显著改变实际摄入。",
         "en": "Whole egg provides high-quality protein and fat-soluble nutrients; cooking oil and seasoning substantially change intake."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:gallus_gallus:breast:steamed",
@@ -1260,42 +1550,16 @@
           "reference": "chicken breast, cooked"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 133.0,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 29.6,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 1.9,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 0.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "去皮熟鸡胸肉是高蛋白、低碳水的禽肉选择；数据不包含额外烹调用油或酱料。",
         "en": "Cooked skinless chicken breast is a high-protein, low-carbohydrate poultry option; values exclude added oil and sauces."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:gallus_gallus:breast:raw",
+        "cookingMethodId": "steamed"
+      }
     },
     {
       "id": "food:taxon:salmo_salar:raw",
@@ -1331,13 +1595,13 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 139.0,
+              "value": 139,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
@@ -1352,7 +1616,7 @@
               "unitId": "g"
             },
             "CHO": {
-              "value": 0.0,
+              "value": 0,
               "unitCategory": "weight",
               "unitId": "g"
             }
@@ -1363,7 +1627,8 @@
         "zh": "大西洋鲑是脂肪鱼，含蛋白质和不饱和脂肪；生食应符合食品安全和冷链要求。",
         "en": "Atlantic salmon is an oily fish with protein and unsaturated fat; raw consumption requires appropriate food-safety and cold-chain controls."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:bos_taurus:milk:whole",
@@ -1383,7 +1648,7 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 31.0,
+          "value": 31,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
@@ -1404,7 +1669,7 @@
             "en": "100 ml"
           },
           "nutritionTableKey": "standard.100ml",
-          "ratioToTable": 1.0
+          "ratioToTable": 1
         },
         {
           "id": "cup",
@@ -1441,18 +1706,18 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 54.0,
+              "value": 54,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
             "PROTEIN": {
-              "value": 3.0,
+              "value": 3,
               "unitCategory": "weight",
               "unitId": "g"
             },
@@ -1470,7 +1735,7 @@
         },
         "standard.100ml": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "volume",
             "unitId": "ml"
           },
@@ -1502,7 +1767,9 @@
         "zh": "全脂牛奶提供蛋白质、脂肪和乳糖；包装规格不同，杯和盒的体积仅作为常见份量估算。",
         "en": "Whole milk provides protein, fat, and lactose; cup and carton sizes are common serving estimates and vary by package."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "ingredient",
+      "hydrationMlPer100g": 87
     },
     {
       "id": "food:taxon:arachis_hypogaea:roasted",
@@ -1523,11 +1790,11 @@
       ],
       "healthMetrics": {
         "glycemicIndex": {
-          "value": 14.0,
+          "value": 14,
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
-          "value": 3.0,
+          "value": 3,
           "unit": "GL"
         },
         "inflammatoryPotential": {
@@ -1548,47 +1815,16 @@
           "reference": "peanuts"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 589.0,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 24.8,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 48.7,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 21.7,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FIBER": {
-              "value": 8.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "烤花生能量密度较高，含脂肪、蛋白质和膳食纤维；食用时应控制份量并留意过敏风险。",
         "en": "Roasted peanuts are energy-dense and provide fat, protein, and fiber; manage portions and consider allergy risk."
       },
-      "commonness": 3
+      "commonness": 3,
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:arachis_hypogaea:raw",
+        "cookingMethodId": "grilled"
+      }
     },
     {
       "id": "food:taxon:triticum_aestivum:mantou",
@@ -1601,10 +1837,6 @@
           "Mantou"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 5,
       "healthMetrics": {
         "glycemicIndex": {
@@ -1626,41 +1858,43 @@
           "reference": "Steamed wheat bun, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 223,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 7.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 1.1,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 47.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "馒头的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Steamed wheat bun are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:refined",
+          "quantity": {
+            "value": 58,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 42,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "面粉加水揉成面团并醒发。"
+        },
+        {
+          "text": "分剂整形后蒸熟。"
+        }
+      ]
     },
     {
       "id": "food:taxon:triticum_aestivum:bread_white",
@@ -1674,10 +1908,6 @@
           "Bread"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 5,
       "healthMetrics": {
         "glycemicIndex": {
@@ -1685,7 +1915,7 @@
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
-          "value": 37.0,
+          "value": 37,
           "unit": "GL"
         }
       },
@@ -1699,41 +1929,59 @@
           "reference": "White bread, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 266,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 8.3,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 3.3,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 49.4,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "面包的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for White bread are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:refined",
+          "quantity": {
+            "value": 57,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 29,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:gallus_gallus:egg:whole",
+          "quantity": {
+            "value": 8,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:bos_taurus:milk:whole",
+          "quantity": {
+            "value": 6,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "混合原料揉成面团并醒发。"
+        },
+        {
+          "text": "整形后烘烤至熟。"
+        }
+      ]
     },
     {
       "id": "food:taxon:triticum_aestivum:bread_whole_wheat",
@@ -1745,10 +1993,6 @@
           "Whole-wheat bread"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.whole_grain"
-      ],
       "commonness": 4,
       "healthMetrics": {
         "glycemicIndex": {
@@ -1770,41 +2014,59 @@
           "reference": "Whole-wheat bread, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 246,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 12.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 3.4,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 43.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "全麦面包的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Whole-wheat bread are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:whole",
+          "quantity": {
+            "value": 62,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 28,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:gallus_gallus:egg:whole",
+          "quantity": {
+            "value": 5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:bos_taurus:milk:whole",
+          "quantity": {
+            "value": 5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.whole_grain"
+      ],
+      "recipeSteps": [
+        {
+          "text": "混合全麦粉和液体揉成面团并醒发。"
+        },
+        {
+          "text": "整形后烘烤至熟。"
+        }
+      ]
     },
     {
       "id": "food:taxon:zea_mays:boiled",
@@ -1843,40 +2105,14 @@
           "reference": "Boiled sweet corn, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 112,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 4.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 1.2,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 22.8,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "煮玉米的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Boiled sweet corn are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:zea_mays:raw",
+        "cookingMethodId": "boiled"
       }
     },
     {
@@ -1916,40 +2152,14 @@
           "reference": "Steamed sweet potato, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 99,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 1.1,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.2,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 24.7,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "红薯的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Steamed sweet potato are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:ipomoea_batatas:raw",
+        "cookingMethodId": "steamed"
       }
     },
     {
@@ -1989,40 +2199,14 @@
           "reference": "Boiled taro, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 58,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 1.9,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.2,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 19.9,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "芋头的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Boiled taro are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:colocasia_esculenta:raw",
+        "cookingMethodId": "boiled"
       }
     },
     {
@@ -2035,10 +2219,6 @@
           "Millet porridge"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.grain"
-      ],
       "commonness": 4,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2060,41 +2240,43 @@
           "reference": "Millet porridge, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 46,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 1.4,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.6,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 10.2,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "小米粥的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Millet porridge are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:panicum_miliaceum:raw",
+          "quantity": {
+            "value": 13,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 87,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "recipeSteps": [
+        {
+          "text": "小米淘洗后加水。"
+        },
+        {
+          "text": "煮至米粒软烂成粥。"
+        }
+      ]
     },
     {
       "id": "food:taxon:oryza_sativa:porridge",
@@ -2107,10 +2289,6 @@
           "Rice porridge"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.grain"
-      ],
       "commonness": 5,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2132,41 +2310,43 @@
           "reference": "Rice porridge, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 46,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 0.8,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.2,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 11.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "白粥的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Rice porridge are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:polished:raw",
+          "quantity": {
+            "value": 13,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 87,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "recipeSteps": [
+        {
+          "text": "大米淘洗后加水。"
+        },
+        {
+          "text": "煮至米粒软烂成粥。"
+        }
+      ]
     },
     {
       "id": "food:taxon:oryza_sativa:glutinous_steamed",
@@ -2189,7 +2369,7 @@
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
-          "value": 22.0,
+          "value": 22,
           "unit": "GL"
         }
       },
@@ -2203,40 +2383,14 @@
           "reference": "Steamed glutinous rice, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 116,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 2.3,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.3,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 25.3,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "糯米饭的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Steamed glutinous rice are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:oryza_sativa:glutinous:raw",
+        "cookingMethodId": "steamed_grain"
       }
     },
     {
@@ -2250,10 +2404,6 @@
           "Zongzi"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 4,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2275,41 +2425,51 @@
           "reference": "Rice dumpling, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 170,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 3.5,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 2.5,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 36.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "粽子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Rice dumpling are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:glutinous:raw",
+          "quantity": {
+            "value": 48,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:sus_scrofa:lean_raw",
+          "quantity": {
+            "value": 12,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 40,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "boiled",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "糯米浸泡，准备馅料。"
+        },
+        {
+          "text": "包制后加水煮熟。"
+        }
+      ]
     },
     {
       "id": "food:taxon:oryza_sativa:rice_noodles",
@@ -2321,10 +2481,6 @@
           "Rice noodles"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 4,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2346,41 +2502,43 @@
           "reference": "Rice noodles, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 109,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 1.7,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.4,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 23.5,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "米粉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Rice noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:polished:raw",
+          "quantity": {
+            "value": 31,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 69,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "boiled",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "米浆制成米粉。"
+        },
+        {
+          "text": "入沸水煮熟。"
+        }
+      ]
     },
     {
       "id": "food:taxon:oryza_sativa:liangpi",
@@ -2393,10 +2551,6 @@
           "Liangpi"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 4,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2404,7 +2558,7 @@
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
-          "value": 11.0,
+          "value": 11,
           "unit": "GL"
         }
       },
@@ -2418,41 +2572,51 @@
           "reference": "Cold rice noodles, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 99,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 1.8,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.6,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 20.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "凉皮的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Cold rice noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:polished:raw",
+          "quantity": {
+            "value": 27,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 65,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:glycine_max:tofu:soft",
+          "quantity": {
+            "value": 8,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "cold_mixed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "米浆蒸制定型后切条。"
+        },
+        {
+          "text": "与配料拌匀食用。"
+        }
+      ]
     },
     {
       "id": "food:taxon:oryza_sativa:rice_cake",
@@ -2464,10 +2628,6 @@
           "Rice cake"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 3,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2489,41 +2649,43 @@
           "reference": "Rice cake, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 188,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 3.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.4,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 42.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "年糕的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Rice cake are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:glutinous:raw",
+          "quantity": {
+            "value": 54,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 46,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "糯米浸泡并磨制。"
+        },
+        {
+          "text": "蒸熟并压制成型。"
+        }
+      ]
     },
     {
       "id": "food:taxon:triticum_aestivum:noodles_boiled",
@@ -2562,40 +2724,14 @@
           "reference": "Boiled wheat noodles, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 110,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 3.8,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.4,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 25.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "面条的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Boiled wheat noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:triticum_aestivum:noodles:dry",
+        "cookingMethodId": "boiled"
       }
     },
     {
@@ -2608,10 +2744,6 @@
           "Lotus root starch drink"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 2,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2633,41 +2765,43 @@
           "reference": "Lotus root starch drink, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 63,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 0.1,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 0.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 15.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "藕粉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Lotus root starch drink are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:nelumbo_nucifera:starch",
+          "quantity": {
+            "value": 18,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 82,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "莲藕淀粉用少量凉水调匀。"
+        },
+        {
+          "text": "冲入热水搅拌至透明。"
+        }
+      ]
     },
     {
       "id": "food:taxon:glycine_max:soy_milk",
@@ -2679,10 +2813,6 @@
           "Soy milk"
         ]
       },
-      "categoryTags": [
-        "food.soy",
-        "food.beverage"
-      ],
       "commonness": 5,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2704,41 +2834,65 @@
           "reference": "Soy milk, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
-            "unitCategory": "weight",
-            "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 31,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 3.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 1.6,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 1.8,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
-          }
-        }
-      },
       "description": {
         "zh": "豆浆的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Soy milk are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:glycine_max:soybean:dried",
+          "quantity": {
+            "value": 8,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 92,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.soy",
+        "food.beverage"
+      ],
+      "recipeSteps": [
+        {
+          "text": "黄豆浸泡后加水研磨。"
+        },
+        {
+          "text": "过滤并煮沸至熟。"
+        }
+      ],
+      "hydrationMlPer100g": 92,
+      "densityGramsPerMl": 1.01,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ]
     },
     {
       "id": "food:taxon:triticum_aestivum:youtiao",
@@ -2751,10 +2905,6 @@
           "Youtiao"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 4,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2776,31 +2926,186 @@
           "reference": "Chinese fried dough, preparation-matched reference"
         }
       ],
+      "description": {
+        "zh": "油条的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Chinese fried dough are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:refined",
+          "quantity": {
+            "value": 54,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 26,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:gallus_gallus:egg:whole",
+          "quantity": {
+            "value": 13,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:plant_oil:generic",
+          "quantity": {
+            "value": 7,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "deep_fried",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "调制面团并醒发。"
+        },
+        {
+          "text": "整形后油炸至金黄。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:flour:refined",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "小麦粉",
+          "中筋面粉"
+        ],
+        "en": [
+          "Refined wheat flour",
+          "All-purpose flour"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "wheat flour, refined; per 100 g edible portion"
+        }
+      ],
       "nutritionTables": {
-        "standard.100g": {
+        "standard.100g_edible": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
           "nutrients": {
             "ENERGY": {
-              "value": 388,
+              "value": 344,
               "unitCategory": "energy",
               "unitId": "kcal"
             },
             "PROTEIN": {
-              "value": 6.9,
+              "value": 11.2,
               "unitCategory": "weight",
               "unitId": "g"
             },
             "FAT": {
-              "value": 18.0,
+              "value": 1.5,
               "unitCategory": "weight",
               "unitId": "g"
             },
             "CHO": {
-              "value": 45.0,
+              "value": 71.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 85,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 60.8,
+          "unit": "GL"
+        }
+      },
+      "description": {
+        "zh": "精制小麦粉是面点的基础食材，营养表按干粉每 100 克可食部计。",
+        "en": "Refined wheat flour is a basic dough ingredient. Values are per 100 g dry edible flour."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:water:drinking",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "饮用水",
+          "水"
+        ],
+        "en": [
+          "Drinking water",
+          "Water"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "densityGramsPerMl": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "water, per 100 g"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
               "unitCategory": "weight",
               "unitId": "g"
             }
@@ -2808,12 +3113,15 @@
         }
       },
       "description": {
-        "zh": "油条的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
-        "en": "Values for Chinese fried dough are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+        "zh": "饮用水用于按实际配方计入菜肴总质量，不提供能量或三大营养素。",
+        "en": "Drinking water is included for recipe mass and provides no energy or macronutrients."
+      },
+      "commonness": 5,
+      "hydrationMlPer100g": 100
     },
     {
       "id": "food:taxon:triticum_aestivum:meat_bun",
+      "kind": "food",
       "names": {
         "zh": [
           "肉包子"
@@ -2823,10 +3131,6 @@
           "Meat bun"
         ]
       },
-      "categoryTags": [
-        "food.staple",
-        "food.staple.processed"
-      ],
       "commonness": 5,
       "healthMetrics": {
         "glycemicIndex": {
@@ -2848,41 +3152,53 @@
           "reference": "Meat-filled steamed bun, preparation-matched reference"
         }
       ],
-      "nutritionTables": {
-        "standard.100g": {
-          "basis": {
-            "value": 100.0,
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:refined",
+          "quantity": {
+            "value": 45,
             "unitCategory": "weight",
             "unitId": "g"
-          },
-          "nutrients": {
-            "ENERGY": {
-              "value": 223,
-              "unitCategory": "energy",
-              "unitId": "kcal"
-            },
-            "PROTEIN": {
-              "value": 9.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "FAT": {
-              "value": 6.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            },
-            "CHO": {
-              "value": 30.0,
-              "unitCategory": "weight",
-              "unitId": "g"
-            }
+          }
+        },
+        {
+          "foodId": "food:taxon:sus_scrofa:lean_raw",
+          "quantity": {
+            "value": 28,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 27,
+            "unitCategory": "weight",
+            "unitId": "g"
           }
         }
-      },
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "recipeSteps": [
+        {
+          "text": "面粉加水和面并醒发。"
+        },
+        {
+          "text": "调制肉馅，包入面皮。"
+        },
+        {
+          "text": "上锅蒸熟。"
+        }
+      ],
       "description": {
         "zh": "肉包子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Meat-filled steamed bun are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ]
     },
     {
       "id": "food:taxon:solanum_melongena:raw",
@@ -2921,7 +3237,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -2952,7 +3268,8 @@
       "description": {
         "zh": "茄子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Eggplant are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:lactuca_sativa:raw",
@@ -2991,7 +3308,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3022,7 +3339,8 @@
       "description": {
         "zh": "生菜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Lettuce are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:daucus_carota:raw",
@@ -3061,7 +3379,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3072,7 +3390,7 @@
               "unitId": "kcal"
             },
             "PROTEIN": {
-              "value": 1.0,
+              "value": 1,
               "unitCategory": "weight",
               "unitId": "g"
             },
@@ -3092,7 +3410,8 @@
       "description": {
         "zh": "胡萝卜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Carrot are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:solanum_melongena:local_round_raw",
@@ -3133,7 +3452,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3164,7 +3483,8 @@
       "description": {
         "zh": "本地圆茄的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Local round eggplant are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:vigna_unguiculata:raw",
@@ -3187,7 +3507,7 @@
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
-          "value": 1.0,
+          "value": 1,
           "unit": "GL"
         }
       },
@@ -3204,7 +3524,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3235,7 +3555,8 @@
       "description": {
         "zh": "豆角的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Yardlong bean are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:phaseolus_vulgaris:raw",
@@ -3275,7 +3596,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3306,7 +3627,8 @@
       "description": {
         "zh": "四季豆的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Green bean are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:lactuca_sativa:asparagus_lettuce",
@@ -3346,7 +3668,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3357,7 +3679,7 @@
               "unitId": "kcal"
             },
             "PROTEIN": {
-              "value": 1.0,
+              "value": 1,
               "unitCategory": "weight",
               "unitId": "g"
             },
@@ -3367,7 +3689,7 @@
               "unitId": "g"
             },
             "CHO": {
-              "value": 3.0,
+              "value": 3,
               "unitCategory": "weight",
               "unitId": "g"
             }
@@ -3377,7 +3699,8 @@
       "description": {
         "zh": "莴苣的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Asparagus lettuce are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:zingiber_mioga:raw",
@@ -3416,7 +3739,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3447,7 +3770,8 @@
       "description": {
         "zh": "茭白的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Water bamboo shoot are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:dioscorea_polystachya:raw",
@@ -3486,7 +3810,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3517,7 +3841,8 @@
       "description": {
         "zh": "山药的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Chinese yam are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:apium_graveolens:raw",
@@ -3556,7 +3881,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3587,7 +3912,8 @@
       "description": {
         "zh": "芹菜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Celery are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:capsicum_annuum:chili",
@@ -3600,6 +3926,7 @@
         ]
       },
       "categoryTags": [
+        "food.seasoning",
         "food.vegetable"
       ],
       "commonness": 3,
@@ -3609,7 +3936,7 @@
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
-          "value": 1.0,
+          "value": 1,
           "unit": "GL"
         }
       },
@@ -3626,7 +3953,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3657,7 +3984,8 @@
       "description": {
         "zh": "小米辣的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Bird's eye chili are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:coriandrum_sativum:raw",
@@ -3671,6 +3999,7 @@
         ]
       },
       "categoryTags": [
+        "food.seasoning",
         "food.vegetable"
       ],
       "commonness": 4,
@@ -3680,7 +4009,7 @@
           "unit": "GI"
         },
         "glycemicLoadPer100g": {
-          "value": 1.0,
+          "value": 1,
           "unit": "GL"
         }
       },
@@ -3697,7 +4026,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3728,7 +4057,8 @@
       "description": {
         "zh": "香菜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Coriander are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:allium_sativum:raw",
@@ -3741,6 +4071,7 @@
         ]
       },
       "categoryTags": [
+        "food.seasoning",
         "food.vegetable"
       ],
       "commonness": 5,
@@ -3767,7 +4098,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3798,7 +4129,8 @@
       "description": {
         "zh": "大蒜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Garlic are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:zingiber_officinale:raw",
@@ -3811,6 +4143,7 @@
         ]
       },
       "categoryTags": [
+        "food.seasoning",
         "food.vegetable"
       ],
       "commonness": 5,
@@ -3837,7 +4170,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3868,7 +4201,8 @@
       "description": {
         "zh": "生姜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Ginger are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:solanum_lycopersicum:cherry_raw",
@@ -3909,7 +4243,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -3920,7 +4254,7 @@
               "unitId": "kcal"
             },
             "PROTEIN": {
-              "value": 1.0,
+              "value": 1,
               "unitCategory": "weight",
               "unitId": "g"
             },
@@ -3940,7 +4274,8 @@
       "description": {
         "zh": "圣女果的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Cherry tomato are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:hylocereus_undatus:raw",
@@ -3980,7 +4315,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -4001,7 +4336,7 @@
               "unitId": "g"
             },
             "CHO": {
-              "value": 11.0,
+              "value": 11,
               "unitCategory": "weight",
               "unitId": "g"
             }
@@ -4011,7 +4346,8 @@
       "description": {
         "zh": "火龙果的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Dragon fruit are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:durio_zibethinus:raw",
@@ -4050,7 +4386,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -4081,7 +4417,8 @@
       "description": {
         "zh": "榴莲的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Durian are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:pyrus_pyrifolia:raw",
@@ -4121,7 +4458,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -4152,7 +4489,8 @@
       "description": {
         "zh": "梨子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Pear are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:citrullus_lanatus:raw",
@@ -4191,7 +4529,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -4222,7 +4560,8 @@
       "description": {
         "zh": "西瓜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Watermelon are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:sus_scrofa:lean_raw",
@@ -4255,7 +4594,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -4276,7 +4615,7 @@
               "unitId": "g"
             },
             "CHO": {
-              "value": 0.0,
+              "value": 0,
               "unitCategory": "weight",
               "unitId": "g"
             }
@@ -4286,7 +4625,8 @@
       "description": {
         "zh": "猪肉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Lean pork are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:bos_taurus:lean_raw",
@@ -4319,7 +4659,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -4340,7 +4680,7 @@
               "unitId": "g"
             },
             "CHO": {
-              "value": 0.0,
+              "value": 0,
               "unitCategory": "weight",
               "unitId": "g"
             }
@@ -4350,7 +4690,8 @@
       "description": {
         "zh": "牛肉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Lean beef are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
     },
     {
       "id": "food:taxon:ovis_aries:lean_raw",
@@ -4383,7 +4724,7 @@
       "nutritionTables": {
         "standard.100g": {
           "basis": {
-            "value": 100.0,
+            "value": 100,
             "unitCategory": "weight",
             "unitId": "g"
           },
@@ -4394,7 +4735,7 @@
               "unitId": "kcal"
             },
             "PROTEIN": {
-              "value": 19.0,
+              "value": 19,
               "unitCategory": "weight",
               "unitId": "g"
             },
@@ -4404,7 +4745,7 @@
               "unitId": "g"
             },
             "CHO": {
-              "value": 0.0,
+              "value": 0,
               "unitCategory": "weight",
               "unitId": "g"
             }
@@ -4414,7 +4755,2922 @@
       "description": {
         "zh": "羊肉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
         "en": "Values for Lean lamb are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
-      }
+      },
+      "kind": "ingredient"
+    },
+    {
+      "id": "food:taxon:oryza_sativa:wholegrain:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "糙米"
+        ],
+        "en": [
+          "Brown rice, raw"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain",
+        "food.staple.whole_grain"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 348,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 7.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 2.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 74.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 3.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 50,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Brown rice, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "糙米为配方计算使用的基础食材。",
+        "en": "Brown rice, raw is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:solanum_tuberosum:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "生土豆"
+        ],
+        "en": [
+          "Potato, raw"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.tuber",
+        "food.vegetable"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 77,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 17.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 56,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Potato, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "生土豆为配方计算使用的基础食材。",
+        "en": "Potato, raw is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:gallus_gallus:breast:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "生鸡胸肉"
+        ],
+        "en": [
+          "Chicken breast, raw"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg.poultry"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 118,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 22.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Chicken breast, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "生鸡胸肉为配方计算使用的基础食材。",
+        "en": "Chicken breast, raw is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:arachis_hypogaea:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "生花生"
+        ],
+        "en": [
+          "Peanuts, raw"
+        ]
+      },
+      "categoryTags": [
+        "food.nut",
+        "food.soy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 567,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 25,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 47,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 21.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 8.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 14,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Peanuts, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "生花生为配方计算使用的基础食材。",
+        "en": "Peanuts, raw is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:zea_mays:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "玉米",
+          "鲜玉米",
+          "带芯玉米"
+        ],
+        "en": [
+          "Sweet corn on the cob",
+          "Fresh corn"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.46,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 112,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 22.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 52,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Sweet corn kernels, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "菜市场购买的带苞叶、玉米芯的鲜玉米。营养表按玉米粒每 100 克可食部计；购买重量记录时，先按约 46% 换算为可食玉米粒。",
+        "en": "Fresh market corn sold with husk and cob. Nutrition is per 100 g edible kernels; convert purchased mass using an edible ratio of about 46%."
+      },
+      "commonness": 3,
+      "servings": [
+        {
+          "id": "edible_100g",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "可食 100 克",
+            "en": "100 g edible kernels"
+          }
+        },
+        {
+          "id": "purchased_100g",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 0.46,
+          "labels": {
+            "zh": "购买 100 克（约 46 克可食）",
+            "en": "100 g purchased (about 46 g edible)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:ipomoea_batatas:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "生红薯"
+        ],
+        "en": [
+          "Sweet potato, raw"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.tuber"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 86,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 20.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 54,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Sweet potato, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "生红薯为配方计算使用的基础食材。",
+        "en": "Sweet potato, raw is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:colocasia_esculenta:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "生芋头"
+        ],
+        "en": [
+          "Taro, raw"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.tuber"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 112,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 26.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 4.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 48,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Taro, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "生芋头为配方计算使用的基础食材。",
+        "en": "Taro, raw is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:panicum_miliaceum:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "小米"
+        ],
+        "en": [
+          "Millet, raw"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 358,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 73.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 71,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Millet, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "小米为配方计算使用的基础食材。",
+        "en": "Millet, raw is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:oryza_sativa:glutinous:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "糯米"
+        ],
+        "en": [
+          "Glutinous rice, raw"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 348,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 7.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 77,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 87,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Glutinous rice, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "糯米为配方计算使用的基础食材。",
+        "en": "Glutinous rice, raw is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:noodles:dry",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "干小麦面条"
+        ],
+        "en": [
+          "Dried wheat noodles"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 347,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 10,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 72,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 55,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Dried wheat noodles; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "干小麦面条为配方计算使用的基础食材。",
+        "en": "Dried wheat noodles is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:flour:whole",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "全麦粉"
+        ],
+        "en": [
+          "Whole-wheat flour"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain",
+        "food.staple.whole_grain"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 340,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 13.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 2.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 66,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 10.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 69,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Whole-wheat flour; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "全麦粉为配方计算使用的基础食材。",
+        "en": "Whole-wheat flour is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:glycine_max:soybean:dried",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "黄豆"
+        ],
+        "en": [
+          "Soybeans, dried"
+        ]
+      },
+      "categoryTags": [
+        "food.soy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 390,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 35,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 16,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 34.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 15.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Soybeans, dried; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "黄豆为配方计算使用的基础食材。",
+        "en": "Soybeans, dried is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:nelumbo_nucifera:starch",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "莲藕淀粉"
+        ],
+        "en": [
+          "Lotus root starch"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 351,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 86.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 85,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Lotus root starch; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "莲藕淀粉为配方计算使用的基础食材。",
+        "en": "Lotus root starch is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:plant_oil:generic",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "植物油"
+        ],
+        "en": [
+          "Vegetable oil"
+        ]
+      },
+      "categoryTags": [
+        "food.oil"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 900,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 100,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Vegetable oil; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "植物油为配方计算使用的基础食材。",
+        "en": "Vegetable oil is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:zea_mays:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "玉米粒",
+          "包装玉米粒",
+          "剥粒玉米"
+        ],
+        "en": [
+          "Sweet corn kernels",
+          "Packaged corn kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 112,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 22.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 52,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Sweet corn kernels, raw; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "已剥粒的冷藏、冷冻或保鲜膜包装玉米粒。包装净含量通常就是可食重量，不再扣除玉米芯或苞叶。",
+        "en": "Pre-shelled chilled, frozen, or packaged corn kernels. Package net weight is normally edible mass; do not deduct cob or husk."
+      },
+      "commonness": 3,
+      "servings": [
+        {
+          "id": "net_100g",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "净含量 100 克",
+            "en": "100 g net weight"
+          }
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:allium_fistulosum:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "大葱"
+        ],
+        "en": [
+          "Welsh onion"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning",
+        "food.vegetable"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 30,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 6.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Welsh onion; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "大葱为配方计算使用的基础食材。",
+        "en": "Welsh onion is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:allium_fistulosum:scallion",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "小葱"
+        ],
+        "en": [
+          "Scallion"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning",
+        "food.vegetable"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 32,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Scallion; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "小葱为配方计算使用的基础食材。",
+        "en": "Scallion is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:houttuynia_cordata:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "折耳根"
+        ],
+        "en": [
+          "Houttuynia"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning",
+        "food.vegetable"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 39,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 8.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Houttuynia; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "折耳根为配方计算使用的基础食材。",
+        "en": "Houttuynia is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:seasoning:salt",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "食盐"
+        ],
+        "en": [
+          "Table salt"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Table salt; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "食盐为配方计算使用的基础食材。",
+        "en": "Table salt is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:seasoning:soy_sauce",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "酱油"
+        ],
+        "en": [
+          "Soy sauce"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 63,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 5.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 8.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Soy sauce; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "酱油为配方计算使用的基础食材。",
+        "en": "Soy sauce is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:seasoning:vinegar",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "食醋"
+        ],
+        "en": [
+          "Vinegar"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 31,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Vinegar; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "食醋为配方计算使用的基础食材。",
+        "en": "Vinegar is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:seasoning:sugar",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "白砂糖"
+        ],
+        "en": [
+          "White sugar"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 400,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 100,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 65,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "White sugar; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "白砂糖为配方计算使用的基础食材。",
+        "en": "White sugar is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:seasoning:cooking_wine",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "料酒"
+        ],
+        "en": [
+          "Cooking wine"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 105,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Cooking wine; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "料酒为配方计算使用的基础食材。",
+        "en": "Cooking wine is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:seasoning:black_pepper",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "黑胡椒"
+        ],
+        "en": [
+          "Black pepper"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 251,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 10.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 64.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 25.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 15,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Black pepper; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "黑胡椒为配方计算使用的基础食材。",
+        "en": "Black pepper is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:animal_fat:lard",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "猪油"
+        ],
+        "en": [
+          "Lard"
+        ]
+      },
+      "categoryTags": [
+        "food.oil"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 897,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 99.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Lard; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "猪油为配方计算使用的基础食材。",
+        "en": "Lard is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:animal_fat:beef_tallow",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "牛油"
+        ],
+        "en": [
+          "Beef tallow"
+        ]
+      },
+      "categoryTags": [
+        "food.oil"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 902,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 100,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Beef tallow; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "牛油为配方计算使用的基础食材。",
+        "en": "Beef tallow is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:animal_fat:chicken_fat",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "鸡油"
+        ],
+        "en": [
+          "Chicken fat"
+        ]
+      },
+      "categoryTags": [
+        "food.oil"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 900,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 100,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Chicken fat; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "鸡油为配方计算使用的基础食材。",
+        "en": "Chicken fat is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:camellia_sinensis:leaves:dried",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "茶叶"
+        ],
+        "en": [
+          "Tea leaves, dried"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 311,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 20,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 47,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 30,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Tea leaves, dried; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "茶叶为配方计算使用的基础食材。",
+        "en": "Tea leaves, dried is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:coffea_arabica:grounds",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "咖啡粉"
+        ],
+        "en": [
+          "Coffee grounds"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 430,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 14,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 15,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 52,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 22,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {},
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Coffee grounds; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "咖啡粉为配方计算使用的基础食材。",
+        "en": "Coffee grounds is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:citrus_limon:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "柠檬"
+        ],
+        "en": [
+          "Lemon"
+        ]
+      },
+      "categoryTags": [
+        "food.fruit"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 35,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 8.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 20,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Lemon; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "柠檬为配方计算使用的基础食材。",
+        "en": "Lemon is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:seasoning:brown_sugar",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "红糖"
+        ],
+        "en": [
+          "Brown sugar"
+        ]
+      },
+      "categoryTags": [
+        "food.seasoning"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 389,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 97,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 65,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Brown sugar; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "红糖为配方计算使用的基础食材。",
+        "en": "Brown sugar is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:beverage:cola",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "可乐"
+        ],
+        "en": [
+          "Cola"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 43,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 10.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 63,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Cola; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "可乐为配方计算使用的基础食材。",
+        "en": "Cola is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3,
+      "hydrationMlPer100g": 89.3,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "food:beverage:fruit_juice",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "果汁"
+        ],
+        "en": [
+          "Fruit juice"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 45,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 10.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 50,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Fruit juice; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "果汁为配方计算使用的基础食材。",
+        "en": "Fruit juice is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3,
+      "hydrationMlPer100g": 88.5,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "food:beverage:yogurt:plain",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "原味酸奶"
+        ],
+        "en": [
+          "Plain yogurt"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 72,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 3.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 8.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 36,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Plain yogurt; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "原味酸奶为配方计算使用的基础食材。",
+        "en": "Plain yogurt is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3,
+      "hydrationMlPer100g": 82,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "food:beverage:milk_tea",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "奶茶"
+        ],
+        "en": [
+          "Milk tea"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 67,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 11.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 55,
+          "unit": "GI"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Milk tea; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "奶茶为配方计算使用的基础食材。",
+        "en": "Milk tea is a base ingredient used for recipe resolution."
+      },
+      "commonness": 3,
+      "hydrationMlPer100g": 85,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "standard.100g_edible",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "food:beverage:tea",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "茶水"
+        ],
+        "en": [
+          "Tea"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:camellia_sinensis:leaves:dried",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 99,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 99,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "茶水的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Tea are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "茶叶加热水冲泡。"
+        },
+        {
+          "text": "按个人浓淡浸泡后饮用。"
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:beverage:coffee:black",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "黑咖啡"
+        ],
+        "en": [
+          "Black coffee"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:coffea_arabica:grounds",
+          "quantity": {
+            "value": 2,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 98,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 98,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "黑咖啡的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Black coffee are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "咖啡粉与热水萃取。"
+        },
+        {
+          "text": "过滤后饮用。"
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:beverage:lemon_water",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "柠檬水"
+        ],
+        "en": [
+          "Lemon water"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:citrus_limon:raw",
+          "quantity": {
+            "value": 5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 95,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 95,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "柠檬水的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Lemon water are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "柠檬切片后加入饮用水。"
+        }
+      ],
+      "techniqueId": "cold_mixed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:beverage:brown_sugar_water",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "红糖水"
+        ],
+        "en": [
+          "Brown sugar water"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "components": [
+        {
+          "foodId": "food:seasoning:brown_sugar",
+          "quantity": {
+            "value": 8,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 92,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 92,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "红糖水的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Brown sugar water are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "红糖加入热水搅拌至溶解。"
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:beverage:soy_milk:commercial",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "豆奶"
+        ],
+        "en": [
+          "Soy milk beverage"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:glycine_max:soybean:dried",
+          "quantity": {
+            "value": 5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:sugar",
+          "quantity": {
+            "value": 4,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 91,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 91,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "豆奶的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Soy milk beverage are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "黄豆提取液与水、糖调配。"
+        },
+        {
+          "text": "均质并加热灭菌。"
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1
     }
   ]
 }

@@ -18,8 +18,8 @@ class FoodNutrientRepositoryTest {
         )
         val ingredients = foods.filterIsInstance<Ingredient>()
         assertTrue(
-            ingredients.all { ingredient ->
-                resolver.resolvePer100g(ingredient).nutrients.keys
+            foods.all { food ->
+                resolver.resolvePer100g(food).nutrients.keys
                     .containsAll(setOf("ENERGY", "PROTEIN", "FAT", "CHO"))
             },
         )
@@ -33,12 +33,14 @@ class FoodNutrientRepositoryTest {
         )
         assertTrue(
             foods.all { food ->
-                val hasGi = food.healthMetrics.glycemicIndex != null
-                val hasGl = food.healthMetrics.glycemicLoadPer100g != null
+                val metrics = resolver.resolvePer100g(food).healthMetrics
+                val hasGi = metrics.glycemicIndex != null
+                val hasGl = metrics.glycemicLoadPer100g != null
                 hasGi == hasGl
             },
         )
         assertTrue(foods.all { it.commonness in 1..5 })
+        assertTrue(foods.filterIsInstance<PreparedFood>().all { it.categoryTags.isNotEmpty() })
         assertEquals("米饭", foods.first { it.id == "food:taxon:oryza_sativa:polished:steamed" }.displayName("zh"))
     }
 
@@ -81,11 +83,17 @@ class FoodNutrientRepositoryTest {
     fun everyDerivedFoodAndDishComponentResolvesToAKnownId() {
         val foods = foods()
         val byId = foods.associateBy { it.id }
-        foods.filterIsInstance<PreparedFood>().forEach {
-            assertTrue(
-                "missing ingredient ${it.derivedFrom.ingredientId}",
-                byId.containsKey(it.derivedFrom.ingredientId),
-            )
+        foods.filterIsInstance<PreparedFood>().forEach { food ->
+            food.derivedFrom?.let { derivation ->
+                assertTrue(
+                    "missing ingredient ${derivation.ingredientId}",
+                    byId.containsKey(derivation.ingredientId),
+                )
+            }
+            assertTrue("food ${food.id} has neither derivation nor components", food.derivedFrom != null || food.components.isNotEmpty())
+            food.components.forEach { component ->
+                assertTrue("missing component ${component.foodId}", byId.containsKey(component.foodId))
+            }
         }
         foods.filterIsInstance<Dish>().forEach { dish ->
             dish.components.forEach { component ->
@@ -94,6 +102,99 @@ class FoodNutrientRepositoryTest {
                     byId.containsKey(component.foodId),
                 )
             }
+        }
+    }
+
+    @Test
+    fun multicomponentProductsAreDishesAndResolveNutritionFromTheirIngredients() {
+        val foods = foods()
+        val resolver = resolverFor(foods)
+        val meatBun = foods.first { it.id == "food:taxon:triticum_aestivum:meat_bun" }
+        val youtiao = foods.first { it.id == "food:taxon:triticum_aestivum:youtiao" }
+
+        assertTrue(meatBun is PreparedFood)
+        assertTrue(youtiao is PreparedFood)
+        assertTrue((meatBun as PreparedFood).components.size >= 3)
+        assertTrue((youtiao as PreparedFood).components.size >= 3)
+        assertTrue(resolver.resolvePer100g(meatBun).nutrients.getValue("ENERGY").value > 0.0)
+        assertTrue(resolver.resolvePer100g(youtiao).nutrients.getValue("FAT").value > 0.0)
+    }
+
+    @Test
+    fun animalFatsAreOilsWithResolvedNutrition() {
+        val foods = foods().associateBy { it.id }
+        listOf("food:animal_fat:lard", "food:animal_fat:beef_tallow", "food:animal_fat:chicken_fat").forEach { id ->
+            val fat = foods[id] as? Ingredient
+            assertTrue("missing animal fat $id", fat != null)
+            assertTrue("$id is not tagged as oil", fat?.categoryTags?.contains("food.oil") == true)
+            assertTrue("$id does not contain fat", fat?.nutritionTables?.values?.first()?.nutrients?.get("FAT")?.value ?: 0.0 > 99.0)
+        }
+    }
+
+    @Test
+    fun marketCornAndPackagedKernelsUseDifferentEdiblePortionRules() {
+        val foods = foods()
+        val marketCorn = foods.first { it.id == "food:taxon:zea_mays:raw" } as Ingredient
+        val packagedKernels = foods.first { it.id == "food:taxon:zea_mays:kernels:raw" } as Ingredient
+
+        assertEquals(0.46, marketCorn.edibleRatio ?: 0.0, 0.0001)
+        assertEquals(1.0, packagedKernels.edibleRatio ?: 0.0, 0.0001)
+        assertEquals(92.0, NutritionResolver.edibleGrams(200.0, requireNotNull(marketCorn.edibleRatio)), 0.0001)
+        assertEquals(200.0, NutritionResolver.edibleGrams(200.0, requireNotNull(packagedKernels.edibleRatio)), 0.0001)
+        assertEquals(0.46, marketCorn.servings.first { it.id == "purchased_100g" }.ratioToTable, 0.0001)
+        assertEquals(1.0, packagedKernels.servings.single().ratioToTable, 0.0001)
+    }
+
+    @Test
+    fun aromaticsAndCoreCondimentsAreSeasonings() {
+        val foods = foods().associateBy { it.id }
+        val seasoningIds = setOf(
+            "food:taxon:zingiber_officinale:raw",
+            "food:taxon:allium_sativum:raw",
+            "food:taxon:allium_fistulosum:raw",
+            "food:taxon:allium_fistulosum:scallion",
+            "food:taxon:houttuynia_cordata:raw",
+            "food:taxon:coriandrum_sativum:raw",
+            "food:taxon:capsicum_annuum:chili",
+            "food:seasoning:salt",
+            "food:seasoning:soy_sauce",
+            "food:seasoning:vinegar",
+            "food:seasoning:sugar",
+            "food:seasoning:cooking_wine",
+            "food:seasoning:black_pepper",
+        )
+
+        seasoningIds.forEach { id ->
+            val ingredient = foods[id] as? Ingredient
+            assertTrue("missing seasoning $id", ingredient != null)
+            assertTrue("$id is not tagged as seasoning", ingredient?.categoryTags?.contains("food.seasoning") == true)
+        }
+    }
+
+    @Test
+    fun beverageFoodsExposeExplicitHydrationForFutureDrinkRecords() {
+        val foods = foods()
+        val resolver = resolverFor(foods)
+        val byId = foods.associateBy { it.id }
+        val expectedHydration = mapOf(
+            "food:water:drinking" to 100.0,
+            "food:beverage:tea" to 99.0,
+            "food:beverage:coffee:black" to 98.0,
+            "food:beverage:lemon_water" to 95.0,
+            "food:beverage:brown_sugar_water" to 92.0,
+            "food:taxon:glycine_max:soy_milk" to 92.0,
+            "food:beverage:soy_milk:commercial" to 91.0,
+            "food:beverage:cola" to 89.3,
+            "food:taxon:bos_taurus:milk:whole" to 87.0,
+            "food:beverage:fruit_juice" to 88.5,
+            "food:beverage:yogurt:plain" to 82.0,
+            "food:beverage:milk_tea" to 85.0,
+        )
+
+        expectedHydration.forEach { (id, per100g) ->
+            val beverage = requireNotNull(byId[id])
+            assertEquals(per100g, beverage.hydrationMlPer100g ?: 0.0, 0.0001)
+            assertEquals(per100g * 2.5, resolver.hydrationMl(beverage, 250.0) ?: 0.0, 0.0001)
         }
     }
 

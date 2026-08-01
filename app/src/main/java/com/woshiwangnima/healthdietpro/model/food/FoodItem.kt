@@ -7,6 +7,7 @@ internal sealed interface FoodItem {
     val kind: FoodKind
     val names: Map<String, List<String>>
     val healthMetrics: FoodHealthMetrics
+    val hydrationMlPer100g: Double?
     val commonness: Int
     val systemTags: List<String>
     val description: Map<String, String>
@@ -42,6 +43,7 @@ internal data class Ingredient(
     val densityGramsPerMl: Double? = null,
     override val servings: List<FoodServing> = emptyList(),
     override val healthMetrics: FoodHealthMetrics = FoodHealthMetrics(),
+    override val hydrationMlPer100g: Double? = null,
     override val commonness: Int = 0,
     override val systemTags: List<String> = emptyList(),
     override val description: Map<String, String> = emptyMap(),
@@ -55,15 +57,20 @@ internal data class PreparedFood(
     override val id: String,
     override val names: Map<String, List<String>>,
     override val categoryTags: List<String>,
-    val derivedFrom: FoodDerivation,
+    val derivedFrom: FoodDerivation? = null,
+    val components: List<DishComponent> = emptyList(),
     val densityGramsPerMl: Double? = null,
     override val servings: List<FoodServing> = emptyList(),
     override val healthMetrics: FoodHealthMetrics = FoodHealthMetrics(),
+    override val hydrationMlPer100g: Double? = null,
     override val commonness: Int = 0,
     override val systemTags: List<String> = emptyList(),
     override val description: Map<String, String> = emptyMap(),
     override val image: FoodImage? = null,
     override val sources: List<FoodSource> = emptyList(),
+    val recipeSteps: List<RecipeStep> = emptyList(),
+    val techniqueId: String? = null,
+    val servesPeople: Int? = null,
 ) : CategorizedFood {
     override val kind: FoodKind get() = FoodKind.FOOD
 }
@@ -74,6 +81,7 @@ internal data class Dish(
     val components: List<DishComponent>,
     override val servings: List<FoodServing> = emptyList(),
     override val healthMetrics: FoodHealthMetrics = FoodHealthMetrics(),
+    override val hydrationMlPer100g: Double? = null,
     override val commonness: Int = 0,
     override val systemTags: List<String> = emptyList(),
     override val description: Map<String, String> = emptyMap(),

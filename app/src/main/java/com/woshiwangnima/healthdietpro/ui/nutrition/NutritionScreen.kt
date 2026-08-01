@@ -92,8 +92,12 @@ import com.woshiwangnima.healthdietpro.model.food.glycemicLoadClassificationBand
 
 private fun FoodItem.categoryTagsOrEmpty(): List<String> = (this as? CategorizedFood)?.categoryTags.orEmpty()
 
-private fun FoodItem.defaultServings(): List<FoodServing> = servings.ifEmpty {
-    listOf(FoodServing("per_100g", "standard.100g", 1.0, mapOf("zh" to "100 克", "en" to "100 g")))
+private fun FoodItem.defaultServings(resolved: ResolvedNutrition?): List<FoodServing> = servings.ifEmpty {
+    if (this is Dish && resolved != null) {
+        listOf(FoodServing("whole_dish", "whole_dish", 1.0, mapOf("zh" to "整道菜", "en" to "Whole dish")))
+    } else {
+        listOf(FoodServing("per_100g", "standard.100g", 1.0, mapOf("zh" to "100 克", "en" to "100 g")))
+    }
 }
 
 @StringRes
@@ -375,12 +379,19 @@ private fun FoodRow(food: FoodItem, language: String, viewModel: NutritionViewMo
         }
     }
     val cookingSuffix: String? = (food as? PreparedFood)?.let {
-        viewModel.cookingMethodFor(it.derivedFrom.cookingMethodId)?.displayLabel(language)
+        it.derivedFrom?.let { derivation ->
+            viewModel.cookingMethodFor(derivation.cookingMethodId)?.displayLabel(language)
+        } ?: it.techniqueId?.let { techniqueId ->
+            viewModel.cookingMethodFor(techniqueId)?.displayLabel(language)
+        }
     }
     val aliases = food.allNames(language).drop(1)
-    // 菜肴额外显示组分数量作为次行。
-    val secondaryLine: String? = (food as? Dish)?.let {
-        stringResource(R.string.nutrition_dish_components) + ": " + it.components.size
+    val secondaryLine: String? = when (food) {
+        is Dish -> stringResource(R.string.nutrition_dish_components) + ": " + food.components.size
+        is PreparedFood -> food.components.takeIf { it.isNotEmpty() }?.let {
+            stringResource(R.string.nutrition_dish_components) + ": " + it.size
+        }
+        else -> null
     }
     var previewing by remember { mutableStateOf(false) }
     Row(modifier = Modifier.fillMaxWidth().clickable { onClick(food) }.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -416,17 +427,21 @@ private fun FoodRow(food: FoodItem, language: String, viewModel: NutritionViewMo
 private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBack: () -> Unit, onCompare: () -> Unit) {
     val imageStore = viewModel.foodImages
     var tab by remember { mutableIntStateOf(0) }
-    val servings = remember(food.id) { food.defaultServings() }
-    var selectedServingId by remember(food.id) { mutableStateOf(servings.first().id) }
+    val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
+    val servings = remember(food.id, resolved) { food.defaultServings(resolved) }
+    var selectedServingId by remember(food.id, servings) { mutableStateOf(servings.first().id) }
     var previewing by remember { mutableStateOf(false) }
     var showHealthMetricsHelp by remember { mutableStateOf(false) }
     var confirmingDelete by remember { mutableStateOf(false) }
-    val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
     val relatedDishes = remember(food.id) { viewModel.relatedDishes(food.id) }
     val isCustom = viewModel.isCustom(food.id)
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
     val cookingSuffix: String? = (food as? PreparedFood)?.let {
-        viewModel.cookingMethodFor(it.derivedFrom.cookingMethodId)?.displayLabel(language)
+        it.derivedFrom?.let { derivation ->
+            viewModel.cookingMethodFor(derivation.cookingMethodId)?.displayLabel(language)
+        } ?: it.techniqueId?.let { techniqueId ->
+            viewModel.cookingMethodFor(techniqueId)?.displayLabel(language)
+        }
     }
     BaseScreen(
         title = stringResource(food.kind.detailTitleRes()),
@@ -482,7 +497,7 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
                 }
             }
             AppDataTable(
-                rows = food.healthMetricRows(stringResource(R.string.nutrition_metric_no_data)),
+                rows = (resolved?.healthMetrics ?: food.healthMetrics).healthMetricRows(stringResource(R.string.nutrition_metric_no_data)),
                 columns = listOf(
                     AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 94.dp)) { AppDataTableText(stringResource(it.labelRes)) },
                     AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount)) }, ColumnWidth.Flex(0.8f, 74.dp)) { AppDataTableText(it.value) },
@@ -529,6 +544,10 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
         else if (tab == 1 && food is Dish) {
             Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
                 DishRecipeSection(food, viewModel, language) { viewModel.openFood(it) }
+            }
+        } else if (tab == 1 && food is PreparedFood && food.components.isNotEmpty()) {
+            Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
+                FoodRecipeSection(food, viewModel, language) { viewModel.openFood(it) }
             }
         } else {
             Text(stringResource(R.string.nutrition_detail_placeholder), modifier = Modifier.padding(top = 24.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -577,13 +596,19 @@ private fun KindInfoSection(food: FoodItem, viewModel: NutritionViewModel, langu
             InfoLine(stringResource(R.string.nutrition_edible_ratio), stringResource(R.string.nutrition_edible_ratio_value, (ratio * 100).toInt()))
         }
         is PreparedFood -> {
-            val source = viewModel.foodById(food.derivedFrom.ingredientId)
-            val method = viewModel.cookingMethodFor(food.derivedFrom.cookingMethodId)
-            // 来源食材：可点击跳转
-            source?.let { src ->
-                IngredientJumpLine(stringResource(R.string.nutrition_derived_from), src.displayName(language)) { onOpenFood(src) }
+            food.derivedFrom?.let { derivation ->
+                val source = viewModel.foodById(derivation.ingredientId)
+                val method = viewModel.cookingMethodFor(derivation.cookingMethodId)
+                source?.let { src ->
+                    IngredientJumpLine(stringResource(R.string.nutrition_derived_from), src.displayName(language)) { onOpenFood(src) }
+                }
+                method?.let { InfoLine(stringResource(R.string.nutrition_cooking_method), it.displayLabel(language)) }
             }
-            method?.let { InfoLine(stringResource(R.string.nutrition_cooking_method), it.displayLabel(language)) }
+            food.techniqueId?.let { techniqueId ->
+                viewModel.cookingMethodFor(techniqueId)?.let { method ->
+                    InfoLine(stringResource(R.string.nutrition_cooking_method), method.displayLabel(language))
+                }
+            }
         }
         is Dish -> DishInfoSection(food, viewModel, language, onOpenFood)
     }
@@ -629,6 +654,29 @@ private fun DishRecipeSection(dish: Dish, viewModel: NutritionViewModel, languag
         dish.recipeSteps.forEachIndexed { index, step ->
             RecipeStepRow(index + 1, step)
         }
+    }
+}
+
+@Composable
+private fun FoodRecipeSection(food: PreparedFood, viewModel: NutritionViewModel, language: String, onOpenFood: (FoodItem) -> Unit) {
+    food.techniqueId?.let { techniqueId ->
+        viewModel.cookingMethodFor(techniqueId)?.let { method ->
+            InfoLine(stringResource(R.string.nutrition_editor_technique), method.displayLabel(language))
+        }
+    }
+    food.servesPeople?.let { InfoLine(stringResource(R.string.nutrition_dish_serves), stringResource(R.string.nutrition_dish_serves_value, it)) }
+    DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_ingredient_list), Modifier.padding(top = 8.dp))
+    val (auxiliary, main) = food.components.partition { component ->
+        viewModel.foodById(component.foodId)?.let(viewModel::isAuxiliary) == true
+    }
+    main.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+    if (auxiliary.isNotEmpty()) {
+        Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary)
+        auxiliary.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+    }
+    if (food.recipeSteps.isNotEmpty()) {
+        DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_title), Modifier.padding(top = 8.dp))
+        food.recipeSteps.forEachIndexed { index, step -> RecipeStepRow(index + 1, step) }
     }
 }
 
@@ -811,15 +859,15 @@ private data class FoodProfileRow(
 )
 
 // GI/GL/炎症指数缺失时仍显示该行，数据填占位符「-」。
-private fun FoodItem.healthMetricRows(noData: String): List<FoodProfileRow> = listOf(
-    healthMetrics.glycemicIndex.let {
-        FoodProfileRow("gi", R.string.nutrition_metric_gi, it?.let { m -> "${m.value} ${m.unit}" } ?: noData, it?.let { m -> classifyGlycemicIndex(m.value) })
+private fun com.woshiwangnima.healthdietpro.model.food.FoodHealthMetrics.healthMetricRows(noData: String): List<FoodProfileRow> = listOf(
+    glycemicIndex.let {
+        FoodProfileRow("gi", R.string.nutrition_metric_gi, it?.let { m -> "${m.value.formatTableValue()} ${m.unit}" } ?: noData, it?.let { m -> classifyGlycemicIndex(m.value) })
     },
-    healthMetrics.glycemicLoadPer100g.let {
-        FoodProfileRow("gl", R.string.nutrition_metric_gl, it?.let { m -> "${m.value} ${m.unit}" } ?: noData, it?.let { m -> classifyGlycemicLoad(m.value) })
+    glycemicLoadPer100g.let {
+        FoodProfileRow("gl", R.string.nutrition_metric_gl, it?.let { m -> "${m.value.formatTableValue()} ${m.unit}" } ?: noData, it?.let { m -> classifyGlycemicLoad(m.value) })
     },
-    healthMetrics.inflammatoryPotential.let {
-        FoodProfileRow("inflammatory", R.string.nutrition_metric_inflammatory_potential, it?.let { m -> "${m.value} ${m.unit}" } ?: noData)
+    inflammatoryPotential.let {
+        FoodProfileRow("inflammatory", R.string.nutrition_metric_inflammatory_potential, it?.let { m -> "${m.value.formatTableValue()} ${m.unit}" } ?: noData)
     },
 )
 
@@ -894,9 +942,11 @@ private fun nutrientRows(resolved: ResolvedNutrition?, serving: FoodServing): Li
     val nutrients = resolved?.nutrients ?: return emptyList()
     val multiplier = serving.ratioToTable
     return nutrients.entries.map { (code, amount) ->
-        FoodProfileRow(code, code.nutrientLabelRes(), "%.1f %s".format(amount.value * multiplier, amount.unitId))
+        FoodProfileRow(code, code.nutrientLabelRes(), "${(amount.value * multiplier).formatTableValue()} ${amount.unitId}")
     }
 }
+
+private fun Double.formatTableValue(): String = "%.1f".format(java.util.Locale.ROOT, this)
 
 @Composable
 private fun FoodServingSelector(servings: List<FoodServing>, selectedServingId: String, onSelected: (String) -> Unit) {

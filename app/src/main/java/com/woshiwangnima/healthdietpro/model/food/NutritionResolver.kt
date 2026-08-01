@@ -7,6 +7,7 @@ internal const val TABLE_STANDARD_100ML = "standard.100ml"
 internal data class ResolvedNutrition(
     val basis: FoodQuantity,
     val nutrients: Map<String, FoodAmount>,
+    val healthMetrics: FoodHealthMetrics = FoodHealthMetrics(),
 )
 
 /**
@@ -21,6 +22,10 @@ internal class NutritionResolver(
     private val cookingMethodsById: Map<String, CookingMethod>,
 ) {
     fun resolvePer100g(item: FoodItem): ResolvedNutrition = resolve(item, mutableSetOf())
+
+    /** Hydration contribution for a consumed edible mass, for future drink-record aggregation. */
+    fun hydrationMl(item: FoodItem, consumedGrams: Double): Double? =
+        item.hydrationMlPer100g?.let { per100g -> consumedGrams * per100g / 100.0 }
 
     private fun resolve(item: FoodItem, visiting: MutableSet<String>): ResolvedNutrition {
         if (!visiting.add(item.id)) {
@@ -42,14 +47,18 @@ internal class NutritionResolver(
             ?: ingredient.nutritionTables[TABLE_STANDARD_100G]
             ?: ingredient.nutritionTables.values.firstOrNull()
             ?: FoodNutrientTable(FoodQuantity(100.0, "weight", "g"), emptyMap())
-        return ResolvedNutrition(table.basis, table.nutrients)
+        return ResolvedNutrition(table.basis, table.nutrients, ingredient.healthMetrics.completeFor(table.nutrients))
     }
 
     private fun resolvePrepared(food: PreparedFood, visiting: MutableSet<String>): ResolvedNutrition {
-        val source = foodsById[food.derivedFrom.ingredientId]
-            ?: throw IllegalStateException("PreparedFood '${food.id}' references missing ingredient '${food.derivedFrom.ingredientId}'")
-        val method = cookingMethodsById[food.derivedFrom.cookingMethodId]
-            ?: throw IllegalStateException("PreparedFood '${food.id}' references missing cooking method '${food.derivedFrom.cookingMethodId}'")
+        if (food.components.isNotEmpty()) {
+            return resolveComponents(food.components, food.healthMetrics, visiting)
+        }
+        val derivation = requireNotNull(food.derivedFrom) { "PreparedFood '${food.id}' requires derivedFrom or components" }
+        val source = foodsById[derivation.ingredientId]
+            ?: throw IllegalStateException("PreparedFood '${food.id}' references missing ingredient '${derivation.ingredientId}'")
+        val method = cookingMethodsById[derivation.cookingMethodId]
+            ?: throw IllegalStateException("PreparedFood '${food.id}' references missing cooking method '${derivation.cookingMethodId}'")
         val base = resolve(source, visiting)
         val yieldFactor = if (method.yieldFactor > 0.0) method.yieldFactor else 1.0
         val codes = base.nutrients.keys + method.addedPer100gRaw.keys
@@ -62,17 +71,33 @@ internal class NutritionResolver(
             val unitId = raw?.unitId ?: added?.unitId ?: "g"
             FoodAmount((rawValue + addedValue) / yieldFactor, unitCategory, unitId)
         }
-        val overridden = derived + food.derivedFrom.nutrientOverrides
-        return ResolvedNutrition(FoodQuantity(100.0, "weight", "g"), overridden)
+        val overridden = derived + derivation.nutrientOverrides
+        return ResolvedNutrition(
+            basis = FoodQuantity(100.0, "weight", "g"),
+            nutrients = overridden,
+            healthMetrics = food.healthMetrics
+                .withFallback(base.healthMetrics)
+                .completeFor(overridden),
+        )
     }
 
     private fun resolveDish(dish: Dish, visiting: MutableSet<String>): ResolvedNutrition {
+        return resolveComponents(dish.components, dish.healthMetrics, visiting)
+    }
+
+    private fun resolveComponents(
+        components: List<DishComponent>,
+        healthMetrics: FoodHealthMetrics,
+        visiting: MutableSet<String>,
+    ): ResolvedNutrition {
         val totals = LinkedHashMap<String, FoodAmount>()
-        for (component in dish.components) {
+        val resolvedComponents = mutableListOf<Pair<ResolvedNutrition, Double>>()
+        for (component in components) {
             val componentItem = foodsById[component.foodId]
-                ?: throw IllegalStateException("Dish '${dish.id}' references missing component '${component.foodId}'")
+                ?: throw IllegalStateException("Food composition references missing component '${component.foodId}'")
             val resolved = resolve(componentItem, visiting)
             val grams = componentGrams(component.quantity, componentItem)
+            resolvedComponents += resolved to grams
             val factor = grams / 100.0
             for ((code, amount) in resolved.nutrients) {
                 val existing = totals[code]
@@ -84,7 +109,13 @@ internal class NutritionResolver(
                 }
             }
         }
-        return ResolvedNutrition(FoodQuantity(100.0, "weight", "g"), totals)
+        return ResolvedNutrition(
+            basis = FoodQuantity(resolvedComponents.sumOf { it.second }, "weight", "g"),
+            nutrients = totals,
+            healthMetrics = healthMetrics
+                .withFallback(resolvedComponents.weightedGlycemicMetrics())
+                .completeFor(totals),
+        )
     }
 
     private fun componentGrams(quantity: FoodQuantity, item: FoodItem): Double = when (quantity.unitCategory) {
@@ -115,4 +146,39 @@ internal class NutritionResolver(
         fun purchasedGrams(edibleGrams: Double, edibleRatio: Double): Double =
             if (edibleRatio > 0.0) edibleGrams / edibleRatio else edibleGrams
     }
+}
+
+private fun FoodHealthMetrics.withFallback(fallback: FoodHealthMetrics): FoodHealthMetrics = FoodHealthMetrics(
+    glycemicIndex = glycemicIndex ?: fallback.glycemicIndex,
+    glycemicLoadPer100g = glycemicLoadPer100g ?: fallback.glycemicLoadPer100g,
+    inflammatoryPotential = inflammatoryPotential ?: fallback.inflammatoryPotential,
+)
+
+private fun FoodHealthMetrics.completeFor(nutrients: Map<String, FoodAmount>): FoodHealthMetrics {
+    val gi = glycemicIndex
+    val carbohydrates = nutrients["CHO"]?.value ?: 0.0
+    return copy(
+        glycemicLoadPer100g = glycemicLoadPer100g ?: gi?.let {
+            FoodMetric(it.value * carbohydrates / 100.0, "GL")
+        },
+    )
+}
+
+private fun List<Pair<ResolvedNutrition, Double>>.weightedGlycemicMetrics(): FoodHealthMetrics {
+    val carbohydrateContributions = map { (nutrition, grams) ->
+        nutrition to ((nutrition.nutrients["CHO"]?.value ?: 0.0) * grams / 100.0)
+    }
+    val totalCarbohydrates = carbohydrateContributions.sumOf { it.second }
+    if (totalCarbohydrates <= 0.0) return FoodHealthMetrics()
+    if (carbohydrateContributions.any { (nutrition, carbohydrates) ->
+            carbohydrates > 0.0 && nutrition.healthMetrics.glycemicIndex == null
+        }
+    ) return FoodHealthMetrics()
+    val gi = carbohydrateContributions.filter { (_, carbohydrates) -> carbohydrates > 0.0 }.sumOf { (nutrition, carbohydrates) ->
+        requireNotNull(nutrition.healthMetrics.glycemicIndex).value * carbohydrates
+    } / totalCarbohydrates
+    return FoodHealthMetrics(
+        glycemicIndex = FoodMetric(gi, "GI", basis = "whole_dish"),
+        glycemicLoadPer100g = FoodMetric(gi * totalCarbohydrates / 100.0, "GL", basis = "whole_dish"),
+    )
 }
