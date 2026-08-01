@@ -1,12 +1,14 @@
 package com.woshiwangnima.healthdietpro.ui.record
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +19,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.DirtyFormActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
@@ -50,6 +57,10 @@ import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseReference
+import com.woshiwangnima.healthdietpro.model.disease.UserCustomDisease
+import com.woshiwangnima.healthdietpro.model.disease.curatedId
+import com.woshiwangnima.healthdietpro.model.disease.customId
 import com.woshiwangnima.healthdietpro.model.medication.MedicationFrequency
 import com.woshiwangnima.healthdietpro.model.medication.MedicationFrequencyUnit
 import com.woshiwangnima.healthdietpro.model.medication.MedicationFrequencyType
@@ -62,14 +73,17 @@ import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Locale
 
 class MedicationCatalogActivity : DirtyFormActivity() {
     companion object { const val EXTRA_CATALOG_ID = "catalog_id" }
     override fun getTitleText(): String = getString(R.string.medication_catalog_heading)
 
+    private val diseaseViewModel: DiseaseRecordViewModel by viewModels()
     private var editingId: String? = null
     private var state by mutableStateOf(CatalogFormState())
     private var showExpiryDatePicker by mutableStateOf(false)
+    private var pickingIndication by mutableStateOf(false)
     private var originalState = CatalogFormState()
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
         uris.forEach { uri ->
@@ -92,13 +106,44 @@ class MedicationCatalogActivity : DirtyFormActivity() {
                 manufacturer = item.manufacturer, method = item.defaultMethod, defaultDoseValue = item.defaultDoseValue.takeIf { it > 0f }?.toString().orEmpty(), defaultDoseUnit = item.defaultDoseUnit,
                 imagePaths = item.imagePaths, imageBitmaps = item.imagePaths.mapNotNull(::loadBitmap), frequency = item.frequency, intakeRules = item.intakeRules.ifEmpty { item.frequency.defaultIntakeRules() },
                 packageQuantity = item.packageQuantity.takeIf { it > 0f }?.toString().orEmpty(), packageUnit = item.packageUnit, packageDescription = item.packageDescription,
-                lotNumber = item.lotNumber, expiryAt = item.expiresAt, indicationTags = item.indicationTags.joinToString(", "), sideEffectWarning = item.sideEffectWarning, archived = item.archived,
+                lotNumber = item.lotNumber, expiryAt = item.expiresAt, indications = item.indications, legacyIndicationTags = item.legacyIndicationTags, sideEffectWarning = item.sideEffectWarning, archived = item.archived,
             )
         }
         originalState = state
-        setContent { HealthDietProTheme { BaseScreen(getTitleText(), ::requestFormExit) { padding ->
-            CatalogEditor(state, padding, categories, { state = it }, { galleryLauncher.launch("image/*") }, { showExpiryDatePicker = true }, ::save, state != originalState)
-        }; if (showExpiryDatePicker) ComposeDatePickerDialog(state.expiryAt ?: System.currentTimeMillis(), { showExpiryDatePicker = false }) { date -> state = state.copy(expiryAt = date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()); showExpiryDatePicker = false }; DiscardChangesConfirmation() } }
+        setContent { HealthDietProTheme {
+            val diseaseState by diseaseViewModel.uiState.collectAsStateWithLifecycle()
+            BackHandler(enabled = pickingIndication) { pickingIndication = false }
+            if (pickingIndication) {
+                BaseScreen(title = stringResource(R.string.disease_record_select_disease), onBack = { pickingIndication = false }) { padding ->
+                    DiseaseBrowsePanel(
+                        state = diseaseState,
+                        userGender = diseaseState.userGender,
+                        onQueryChange = diseaseViewModel::setQuery,
+                        onCategorySelect = diseaseViewModel::toggleCategory,
+                        onCustomToggle = diseaseViewModel::toggleCustomOnly,
+                        onDepartmentToggle = diseaseViewModel::toggleDepartment,
+                        onStatusToggle = diseaseViewModel::toggleStatus,
+                        onAddCustom = {},
+                        onOpenDetail = {},
+                        onOpenCustomDetail = {},
+                        onAddDisease = {},
+                        onSelectReference = { reference ->
+                            state = state.copy(indications = state.indications + reference)
+                            pickingIndication = false
+                        },
+                        excludedReferences = state.indications.toSet(),
+                        modifier = Modifier.padding(padding),
+                        pickerMode = true,
+                    )
+                }
+            } else {
+                BaseScreen(getTitleText(), ::requestFormExit) { padding ->
+                    CatalogEditor(state, padding, categories, diseaseState.diseases.associateBy { it.id }, diseaseState.customDiseases.associateBy { it.id }, { state = it }, { galleryLauncher.launch("image/*") }, { showExpiryDatePicker = true }, { pickingIndication = true }, ::save, state != originalState)
+                }
+                if (showExpiryDatePicker) ComposeDatePickerDialog(state.expiryAt ?: System.currentTimeMillis(), { showExpiryDatePicker = false }) { date -> state = state.copy(expiryAt = date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()); showExpiryDatePicker = false }
+                DiscardChangesConfirmation()
+            }
+        } }
     }
 
     private fun saveImage(bitmap: Bitmap) {
@@ -118,7 +163,7 @@ class MedicationCatalogActivity : DirtyFormActivity() {
             defaultDoseValue = state.defaultDoseValue.toFloatOrNull() ?: 0f, defaultDoseUnit = state.defaultDoseUnit.trim(), imagePaths = state.imagePaths,
             frequency = state.frequency, intakeRules = state.intakeRules, packageQuantity = state.packageQuantity.toFloatOrNull() ?: 0f, packageUnit = state.packageUnit.trim(),
             packageDescription = state.packageDescription.trim(), lotNumber = state.lotNumber.trim(), expiresAt = state.expiryAt,
-            indicationTags = state.indicationTags.split(',').map(String::trim).filter(String::isNotEmpty), sideEffectWarning = state.sideEffectWarning.trim(), archived = state.archived,
+            indications = state.indications, legacyIndicationTags = state.legacyIndicationTags, sideEffectWarning = state.sideEffectWarning.trim(), archived = state.archived,
         ))
         setResult(Activity.RESULT_OK); finish()
     }
@@ -131,11 +176,11 @@ private data class CatalogFormState(
     val name: String = "", val specValue: String = "", val categoryId: String = "", val unitId: String = "", val manufacturer: String = "", val method: String = "",
     val defaultDoseValue: String = "", val defaultDoseUnit: String = "", val imagePaths: List<String> = emptyList(), val imageBitmaps: List<Bitmap> = emptyList(), val frequency: MedicationFrequency = MedicationFrequency(), val intakeRules: List<MedicationIntakeRule> = MedicationFrequency().defaultIntakeRules(),
     val packageQuantity: String = "", val packageUnit: String = "", val packageDescription: String = "", val lotNumber: String = "", val expiryAt: Long? = null,
-    val indicationTags: String = "", val sideEffectWarning: String = "", val archived: Boolean = false,
+    val indications: List<DiseaseReference> = emptyList(), val legacyIndicationTags: List<String> = emptyList(), val sideEffectWarning: String = "", val archived: Boolean = false,
 )
 
 @androidx.compose.runtime.Composable
-private fun CatalogEditor(state: CatalogFormState, padding: PaddingValues, categories: List<UnitCategory>, onChange: (CatalogFormState) -> Unit, onPickImage: () -> Unit, onPickExpiryDate: () -> Unit, onSave: () -> Unit, saveEnabled: Boolean) {
+private fun CatalogEditor(state: CatalogFormState, padding: PaddingValues, categories: List<UnitCategory>, diseasesById: Map<String, com.woshiwangnima.healthdietpro.model.disease.Disease>, customDiseasesById: Map<String, UserCustomDisease>, onChange: (CatalogFormState) -> Unit, onPickImage: () -> Unit, onPickExpiryDate: () -> Unit, onAddIndication: () -> Unit, onSave: () -> Unit, saveEnabled: Boolean) {
     var showArchiveHelp by androidx.compose.runtime.remember { mutableStateOf(false) }
     val category = categories.find { it.id == state.categoryId }
     val units = category?.units?.filter { !it.hidden }.orEmpty()
@@ -175,7 +220,7 @@ private fun CatalogEditor(state: CatalogFormState, padding: PaddingValues, categ
             )
         }
         item { Text(stringResource(R.string.medication_catalog_clinical), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
-        item { OutlinedTextField(state.indicationTags, { onChange(state.copy(indicationTags = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_indications)) }, colors = AppInputTextFieldColors()) }
+        item { MedicationIndicationsEditor(state.indications, diseasesById, customDiseasesById, onAddIndication) { updated -> onChange(state.copy(indications = updated)) } }
         item { OutlinedTextField(state.sideEffectWarning, { onChange(state.copy(sideEffectWarning = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_side_effect_warning)) }, colors = AppInputTextFieldColors(), minLines = 2) }
         item { Text(stringResource(R.string.medication_catalog_other), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
         item { HorizontalImageEditor(state.imageBitmaps, onPickImage, { index -> onChange(state.copy(imagePaths = state.imagePaths.filterIndexed { i, _ -> i != index }, imageBitmaps = state.imageBitmaps.filterIndexed { i, _ -> i != index })) }) }
@@ -192,6 +237,36 @@ private fun CatalogEditor(state: CatalogFormState, padding: PaddingValues, categ
         }
     }
 }
+
+@androidx.compose.runtime.Composable
+private fun MedicationIndicationsEditor(
+    indications: List<DiseaseReference>,
+    diseasesById: Map<String, com.woshiwangnima.healthdietpro.model.disease.Disease>,
+    customDiseasesById: Map<String, UserCustomDisease>,
+    onAdd: () -> Unit,
+    onChange: (List<DiseaseReference>) -> Unit,
+) {
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        AppIconTextButton(stringResource(R.string.medication_catalog_add_indication), R.drawable.ic_add, onAdd)
+        indications.forEach { reference ->
+            androidx.compose.material3.Surface(color = androidx.compose.material3.MaterialTheme.colorScheme.tertiaryContainer, shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp)) {
+                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Text(reference.displayName(diseasesById, customDiseasesById), modifier = Modifier.padding(start = 8.dp), color = androidx.compose.material3.MaterialTheme.colorScheme.onTertiaryContainer)
+                    IconButton(onClick = { onChange(indications - reference) }) {
+                        Icon(painterResource(R.drawable.ic_cancel), contentDescription = stringResource(R.string.medication_catalog_remove_indication), tint = androidx.compose.material3.MaterialTheme.colorScheme.onTertiaryContainer)
+                    }
+                }
+            }
+        }
+    }
+}
+
+internal fun DiseaseReference.displayName(
+    diseasesById: Map<String, com.woshiwangnima.healthdietpro.model.disease.Disease>,
+    customDiseasesById: Map<String, UserCustomDisease>,
+): String = curatedId()?.let { diseasesById[it]?.displayName(Locale.getDefault()) ?: it }
+    ?: customId()?.let { customDiseasesById[it]?.name ?: it }
+    ?: ""
 
 @androidx.compose.runtime.Composable
 private fun FrequencyEditor(value: MedicationFrequency, onChange: (MedicationFrequency) -> Unit) {

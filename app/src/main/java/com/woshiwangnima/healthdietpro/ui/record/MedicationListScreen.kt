@@ -20,10 +20,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
 import com.woshiwangnima.healthdietpro.R
@@ -45,11 +47,16 @@ import com.woshiwangnima.healthdietpro.model.medication.formatDefaultDose
 import com.woshiwangnima.healthdietpro.model.medication.formatDose
 import com.woshiwangnima.healthdietpro.model.medication.formatSpecification
 import com.woshiwangnima.healthdietpro.model.medication.format
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRange
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
+import com.woshiwangnima.healthdietpro.common.time.resolve
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 @Composable
 internal fun MedicationListScreen(
@@ -64,7 +71,8 @@ internal fun MedicationListScreen(
     onAddCatalogItem: () -> Unit,
     onEditCatalogItem: (MedicationCatalogItem) -> Unit,
     onDeleteCatalogItem: (MedicationCatalogItem) -> Unit,
-    onTimeRangeChanged: (RecordTimeRange) -> Unit,
+    timeRangeSelection: RecordTimeRangeSelection,
+    onTimeRangeSelectionChanged: (RecordTimeRangeSelection) -> Unit,
 ) {
     val tabs = remember {
         listOf(
@@ -90,8 +98,8 @@ internal fun MedicationListScreen(
                         canAdd = canAddRecord,
                         onEdit = onEditRecord,
                         onDelete = onDeleteRecord,
-                        timeRange = uiState.timeRange,
-                        onTimeRangeChanged = onTimeRangeChanged,
+                        timeRangeSelection = timeRangeSelection,
+                        onTimeRangeSelectionChanged = onTimeRangeSelectionChanged,
                     )
                     2 -> MedicationCatalogPage(uiState.catalog, onAddCatalogItem, onEditCatalogItem, onDeleteCatalogItem)
                 }
@@ -136,6 +144,9 @@ private fun MedicationCatalogPage(
 private fun CatalogTable(catalog: List<MedicationCatalogItem>, onEdit: (MedicationCatalogItem) -> Unit, onDelete: (MedicationCatalogItem) -> Unit, modifier: Modifier = Modifier) {
     val locale = Locale.getDefault()
     val units = UnitConverter.getRepository()
+    val context = LocalContext.current
+    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().associateBy { it.id } }
+    val customDiseasesById = remember { UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy { it.id } }
     AppDataTable(
         rows = catalog, modifier = modifier, rowKey = { _, item -> item.id },
         columns = listOf(
@@ -143,7 +154,7 @@ private fun CatalogTable(catalog: List<MedicationCatalogItem>, onEdit: (Medicati
             AppDataTableColumn<MedicationCatalogItem>("specDose", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_spec_dose)) }, ColumnWidth.Fixed(136.dp)) { AppDataTableText(listOf(it.formatSpecification(units, locale), it.formatDefaultDose(locale)).filter(String::isNotBlank).joinToString(" / ")) },
             AppDataTableColumn<MedicationCatalogItem>("frequency", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_frequency)) }, ColumnWidth.Fixed(112.dp)) { AppDataTableText(it.frequency.format(locale)) },
             AppDataTableColumn<MedicationCatalogItem>("timing", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_timing)) }, ColumnWidth.Fixed(128.dp)) { AppDataTableText(it.intakeRules.format(locale)) },
-            AppDataTableColumn<MedicationCatalogItem>("purpose", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_indications)) }, ColumnWidth.Flex(1f, 130.dp)) { AppDataTableText(it.indicationTags.joinToString(", ")) },
+            AppDataTableColumn<MedicationCatalogItem>("purpose", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_indications)) }, ColumnWidth.Flex(1f, 130.dp)) { item -> AppDataTableText(item.indications.joinToString(", ") { it.displayName(diseasesById, customDiseasesById) }) },
             AppDataTableColumn<MedicationCatalogItem>("manufacturer", { AppDataTableHeaderText(stringResource(R.string.medication_catalog_manufacturer)) }, ColumnWidth.Flex(1f, 120.dp)) { AppDataTableText(it.manufacturer) },
         ),
         layoutPolicy = AppDataTableLayoutPolicy.HorizontalScroll(minTableWidth = 900.dp), actionsHeader = { AppDataTableHeaderText(stringResource(R.string.medication_record_actions)) },
@@ -180,10 +191,18 @@ private fun MedicationRecordsPage(
     canAdd: Boolean,
     onEdit: (MedicationRecord) -> Unit,
     onDelete: (MedicationRecord) -> Unit,
-    timeRange: RecordTimeRange,
-    onTimeRangeChanged: (RecordTimeRange) -> Unit,
+    timeRangeSelection: RecordTimeRangeSelection,
+    onTimeRangeSelectionChanged: (RecordTimeRangeSelection) -> Unit,
 ) {
     var pendingDeletion by remember { mutableStateOf<MedicationRecord?>(null) }
+    var nowMillis by remember { mutableStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(timeRangeSelection is RecordTimeRangeSelection.Preset) {
+        if (timeRangeSelection !is RecordTimeRangeSelection.Preset) return@LaunchedEffect
+        while (true) {
+            nowMillis = System.currentTimeMillis()
+            delay(60_000L - nowMillis % 60_000L)
+        }
+    }
     pendingDeletion?.let { record ->
         AlertDialog(
             onDismissRequest = { pendingDeletion = null },
@@ -209,6 +228,7 @@ private fun MedicationRecordsPage(
         modifier = Modifier.fillMaxSize().padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        val timeRange = timeRangeSelection.resolve(nowMillis)
         val filteredRecords = remember(records, timeRange) { records.filter { timeRange.contains(it.timestamp) } }
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -223,7 +243,7 @@ private fun MedicationRecordsPage(
                 modifier = Modifier.alpha(if (canAdd) 1f else 0.45f),
             )
         }
-        RecordTimeRangeFilter(range = timeRange, onRangeChanged = onTimeRangeChanged)
+        RecordTimeRangeFilter(selection = timeRangeSelection, onSelectionChanged = onTimeRangeSelectionChanged)
         if (filteredRecords.isEmpty()) {
             Text(
                 text = if (records.isEmpty()) {

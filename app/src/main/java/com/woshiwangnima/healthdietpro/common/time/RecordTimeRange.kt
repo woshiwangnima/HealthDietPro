@@ -16,6 +16,12 @@ internal data class RecordTimeRange(
     fun contains(timestamp: Long): Boolean = timestamp in startMillis..endMillis
 }
 
+/** A preset tracks the current time; a custom range remains fixed until edited again. */
+internal sealed interface RecordTimeRangeSelection {
+    data class Preset(val preset: RecordTimeRangePreset) : RecordTimeRangeSelection
+    data class Custom(val range: RecordTimeRange) : RecordTimeRangeSelection
+}
+
 internal enum class RecordTimeRangePreset {
     ALL,
     TODAY,
@@ -48,4 +54,12 @@ internal fun RecordTimeRangePreset.resolve(
         RecordTimeRangePreset.LAST_1_YEAR -> now.minusYears(1)
     }
     return RecordTimeRange(start.toInstant().toEpochMilli(), now.toInstant().toEpochMilli())
+}
+
+internal fun RecordTimeRangeSelection.resolve(
+    nowMillis: Long = System.currentTimeMillis(),
+    zoneId: ZoneId = ZoneId.systemDefault(),
+): RecordTimeRange = when (this) {
+    is RecordTimeRangeSelection.Preset -> preset.resolve(nowMillis, zoneId)
+    is RecordTimeRangeSelection.Custom -> range
 }

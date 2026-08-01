@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,18 +32,29 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRange
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
 import com.woshiwangnima.healthdietpro.common.time.resolve
+import kotlinx.coroutines.delay
 
 /** Shared absolute and relative time range picker for record lists and charts. */
 @Composable
 internal fun RecordTimeRangeFilter(
-    range: RecordTimeRange,
-    onRangeChanged: (RecordTimeRange) -> Unit,
+    selection: RecordTimeRangeSelection,
+    onSelectionChanged: (RecordTimeRangeSelection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var pickingStart by remember { mutableStateOf<Boolean?>(null) }
+    var nowMillis by remember { mutableStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(selection is RecordTimeRangeSelection.Preset) {
+        if (selection !is RecordTimeRangeSelection.Preset) return@LaunchedEffect
+        while (true) {
+            nowMillis = System.currentTimeMillis()
+            delay(60_000L - nowMillis % 60_000L)
+        }
+    }
+    val range = selection.resolve(nowMillis)
     Column(modifier.fillMaxWidth()) {
         RecordTimeRangePickerField(range, expanded, { expanded = !expanded })
         if (expanded) {
@@ -60,7 +72,7 @@ internal fun RecordTimeRangeFilter(
                     )
                 }
                 Surface(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.28f), shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)) {
-                    PresetPanel(onRangeChanged)
+                    PresetPanel(selection, onSelectionChanged)
                 }
             }
         }
@@ -75,7 +87,7 @@ internal fun RecordTimeRangeFilter(
                 } else {
                     RecordTimeRange(range.startMillis, selected.coerceAtLeast(range.startMillis))
                 }
-                onRangeChanged(updated)
+                onSelectionChanged(RecordTimeRangeSelection.Custom(updated))
                 pickingStart = null
             },
             precision = RecordTimePrecision.MINUTE,
@@ -110,7 +122,10 @@ internal fun RecordTimeRangePickerField(
 }
 
 @Composable
-private fun PresetPanel(onRangeChanged: (RecordTimeRange) -> Unit) {
+private fun PresetPanel(
+    selection: RecordTimeRangeSelection,
+    onSelectionChanged: (RecordTimeRangeSelection) -> Unit,
+) {
     val scrollState = rememberScrollState()
     Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // Exactly one scroll container owns the gesture and moves every preset row together.
@@ -124,7 +139,8 @@ private fun PresetPanel(onRangeChanged: (RecordTimeRange) -> Unit) {
                     RecordTimeRangePreset.THIS_MONTH to R.string.record_time_range_this_month,
                     RecordTimeRangePreset.THIS_YEAR to R.string.record_time_range_this_year,
                 ),
-                onRangeChanged = onRangeChanged,
+                selection = selection,
+                onSelectionChanged = onSelectionChanged,
             )
             PresetIconRow(
                 iconRes = R.drawable.ic_time,
@@ -136,13 +152,18 @@ private fun PresetPanel(onRangeChanged: (RecordTimeRange) -> Unit) {
                     RecordTimeRangePreset.LAST_30_DAYS to R.string.record_time_range_last_30_days,
                     RecordTimeRangePreset.LAST_1_YEAR to R.string.record_time_range_last_1_year,
                 ),
-                onRangeChanged = onRangeChanged,
+                selection = selection,
+                onSelectionChanged = onSelectionChanged,
             )
             PresetIconRow(
                 iconRes = R.drawable.ic_list,
                 tooltip = stringResource(R.string.record_time_range_all_tooltip),
-                presets = listOf(RecordTimeRangePreset.ALL to R.string.record_time_range_all),
-                onRangeChanged = onRangeChanged,
+                presets = listOf(
+                    RecordTimeRangePreset.ALL to R.string.record_time_range_all,
+                    null to R.string.record_time_range_custom,
+                ),
+                selection = selection,
+                onSelectionChanged = onSelectionChanged,
             )
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
@@ -158,8 +179,9 @@ private fun PresetPanel(onRangeChanged: (RecordTimeRange) -> Unit) {
 private fun PresetIconRow(
     @androidx.annotation.DrawableRes iconRes: Int,
     tooltip: String,
-    presets: List<Pair<RecordTimeRangePreset, Int>>,
-    onRangeChanged: (RecordTimeRange) -> Unit,
+    presets: List<Pair<RecordTimeRangePreset?, Int>>,
+    selection: RecordTimeRangeSelection,
+    onSelectionChanged: (RecordTimeRangeSelection) -> Unit,
 ) {
     InlineTooltip(message = tooltip) { _, onTooltipClick ->
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -168,9 +190,18 @@ private fun PresetIconRow(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 presets.forEach { (preset, labelRes) ->
+                    val selected = when (selection) {
+                        is RecordTimeRangeSelection.Preset -> selection.preset == preset
+                        is RecordTimeRangeSelection.Custom -> preset == null
+                    }
                     Surface(
-                        onClick = { onRangeChanged(preset.resolve()) },
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+                        onClick = {
+                            onSelectionChanged(
+                                preset?.let(RecordTimeRangeSelection::Preset)
+                                    ?: RecordTimeRangeSelection.Custom(selection.resolve()),
+                            )
+                        },
+                        color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
                         modifier = Modifier.width(PRESET_BUTTON_WIDTH),
                     ) {
@@ -178,6 +209,7 @@ private fun PresetIconRow(
                             text = stringResource(labelRes),
                             modifier = Modifier.padding(vertical = 10.dp),
                             style = MaterialTheme.typography.labelMedium,
+                            color = if (selected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                         )
                     }

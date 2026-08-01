@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.model.medication
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseReference
 
 @Serializable
 data class MedicationRecord(
@@ -23,7 +24,8 @@ data class MedicationRecord(
     val medicationImagePaths: List<String> = emptyList(),
     val frequency: MedicationFrequency = MedicationFrequency(),
     val intakeRules: List<MedicationIntakeRule> = emptyList(),
-    val purposes: List<String> = emptyList(),
+    val indicationReferences: List<DiseaseReference> = emptyList(),
+    val legacyPurposeTags: List<String> = emptyList(),
     val sideEffectWarning: String = "",
     val lotNumber: String = "",
     val expiresAt: Long? = null,
@@ -48,7 +50,9 @@ data class MedicationCatalogItem(
     val packageDescription: String = "",
     val lotNumber: String = "",
     val expiresAt: Long? = null,
-    val indicationTags: List<String> = emptyList(),
+    val indications: List<DiseaseReference> = emptyList(),
+    /** Pre-migration free text retained only for recovery/audit; never treated as a disease reference. */
+    val legacyIndicationTags: List<String> = emptyList(),
     val sideEffectWarning: String = "",
     val archived: Boolean = false,
 )

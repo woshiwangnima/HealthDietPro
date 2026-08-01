@@ -7,6 +7,8 @@ import com.woshiwangnima.healthdietpro.model.bloodpressure.BloodPressureReposito
 import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
 import com.woshiwangnima.healthdietpro.model.disease.UserCustomDisease
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.disease.curatedId
+import com.woshiwangnima.healthdietpro.model.disease.customId
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
@@ -96,8 +98,8 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
                 RecordLatest(it.timestamp, String.format(Locale.getDefault(), precision, systolic, diastolic, pressureUnit))
             },
             RecordActionId.Disease to latestDisease?.let { record ->
-                val name = record.disease.curatedDiseaseId?.let { diseaseCatalog.findById(it)?.displayName(Locale.getDefault()) }
-                    ?: record.disease.customDiseaseId?.let { customDiseases[it]?.name }.orEmpty()
+                val name = record.disease.curatedId()?.let { diseaseCatalog.findById(it)?.displayName(Locale.getDefault()) }
+                    ?: record.disease.customId()?.let { customDiseases[it]?.name }.orEmpty()
                 RecordLatest(record.updatedAt, name)
             },
             RecordActionId.Medication to medication?.let { RecordLatest(it.timestamp, "${it.medicationName} ${it.doseValue} ${it.doseUnit}") },

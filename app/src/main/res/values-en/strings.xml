@@ -619,7 +619,9 @@
     <string name="medication_catalog_lot_number">Lot number (optional)</string>
     <string name="medication_catalog_expiry_date">Expiry date, YYYY-MM-DD (optional)</string>
     <string name="medication_catalog_clinical">Clinical association</string>
-    <string name="medication_catalog_indications">Indications or purposes, comma separated</string>
+    <string name="medication_catalog_indications">Indications</string>
+    <string name="medication_catalog_add_indication">Add indication</string>
+    <string name="medication_catalog_remove_indication">Remove indication</string>
     <string name="medication_catalog_side_effect_warning">Main side effects and response</string>
     <string name="medication_catalog_image_count">%1$d medicine images selected</string>
     <string name="medication_catalog_delete_confirm_title">Delete archived medicine?</string>
@@ -669,6 +671,7 @@
     <string name="record_time_range_last_30_days">Last 30 days</string>
     <string name="record_time_range_last_1_year">Last 1 year</string>
     <string name="record_time_range_all">All</string>
+    <string name="record_time_range_custom">Custom</string>
     <string name="record_time_range_all_tooltip">Shows all records from the archive through the current time.</string>
     <string name="record_time_range_natural_tooltip">Anchored to natural calendar boundaries such as the start of today, week, month, or year.</string>
     <string name="record_time_range_relative_tooltip">Anchored to the current moment and measured backward by an exact elapsed duration.</string>

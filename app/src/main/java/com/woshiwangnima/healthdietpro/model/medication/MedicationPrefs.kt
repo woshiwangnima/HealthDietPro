@@ -5,6 +5,10 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
 
 /**
  * 用药记录的 per-user 存储。所有数据挂在 `medication_records_${userId}` 这个键下，
@@ -19,6 +23,8 @@ object MedicationPrefs {
 
     private const val KEY_RECORDS = "medication_records"
     private const val KEY_CATALOG = "medication_catalog"
+    private const val KEY_CATALOG_BACKUP = "medication_catalog_backup_v1"
+    private const val KEY_RECORDS_BACKUP = "medication_records_backup_v1"
     private val json = Json { ignoreUnknownKeys = true }
 
     private fun prefs(context: Context) =
@@ -56,7 +62,13 @@ object MedicationPrefs {
 
     private fun readRecords(context: Context, key: String = keyFor(context)): List<MedicationRecord> {
         val raw = prefs(context).getString(key, null) ?: return emptyList()
-        return runCatching { json.decodeFromString<List<MedicationRecord>>(raw) }.getOrDefault(emptyList())
+        return runCatching {
+            val migrated = migrateRecords(raw)
+            val records = json.decodeFromString<List<MedicationRecord>>(migrated)
+            val canonical = json.encodeToString(records)
+            if (canonical != raw) persistMigration(context, key, raw, canonical, KEY_RECORDS_BACKUP)
+            records
+        }.getOrDefault(emptyList())
     }
 
     private fun readCatalog(context: Context): List<MedicationCatalogItem> {
@@ -65,7 +77,13 @@ object MedicationPrefs {
 
     private fun readCatalog(context: Context, key: String = catalogKeyFor(context)): List<MedicationCatalogItem> {
         val stored = prefs(context).getString(key, null)
-        return stored?.let { runCatching { json.decodeFromString<List<MedicationCatalogItem>>(it) }.getOrDefault(emptyList()) }
+        return stored?.let { raw -> runCatching {
+            val migrated = migrateCatalog(raw)
+            val catalog = json.decodeFromString<List<MedicationCatalogItem>>(migrated)
+            val canonical = json.encodeToString(catalog)
+            if (canonical != raw) persistMigration(context, key, raw, canonical, KEY_CATALOG_BACKUP)
+            catalog
+        }.getOrDefault(emptyList()) }
             ?: emptyList()
     }
 
@@ -84,6 +102,60 @@ object MedicationPrefs {
 
     fun deleteCatalogItem(context: Context, id: String) {
         saveCatalog(context, getCatalog(context).filterNot { it.id == id })
+    }
+
+    fun restoreLatestCatalogBackup(context: Context): Boolean = restoreBackup(context, KEY_CATALOG_BACKUP, catalogKeyFor(context))
+
+    fun restoreLatestRecordsBackup(context: Context): Boolean = restoreBackup(context, KEY_RECORDS_BACKUP, keyFor(context))
+
+    private fun restoreBackup(context: Context, backupBaseKey: String, targetKey: String): Boolean {
+        val p = prefs(context)
+        val backupKey = ProfilePrefs.makeChartStateKey(context, backupBaseKey)
+        val raw = p.getString(backupKey, null) ?: return false
+        p.edit().putString(targetKey, raw).remove(backupKey).apply()
+        return true
+    }
+
+    private fun persistMigration(context: Context, key: String, original: String, migrated: String, backupBaseKey: String) {
+        val p = prefs(context)
+        val backupKey = ProfilePrefs.makeChartStateKey(context, backupBaseKey)
+        val editor = p.edit().putString(key, migrated)
+        if (!p.contains(backupKey)) editor.putString(backupKey, original)
+        editor.commit()
+    }
+
+    private fun migrateCatalog(raw: String): String {
+        val root = json.parseToJsonElement(raw)
+        if (root !is JsonArray) return raw
+        var changed = false
+        val result = root.map { element ->
+            val obj = element.jsonObject
+            if ("indicationTags" !in obj || "indications" in obj) return@map element
+            changed = true
+            buildJsonObject {
+                obj.forEach { (key, value) -> if (key != "indicationTags") put(key, value) }
+                put("indications", JsonArray(emptyList()))
+                put("legacyIndicationTags", obj["indicationTags"] ?: JsonArray(emptyList()))
+            }
+        }
+        return if (changed) JsonArray(result).toString() else raw
+    }
+
+    private fun migrateRecords(raw: String): String {
+        val root = json.parseToJsonElement(raw)
+        if (root !is JsonArray) return raw
+        var changed = false
+        val result = root.map { element ->
+            val obj = element.jsonObject
+            if ("purposes" !in obj || "indicationReferences" in obj) return@map element
+            changed = true
+            buildJsonObject {
+                obj.forEach { (key, value) -> if (key != "purposes") put(key, value) }
+                put("indicationReferences", JsonArray(emptyList()))
+                put("legacyPurposeTags", obj["purposes"] ?: JsonArray(emptyList()))
+            }
+        }
+        return if (changed) JsonArray(result).toString() else raw
     }
 
     /** 药品名历史：按最近使用排序的去重列表。 */

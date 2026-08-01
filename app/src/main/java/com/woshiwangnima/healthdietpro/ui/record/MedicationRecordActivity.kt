@@ -34,10 +34,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -67,6 +69,8 @@ import com.woshiwangnima.healthdietpro.model.medication.formatSelectionDetails
 import com.woshiwangnima.healthdietpro.model.medication.formatSpecification
 import com.woshiwangnima.healthdietpro.model.medication.format
 import com.woshiwangnima.healthdietpro.model.medication.defaultIntakeRules
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
 import com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
 import com.woshiwangnima.healthdietpro.util.image.WatermarkUtil
 import com.woshiwangnima.healthdietpro.util.location.CurrentLocationProvider
@@ -186,8 +190,8 @@ class MedicationRecordActivity : DirtyFormActivity() {
             photoBitmaps = record.recordPhotoPaths.mapNotNull(::loadBitmap),
             frequency = record.frequency,
             intakeRules = record.intakeRules.ifEmpty { record.frequency.defaultIntakeRules() },
-            purposes = record.purposes,
-            purposeOptions = record.purposes,
+            indicationReferences = record.indicationReferences,
+            indicationOptions = record.indicationReferences,
             sideEffectWarning = record.sideEffectWarning,
             lotNumber = record.lotNumber,
             expiresAt = record.expiresAt,
@@ -311,7 +315,7 @@ class MedicationRecordActivity : DirtyFormActivity() {
             medicationImagePaths = state.medicationImagePaths,
             frequency = state.frequency,
             intakeRules = state.intakeRules,
-            purposes = state.purposes,
+            indicationReferences = state.indicationReferences,
             sideEffectWarning = state.sideEffectWarning,
             lotNumber = state.lotNumber,
             expiresAt = state.expiresAt,
@@ -350,8 +354,8 @@ private data class MedicationRecordFormState(
     val medicationImagePaths: List<String> = emptyList(),
     val frequency: com.woshiwangnima.healthdietpro.model.medication.MedicationFrequency = com.woshiwangnima.healthdietpro.model.medication.MedicationFrequency(),
     val intakeRules: List<com.woshiwangnima.healthdietpro.model.medication.MedicationIntakeRule> = emptyList(),
-    val purposes: List<String> = emptyList(),
-    val purposeOptions: List<String> = emptyList(),
+    val indicationReferences: List<com.woshiwangnima.healthdietpro.model.disease.DiseaseReference> = emptyList(),
+    val indicationOptions: List<com.woshiwangnima.healthdietpro.model.disease.DiseaseReference> = emptyList(),
     val sideEffectWarning: String = "",
     val lotNumber: String = "",
     val expiresAt: Long? = null,
@@ -408,7 +412,7 @@ private fun MedicationRecordScreen(
                     onSelect = { option -> catalog.find { it.id == option.id }?.let { item ->
                         val isExpired = item.expiresAt?.let { it < System.currentTimeMillis() } == true
                         val warning = listOfNotNull(if (isExpired) expiredWarning else null, item.sideEffectWarning.takeIf { it.isNotBlank() }).joinToString("\n")
-                        onStateChange(state.copy(medicationId = item.id, medicationName = item.name, doseValue = item.defaultDoseValue.takeIf { value -> value > 0f }?.toString().orEmpty(), doseUnit = item.defaultDoseUnit, specValue = item.specValue.takeIf { value -> value > 0f }?.toString().orEmpty(), specCategoryId = item.specUnitCategory, specUnitId = item.specUnitId, method = item.defaultMethod, manufacturer = item.manufacturer, medicationImagePaths = item.imagePaths, frequency = item.frequency, intakeRules = item.intakeRules.ifEmpty { item.frequency.defaultIntakeRules() }, purposes = item.indicationTags, purposeOptions = item.indicationTags, sideEffectWarning = item.sideEffectWarning, lotNumber = item.lotNumber, expiresAt = item.expiresAt))
+                        onStateChange(state.copy(medicationId = item.id, medicationName = item.name, doseValue = item.defaultDoseValue.takeIf { value -> value > 0f }?.toString().orEmpty(), doseUnit = item.defaultDoseUnit, specValue = item.specValue.takeIf { value -> value > 0f }?.toString().orEmpty(), specCategoryId = item.specUnitCategory, specUnitId = item.specUnitId, method = item.defaultMethod, manufacturer = item.manufacturer, medicationImagePaths = item.imagePaths, frequency = item.frequency, intakeRules = item.intakeRules.ifEmpty { item.frequency.defaultIntakeRules() }, indicationReferences = item.indications, indicationOptions = item.indications, sideEffectWarning = item.sideEffectWarning, lotNumber = item.lotNumber, expiresAt = item.expiresAt))
                         if (warning.isNotBlank()) safetyWarning = warning
                     } },
                 )
@@ -422,7 +426,7 @@ private fun MedicationRecordScreen(
             item {
                 CatalogSnapshot(state)
             }
-            if (state.purposes.isNotEmpty()) {
+            if (state.indicationReferences.isNotEmpty()) {
                 item {
                     PurposeSection(state, onStateChange)
                 }
@@ -456,7 +460,10 @@ private fun CatalogSnapshot(state: MedicationRecordFormState) {
         specUnitCategory = state.specCategoryId, specUnitId = state.specUnitId,
     ).formatSpecification(UnitConverter.getRepository(), java.util.Locale.getDefault())
     val locale = java.util.Locale.getDefault()
-    val content = listOf(spec, state.manufacturer, state.method, state.frequency.format(locale), state.intakeRules.format(locale), state.purposes.joinToString(", "), state.lotNumber).filter { it.isNotBlank() }.joinToString(" / ")
+    val context = LocalContext.current
+    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().associateBy { it.id } }
+    val customDiseasesById = remember { UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy { it.id } }
+    val content = listOf(spec, state.manufacturer, state.method, state.frequency.format(locale), state.intakeRules.format(locale), state.indicationReferences.joinToString(", ") { it.displayName(diseasesById, customDiseasesById) }, state.lotNumber).filter { it.isNotBlank() }.joinToString(" / ")
     Text(text = stringResource(R.string.medication_record_catalog_snapshot, content), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
@@ -465,20 +472,23 @@ private fun PurposeSection(
     state: MedicationRecordFormState,
     onStateChange: (MedicationRecordFormState) -> Unit,
 ) {
+    val context = LocalContext.current
+    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().associateBy { it.id } }
+    val customDiseasesById = remember { UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy { it.id } }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.medication_record_purpose), style = MaterialTheme.typography.titleSmall)
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            state.purposeOptions.forEach { purpose ->
+            state.indicationOptions.forEach { purpose ->
                 FilterChip(
-                    selected = purpose in state.purposes,
+                    selected = purpose in state.indicationReferences,
                     onClick = {
-                        val purposes = if (purpose in state.purposes) state.purposes - purpose else state.purposes + purpose
-                        onStateChange(state.copy(purposes = purposes))
+                        val indications = if (purpose in state.indicationReferences) state.indicationReferences - purpose else state.indicationReferences + purpose
+                        onStateChange(state.copy(indicationReferences = indications))
                     },
-                    label = { Text(purpose) },
+                    label = { Text(purpose.displayName(diseasesById, customDiseasesById)) },
                 )
             }
         }

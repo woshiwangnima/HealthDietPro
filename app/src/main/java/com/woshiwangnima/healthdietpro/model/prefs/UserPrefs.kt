@@ -150,6 +150,8 @@ class UserPrefsScope private constructor(
     fun getString(key: String, default: String) = sp.getString(key, default) ?: default
     fun putString(key: String, v: String) { sp.edit().putString(key, v).apply() }
 
+    fun remove(key: String) { sp.edit().remove(key).apply() }
+
     fun getInt(key: String, default: Int) = sp.getInt(key, default)
     fun putInt(key: String, v: Int) { sp.edit().putInt(key, v).apply() }
 

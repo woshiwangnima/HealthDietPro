@@ -619,7 +619,9 @@
     <string name="medication_catalog_lot_number">生产批号（非必填）</string>
     <string name="medication_catalog_expiry_date">有效期，格式 YYYY-MM-DD（非必填）</string>
     <string name="medication_catalog_clinical">临床关联</string>
-    <string name="medication_catalog_indications">适应症或用途标签，以逗号分隔</string>
+    <string name="medication_catalog_indications">适应症</string>
+    <string name="medication_catalog_add_indication">添加适应症</string>
+    <string name="medication_catalog_remove_indication">删除适应症</string>
     <string name="medication_catalog_side_effect_warning">主要副作用及应对</string>
     <string name="medication_catalog_image_count">已选择 %1$d 张药品图片</string>
     <string name="medication_catalog_delete_confirm_title">删除已归档药品？</string>
@@ -669,6 +671,7 @@
     <string name="record_time_range_last_30_days">最近30天</string>
     <string name="record_time_range_last_1_year">最近1年</string>
     <string name="record_time_range_all">全部</string>
+    <string name="record_time_range_custom">自定义</string>
     <string name="record_time_range_all_tooltip">显示存档中的全部记录，结束时间为当前时刻。</string>
     <string name="record_time_range_natural_tooltip">锚定自然日历边界，例如今天、本周、本月或本年的起点。</string>
     <string name="record_time_range_relative_tooltip">锚定当前时间点，按精确经过时长向前倒推。</string>

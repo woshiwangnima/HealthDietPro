@@ -11,6 +11,7 @@ import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
 import com.woshiwangnima.healthdietpro.model.disease.UserCustomDisease
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.Gender
+import com.woshiwangnima.healthdietpro.model.disease.curatedId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +34,7 @@ internal data class DiseaseRecordUiState(
     val query: String = "",
 ) {
     fun filtered(diseaseById: Map<String, Disease>): List<UserDiseaseRecord> = records.filter { record ->
-        val disease = record.disease.curatedDiseaseId?.let(diseaseById::get)
+        val disease = record.disease.curatedId()?.let(diseaseById::get)
         (selectedCategoryIds.isEmpty() || disease?.categoryIds?.any(selectedCategoryIds::contains) == true) &&
             (selectedDepartmentIds.isEmpty() || disease?.careDepartmentIds?.any(selectedDepartmentIds::contains) == true) &&
             (selectedStatuses.isEmpty() || record.status in selectedStatuses) &&
@@ -45,7 +46,7 @@ internal data class DiseaseRecordUiState(
         (selectedCategoryIds.isEmpty() || disease.categoryIds.any(selectedCategoryIds::contains)) &&
             (selectedDepartmentIds.isEmpty() || disease.careDepartmentIds.any(selectedDepartmentIds::contains)) &&
             (selectedStatuses.isEmpty() || records.any { record ->
-                record.disease.curatedDiseaseId == disease.id && record.status in selectedStatuses
+                record.disease.curatedId() == disease.id && record.status in selectedStatuses
             }) &&
             (query.isBlank() || matchesDisease(disease, query))
     }

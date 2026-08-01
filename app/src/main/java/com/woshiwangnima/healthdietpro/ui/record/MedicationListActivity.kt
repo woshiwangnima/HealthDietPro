@@ -24,6 +24,7 @@ import com.woshiwangnima.healthdietpro.model.medication.removeRecordById
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRange
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
 import com.woshiwangnima.healthdietpro.common.time.resolve
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -112,7 +113,8 @@ private fun MedicationListRoute(
         onAddCatalogItem = onAddCatalogItem,
         onEditCatalogItem = onEditCatalogItem,
         onDeleteCatalogItem = onDeleteCatalogItem,
-        onTimeRangeChanged = viewModel::setTimeRange,
+        timeRangeSelection = uiState.timeRangeSelection,
+        onTimeRangeSelectionChanged = viewModel::setTimeRangeSelection,
     )
 }
 
@@ -120,7 +122,7 @@ internal data class MedicationListUiState(
     val selectedTab: Int = 0,
     val records: List<MedicationRecord> = emptyList(),
     val catalog: List<MedicationCatalogItem> = emptyList(),
-    val timeRange: RecordTimeRange = RecordTimeRangePreset.TODAY.resolve(),
+    val timeRangeSelection: RecordTimeRangeSelection = RecordTimeRangeSelection.Preset(RecordTimeRangePreset.TODAY),
 )
 
 internal class MedicationListViewModel(application: Application) : ViewModel() {
@@ -141,8 +143,8 @@ internal class MedicationListViewModel(application: Application) : ViewModel() {
         AppPrefs.setMedicationTab(app, selectedTab)
     }
 
-    fun setTimeRange(range: RecordTimeRange) {
-        _uiState.value = _uiState.value.copy(timeRange = range)
+    fun setTimeRangeSelection(selection: RecordTimeRangeSelection) {
+        _uiState.value = _uiState.value.copy(timeRangeSelection = selection)
     }
 
     fun refresh() {

@@ -39,4 +39,19 @@ class RecordTimeRangeTest {
         assertEquals(0L, range.startMillis)
         assertEquals(now, range.endMillis)
     }
+
+    @Test
+    fun `preset selection resolves against the latest current time`() {
+        val later = now + 90_000L
+        val selection = RecordTimeRangeSelection.Preset(RecordTimeRangePreset.TODAY)
+
+        assertEquals(later, selection.resolve(later, zone).endMillis)
+    }
+
+    @Test
+    fun `custom selection retains its fixed endpoints`() {
+        val selection = RecordTimeRangeSelection.Custom(RecordTimeRange(100L, 200L))
+
+        assertEquals(RecordTimeRange(100L, 200L), selection.resolve(now, zone))
+    }
 }

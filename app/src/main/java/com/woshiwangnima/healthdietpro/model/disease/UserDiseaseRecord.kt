@@ -1,6 +1,24 @@
 package com.woshiwangnima.healthdietpro.model.disease
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonEncoder
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.put
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import java.time.LocalDate
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 
@@ -16,16 +34,76 @@ internal enum class DiseaseDurationKind { SHORT_TERM, LONG_TERM, UNKNOWN }
 @Serializable
 internal enum class FamilyRelation { PARENT, SIBLING, CHILD, GRANDPARENT, OTHER }
 
-@Serializable
-internal data class DiseaseReference(
-    val curatedDiseaseId: String? = null,
-    val customDiseaseId: String? = null,
-) {
-    init {
-        require((curatedDiseaseId != null) != (customDiseaseId != null))
+/** A disease reference is a tagged union: exactly one source can be selected. */
+@Serializable(with = DiseaseReferenceSerializer::class)
+sealed class DiseaseReference {
+    @Serializable
+    @SerialName("curated")
+    data class Curated(
+        /** Key is the ICD family/version, currently "11"; value is the stable app disease id. */
+        val curatedDiseaseId: Map<String, String>,
+    ) : DiseaseReference() {
+        init { require(curatedDiseaseId.isNotEmpty() && curatedDiseaseId.values.all(String::isNotBlank)) }
     }
 
-    val isCustom: Boolean get() = customDiseaseId != null
+    @Serializable
+    @SerialName("custom")
+    data class Custom(
+        val customDiseaseId: String,
+    ) : DiseaseReference() {
+        init { require(customDiseaseId.isNotBlank()) }
+    }
+
+    val isCustom: Boolean get() = this is Custom
+}
+
+internal fun DiseaseReference.curatedId(icdFamily: String = "11"): String? =
+    (this as? DiseaseReference.Curated)?.curatedDiseaseId?.get(icdFamily)
+
+internal fun DiseaseReference.customId(): String? =
+    (this as? DiseaseReference.Custom)?.customDiseaseId
+
+object DiseaseReferenceSerializer : KSerializer<DiseaseReference> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("DiseaseReference")
+
+    override fun serialize(encoder: Encoder, value: DiseaseReference) {
+        val jsonEncoder = encoder as? JsonEncoder ?: error("DiseaseReference requires JSON")
+        jsonEncoder.encodeJsonElement(when (value) {
+            is DiseaseReference.Curated -> buildJsonObject {
+                put("kind", "curated")
+                put("curatedDiseaseId", jsonEncoder.json.encodeToJsonElement(MapSerializer(String.serializer(), String.serializer()), value.curatedDiseaseId))
+            }
+            is DiseaseReference.Custom -> buildJsonObject {
+                put("kind", "custom")
+                put("customDiseaseId", value.customDiseaseId)
+            }
+        })
+    }
+
+    override fun deserialize(decoder: Decoder): DiseaseReference {
+        val jsonDecoder = decoder as? JsonDecoder ?: error("DiseaseReference requires JSON")
+        val objectValue = jsonDecoder.decodeJsonElement().jsonObject
+        return when (objectValue["kind"]?.jsonPrimitive?.content) {
+            "curated" -> DiseaseReference.Curated(
+                jsonDecoder.json.decodeFromJsonElement(objectValue.getValue("curatedDiseaseId")),
+            )
+            "custom" -> DiseaseReference.Custom(objectValue.getValue("customDiseaseId").jsonPrimitive.content)
+            null -> decodeLegacy(objectValue, jsonDecoder)
+            else -> error("Unknown disease reference kind")
+        }
+    }
+
+    private fun decodeLegacy(value: JsonObject, decoder: JsonDecoder): DiseaseReference {
+        value["customDiseaseId"]?.jsonPrimitive?.contentOrNull?.let(DiseaseReference::Custom)
+            ?.let { return it }
+        val curated = value["curatedDiseaseId"] ?: error("Disease reference has no source")
+        return when (curated) {
+            is JsonPrimitive -> DiseaseReference.Curated(mapOf("11" to curated.content))
+            else -> DiseaseReference.Curated(
+                decoder.json.decodeFromJsonElement(MapSerializer(String.serializer(), String.serializer()), curated),
+            )
+        }
+    }
 }
 
 @Serializable

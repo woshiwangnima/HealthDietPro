@@ -9,6 +9,8 @@ import com.woshiwangnima.healthdietpro.model.disease.DiseaseHistoryType
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRecordStatus
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
+import com.woshiwangnima.healthdietpro.model.disease.curatedId
+import com.woshiwangnima.healthdietpro.model.disease.customId
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
@@ -135,8 +137,8 @@ internal class ProfileUserInfoViewModel(
         val customDiseases = repository.loadCustomDiseases().associateBy { it.id }
         val locale = Locale.getDefault()
         return records.mapNotNull { record ->
-            record.disease.curatedDiseaseId?.let { diseases[it]?.displayName(locale) }
-                ?: record.disease.customDiseaseId?.let { customDiseases[it]?.name }
+            record.disease.curatedId()?.let { diseases[it]?.displayName(locale) }
+                ?: record.disease.customId()?.let { customDiseases[it]?.name }
         }.joinToString("、")
     }
 }
