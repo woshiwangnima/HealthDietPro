@@ -57,6 +57,9 @@ import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.HorizontalImageEditor
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
+import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
+import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
+import com.woshiwangnima.healthdietpro.common.time.normalizeRecordTimestamp
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
 import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
@@ -154,6 +157,7 @@ class MedicationRecordActivity : DirtyFormActivity() {
                             formState = formState.copy(timestamp = timestamp)
                             showDateTimePicker = false
                         },
+                        precision = RecordTimePrecision.MINUTE,
                     )
                 }
                 DiscardChangesConfirmation()
@@ -331,7 +335,7 @@ class MedicationRecordActivity : DirtyFormActivity() {
 }
 
 private data class MedicationRecordFormState(
-    val timestamp: Long = System.currentTimeMillis(),
+    val timestamp: Long = normalizeRecordTimestamp(System.currentTimeMillis(), RecordTimePrecision.MINUTE),
     val medicationName: String = "",
     val medicationId: String? = null,
     val doseValue: String = "",
@@ -487,25 +491,12 @@ private fun TimeField(
     timestamp: Long,
     onClick: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            text = stringResource(R.string.medication_record_time),
-            style = MaterialTheme.typography.titleSmall,
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f))
-                .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp, vertical = 14.dp),
-        ) {
-            Text(
-                text = formatDateTime(timestamp),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }
+    RecordTimePickerField(
+        title = stringResource(R.string.medication_record_time),
+        valueMillis = timestamp,
+        precision = com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision.MINUTE,
+        onClick = onClick,
+    )
 }
 
 @Composable

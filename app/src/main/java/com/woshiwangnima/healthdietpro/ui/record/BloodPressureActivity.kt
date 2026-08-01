@@ -84,6 +84,10 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
+import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
+import com.woshiwangnima.healthdietpro.common.time.normalizeRecordTimestamp
+import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
@@ -324,7 +328,7 @@ private fun BloodPressureReferenceRow(label: String, standard: String, backgroun
 @Composable
 private fun BloodPressureEditorScreen(record: BloodPressureRecord?, onBack: () -> Unit, onSave: (BloodPressureRecord) -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
-    var timestamp by rememberSaveable(record?.id) { mutableStateOf(record?.timestamp ?: System.currentTimeMillis() / 60_000L * 60_000L) }
+    var timestamp by rememberSaveable(record?.id) { mutableStateOf(record?.timestamp ?: normalizeRecordTimestamp(System.currentTimeMillis(), RecordTimePrecision.SECOND)) }
     var unitId by rememberSaveable { mutableStateOf(AppPrefs.getUnit(context, UnitCategoryType.Pressure.id, UnitCategoryType.Pressure.defaultUnitId)) }
     var systolic by rememberSaveable(record?.id) { mutableStateOf(record?.systolicMmhg?.let { pressureValue(it, unitId) }.orEmpty()) }
     var diastolic by rememberSaveable(record?.id) { mutableStateOf(record?.diastolicMmhg?.let { pressureValue(it, unitId) }.orEmpty()) }
@@ -338,8 +342,7 @@ private fun BloodPressureEditorScreen(record: BloodPressureRecord?, onBack: () -
         Column(Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item { AppFormSubtitle(stringResource(R.string.blood_pressure_editor_hint)) }
-                item { Text(stringResource(R.string.blood_pressure_time), style = MaterialTheme.typography.titleSmall) }
-                item { Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .36f)).clickable { showDateTimePicker = true }.padding(horizontal = 12.dp, vertical = 14.dp)) { Text(com.woshiwangnima.healthdietpro.common.ui.formatDateTime(timestamp)) } }
+                item { RecordTimePickerField(stringResource(R.string.blood_pressure_time), timestamp, RecordTimePrecision.SECOND, { showDateTimePicker = true }) }
                 item { EditorTextField(label = stringResource(R.string.blood_pressure_systolic), value = systolic, onValueChange = { systolic = it }, required = true, numeric = true, suffix = { Text(unit) }) }
                 item { EditorTextField(label = stringResource(R.string.blood_pressure_diastolic), value = diastolic, onValueChange = { diastolic = it }, required = true, numeric = true, suffix = { Text(unit) }, supportingTextOverride = if (!valid && systolic.isNotBlank() && diastolic.isNotBlank()) ({ Text(stringResource(R.string.blood_pressure_values_invalid)) }) else null) }
                 if (valid && systolicBase != null && diastolicBase != null) item {
@@ -362,7 +365,14 @@ private fun BloodPressureEditorScreen(record: BloodPressureRecord?, onBack: () -
             )
         }
     }
-    if (showDateTimePicker) ComposeDateTimePickerDialog(timestamp, { showDateTimePicker = false }) { timestamp = it; showDateTimePicker = false }
+    if (showDateTimePicker) {
+        ComposeDateTimePickerDialog(
+            initialMillis = timestamp,
+            onDismiss = { showDateTimePicker = false },
+            onDateTimePicked = { timestamp = it; showDateTimePicker = false },
+            precision = RecordTimePrecision.SECOND,
+        )
+    }
 }
 
 @Composable private fun BloodPressureCategory.labelRes(): Int = when (this) {
@@ -385,5 +395,9 @@ private fun pressureUnitOptions(): List<AppDropdownOption> = UnitConverter.getRe
 private fun pressureValue(valueMmhg: Float, unitId: String): String = String.format(Locale.getDefault(), if (unitId == "kpa") "%.1f" else "%.0f", UnitConverter.fromBase(UnitCategoryType.Pressure.id, valueMmhg, unitId))
 private fun BloodPressureRecord.pressureText(unitId: String, unit: String) = "${pressureValue(systolicMmhg, unitId)}/${pressureValue(diastolicMmhg, unitId)} $unit"
 private fun BloodPressureRecord.pulsePressureText(unitId: String, unit: String) = "${pressureValue(pulsePressureMmhg, unitId)} $unit"
-private fun formatBloodPressureTime(timestamp: Long): String = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-private fun formatBloodPressureAxisTime(timestamp: Long, intervalMs: Long): String = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(if (intervalMs < 86_400_000L) "MM-dd HH:mm" else "MM-dd"))
+private fun formatBloodPressureTime(timestamp: Long): String = formatRecordTimestamp(timestamp, RecordTimePrecision.SECOND)
+private fun formatBloodPressureAxisTime(timestamp: Long, intervalMs: Long): String = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(when {
+    intervalMs < 60_000L -> "MM-dd HH:mm:ss"
+    intervalMs < 86_400_000L -> "MM-dd HH:mm"
+    else -> "MM-dd"
+}))

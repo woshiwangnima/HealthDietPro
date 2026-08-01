@@ -58,6 +58,8 @@ import com.woshiwangnima.healthdietpro.common.ui.AliasListEditor
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ColumnWidth
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
+import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
+import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
@@ -521,7 +523,16 @@ private fun CustomDiseaseMultiSelect(title: String, labels: Map<String, String>,
         }
     }
 }
-@Composable private fun DateField(label: String, value: String?, onClick: () -> Unit) { Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp)) { Text(label, style = MaterialTheme.typography.labelLarge); Text(value ?: stringResource(R.string.disease_record_date_not_set), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+@Composable private fun DateField(label: String, value: String?, onClick: () -> Unit) {
+    val timestamp = value?.let { LocalDate.parse(it).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
+    RecordTimePickerField(
+        title = label,
+        valueMillis = timestamp,
+        precision = RecordTimePrecision.DATE,
+        emptyText = stringResource(R.string.disease_record_date_not_set),
+        onClick = onClick,
+    )
+}
 @Composable private fun DeleteDiseaseDialog(onDismiss: () -> Unit, onDelete: () -> Unit) { AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.body_record_delete_confirm_title)) }, text = { Text(stringResource(R.string.body_record_delete_confirm_message)) }, confirmButton = { TextButton(onClick = onDelete) { Text(stringResource(R.string.body_record_delete)) } }, dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } }) }
 private fun Disease.localizedDescription(): String = i18n[Locale.getDefault().language]?.description ?: i18n["zh"]?.description.orEmpty()
 private fun Disease.localizedAliases(): List<String> = i18n[Locale.getDefault().language]?.aliases ?: i18n["zh"]?.aliases.orEmpty()

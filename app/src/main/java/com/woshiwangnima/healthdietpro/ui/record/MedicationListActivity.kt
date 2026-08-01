@@ -22,6 +22,9 @@ import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
 import com.woshiwangnima.healthdietpro.model.medication.removeRecordById
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRange
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
+import com.woshiwangnima.healthdietpro.common.time.resolve
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -99,7 +102,7 @@ private fun MedicationListRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     MedicationListScreen(
         uiState = uiState,
-        title = stringResource(R.string.medication_record_title),
+        title = stringResource(R.string.medication_list_title),
         onBack = onBack,
         onTabSelected = viewModel::selectTab,
         onAddRecord = onAddRecord,
@@ -109,6 +112,7 @@ private fun MedicationListRoute(
         onAddCatalogItem = onAddCatalogItem,
         onEditCatalogItem = onEditCatalogItem,
         onDeleteCatalogItem = onDeleteCatalogItem,
+        onTimeRangeChanged = viewModel::setTimeRange,
     )
 }
 
@@ -116,6 +120,7 @@ internal data class MedicationListUiState(
     val selectedTab: Int = 0,
     val records: List<MedicationRecord> = emptyList(),
     val catalog: List<MedicationCatalogItem> = emptyList(),
+    val timeRange: RecordTimeRange = RecordTimeRangePreset.TODAY.resolve(),
 )
 
 internal class MedicationListViewModel(application: Application) : ViewModel() {
@@ -134,6 +139,10 @@ internal class MedicationListViewModel(application: Application) : ViewModel() {
         val selectedTab = tab.coerceIn(0, 2)
         _uiState.value = _uiState.value.copy(selectedTab = selectedTab)
         AppPrefs.setMedicationTab(app, selectedTab)
+    }
+
+    fun setTimeRange(range: RecordTimeRange) {
+        _uiState.value = _uiState.value.copy(timeRange = range)
     }
 
     fun refresh() {

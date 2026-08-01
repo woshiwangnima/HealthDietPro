@@ -45,6 +45,8 @@ import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.HorizontalImageEditor
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
+import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
+import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
@@ -163,7 +165,15 @@ private fun CatalogEditor(state: CatalogFormState, padding: PaddingValues, categ
         } }
         item { OutlinedTextField(state.packageDescription, { onChange(state.copy(packageDescription = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_package_description)) }, colors = AppInputTextFieldColors()) }
         item { OutlinedTextField(state.lotNumber, { onChange(state.copy(lotNumber = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_lot_number)) }, colors = AppInputTextFieldColors()) }
-        item { androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth().background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f)).clickable(onClick = onPickExpiryDate).padding(12.dp)) { Text(state.expiryAt?.let { java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDate().toString() } ?: stringResource(R.string.medication_catalog_expiry_date)) } }
+        item {
+            RecordTimePickerField(
+                title = stringResource(R.string.medication_catalog_expiry_date),
+                valueMillis = state.expiryAt,
+                precision = RecordTimePrecision.DATE,
+                emptyText = stringResource(R.string.medication_catalog_expiry_date),
+                onClick = onPickExpiryDate,
+            )
+        }
         item { Text(stringResource(R.string.medication_catalog_clinical), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
         item { OutlinedTextField(state.indicationTags, { onChange(state.copy(indicationTags = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_indications)) }, colors = AppInputTextFieldColors()) }
         item { OutlinedTextField(state.sideEffectWarning, { onChange(state.copy(sideEffectWarning = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_side_effect_warning)) }, colors = AppInputTextFieldColors(), minLines = 2) }

@@ -37,6 +37,7 @@ fun DiscardChangesDialog(
     onDiscard: () -> Unit,
     onSave: () -> Unit,
     onDismiss: () -> Unit,
+    saveEnabled: Boolean = true,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -54,6 +55,7 @@ fun DiscardChangesDialog(
                 text = stringResource(R.string.form_discard_changes_save),
                 iconRes = R.drawable.ic_save,
                 onClick = onSave,
+                enabled = saveEnabled,
             )
         },
         dismissButton = {

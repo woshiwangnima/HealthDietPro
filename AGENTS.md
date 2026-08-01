@@ -120,6 +120,15 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - 弹窗、选择器、编辑器等暂态 UI 的 `BackHandler` 优先级必须高于页面路由：系统返回先关闭暂态 UI，再返回上一级页面。
 - 页面路由的 `BackHandler` 必须在实际渲染该路由分支前保持组合，避免因提前 `return` 导致系统返回未注册。
 
+## Compose 编辑表单
+
+- 编辑屏必须保留初始不可变表单快照，保存按钮仅在输入合法且领域数据实际变化时启用；单位等 UI 偏好变化不应误判为记录已修改。
+- 顶部返回和系统返回都必须先处理未保存状态：无修改直接返回；有修改弹出保存/放弃/取消确认。确认框的保存操作在当前输入不合法时必须禁用。
+- 字段帮助文案应就近附着在对应字段（优先 tooltip 或 supporting text），禁止作为与字段无关的页面顶部说明；数值与其单位选择器需在同一行时使用明确的水平布局。
+- 文本与数值输入使用不同组件：`TextInputField` 仅处理文字；`NumericInputField` 必须声明整数/小数、是否允许负号、可选 `Range<Double>`、精度与步长。范围必须复用 `common/range/Range`，完整展示开闭边界和无穷端点。
+- 含 tooltip 与步长时，操作顺序固定为输入框内清空按钮、输入框外步长按钮、最右侧 tooltip 按钮；tooltip 用单击展开/收起说明，不使用长按。
+- 可滚动表单宿主必须采用 `imePadding()`，空白区域点击时 `clearFocus()` 并隐藏键盘；字段必须用 `BringIntoViewRequester` 在获焦时滚动到 IME 可见区域，避免底部输入被键盘遮挡。
+
 ## 工作流
 
 - 不主动 commit / push（除非明确要求）。

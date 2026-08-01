@@ -41,6 +41,9 @@ import com.woshiwangnima.healthdietpro.common.ui.ComposeDateTimePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
+import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
+import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
+import com.woshiwangnima.healthdietpro.common.time.normalizeRecordTimestamp
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.profile.bodyRecordEpochMillis
 import com.woshiwangnima.healthdietpro.model.profile.formatBodyRecordDateTime
@@ -105,7 +108,7 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
                     Activity.RESULT_OK,
                     Intent()
                         .putExtra(EXTRA_POSITION, position)
-                        .putExtra(EXTRA_RECORD, BodyRecord(form.date, UnitConverter.toBase(category, value, form.unitId), form.unitId, bodyRecordEpochMillis(form.date))),
+                        .putExtra(EXTRA_RECORD, BodyRecord(form.date, UnitConverter.toBase(category, value, form.unitId), form.unitId, normalizeRecordTimestamp(bodyRecordEpochMillis(form.date), RecordTimePrecision.MINUTE))),
                 )
                 finish()
             }
@@ -162,18 +165,12 @@ private fun BodyMetricRecordScreen(
                 AppFormSubtitle(customMetricTitle ?: stringResource(if (isHeight) R.string.body_record_height_help else R.string.body_record_weight_help, form.unitId))
             }
             item {
-                Text(stringResource(R.string.body_record_time), style = MaterialTheme.typography.titleSmall)
-            }
-            item {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f))
-                        .clickable { showDateTimePicker = true }
-                        .padding(horizontal = 12.dp, vertical = 14.dp),
-                ) {
-                    Text(form.date, style = MaterialTheme.typography.bodyLarge)
-                }
+                RecordTimePickerField(
+                    title = stringResource(R.string.body_record_time),
+                    valueMillis = bodyRecordEpochMillis(form.date),
+                    precision = RecordTimePrecision.MINUTE,
+                    onClick = { showDateTimePicker = true },
+                )
             }
             item {
                 OutlinedTextField(
@@ -216,6 +213,7 @@ private fun BodyMetricRecordScreen(
                 onFormChange(form.copy(date = formatDateTime(it)))
                 showDateTimePicker = false
             },
+            precision = RecordTimePrecision.MINUTE,
         )
     }
 }

@@ -3,6 +3,8 @@ package com.woshiwangnima.healthdietpro.ui.record
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartViewModel
+import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
+import com.woshiwangnima.healthdietpro.common.time.normalizeRecordTimestamp
 import com.woshiwangnima.healthdietpro.model.bloodpressure.BloodPressureRecord
 import com.woshiwangnima.healthdietpro.model.bloodpressure.BloodPressureRepository
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +29,7 @@ internal class BloodPressureViewModel(application: Application) : BaseChartViewM
     }
 
     fun upsert(record: BloodPressureRecord) {
-        val normalized = record.copy(timestamp = record.timestamp / 60_000L * 60_000L)
+        val normalized = record.copy(timestamp = normalizeRecordTimestamp(record.timestamp, RecordTimePrecision.SECOND))
         val updated = (_records.value.filterNot { it.id == normalized.id } + normalized).sortedByDescending { it.timestamp }
         _records.value = updated
         viewModelScope.launch(Dispatchers.IO) { repository.save(updated) }

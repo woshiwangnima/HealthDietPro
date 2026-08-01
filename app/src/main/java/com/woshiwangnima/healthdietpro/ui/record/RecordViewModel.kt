@@ -14,6 +14,8 @@ import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
+import com.woshiwangnima.healthdietpro.model.unit.formatGlucoseValue
+import com.woshiwangnima.healthdietpro.ui.profile.CircumferenceMetric
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,11 +77,18 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
         val pressureUnit = UnitConverter.getRepository()?.getUnit(UnitCategoryType.Pressure.id, pressureUnitId)
             ?.symbol(Locale.getDefault()) ?: pressureUnitId
         val medication = MedicationPrefs.getRecords(context).maxByOrNull { it.timestamp }
-        val circumference = profile.circumferenceRecords.values.flatten().maxByOrNull { it.recordedAtMillis }
+        val glucoseUnitId = AppPrefs.getUnit(context, UnitCategoryType.Glucose.id, UnitCategoryType.Glucose.defaultUnitId)
+        val glucoseUnit = UnitConverter.getRepository()?.getUnit(UnitCategoryType.Glucose.id, glucoseUnitId)
+            ?.symbol(Locale.getDefault()) ?: glucoseUnitId
+        val circumference = profile.circumferenceRecords
+            .flatMap { (metricId, records) -> records.map { metricId to it } }
+            .maxByOrNull { (_, record) -> record.recordedAtMillis }
         val latest = mapOf(
             RecordActionId.Height to profile.heightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} cm") },
             RecordActionId.Weight to profile.weightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} kg") },
-            RecordActionId.BloodGlucose to glucose?.let { RecordLatest(it.timestamp, "${it.valueMmolPerL} mmol/L") },
+            RecordActionId.BloodGlucose to glucose?.let {
+                RecordLatest(it.timestamp, "${formatGlucoseValue(it.valueMmolPerL, glucoseUnitId)} $glucoseUnit")
+            },
             RecordActionId.BloodPressure to bloodPressure?.let {
                 val systolic = UnitConverter.fromBase(UnitCategoryType.Pressure.id, it.systolicMmhg, pressureUnitId)
                 val diastolic = UnitConverter.fromBase(UnitCategoryType.Pressure.id, it.diastolicMmhg, pressureUnitId)
@@ -92,7 +101,13 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
                 RecordLatest(record.updatedAt, name)
             },
             RecordActionId.Medication to medication?.let { RecordLatest(it.timestamp, "${it.medicationName} ${it.doseValue} ${it.doseUnit}") },
-            RecordActionId.Waist to circumference?.let { RecordLatest(it.recordedAtMillis, "${it.value} cm") },
+            RecordActionId.Waist to circumference?.let { (metricId, record) ->
+                val metricName = CircumferenceMetric.entries.firstOrNull { it.id == metricId }
+                    ?.let { context.getString(it.titleRes) }
+                    ?: metricId
+                val value = UnitConverter.fromBase(UnitCategoryType.Length.id, record.value, "cm")
+                RecordLatest(record.recordedAtMillis, "$metricName ${String.format(Locale.getDefault(), "%.1f cm", value)}")
+            },
         )
         val prefs = UserPrefs.current(context)
         val history = deserializeSearchHistory(prefs.getString(SEARCH_HISTORY_KEY, "[]"))

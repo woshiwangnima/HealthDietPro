@@ -63,6 +63,8 @@ import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.AppInputLabel
 import com.woshiwangnima.healthdietpro.common.ui.AppInputTextFieldColors
+import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
+import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
@@ -224,6 +226,9 @@ class ProfileEditActivity : DirtyFormActivity() {
             name = profileName,
             selectedGender = selectedGender,
             birthdayText = selectedBirthday?.date ?: getString(R.string.profile_edit_choose),
+            birthdayMillis = selectedBirthday?.date?.let { date ->
+                LocalDate.parse(date).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            },
             regionText = selectedRegion.takeIf { !it.isEmpty() }?.display() ?: getString(R.string.profile_edit_choose),
             heightText = latestHeight?.let { "%.1f cm".format(it.value) } ?: getString(R.string.profile_edit_no_record),
             weightText = latestWeight?.let { "%.1f kg".format(it.value) } ?: getString(R.string.profile_edit_no_record),
@@ -500,6 +505,7 @@ private data class ProfileEditUiState(
     val name: String = "",
     val selectedGender: Gender = Gender.MALE,
     val birthdayText: String = "",
+    val birthdayMillis: Long? = null,
     val regionText: String = "",
     val diseaseText: String = "",
     val heightText: String = "",
@@ -608,7 +614,15 @@ private fun ProfileEditScreen(
                         onSelect = { option -> onGenderSelect(Gender.valueOf(option.id)) },
                     )
                 }
-                item { ProfileClickableField(stringResource(R.string.profile_edit_birthday), state.birthdayText, onBirthdayClick) }
+                item {
+                    RecordTimePickerField(
+                        title = stringResource(R.string.profile_edit_birthday),
+                        valueMillis = state.birthdayMillis,
+                        precision = RecordTimePrecision.DATE,
+                        emptyText = state.birthdayText,
+                        onClick = onBirthdayClick,
+                    )
+                }
                 item { ProfileClickableField(stringResource(R.string.profile_edit_region), state.regionText, onRegionClick) }
                 item {
                     Surface(

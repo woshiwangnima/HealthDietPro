@@ -46,6 +46,8 @@ import com.woshiwangnima.healthdietpro.model.medication.formatDose
 import com.woshiwangnima.healthdietpro.model.medication.formatSpecification
 import com.woshiwangnima.healthdietpro.model.medication.format
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
+import com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRange
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.util.Locale
 
@@ -62,6 +64,7 @@ internal fun MedicationListScreen(
     onAddCatalogItem: () -> Unit,
     onEditCatalogItem: (MedicationCatalogItem) -> Unit,
     onDeleteCatalogItem: (MedicationCatalogItem) -> Unit,
+    onTimeRangeChanged: (RecordTimeRange) -> Unit,
 ) {
     val tabs = remember {
         listOf(
@@ -87,6 +90,8 @@ internal fun MedicationListScreen(
                         canAdd = canAddRecord,
                         onEdit = onEditRecord,
                         onDelete = onDeleteRecord,
+                        timeRange = uiState.timeRange,
+                        onTimeRangeChanged = onTimeRangeChanged,
                     )
                     2 -> MedicationCatalogPage(uiState.catalog, onAddCatalogItem, onEditCatalogItem, onDeleteCatalogItem)
                 }
@@ -175,6 +180,8 @@ private fun MedicationRecordsPage(
     canAdd: Boolean,
     onEdit: (MedicationRecord) -> Unit,
     onDelete: (MedicationRecord) -> Unit,
+    timeRange: RecordTimeRange,
+    onTimeRangeChanged: (RecordTimeRange) -> Unit,
 ) {
     var pendingDeletion by remember { mutableStateOf<MedicationRecord?>(null) }
     pendingDeletion?.let { record ->
@@ -202,16 +209,13 @@ private fun MedicationRecordsPage(
         modifier = Modifier.fillMaxSize().padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        val filteredRecords = remember(records, timeRange) { records.filter { timeRange.contains(it.timestamp) } }
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                text = stringResource(R.string.body_record_count, records.size),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            Spacer(Modifier.width(1.dp))
             AppIconTextButton(
                 text = stringResource(R.string.medication_record_add),
                 iconRes = R.drawable.ic_add,
@@ -219,15 +223,20 @@ private fun MedicationRecordsPage(
                 modifier = Modifier.alpha(if (canAdd) 1f else 0.45f),
             )
         }
-        if (records.isEmpty()) {
+        RecordTimeRangeFilter(range = timeRange, onRangeChanged = onTimeRangeChanged)
+        if (filteredRecords.isEmpty()) {
             Text(
-                text = stringResource(R.string.medication_record_empty),
+                text = if (records.isEmpty()) {
+                    stringResource(R.string.common_empty_records)
+                } else {
+                    stringResource(R.string.medication_record_empty_filtered, records.size)
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else {
             MedicationRecordTable(
-                records = records,
+                records = filteredRecords,
                 onEdit = onEdit,
                 onDelete = { pendingDeletion = it },
             )
