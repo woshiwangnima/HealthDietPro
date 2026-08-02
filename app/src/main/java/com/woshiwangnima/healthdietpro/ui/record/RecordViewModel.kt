@@ -10,6 +10,7 @@ import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.disease.curatedId
 import com.woshiwangnima.healthdietpro.model.disease.customId
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
+import com.woshiwangnima.healthdietpro.model.water.WaterRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
@@ -79,6 +80,7 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
         val pressureUnit = UnitConverter.getRepository()?.getUnit(UnitCategoryType.Pressure.id, pressureUnitId)
             ?.symbol(Locale.getDefault()) ?: pressureUnitId
         val medication = MedicationPrefs.getRecords(context).maxByOrNull { it.timestamp }
+        val water = WaterRepository.fromContext(context).load().records.maxByOrNull { it.timestamp }
         val glucoseUnitId = AppPrefs.getUnit(context, UnitCategoryType.Glucose.id, UnitCategoryType.Glucose.defaultUnitId)
         val glucoseUnit = UnitConverter.getRepository()?.getUnit(UnitCategoryType.Glucose.id, glucoseUnitId)
             ?.symbol(Locale.getDefault()) ?: glucoseUnitId
@@ -103,6 +105,7 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
                 RecordLatest(record.updatedAt, name)
             },
             RecordActionId.Medication to medication?.let { RecordLatest(it.timestamp, "${it.medicationName} ${it.doseValue} ${it.doseUnit}") },
+            RecordActionId.Water to water?.let { RecordLatest(it.timestamp, "${it.beverageName} ${it.volumeMl.toInt()} ml") },
             RecordActionId.Waist to circumference?.let { (metricId, record) ->
                 val metricName = CircumferenceMetric.entries.firstOrNull { it.id == metricId }
                     ?.let { context.getString(it.titleRes) }

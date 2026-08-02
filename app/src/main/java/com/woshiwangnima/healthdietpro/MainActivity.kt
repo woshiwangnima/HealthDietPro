@@ -61,6 +61,8 @@ import com.woshiwangnima.healthdietpro.model.food.RecipeStepDto
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRepository
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingAnchor
+import com.woshiwangnima.healthdietpro.model.water.WaterRecord
+import com.woshiwangnima.healthdietpro.model.water.WaterRepository
 import com.woshiwangnima.healthdietpro.ui.nutrition.NutritionScreen
 import com.woshiwangnima.healthdietpro.ui.nutrition.NutritionViewModel
 import com.woshiwangnima.healthdietpro.ui.profile.BmiDetailActivity
@@ -78,6 +80,7 @@ import com.woshiwangnima.healthdietpro.ui.record.MedicationRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.BloodGlucoseActivity
 import com.woshiwangnima.healthdietpro.ui.record.BloodPressureActivity
 import com.woshiwangnima.healthdietpro.ui.record.DiseaseRecordActivity
+import com.woshiwangnima.healthdietpro.ui.record.WaterRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.RecordActionId
 import com.woshiwangnima.healthdietpro.ui.record.RecordScreen
 import com.woshiwangnima.healthdietpro.ui.record.RecordViewModel
@@ -432,7 +435,7 @@ class MainActivity : BaseActivity() {
                     if (isVerified) {
                         when (testPage) {
                             TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, Modifier.fillMaxSize())
-                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTestSearchHistories, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
+                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTodayWaterRecords, ::addTestSearchHistories, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                             TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
                             TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
                         }
@@ -669,6 +672,30 @@ class MainActivity : BaseActivity() {
     private fun addYesterdayGlucoseSeries(count: Int) = addTestGlucoseSeries(daysAgo = 1, count = count, messageRes = R.string.test_gm_yesterday_glucose_added)
     private fun addTodayGlucoseSeries(count: Int) = addTestGlucoseSeries(daysAgo = 0, count = count, messageRes = R.string.test_gm_today_glucose_added)
 
+    private fun addTodayWaterRecords(count: Int) {
+        ProfilePrefs.createDefaultIfEmpty(this)
+        val repository = WaterRepository.fromContext(this)
+        val random = kotlin.random.Random(System.nanoTime())
+        val dayStart = java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val drinks = listOf(
+            "food:water:drinking" to "饮用水",
+            "food:beverage:tea" to "茶水",
+            "food:beverage:milk_tea" to "奶茶",
+        )
+        repeat(count) { index ->
+            val drink = drinks[index % drinks.size]
+            repository.add(WaterRecord(
+                id = "test_water_${System.nanoTime()}_$index",
+                timestamp = dayStart + random.nextLong(24 * 60 * 60 * 1000L),
+                beverageId = drink.first,
+                beverageName = drink.second,
+                volumeMl = random.nextInt(150, 451).toDouble(),
+            ))
+        }
+        recordViewModel.refresh()
+        Toast.makeText(this, "已为当前用户添加 $count 条随机今日饮水记录", Toast.LENGTH_SHORT).show()
+    }
+
     private fun addTestGlucoseSeries(daysAgo: Long, count: Int, messageRes: Int) {
         ProfilePrefs.createDefaultIfEmpty(this)
         val dayStart = java.time.LocalDate.now().minusDays(daysAgo).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -697,11 +724,11 @@ class MainActivity : BaseActivity() {
             RecordActionId.BloodGlucose -> startActivity(Intent(this, BloodGlucoseActivity::class.java))
             RecordActionId.BloodPressure -> startActivity(Intent(this, BloodPressureActivity::class.java))
             RecordActionId.Disease -> startActivity(Intent(this, DiseaseRecordActivity::class.java))
+            RecordActionId.Water -> startActivity(Intent(this, WaterRecordActivity::class.java))
             RecordActionId.Medication -> startActivity(Intent(this, MedicationListActivity::class.java))
             RecordActionId.Waist -> openCircumferenceDetail()
             RecordActionId.Period,
             RecordActionId.Diet,
-            RecordActionId.Water,
             RecordActionId.Exercise,
             RecordActionId.Sleep,
             RecordActionId.Bowel,
@@ -720,6 +747,7 @@ class MainActivity : BaseActivity() {
             RecordActionId.BloodPressure -> startActivity(Intent(this, BloodPressureActivity::class.java).putExtra(BloodPressureActivity.EXTRA_OPEN_EDITOR, true))
             RecordActionId.Waist -> openCircumferenceDetail(selectMetricForNewRecord = true)
             RecordActionId.Medication -> openMedicationRecord()
+            RecordActionId.Water -> startActivity(Intent(this, WaterRecordActivity::class.java).putExtra(WaterRecordActivity.EXTRA_OPEN_EDITOR, true))
             else -> Unit
         }
     }

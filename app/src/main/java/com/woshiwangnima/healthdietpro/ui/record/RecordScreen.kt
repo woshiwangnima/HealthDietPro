@@ -107,6 +107,7 @@ private val quickAddActionIds = setOf(
     RecordActionId.BloodPressure,
     RecordActionId.Waist,
     RecordActionId.Medication,
+    RecordActionId.Water,
 )
 
 @Composable

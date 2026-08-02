@@ -43,6 +43,7 @@ private val USER_ARCHIVE_KEYS = listOf(
     "medications",
     "bloodGlucose",
     "bloodPressure",
+    "water",
     "diseaseRecords",
     "customFoods",
     "userPreferences",

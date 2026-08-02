@@ -9,6 +9,7 @@ import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodArchiveStore
 import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodArchive
 import com.woshiwangnima.healthdietpro.model.medication.MedicationArchiveStore
 import com.woshiwangnima.healthdietpro.model.medication.MedicationArchive
+import com.woshiwangnima.healthdietpro.model.water.WaterArchiveStore
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.profile.BodyMetricsRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -70,6 +71,7 @@ internal class PlainUserArchiveRepository(
             medications = readDomainSnapshot(profile.id, "medications"),
             bloodGlucose = readDomainSnapshot(profile.id, "blood_glucose"),
             bloodPressure = readDomainSnapshot(profile.id, "blood_pressure"),
+            water = readDomainSnapshot(profile.id, "water"),
             diseaseRecords = readDomainSnapshot(profile.id, "disease_records"),
             customFoods = imageExport.domain,
             userPreferences = preferences,
@@ -335,6 +337,7 @@ internal class PlainUserArchiveRepository(
                 "medications" -> MedicationArchiveStore.forUser(context, userId).validateJson(content.toString())
                 "blood_glucose" -> BloodGlucoseArchiveStore.forUser(context, userId).validateJson(content.toString())
                 "blood_pressure" -> BloodPressureArchiveStore.forUser(context, userId).validateJson(content.toString())
+                "water" -> WaterArchiveStore.forUser(context, userId).validateJson(content.toString())
                 "disease_records" -> UserDiseaseArchiveStore.forUser(context, userId).validateJson(content.toString())
                 "custom_foods" -> UserCustomFoodArchiveStore.forUser(context, userId).validateJson(content.toString())
                 else -> error("Unsupported user archive domain: $domainId")
@@ -369,6 +372,7 @@ internal class PlainUserArchiveRepository(
         medications?.let { put("medications", it) }
         bloodGlucose?.let { put("blood_glucose", it) }
         bloodPressure?.let { put("blood_pressure", it) }
+        water?.let { put("water", it) }
         diseaseRecords?.let { put("disease_records", it) }
         customFoods?.let { put("custom_foods", it) }
     }
@@ -416,6 +420,7 @@ internal data class UserArchiveBundle(
     val medications: JsonElement? = null,
     val bloodGlucose: JsonElement? = null,
     val bloodPressure: JsonElement? = null,
+    val water: JsonElement? = null,
     val diseaseRecords: JsonElement? = null,
     val customFoods: JsonElement? = null,
     val userPreferences: Map<String, UserArchivePreference> = emptyMap(),

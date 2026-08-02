@@ -30,6 +30,7 @@ internal fun TestGmScreen(
     onAddNutritionFoods: (Int) -> Unit,
     onAddYesterdayGlucose: (Int) -> Unit,
     onAddTodayGlucose: (Int) -> Unit,
+    onAddTodayWater: (Int) -> Unit,
     onAddSearchHistories: (Int) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -69,6 +70,7 @@ internal fun TestGmScreen(
                     AppIconTextButton("添加随机药品和用药记录", R.drawable.ic_add, { onAddMedicationRecord(count) }, Modifier.fillMaxWidth())
                     AppIconTextButton("添加随机昨日血糖记录", R.drawable.ic_add, { onAddYesterdayGlucose(count) }, Modifier.fillMaxWidth())
                     AppIconTextButton("添加随机今日血糖记录", R.drawable.ic_add, { onAddTodayGlucose(count) }, Modifier.fillMaxWidth())
+                    AppIconTextButton("添加随机今日饮水记录", R.drawable.ic_add, { onAddTodayWater(count) }, Modifier.fillMaxWidth())
                 }
             }
             item {

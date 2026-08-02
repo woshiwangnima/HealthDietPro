@@ -65,7 +65,7 @@ internal fun defaultRecordSections(): List<RecordSectionUiState> = listOf(
         titleIconRes = R.drawable.ic_list,
         items = listOf(
             RecordActionItemUiState(RecordActionId.Diet, R.string.record_action_diet, R.drawable.ic_placeholder, false),
-            RecordActionItemUiState(RecordActionId.Water, R.string.record_action_water, R.drawable.ic_placeholder, false),
+            RecordActionItemUiState(RecordActionId.Water, R.string.record_action_water, R.drawable.ic_volume, true),
             RecordActionItemUiState(RecordActionId.Exercise, R.string.record_action_exercise, R.drawable.ic_placeholder, false),
             RecordActionItemUiState(RecordActionId.Sleep, R.string.record_action_sleep, R.drawable.ic_placeholder, false),
             RecordActionItemUiState(RecordActionId.Bowel, R.string.record_action_bowel, R.drawable.ic_placeholder, false),

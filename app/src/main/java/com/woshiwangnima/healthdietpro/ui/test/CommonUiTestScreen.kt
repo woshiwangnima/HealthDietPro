@@ -39,6 +39,9 @@ import com.woshiwangnima.healthdietpro.common.ui.TextInputField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputKind
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputSpec
+import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
+import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
+import com.woshiwangnima.healthdietpro.common.ui.WaterGlassProgress
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
 
 internal enum class CommonUiTestCategory(val chineseName: String, val className: String) {
@@ -47,6 +50,7 @@ internal enum class CommonUiTestCategory(val chineseName: String, val className:
     ConfirmDialog("确认对话框", "ConfirmDialog"),
     DataTable("数据表格", "AppDataTable"),
     Chart("图表", "ComposeBaseChart"),
+    HydrationVisuals("饮水可视化", "AnimatedDonutChart / WaterGlassProgress"),
     SegmentedTabs("等宽分段标签", "EqualWidthSegmentedTabs"),
     InputField("输入框", "TextInputField / NumericInputField"),
 }
@@ -122,6 +126,7 @@ private fun CommonUiVariantScreen(category: CommonUiTestCategory, onBack: () -> 
             }
             CommonUiTestCategory.DataTable -> DataTableSamples()
             CommonUiTestCategory.Chart -> com.woshiwangnima.healthdietpro.common.ui.ComposeChartPreviewSamples()
+            CommonUiTestCategory.HydrationVisuals -> HydrationVisualSamples()
             CommonUiTestCategory.SegmentedTabs -> {
                 Text("选择不同标签以查看滑动指示条和文字颜色动画。")
                 EqualWidthSegmentedTabs(
@@ -148,6 +153,27 @@ private fun CommonUiVariantScreen(category: CommonUiTestCategory, onBack: () -> 
             }
         }
     } }
+}
+
+@Composable
+private fun HydrationVisualSamples() {
+    Text("环形图会在进入页面时依次绘制饮品构成；玻璃杯液面会持续左右晃动。")
+    WaterGlassProgress(
+        progress = .68f,
+        valueLabel = "1,700 ml",
+        supportingLabel = "今日目标 2,500 ml",
+        modifier = Modifier.fillMaxWidth(),
+    )
+    AnimatedDonutChart(
+        segments = listOf(
+            DonutChartSegment("water", "饮用水", 1_250f),
+            DonutChartSegment("tea", "茶饮", 300f),
+            DonutChartSegment("milk", "牛奶", 150f),
+        ),
+        centerValue = "1,700 ml",
+        centerLabel = "今日记录",
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
