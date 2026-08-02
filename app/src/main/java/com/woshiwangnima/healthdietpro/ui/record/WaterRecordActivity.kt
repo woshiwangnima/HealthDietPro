@@ -180,22 +180,9 @@ private fun WaterStatisticsPage(records: List<WaterRecord>, beverages: List<Beve
         item { WaterGlassProgress((todayActualWater / recommendation).toFloat().coerceIn(0f, 1f), formatMl(todayActualWater), stringResource(R.string.water_statistics_progress, (todayActualWater / recommendation * 100).toInt())) }
         item { Text(stringResource(R.string.water_statistics_breakdown), modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium) }
         item { RecordTimeRangeFilter(rangeSelection, { rangeSelection = it }) }
-        if (rows.isEmpty()) item { Text(stringResource(R.string.water_statistics_empty), color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        else {
-            item { AnimatedDonutChart(segments, formatMl(totalActualWater), stringResource(R.string.water_statistics_actual_water), Modifier.fillMaxWidth()) }
-            item {
-                AppDataTable(
-                    rows = rows,
-                    rowKey = { _, item -> item.beverageName },
-                    showRowNumber = false,
-                    showPager = false,
-                    columns = listOf(
-                        AppDataTableColumn("beverage", { AppDataTableHeaderText(stringResource(R.string.water_beverage)) }, ColumnWidth.Flex(1.2f, 130.dp)) { row -> BeverageNameCell(row.beverageName, row.color) },
-                        AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.water_statistics_volume_water)) }, ColumnWidth.Fixed(126.dp)) { row -> AppDataTableText("${formatMl(row.beverageVolumeMl)} / ${if (row.hasKnownWaterContent) formatMl(row.actualWaterMl) else "-"}") },
-                        AppDataTableColumn("percent", { AppDataTableHeaderText(stringResource(R.string.water_statistics_percent_water)) }, ColumnWidth.Fixed(126.dp)) { row -> AppDataTableText("${if (totalActualWater > 0) "${(row.beverageVolumeMl / rows.sumOf(WaterCompositionRow::beverageVolumeMl) * 100).toInt()}%" else "-"} / ${if (row.hasKnownWaterContent && totalActualWater > 0) "${(row.actualWaterMl / totalActualWater * 100).toInt()}%" else "-"}") },
-                    ),
-                )
-            }
+        item { AnimatedDonutChart(segments, formatMl(totalActualWater), stringResource(R.string.water_statistics_actual_water), Modifier.fillMaxWidth()) }
+        if (rows.isNotEmpty()) {
+            item { WaterCompositionTable(rows, totalActualWater) }
         }
     }
 }
@@ -221,6 +208,48 @@ private fun BeverageNameCell(name: String, color: androidx.compose.ui.graphics.C
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
         androidx.compose.foundation.Canvas(Modifier.size(10.dp)) { drawCircle(color ?: androidx.compose.ui.graphics.Color.Transparent) }
         Text(name, modifier = Modifier.padding(start = 6.dp))
+    }
+}
+
+@Composable
+private fun WaterCompositionTable(rows: List<WaterCompositionRow>, totalActualWater: Double) {
+    val totalVolume = rows.sumOf(WaterCompositionRow::beverageVolumeMl)
+    androidx.compose.material3.Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .32f),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            WaterCompositionTableRow(
+                beverage = stringResource(R.string.water_beverage),
+                amount = stringResource(R.string.water_statistics_volume_water),
+                percent = stringResource(R.string.water_statistics_percent_water),
+                header = true,
+            )
+            rows.forEach { row ->
+                val beveragePercent = if (totalVolume > 0.0) "${(row.beverageVolumeMl / totalVolume * 100).toInt()}%" else "-"
+                val waterPercent = if (row.hasKnownWaterContent && totalActualWater > 0.0) "${(row.actualWaterMl / totalActualWater * 100).toInt()}%" else "-"
+                WaterCompositionTableRow(
+                    beverage = row.beverageName,
+                    amount = "${formatMl(row.beverageVolumeMl)} / ${if (row.hasKnownWaterContent) formatMl(row.actualWaterMl) else "-"}",
+                    percent = "$beveragePercent / $waterPercent",
+                    color = row.color,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WaterCompositionTableRow(beverage: String, amount: String, percent: String, color: androidx.compose.ui.graphics.Color? = null, header: Boolean = false) {
+    val style = if (header) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodySmall
+    Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        Row(Modifier.weight(1.15f), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            if (color != null) androidx.compose.foundation.Canvas(Modifier.size(10.dp)) { drawCircle(color) }
+            Text(beverage, modifier = Modifier.padding(start = if (color == null) 0.dp else 6.dp), style = style)
+        }
+        Text(amount, modifier = Modifier.weight(1.1f), style = style)
+        Text(percent, modifier = Modifier.weight(1.05f), style = style)
     }
 }
 
