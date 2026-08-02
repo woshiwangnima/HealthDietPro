@@ -1,10 +1,12 @@
 package com.woshiwangnima.healthdietpro.model.bloodglucose
 
 import android.content.Context
-import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
+import kotlinx.serialization.Serializable
 
+@Serializable
 internal enum class BloodGlucoseAlertMode { Sound, Vibration, SoundAndVibration }
 
+@Serializable
 internal data class BloodGlucoseReminderSettings(
     val highEnabled: Boolean = false,
     val highThresholdMmolPerL: Float = 10.0f,
@@ -22,6 +24,7 @@ internal data class BloodGlucoseReminderSettings(
     val fallingAlertDurationSeconds: Int = 2,
 )
 
+@Serializable
 internal enum class BloodGlucoseAlertKind {
     High,
     Low,
@@ -37,67 +40,21 @@ internal data class BloodGlucoseAlert(
 )
 
 internal class BloodGlucoseReminderRepository private constructor(context: Context) {
-    private val userPrefs = UserPrefs.current(context)
+    private val archive = BloodGlucoseArchiveStore.current(context)
 
-    fun load(): BloodGlucoseReminderSettings = BloodGlucoseReminderSettings(
-        highEnabled = userPrefs.getBoolean(KEY_HIGH_ENABLED, false),
-        highThresholdMmolPerL = userPrefs.getFloat(KEY_HIGH_THRESHOLD, 10.0f),
-        lowEnabled = userPrefs.getBoolean(KEY_LOW_ENABLED, false),
-        lowThresholdMmolPerL = userPrefs.getFloat(KEY_LOW_THRESHOLD, 3.9f),
-        emergencyLowEnabled = userPrefs.getBoolean(KEY_EMERGENCY_LOW_ENABLED, false),
-        emergencyLowThresholdMmolPerL = userPrefs.getFloat(KEY_EMERGENCY_LOW_THRESHOLD, 3.0f),
-        risingEnabled = userPrefs.getBoolean(KEY_RISING_ENABLED, false),
-        risingMode = loadMode(KEY_RISING_MODE),
-        risingReminderIntervalSeconds = userPrefs.getInt(KEY_RISING_INTERVAL, 900),
-        risingAlertDurationSeconds = userPrefs.getInt(KEY_RISING_DURATION, 2),
-        fallingEnabled = userPrefs.getBoolean(KEY_FALLING_ENABLED, false),
-        fallingMode = loadMode(KEY_FALLING_MODE),
-        fallingReminderIntervalSeconds = userPrefs.getInt(KEY_FALLING_INTERVAL, 900),
-        fallingAlertDurationSeconds = userPrefs.getInt(KEY_FALLING_DURATION, 2),
-    )
+    fun load(): BloodGlucoseReminderSettings = archive.load().reminder
 
     fun save(settings: BloodGlucoseReminderSettings) {
-        userPrefs.putBoolean(KEY_HIGH_ENABLED, settings.highEnabled)
-        userPrefs.putFloat(KEY_HIGH_THRESHOLD, settings.highThresholdMmolPerL)
-        userPrefs.putBoolean(KEY_LOW_ENABLED, settings.lowEnabled)
-        userPrefs.putFloat(KEY_LOW_THRESHOLD, settings.lowThresholdMmolPerL)
-        userPrefs.putBoolean(KEY_EMERGENCY_LOW_ENABLED, settings.emergencyLowEnabled)
-        userPrefs.putFloat(KEY_EMERGENCY_LOW_THRESHOLD, settings.emergencyLowThresholdMmolPerL)
-        userPrefs.putBoolean(KEY_RISING_ENABLED, settings.risingEnabled)
-        userPrefs.putString(KEY_RISING_MODE, settings.risingMode.name)
-        userPrefs.putInt(KEY_RISING_INTERVAL, settings.risingReminderIntervalSeconds)
-        userPrefs.putInt(KEY_RISING_DURATION, settings.risingAlertDurationSeconds)
-        userPrefs.putBoolean(KEY_FALLING_ENABLED, settings.fallingEnabled)
-        userPrefs.putString(KEY_FALLING_MODE, settings.fallingMode.name)
-        userPrefs.putInt(KEY_FALLING_INTERVAL, settings.fallingReminderIntervalSeconds)
-        userPrefs.putInt(KEY_FALLING_DURATION, settings.fallingAlertDurationSeconds)
+        archive.update { it.copy(reminder = settings) }
     }
 
-    fun lastAlertAt(kind: BloodGlucoseAlertKind): Long = userPrefs.getLong("blood_glucose_alert_last_${kind.name}", 0L)
+    fun lastAlertAt(kind: BloodGlucoseAlertKind): Long = archive.load().lastAlertAt[kind] ?: 0L
 
-    fun saveLastAlertAt(kind: BloodGlucoseAlertKind, timestamp: Long) = userPrefs.putLong("blood_glucose_alert_last_${kind.name}", timestamp)
-
-    private fun loadMode(key: String): BloodGlucoseAlertMode =
-        userPrefs.getString(key, BloodGlucoseAlertMode.SoundAndVibration.name)
-            .let { saved -> BloodGlucoseAlertMode.entries.find { it.name == saved } }
-            ?: BloodGlucoseAlertMode.SoundAndVibration
+    fun saveLastAlertAt(kind: BloodGlucoseAlertKind, timestamp: Long) {
+        archive.update { it.copy(lastAlertAt = it.lastAlertAt + (kind to timestamp)) }
+    }
 
     companion object {
-        private const val KEY_HIGH_ENABLED = "blood_glucose_alert_high_enabled"
-        private const val KEY_HIGH_THRESHOLD = "blood_glucose_alert_high_threshold_mmol_l"
-        private const val KEY_LOW_ENABLED = "blood_glucose_alert_low_enabled"
-        private const val KEY_LOW_THRESHOLD = "blood_glucose_alert_low_threshold_mmol_l"
-        private const val KEY_EMERGENCY_LOW_ENABLED = "blood_glucose_alert_emergency_low_enabled"
-        private const val KEY_EMERGENCY_LOW_THRESHOLD = "blood_glucose_alert_emergency_low_threshold_mmol_l"
-        private const val KEY_RISING_ENABLED = "blood_glucose_alert_rising_enabled"
-        private const val KEY_RISING_MODE = "blood_glucose_alert_rising_mode"
-        private const val KEY_RISING_INTERVAL = "blood_glucose_alert_rising_interval_minutes"
-        private const val KEY_RISING_DURATION = "blood_glucose_alert_rising_duration_seconds"
-        private const val KEY_FALLING_ENABLED = "blood_glucose_alert_falling_enabled"
-        private const val KEY_FALLING_MODE = "blood_glucose_alert_falling_mode"
-        private const val KEY_FALLING_INTERVAL = "blood_glucose_alert_falling_interval_minutes"
-        private const val KEY_FALLING_DURATION = "blood_glucose_alert_falling_duration_seconds"
-
         fun fromContext(context: Context) = BloodGlucoseReminderRepository(context.applicationContext)
     }
 }

@@ -3,12 +3,9 @@ package com.woshiwangnima.healthdietpro.model.medication
 import android.content.Context
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.put
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
 
 /**
  * 用药记录的 per-user 存储。所有数据挂在 `medication_records_${userId}` 这个键下，
@@ -21,29 +18,14 @@ import kotlinx.serialization.json.put
  */
 object MedicationPrefs {
 
-    private const val KEY_RECORDS = "medication_records"
-    private const val KEY_CATALOG = "medication_catalog"
-    private const val KEY_CATALOG_BACKUP = "medication_catalog_backup_v1"
-    private const val KEY_RECORDS_BACKUP = "medication_records_backup_v1"
-    private val json = Json { ignoreUnknownKeys = true }
-
-    private fun prefs(context: Context) =
-        context.getSharedPreferences("health_diet_prefs", Context.MODE_PRIVATE)
-
-    private fun keyFor(context: Context): String =
-        ProfilePrefs.makeChartStateKey(context, KEY_RECORDS)
-
-    private fun catalogKeyFor(context: Context): String =
-        ProfilePrefs.makeChartStateKey(context, KEY_CATALOG)
-
     fun getRecords(context: Context): List<MedicationRecord> {
-        return readRecords(context)
+        return archive(context).records
     }
 
     fun saveRecords(context: Context, records: List<MedicationRecord>) {
-        prefs(context).edit()
-            .putString(keyFor(context), json.encodeToString(records))
-            .apply()
+        MedicationArchiveStore.current(context).update {
+            it.copy(records = records.sortedByDescending { record -> record.timestamp })
+        }
     }
 
     fun addRecord(context: Context, record: MedicationRecord) {
@@ -53,44 +35,11 @@ object MedicationPrefs {
     }
 
     fun getCatalog(context: Context): List<MedicationCatalogItem> {
-        return readCatalog(context)
-    }
-
-    private fun readRecords(context: Context): List<MedicationRecord> {
-        return readRecords(context, keyFor(context))
-    }
-
-    private fun readRecords(context: Context, key: String = keyFor(context)): List<MedicationRecord> {
-        val raw = prefs(context).getString(key, null) ?: return emptyList()
-        return runCatching {
-            val migrated = migrateRecords(raw)
-            val records = json.decodeFromString<List<MedicationRecord>>(migrated)
-            val canonical = json.encodeToString(records)
-            if (canonical != raw) persistMigration(context, key, raw, canonical, KEY_RECORDS_BACKUP)
-            records
-        }.getOrDefault(emptyList())
-    }
-
-    private fun readCatalog(context: Context): List<MedicationCatalogItem> {
-        return readCatalog(context, catalogKeyFor(context))
-    }
-
-    private fun readCatalog(context: Context, key: String = catalogKeyFor(context)): List<MedicationCatalogItem> {
-        val stored = prefs(context).getString(key, null)
-        return stored?.let { raw -> runCatching {
-            val migrated = migrateCatalog(raw)
-            val catalog = json.decodeFromString<List<MedicationCatalogItem>>(migrated)
-            val canonical = json.encodeToString(catalog)
-            if (canonical != raw) persistMigration(context, key, raw, canonical, KEY_CATALOG_BACKUP)
-            catalog
-        }.getOrDefault(emptyList()) }
-            ?: emptyList()
+        return archive(context).catalog
     }
 
     fun saveCatalog(context: Context, catalog: List<MedicationCatalogItem>) {
-        prefs(context).edit()
-            .putString(catalogKeyFor(context), json.encodeToString(catalog))
-            .apply()
+        MedicationArchiveStore.current(context).update { it.copy(catalog = catalog) }
     }
 
     fun upsertCatalogItem(context: Context, item: MedicationCatalogItem) {
@@ -104,59 +53,37 @@ object MedicationPrefs {
         saveCatalog(context, getCatalog(context).filterNot { it.id == id })
     }
 
-    fun restoreLatestCatalogBackup(context: Context): Boolean = restoreBackup(context, KEY_CATALOG_BACKUP, catalogKeyFor(context))
+    fun saveCatalogImage(context: Context, bitmap: android.graphics.Bitmap): String =
+        saveImage(context, "catalog", bitmap)
 
-    fun restoreLatestRecordsBackup(context: Context): Boolean = restoreBackup(context, KEY_RECORDS_BACKUP, keyFor(context))
+    fun saveRecordPhoto(context: Context, bitmap: android.graphics.Bitmap): String =
+        saveImage(context, "records", bitmap)
 
-    private fun restoreBackup(context: Context, backupBaseKey: String, targetKey: String): Boolean {
-        val p = prefs(context)
-        val backupKey = ProfilePrefs.makeChartStateKey(context, backupBaseKey)
-        val raw = p.getString(backupKey, null) ?: return false
-        p.edit().putString(targetKey, raw).remove(backupKey).apply()
-        return true
+    fun loadAttachment(context: Context, relativePath: String): android.graphics.Bitmap? =
+        File(context.filesDir, relativePath).takeIf(File::exists)
+            ?.let { android.graphics.BitmapFactory.decodeFile(it.absolutePath) }
+
+    fun deleteAttachment(context: Context, relativePath: String) {
+        val file = File(context.filesDir, relativePath)
+        if (file.canonicalPath.startsWith(attachmentDirectory(context).canonicalPath + File.separator)) file.delete()
     }
 
-    private fun persistMigration(context: Context, key: String, original: String, migrated: String, backupBaseKey: String) {
-        val p = prefs(context)
-        val backupKey = ProfilePrefs.makeChartStateKey(context, backupBaseKey)
-        val editor = p.edit().putString(key, migrated)
-        if (!p.contains(backupKey)) editor.putString(backupKey, original)
-        editor.commit()
+    private fun archive(context: Context): MedicationArchive =
+        MedicationArchiveStore.current(context).load()
+
+    private fun saveImage(context: Context, type: String, bitmap: android.graphics.Bitmap): String {
+        val directory = File(attachmentDirectory(context), type).apply { mkdirs() }
+        val file = File(directory, "${UUID.randomUUID()}.jpg")
+        FileOutputStream(file).use { bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
+        return file.relativeTo(context.filesDir).invariantSeparatorsPath
     }
 
-    private fun migrateCatalog(raw: String): String {
-        val root = json.parseToJsonElement(raw)
-        if (root !is JsonArray) return raw
-        var changed = false
-        val result = root.map { element ->
-            val obj = element.jsonObject
-            if ("indicationTags" !in obj || "indications" in obj) return@map element
-            changed = true
-            buildJsonObject {
-                obj.forEach { (key, value) -> if (key != "indicationTags") put(key, value) }
-                put("indications", JsonArray(emptyList()))
-                put("legacyIndicationTags", obj["indicationTags"] ?: JsonArray(emptyList()))
-            }
-        }
-        return if (changed) JsonArray(result).toString() else raw
+    private fun attachmentDirectory(context: Context): File {
+        val userId = ProfilePrefs.getCurrentUserId(context)
+        val safeUserId = userId.replace(Regex("[^A-Za-z0-9_-]"), "_")
+        return File(context.filesDir, "user_archives/$safeUserId/attachments/medications")
     }
 
-    private fun migrateRecords(raw: String): String {
-        val root = json.parseToJsonElement(raw)
-        if (root !is JsonArray) return raw
-        var changed = false
-        val result = root.map { element ->
-            val obj = element.jsonObject
-            if ("purposes" !in obj || "indicationReferences" in obj) return@map element
-            changed = true
-            buildJsonObject {
-                obj.forEach { (key, value) -> if (key != "purposes") put(key, value) }
-                put("indicationReferences", JsonArray(emptyList()))
-                put("legacyPurposeTags", obj["purposes"] ?: JsonArray(emptyList()))
-            }
-        }
-        return if (changed) JsonArray(result).toString() else raw
-    }
 
     /** 药品名历史：按最近使用排序的去重列表。 */
     fun getMedicationNameHistory(context: Context): List<String> {

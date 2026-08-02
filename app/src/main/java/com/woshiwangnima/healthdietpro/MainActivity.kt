@@ -45,6 +45,7 @@ import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
+import com.woshiwangnima.healthdietpro.model.profile.BodyMetricsRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.formatBodyRecordDateTime
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
@@ -172,7 +173,7 @@ class MainActivity : BaseActivity() {
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         val records = result.bodyRecordsResult() ?: return@registerForActivityResult
-        ProfilePrefs.save(this, ProfilePrefs.load(this).copy(heightRecords = records))
+        BodyMetricsRepository.current(this).update { it.copy(heightRecords = records) }
         profileViewModel.refresh()
         recordViewModel.refresh()
     }
@@ -181,7 +182,7 @@ class MainActivity : BaseActivity() {
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         val records = result.bodyRecordsResult() ?: return@registerForActivityResult
-        ProfilePrefs.save(this, ProfilePrefs.load(this).copy(weightRecords = records))
+        BodyMetricsRepository.current(this).update { it.copy(weightRecords = records) }
         profileViewModel.refresh()
         recordViewModel.refresh()
     }
@@ -189,7 +190,9 @@ class MainActivity : BaseActivity() {
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         result.bodyRecordResult()?.let { record ->
-            ProfilePrefs.save(this, ProfilePrefs.load(this).copy(heightRecords = ProfilePrefs.load(this).heightRecords + record))
+            BodyMetricsRepository.current(this).update { metrics ->
+                metrics.copy(heightRecords = metrics.heightRecords + record)
+            }
             profileViewModel.refresh()
             recordViewModel.refresh()
         }
@@ -198,7 +201,9 @@ class MainActivity : BaseActivity() {
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         result.bodyRecordResult()?.let { record ->
-            ProfilePrefs.save(this, ProfilePrefs.load(this).copy(weightRecords = ProfilePrefs.load(this).weightRecords + record))
+            BodyMetricsRepository.current(this).update { metrics ->
+                metrics.copy(weightRecords = metrics.weightRecords + record)
+            }
             profileViewModel.refresh()
             recordViewModel.refresh()
         }
@@ -210,7 +215,7 @@ class MainActivity : BaseActivity() {
         @Suppress("DEPRECATION")
         val records = CircumferenceDetailActivity.readRecords(result.data?.getSerializableExtra(CircumferenceDetailActivity.EXTRA_RECORDS))
         if (records.isEmpty() && result.data?.hasExtra(CircumferenceDetailActivity.EXTRA_RECORDS) != true) return@registerForActivityResult
-        ProfilePrefs.save(this, ProfilePrefs.load(this).copy(circumferenceRecords = records))
+        BodyMetricsRepository.current(this).update { it.copy(circumferenceRecords = records) }
         profileViewModel.refresh()
         recordViewModel.refresh()
     }
@@ -307,10 +312,13 @@ class MainActivity : BaseActivity() {
         })
 
         checkFirstLaunch()
+        ProfilePrefs.noteApplicationOpened(this)
     }
+
 
     override fun onResume() {
         super.onResume()
+        ProfilePrefs.noteCurrentUserActivity(this)
         try {
             window.decorView.windowInsetsController?.show(AndroidWindowInsets.Type.systemBars())
         } catch (_: Exception) {
@@ -537,7 +545,7 @@ class MainActivity : BaseActivity() {
     private fun addTestWeightRecord(count: Int) = addTestBodyRecords(isWeight = true, count = count)
 
     private fun addTestBodyRecords(isWeight: Boolean, count: Int) {
-        val profile = ProfilePrefs.createDefaultIfEmpty(this)
+        ProfilePrefs.createDefaultIfEmpty(this)
         val random = kotlin.random.Random(System.nanoTime())
         val now = System.currentTimeMillis()
         val records = List(count) {
@@ -549,12 +557,15 @@ class MainActivity : BaseActivity() {
                 recordedAtMillis = timestamp,
             )
         }
-        val updated = if (isWeight) {
-            profile.copy(weightRecords = (profile.weightRecords + records).sortedBy { it.recordedAtMillis })
+        if (isWeight) {
+            BodyMetricsRepository.current(this).update { metrics ->
+                metrics.copy(weightRecords = (metrics.weightRecords + records).sortedBy { it.recordedAtMillis })
+            }
         } else {
-            profile.copy(heightRecords = (profile.heightRecords + records).sortedBy { it.recordedAtMillis })
+            BodyMetricsRepository.current(this).update { metrics ->
+                metrics.copy(heightRecords = (metrics.heightRecords + records).sortedBy { it.recordedAtMillis })
+            }
         }
-        ProfilePrefs.save(this, updated)
         profileViewModel.refresh()
         recordViewModel.refresh()
         Toast.makeText(this, if (isWeight) R.string.test_gm_weight_added else R.string.test_gm_height_added, Toast.LENGTH_SHORT).show()

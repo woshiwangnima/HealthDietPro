@@ -170,7 +170,7 @@ private fun BodyMetricDataPage(
     onRecordsChanged: (List<BodyRecord>) -> Unit,
     onEditRecord: (Int) -> Unit,
 ) {
-    var deletePosition by remember { mutableStateOf<Int?>(null) }
+    var deleteRecordId by remember { mutableStateOf<String?>(null) }
     val rows = remember(records) {
         records.mapIndexed { index, record -> BodyMetricTableRow(index, record) }
             .sortedByDescending { bodyRecordEpochMillis(it.record.date) }
@@ -181,11 +181,11 @@ private fun BodyMetricDataPage(
         category = category,
         onAdd = { onEditRecord(-1) },
         onEdit = { row -> onEditRecord(row.sourceIndex) },
-        onDelete = { row -> deletePosition = row.sourceIndex },
+        onDelete = { row -> deleteRecordId = row.record.id.orEmpty() },
     )
-    deletePosition?.let { position ->
+    deleteRecordId?.let { recordId ->
         AlertDialog(
-            onDismissRequest = { deletePosition = null },
+            onDismissRequest = { deleteRecordId = null },
             title = { Text(stringResource(R.string.body_record_delete_confirm_title)) },
             text = { Text(stringResource(R.string.body_record_delete_confirm_message)) },
             confirmButton = {
@@ -193,8 +193,8 @@ private fun BodyMetricDataPage(
                     text = stringResource(R.string.body_record_delete),
                     iconRes = R.drawable.ic_delete,
                     onClick = {
-                        onRecordsChanged(records.removeRecordAt(position))
-                        deletePosition = null
+                        onRecordsChanged(records.filterNot { it.id == recordId })
+                        deleteRecordId = null
                     },
                 )
             },
@@ -202,7 +202,7 @@ private fun BodyMetricDataPage(
                 AppOutlinedIconTextButton(
                     text = stringResource(R.string.body_record_cancel),
                     iconRes = R.drawable.ic_cancel,
-                    onClick = { deletePosition = null },
+                    onClick = { deleteRecordId = null },
                 )
             },
         )
@@ -226,7 +226,7 @@ private fun BodyMetricRecordTable(
         }
         AppDataTable(
             rows = rows,
-            rowKey = { _, row -> row.sourceIndex },
+            rowKey = { _, row -> row.record.id.orEmpty() },
             columns = listOf(
                 AppDataTableColumn("time", { AppDataTableHeaderText(stringResource(R.string.body_record_table_time)) }, ColumnWidth.Fixed(156.dp)) { AppDataTableText(it.record.date) },
                 AppDataTableColumn("value", { AppDataTableHeaderText(stringResource(R.string.body_record_value)) }, ColumnWidth.Fixed(120.dp)) { AppDataTableText("%.1f".format(UnitConverter.fromBase(category, it.record.value, unitId))) },

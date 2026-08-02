@@ -9,7 +9,6 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
@@ -36,38 +35,9 @@ data class ArchiveSchemaVersion(
     override fun toString(): String = "$major.$minor.$patch"
 
     companion object {
-        val Unversioned = ArchiveSchemaVersion(0, 0, 0)
-        val LegacyV1 = ArchiveSchemaVersion(0, 0, 1)
-        val LegacyV2 = ArchiveSchemaVersion(0, 0, 2)
-        val LegacyV3 = ArchiveSchemaVersion(0, 0, 3)
-        val CircumferenceRecords = ArchiveSchemaVersion(1, 0, 1)
-        val BodyRecordDateTime = ArchiveSchemaVersion(1, 0, 2)
-        val DiseaseReferenceUnion = ArchiveSchemaVersion(1, 0, 3)
-        val MedicationDiseaseIndications = ArchiveSchemaVersion(1, 0, 4)
-        val Current = MedicationDiseaseIndications
+        val UserArchiveEnvelope = ArchiveSchemaVersion(1, 4, 0)
+        val Current = UserArchiveEnvelope
     }
-}
-
-internal fun archiveSchemaVersionFromLegacy(value: Int?): ArchiveSchemaVersion = when (value) {
-    null, 0 -> ArchiveSchemaVersion.Unversioned
-    1 -> ArchiveSchemaVersion.LegacyV1
-    2 -> ArchiveSchemaVersion.LegacyV2
-    3 -> ArchiveSchemaVersion.LegacyV3
-    else -> ArchiveSchemaVersion(0, 0, value.coerceAtLeast(0))
-}
-
-internal fun migrateArchiveSchemaVersion(
-    storedVersion: ArchiveSchemaVersion?,
-): ArchiveSchemaVersion {
-    var migrated = storedVersion ?: ArchiveSchemaVersion.Unversioned
-    if (migrated < ArchiveSchemaVersion.LegacyV1) migrated = ArchiveSchemaVersion.LegacyV1
-    if (migrated < ArchiveSchemaVersion.LegacyV2) migrated = ArchiveSchemaVersion.LegacyV2
-    if (migrated < ArchiveSchemaVersion.LegacyV3) migrated = ArchiveSchemaVersion.LegacyV3
-    if (migrated < ArchiveSchemaVersion.CircumferenceRecords) migrated = ArchiveSchemaVersion.CircumferenceRecords
-    if (migrated < ArchiveSchemaVersion.BodyRecordDateTime) migrated = ArchiveSchemaVersion.BodyRecordDateTime
-    if (migrated < ArchiveSchemaVersion.DiseaseReferenceUnion) migrated = ArchiveSchemaVersion.DiseaseReferenceUnion
-    if (migrated < ArchiveSchemaVersion.MedicationDiseaseIndications) migrated = ArchiveSchemaVersion.MedicationDiseaseIndications
-    return migrated
 }
 
 object ArchiveSchemaVersionSerializer : KSerializer<ArchiveSchemaVersion> {
@@ -84,14 +54,12 @@ object ArchiveSchemaVersionSerializer : KSerializer<ArchiveSchemaVersion> {
 
     override fun deserialize(decoder: Decoder): ArchiveSchemaVersion {
         val jsonDecoder = decoder as? JsonDecoder ?: error("Archive schema version requires JSON")
-        return when (val element = jsonDecoder.decodeJsonElement()) {
-            is JsonPrimitive -> archiveSchemaVersionFromLegacy(element.intOrNull)
-            is JsonObject -> ArchiveSchemaVersion(
-                major = element["major"]?.jsonPrimitive?.intOrNull ?: 0,
-                minor = element["minor"]?.jsonPrimitive?.intOrNull ?: 0,
-                patch = element["patch"]?.jsonPrimitive?.intOrNull ?: 0,
-            )
-            else -> error("Invalid archive schema version")
-        }
+        val element = jsonDecoder.decodeJsonElement() as? JsonObject
+            ?: error("Archive schema version must be an object")
+        return ArchiveSchemaVersion(
+            major = element["major"]?.jsonPrimitive?.intOrNull ?: error("Missing archive schema major"),
+            minor = element["minor"]?.jsonPrimitive?.intOrNull ?: error("Missing archive schema minor"),
+            patch = element["patch"]?.jsonPrimitive?.intOrNull ?: error("Missing archive schema patch"),
+        )
     }
 }

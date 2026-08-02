@@ -31,6 +31,7 @@ import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
+import com.woshiwangnima.healthdietpro.model.archive.userArchiveDirectory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -318,13 +319,13 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         val imageUserId = userId ?: return
         viewModelScope.launch {
             val savedKey = withContext(Dispatchers.IO) {
-                val directory = File(context.filesDir, "food_images/$imageUserId").apply { mkdirs() }
+                val directory = File(userArchiveDirectory(context, imageUserId), "attachments/foods").apply { mkdirs() }
                 val file = File(directory, "${UUID.randomUUID()}.image")
                 runCatching {
                     checkNotNull(context.contentResolver.openInputStream(uri)).use { input ->
                         file.outputStream().use(input::copyTo)
                     }
-                    "user:food_images/$imageUserId/${file.name}"
+                    "user:user_archives/${imageUserId.replace(Regex("[^A-Za-z0-9_-]"), "_")}/attachments/foods/${file.name}"
                 }.getOrElse {
                     file.delete()
                     null

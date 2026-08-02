@@ -72,7 +72,6 @@ import com.woshiwangnima.healthdietpro.model.unit.UnitCategory
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.io.File
-import java.io.FileOutputStream
 import java.util.Locale
 
 class MedicationCatalogActivity : DirtyFormActivity() {
@@ -148,13 +147,11 @@ class MedicationCatalogActivity : DirtyFormActivity() {
 
     private fun saveImage(bitmap: Bitmap) {
         if (state.imageBitmaps.any { it.sameAs(bitmap) }) return
-        val dir = File(filesDir, "medication_catalog_images").apply { mkdirs() }
-        val name = "medicine_${System.currentTimeMillis()}.jpg"
-        FileOutputStream(File(dir, name)).use { bitmap.compress(Bitmap.CompressFormat.JPEG, 85, it) }
-        state = state.copy(imagePaths = state.imagePaths + "medication_catalog_images/$name", imageBitmaps = state.imageBitmaps + bitmap)
+        val path = MedicationPrefs.saveCatalogImage(this, bitmap)
+        state = state.copy(imagePaths = state.imagePaths + path, imageBitmaps = state.imageBitmaps + bitmap)
     }
     private fun formatDate(timestamp: Long): String = java.time.Instant.ofEpochMilli(timestamp).atZone(java.time.ZoneId.systemDefault()).toLocalDate().toString()
-    private fun loadBitmap(path: String): Bitmap? = File(filesDir, path).takeIf(File::exists)?.let { BitmapFactory.decodeFile(it.path) }
+    private fun loadBitmap(path: String): Bitmap? = MedicationPrefs.loadAttachment(this, path)
     private fun save() {
         if (state.name.trim().isEmpty()) { Toast.makeText(this, R.string.medication_catalog_name_required, Toast.LENGTH_SHORT).show(); return }
         MedicationPrefs.upsertCatalogItem(this, MedicationCatalogItem(

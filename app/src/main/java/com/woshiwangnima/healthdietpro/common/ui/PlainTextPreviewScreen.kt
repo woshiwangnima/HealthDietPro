@@ -28,11 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.model.archive.stableJsonString
 
 /** Reusable read-only preview for structured plaintext before an export action. */
 @Composable
 internal fun PlainTextPreviewScreen(title: String, content: String, onBack: () -> Unit) {
-    val formatted = remember(content) { formatStructuredPlainText(content) }
+    val formatted = remember(content) { stableJsonString(content, prettyPrint = true) }
     val lines = remember(formatted) { formatted.lines() }
     val foldRanges = remember(lines) { findFoldRanges(lines) }
     var collapsedStarts by remember(lines) { mutableStateOf(emptySet<Int>()) }
@@ -71,29 +72,4 @@ private fun findFoldRanges(lines: List<String>): Map<Int, Int> {
         if ((line.trimStart().startsWith("}") || line.trimStart().startsWith("]")) && stack.isNotEmpty()) ranges[stack.removeLast()] = index
     }
     return ranges
-}
-
-/** Formats JSON-like plaintext without parsing or changing any quoted content. */
-private fun formatStructuredPlainText(content: String): String {
-    if (content.isBlank()) return content
-    val output = StringBuilder()
-    var indent = 0
-    var inString = false
-    var escaped = false
-    content.forEach { character ->
-        when {
-            inString -> {
-                output.append(character)
-                if (escaped) escaped = false else if (character == '\\') escaped = true else if (character == '"') inString = false
-            }
-            character == '"' -> { inString = true; output.append(character) }
-            character == '{' || character == '[' -> { output.append(character).append('\n'); indent++; output.append("  ".repeat(indent)) }
-            character == '}' || character == ']' -> { indent = (indent - 1).coerceAtLeast(0); output.append('\n').append("  ".repeat(indent)).append(character) }
-            character == ',' -> output.append(character).append('\n').append("  ".repeat(indent))
-            character == ':' -> output.append(": ")
-            character.isWhitespace() -> Unit
-            else -> output.append(character)
-        }
-    }
-    return output.toString()
 }

@@ -72,9 +72,13 @@ import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.ui.AppTextIconButton
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.archive.resolveAvatarFile
+import com.woshiwangnima.healthdietpro.model.archive.userArchiveDirectory
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.profile.AppDate
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
+import com.woshiwangnima.healthdietpro.model.profile.BodyMetrics
+import com.woshiwangnima.healthdietpro.model.profile.BodyMetricsRepository
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
@@ -242,7 +246,7 @@ class ProfileEditActivity : DirtyFormActivity() {
 
     private fun avatarFilePath(): String? =
         avatarFileName.takeIf { it.isNotBlank() }
-            ?.let { File(filesDir, "avatars/$it") }
+            ?.let { resolveAvatarFile(this, originalProfile?.id.orEmpty(), it) }
             ?.takeIf { it.exists() }
             ?.absolutePath
 
@@ -453,10 +457,12 @@ class ProfileEditActivity : DirtyFormActivity() {
             inputStream?.close()
             if (bitmap == null) return
             val cropped = cropToSquare(bitmap, 200)
-            val dir = File(filesDir, "avatars")
+            val userId = originalProfile?.id ?: ProfilePrefs.getCurrentUserId(this)
+            val dir = File(userArchiveDirectory(this, userId), "attachments/avatar")
             if (!dir.exists()) dir.mkdirs()
-            avatarFileName = "${System.currentTimeMillis()}.jpg"
-            FileOutputStream(File(dir, avatarFileName)).use { out ->
+            val fileName = "${System.currentTimeMillis()}.jpg"
+            avatarFileName = "attachments/avatar/$fileName"
+            FileOutputStream(File(dir, fileName)).use { out ->
                 cropped.compress(Bitmap.CompressFormat.JPEG, 85, out)
             }
             refreshUiState()
@@ -482,17 +488,23 @@ class ProfileEditActivity : DirtyFormActivity() {
             Toast.makeText(this, R.string.profile_edit_name_required, Toast.LENGTH_SHORT).show()
             return
         }
+        val original = originalProfile
+        val latest = ProfilePrefs.load(this)
+        val updatedMetrics = BodyMetrics(
+            heightRecords = if (heightRecords.toList() == original?.heightRecords) latest.heightRecords else heightRecords.toList(),
+            weightRecords = if (weightRecords.toList() == original?.weightRecords) latest.weightRecords else weightRecords.toList(),
+            circumferenceRecords = latest.circumferenceRecords,
+        )
+        BodyMetricsRepository.current(this).replace(updatedMetrics)
         ProfilePrefs.save(
             this,
-            UserProfile(
+            latest.copy(
                 id = editingUserId,
                 name = name,
                 gender = selectedGender,
                 birthday = selectedBirthday,
                 region = selectedRegion,
                 diseaseIds = selectedDiseaseIds.toList(),
-                heightRecords = heightRecords.toList(),
-                weightRecords = weightRecords.toList(),
                 avatarFileName = avatarFileName,
             ),
         )

@@ -2,7 +2,6 @@ package com.woshiwangnima.healthdietpro.model.bloodglucose
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.common.range.UnitRange
-import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 
@@ -28,20 +27,15 @@ enum class BloodGlucoseDiabetesType(
 }
 
 class BloodGlucoseTargetRepository private constructor(context: Context) {
-    private val userPrefs = UserPrefs.current(context)
+    private val archive = BloodGlucoseArchiveStore.current(context)
 
-    fun loadDiabetesType(): BloodGlucoseDiabetesType =
-        userPrefs.getString(KEY_DIABETES_TYPE, BloodGlucoseDiabetesType.Normal.name)
-            .let { saved -> BloodGlucoseDiabetesType.entries.find { it.name == saved } }
-            ?: BloodGlucoseDiabetesType.Normal
+    fun loadDiabetesType(): BloodGlucoseDiabetesType = archive.load().diabetesType
 
     fun saveDiabetesType(type: BloodGlucoseDiabetesType) {
-        userPrefs.putString(KEY_DIABETES_TYPE, type.name)
+        archive.update { it.copy(diabetesType = type) }
     }
 
     companion object {
-        private const val KEY_DIABETES_TYPE = "blood_glucose_diabetes_type_v1"
-
         fun fromContext(context: Context) = BloodGlucoseTargetRepository(context.applicationContext)
     }
 }

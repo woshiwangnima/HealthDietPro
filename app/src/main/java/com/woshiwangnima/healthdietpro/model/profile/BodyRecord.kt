@@ -17,6 +17,8 @@ data class BodyRecord(
     val unit: String? = null,
     /** Exact user-selected timestamp matching [date]. */
     val recordedAtMillis: Long,
+    /** Stable identity for editing, deleting, importing, and migrating this record. */
+    val id: String? = null,
 ) : Serializable {
     fun getUnit(isWeight: Boolean): String =
         unit?.takeIf { it.isNotEmpty() } ?: if (isWeight) UnitCategoryType.Weight.defaultUnitId else UnitCategoryType.Length.defaultUnitId

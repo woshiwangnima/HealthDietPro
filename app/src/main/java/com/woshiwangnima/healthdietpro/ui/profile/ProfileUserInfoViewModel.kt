@@ -14,6 +14,7 @@ import com.woshiwangnima.healthdietpro.model.disease.customId
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserProfile
+import com.woshiwangnima.healthdietpro.model.archive.resolveAvatarFile
 import com.woshiwangnima.healthdietpro.model.region.ProvinceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -103,7 +104,7 @@ internal class ProfileUserInfoViewModel(
         val app = getApplication<Application>()
         return profile.avatarFileName
             .takeIf { it.isNotBlank() }
-            ?.let { File(app.filesDir, "avatars/$it") }
+            ?.let { resolveAvatarFile(app, profile.id, it) }
             ?.takeIf { it.exists() }
             ?.absolutePath
     }

@@ -108,7 +108,7 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
                     Activity.RESULT_OK,
                     Intent()
                         .putExtra(EXTRA_POSITION, position)
-                        .putExtra(EXTRA_RECORD, BodyRecord(form.date, UnitConverter.toBase(category, value, form.unitId), form.unitId, normalizeRecordTimestamp(bodyRecordEpochMillis(form.date), RecordTimePrecision.MINUTE))),
+                        .putExtra(EXTRA_RECORD, BodyRecord(form.date, UnitConverter.toBase(category, value, form.unitId), form.unitId, normalizeRecordTimestamp(bodyRecordEpochMillis(form.date), RecordTimePrecision.MINUTE), editing?.id)),
                 )
                 finish()
             }

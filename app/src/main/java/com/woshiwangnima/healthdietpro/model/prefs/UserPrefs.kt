@@ -1,199 +1,231 @@
 package com.woshiwangnima.healthdietpro.model.prefs
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.woshiwangnima.healthdietpro.model.archive.ArchiveSchemaVersion
-import com.woshiwangnima.healthdietpro.model.archive.appVersion
-import com.woshiwangnima.healthdietpro.model.archive.archiveSchemaVersionFromLegacy
-import com.woshiwangnima.healthdietpro.model.archive.migrateArchiveSchemaVersion
+import android.util.AtomicFile
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import java.io.File
+import java.util.concurrent.ConcurrentHashMap
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
- * 按用户存储的设置统一入口。每个用户一个独立 prefs 文件 `user_prefs_<uid>`，
- * uid 为空时回退 `user_prefs_default`。删用户即删文件，隔离清晰。
- *
- * 通过 [current] 获取当前登录用户的 scope；通过 [forUser] 获取指定用户的 scope。
- * 一次性数据迁移见 [ensureMigrated]。
+ * Per-user preference entry point. Preferences are stored in
+ * `files/user_archives/<uid>/user_preferences.json`.
  */
 object UserPrefs {
-    private const val APP_PREFS_NAME = "app_prefs"
-    private const val APP_KEY_MIGRATED = "user_prefs_migrated"
-
-    /** 迁移到用户级的精确键名（app_prefs → user_prefs_<uid>）。 */
-    private val MIGRATE_KEYS_EXACT = listOf(
-        "reminder_drink_water", "reminder_medication", "reminder_period", "reminder_fasting",
-        "tab_weight_chart", "tab_height_chart", "tab_bmi_chart"
-    )
-
-    /** 迁移到用户级的前缀键名（匹配任意后缀）。 */
-    private val MIGRATE_KEY_PREFIXES = listOf(
-        "pref_unit_",
-        "chart_style_", "chart_timerange_", "chart_ymin_", "chart_ymax_", "chart_label_"
-    )
-
     fun current(context: Context): UserPrefsScope {
-        ensureMigrated(context)
-        val uid = ProfilePrefs.getCurrentUserId(context)
-        return UserPrefsScope.create(context, uid)
+        return UserPrefsScope.create(context, ProfilePrefs.getCurrentUserId(context))
     }
 
-    fun forUser(context: Context, uid: String): UserPrefsScope =
-        UserPrefsScope.create(context, uid)
+    fun forUser(context: Context, uid: String): UserPrefsScope = UserPrefsScope.create(context, uid)
 
-    /** 读取指定用户的全部偏好键值，供归档模块编码为明文 JSON。 */
     internal fun snapshot(context: Context, uid: String): Map<String, Any> =
-        context.getSharedPreferences(UserPrefsScope.fileName(uid), Context.MODE_PRIVATE).all
-            .mapNotNull { (key, value) -> value?.let { key to it } }
-            .toMap()
+        UserPrefsScope.create(context, uid).snapshot()
 
-    /**
-     * 以一个 SharedPreferences 事务替换指定用户的全部偏好。
-     * 归档格式在替换前已经完成校验，写入完成后立即补齐当前归档版本信息。
-     */
-    internal fun replaceAll(context: Context, uid: String, values: Map<String, Any>): Boolean {
-        val scope = UserPrefsScope.create(context, uid)
-        val target = context.getSharedPreferences(UserPrefsScope.fileName(scope.uid), Context.MODE_PRIVATE)
-        val editor = target.edit().clear()
-        values.forEach { (key, value) ->
-            when (value) {
-                is Boolean -> editor.putBoolean(key, value)
-                is Int -> editor.putInt(key, value)
-                is Long -> editor.putLong(key, value)
-                is Float -> editor.putFloat(key, value)
-                is String -> editor.putString(key, value)
-                is Set<*> -> @Suppress("UNCHECKED_CAST") editor.putStringSet(key, value as Set<String>)
-            }
-        }
-        return editor.commit().also { committed ->
-            if (committed) UserPrefsScope.create(context, uid)
-        }
-    }
+    internal fun replaceAll(context: Context, uid: String, values: Map<String, Any>): Boolean =
+        UserPrefsScope.create(context, uid).replaceAll(values)
 
-    /** 删除指定用户的 user_prefs_<uid> 文件（删用户时清理）。 */
+    /** Deletes the current user's preference domain. */
     fun deleteUserFile(context: Context, uid: String) {
-        // API 24+ 支持 deleteSharedPreferences；本项目 minSdk=35，直接用
-        context.deleteSharedPreferences(UserPrefsScope.fileName(uid))
-    }
-
-    /**
-     * 一次性、幂等迁移：把旧 app_prefs 中的用户级键拷贝到当前用户的 user_prefs_<uid>，
-     * 然后从 app_prefs 删除这些键。以 app_prefs 中的 `user_prefs_migrated` 标记防重复。
-     */
-    @Synchronized
-    fun ensureMigrated(context: Context) {
-        val appPrefs = context.getSharedPreferences(APP_PREFS_NAME, Context.MODE_PRIVATE)
-        if (appPrefs.getBoolean(APP_KEY_MIGRATED, false)) return
-        val uid = ProfilePrefs.getCurrentUserId(context)
-        val target = context.getSharedPreferences(UserPrefsScope.fileName(uid), Context.MODE_PRIVATE)
-        val allKeys = appPrefs.all.keys.toList()
-
-        val dst = target.edit()
-        for (key in MIGRATE_KEYS_EXACT) {
-            if (appPrefs.contains(key)) copyAny(appPrefs, key, dst)
-        }
-        for (key in allKeys) {
-            if (MIGRATE_KEY_PREFIXES.any { key.startsWith(it) }) copyAny(appPrefs, key, dst)
-        }
-        dst.apply()
-
-        val clean = appPrefs.edit()
-        for (key in MIGRATE_KEYS_EXACT) clean.remove(key)
-        for (key in allKeys) {
-            if (MIGRATE_KEY_PREFIXES.any { key.startsWith(it) }) clean.remove(key)
-        }
-        clean.putBoolean(APP_KEY_MIGRATED, true).apply()
-    }
-
-    private fun copyAny(src: SharedPreferences, key: String, dst: SharedPreferences.Editor) {
-        val v = src.all[key] ?: return
-        when (v) {
-            is Boolean -> dst.putBoolean(key, v)
-            is Int -> dst.putInt(key, v)
-            is Long -> dst.putLong(key, v)
-            is Float -> dst.putFloat(key, v)
-            is String -> dst.putString(key, v)
-            is Set<*> -> @Suppress("UNCHECKED_CAST") dst.putStringSet(key, v as Set<String>)
-            else -> null
-        }
+        UserPreferencesArchiveStore(context, UserPrefsScope.normalizedUid(uid)).delete()
     }
 }
 
-/**
- * 单个用户的设置作用域。持有 uid 与对应的 [SharedPreferences]，方法签名无需再传 uid。
- */
+/** A typed preference scope for one user. */
 class UserPrefsScope private constructor(
     val context: Context,
     val uid: String,
-    private val sp: SharedPreferences
+    private val store: UserPreferencesArchiveStore,
+    private var values: Map<String, Any>,
 ) {
     companion object {
-        private const val FILE_PREFIX = "user_prefs_"
-        private const val FALLBACK_UID = "default"
-        private const val KEY_LEGACY_ARCHIVE_SCHEMA_VERSION = "archive_schema_version"
-        private const val KEY_ARCHIVE_SCHEMA_MAJOR = "archive_schema_major"
-        private const val KEY_ARCHIVE_SCHEMA_MINOR = "archive_schema_minor"
-        private const val KEY_ARCHIVE_SCHEMA_PATCH = "archive_schema_patch"
-        private const val KEY_ARCHIVE_APP_VERSION = "archive_app_version"
+        private const val fallbackUid = "default"
 
-        internal fun fileName(uid: String): String =
-            if (uid.isEmpty()) "${FILE_PREFIX}${FALLBACK_UID}" else "${FILE_PREFIX}${uid}"
+        internal fun normalizedUid(uid: String): String = uid.ifEmpty { fallbackUid }
 
         internal fun create(context: Context, uid: String): UserPrefsScope {
-            val sp = context.getSharedPreferences(fileName(uid), Context.MODE_PRIVATE)
-            return UserPrefsScope(context, uid, sp).also { it.migrateArchiveChain() }
+            val normalizedUid = normalizedUid(uid)
+            val store = UserPreferencesArchiveStore(context, normalizedUid)
+            val loaded = store.load()
+            return UserPrefsScope(context, uid, store, loaded)
         }
+
+        internal fun isSupportedValue(value: Any): Boolean = when (value) {
+            is Boolean, is Int, is Long, is String -> true
+            is Float -> value.isFinite()
+            is Set<*> -> value.all { it is String }
+            else -> false
+        }
+
     }
 
-    fun getBoolean(key: String, default: Boolean) = sp.getBoolean(key, default)
-    fun putBoolean(key: String, v: Boolean) { sp.edit().putBoolean(key, v).apply() }
+    fun getBoolean(key: String, default: Boolean): Boolean = values[key] as? Boolean ?: default
+    fun putBoolean(key: String, v: Boolean) { put(key, v) }
 
-    fun getString(key: String, default: String) = sp.getString(key, default) ?: default
-    fun putString(key: String, v: String) { sp.edit().putString(key, v).apply() }
+    fun getString(key: String, default: String): String = values[key] as? String ?: default
+    fun putString(key: String, v: String) { put(key, v) }
 
-    fun remove(key: String) { sp.edit().remove(key).apply() }
+    fun remove(key: String) { update { it - key } }
 
-    fun getInt(key: String, default: Int) = sp.getInt(key, default)
-    fun putInt(key: String, v: Int) { sp.edit().putInt(key, v).apply() }
+    fun getInt(key: String, default: Int): Int = values[key] as? Int ?: default
+    fun putInt(key: String, v: Int) { put(key, v) }
 
-    fun getFloat(key: String, default: Float) = sp.getFloat(key, default)
-    fun putFloat(key: String, v: Float) { sp.edit().putFloat(key, v).apply() }
+    fun getFloat(key: String, default: Float): Float = values[key] as? Float ?: default
+    fun putFloat(key: String, v: Float) { put(key, v) }
 
-    fun getLong(key: String, default: Long) = sp.getLong(key, default)
-    fun putLong(key: String, v: Long) { sp.edit().putLong(key, v).apply() }
+    fun getLong(key: String, default: Long): Long = values[key] as? Long ?: default
+    fun putLong(key: String, v: Long) { put(key, v) }
 
-    fun contains(key: String) = sp.contains(key)
+    fun contains(key: String): Boolean = key in values
 
-    private fun migrateArchiveChain() {
-        val editor = sp.edit()
-        val storedSchemaVersion = if (
-            sp.contains(KEY_ARCHIVE_SCHEMA_MAJOR) ||
-                sp.contains(KEY_ARCHIVE_SCHEMA_MINOR) ||
-                sp.contains(KEY_ARCHIVE_SCHEMA_PATCH)
-        ) {
-            ArchiveSchemaVersion(
-                major = sp.getInt(KEY_ARCHIVE_SCHEMA_MAJOR, 0),
-                minor = sp.getInt(KEY_ARCHIVE_SCHEMA_MINOR, 0),
-                patch = sp.getInt(KEY_ARCHIVE_SCHEMA_PATCH, 0),
-            )
-        } else {
-            archiveSchemaVersionFromLegacy(
-                if (sp.contains(KEY_LEGACY_ARCHIVE_SCHEMA_VERSION)) {
-                    sp.getInt(KEY_LEGACY_ARCHIVE_SCHEMA_VERSION, 0)
-                } else {
-                    null
-                },
-            )
+    internal fun snapshot(): Map<String, Any> = values.toMap()
+
+    internal fun replaceAll(replacement: Map<String, Any>): Boolean {
+        val validValues = replacement.filterValues(::isSupportedValue)
+        if (validValues.size != replacement.size) return false
+        return replace(validValues)
+    }
+
+    internal fun putAll(additions: Map<String, Any>): Boolean {
+        val validValues = additions.filterValues(::isSupportedValue)
+        if (validValues.size != additions.size) return false
+        return update { it + validValues }
+    }
+
+    private fun put(key: String, value: Any) {
+        require(isSupportedValue(value)) { "Unsupported preference value" }
+        update { it + (key to value) }
+    }
+
+    private fun replace(replacement: Map<String, Any>): Boolean {
+        val saved = store.replace(replacement)
+        if (saved) values = replacement.toMap()
+        return saved
+    }
+
+    private fun update(transform: (Map<String, Any>) -> Map<String, Any>): Boolean {
+        val updated = store.update(transform)
+        if (updated != null) values = updated
+        return updated != null
+    }
+
+}
+
+@Serializable
+private data class UserPreferencesArchive(
+    val values: Map<String, UserPreferenceValue>,
+)
+
+@Serializable
+private data class UserPreferenceValue(
+    val type: UserPreferenceType,
+    val boolean: Boolean? = null,
+    val int: Int? = null,
+    val long: Long? = null,
+    val float: Float? = null,
+    val string: String? = null,
+    val strings: List<String>? = null,
+)
+
+@Serializable
+private enum class UserPreferenceType { BOOLEAN, INT, LONG, FLOAT, STRING, STRING_SET }
+
+private class UserPreferencesArchiveStore(
+    context: Context,
+    private val uid: String,
+) {
+    private val context = context.applicationContext
+
+    fun load(): Map<String, Any> = synchronized(lock) { readArchive().orEmpty() }
+
+    fun replace(values: Map<String, Any>): Boolean = synchronized(lock) {
+        write(values)
+    }
+
+    fun update(transform: (Map<String, Any>) -> Map<String, Any>): Map<String, Any>? = synchronized(lock) {
+        val latest = readArchive().orEmpty()
+        val updated = transform(latest)
+        updated.takeIf { write(it) }
+    }
+
+    private fun write(values: Map<String, Any>): Boolean = run {
+        val archive = UserPreferencesArchive(values.toSortedMap().mapValues { (_, value) -> encode(value) })
+        val saved = runCatching {
+            archiveFile.parentFile?.mkdirs()
+            val atomicFile = AtomicFile(archiveFile)
+            val output = atomicFile.startWrite()
+            try {
+                output.write(
+                    json.encodeDomain(context, DOMAIN_ID, archive, UserPreferencesArchive.serializer())
+                        .toByteArray(Charsets.UTF_8),
+                )
+                atomicFile.finishWrite(output)
+            } catch (error: Throwable) {
+                atomicFile.failWrite(output)
+                throw error
+            }
+        }.isSuccess
+        if (saved) runCatching {
+            writeUserArchiveManifest(context, uid)
+            ProfilePrefs.noteUserActivity(context, uid)
         }
-        val schemaVersion = migrateArchiveSchemaVersion(storedSchemaVersion)
-        editor
-            .putInt(KEY_ARCHIVE_SCHEMA_MAJOR, schemaVersion.major)
-            .putInt(KEY_ARCHIVE_SCHEMA_MINOR, schemaVersion.minor)
-            .putInt(KEY_ARCHIVE_SCHEMA_PATCH, schemaVersion.patch)
-            .remove(KEY_LEGACY_ARCHIVE_SCHEMA_VERSION)
-        val installedVersion = appVersion(context)
-        if (sp.getString(KEY_ARCHIVE_APP_VERSION, "") != installedVersion) {
-            editor.putString(KEY_ARCHIVE_APP_VERSION, installedVersion)
-        }
-        editor.apply()
+        saved
+    }
+
+    fun delete() = synchronized(lock) {
+        archiveFile.delete()
+        File(archiveFile.parentFile, "${archiveFile.name}.bak").delete()
+        File(archiveFile.parentFile, "${archiveFile.name}.new").delete()
+    }
+
+    private fun readArchive(): Map<String, Any>? = runCatching {
+        val raw = archiveFile.readText(Charsets.UTF_8)
+        val archive = json.decodeDomain(
+            raw,
+            DOMAIN_ID,
+            UserPreferencesArchive.serializer(),
+        )
+        val values = archive.values.mapValues { (_, value) -> decode(value) }.toSortedMap()
+        values
+    }.getOrNull()
+
+    private fun encode(value: Any): UserPreferenceValue = when (value) {
+        is Boolean -> UserPreferenceValue(UserPreferenceType.BOOLEAN, boolean = value)
+        is Int -> UserPreferenceValue(UserPreferenceType.INT, int = value)
+        is Long -> UserPreferenceValue(UserPreferenceType.LONG, long = value)
+        is Float -> UserPreferenceValue(UserPreferenceType.FLOAT, float = value)
+        is String -> UserPreferenceValue(UserPreferenceType.STRING, string = value)
+        is Set<*> -> UserPreferenceValue(
+            UserPreferenceType.STRING_SET,
+            strings = value.filterIsInstance<String>().sorted(),
+        )
+        else -> error("Unsupported preference value")
+    }
+
+    private fun decode(value: UserPreferenceValue): Any = when (value.type) {
+        UserPreferenceType.BOOLEAN -> requireNotNull(value.boolean)
+        UserPreferenceType.INT -> requireNotNull(value.int)
+        UserPreferenceType.LONG -> requireNotNull(value.long)
+        UserPreferenceType.FLOAT -> requireNotNull(value.float).also { require(it.isFinite()) }
+        UserPreferenceType.STRING -> requireNotNull(value.string)
+        UserPreferenceType.STRING_SET -> requireNotNull(value.strings).also { require(it.size == it.toSet().size) }.toSet()
+    }
+
+    private val archiveFile: File
+        get() = File(context.filesDir, "user_archives/${safeUid(uid)}/user_preferences.json")
+    private val lock: Any
+        get() = locks.getOrPut(archiveFile.absolutePath) { Any() }
+
+    private companion object {
+        const val DOMAIN_ID = "user_preferences"
+        val locks = ConcurrentHashMap<String, Any>()
+        val json = Json { encodeDefaults = false; explicitNulls = false; ignoreUnknownKeys = false }
+
+        fun safeUid(uid: String): String = uid.replace(Regex("[^A-Za-z0-9_-]"), "_")
     }
 }

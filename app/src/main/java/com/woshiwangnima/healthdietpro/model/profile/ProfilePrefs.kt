@@ -9,17 +9,18 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
 import com.woshiwangnima.healthdietpro.model.archive.ArchiveSchemaVersion
+import com.woshiwangnima.healthdietpro.model.archive.UserProfileArchiveStore
 import com.woshiwangnima.healthdietpro.model.archive.appVersion
-import com.woshiwangnima.healthdietpro.model.archive.archiveSchemaVersionFromLegacy
-import com.woshiwangnima.healthdietpro.model.archive.migrateArchiveSchemaVersion
+import com.woshiwangnima.healthdietpro.model.archive.migrateAvatarReference
+import com.woshiwangnima.healthdietpro.model.archive.deleteAvatarReference
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import java.io.File
 import java.lang.reflect.Type
 
 object ProfilePrefs {
     private const val PREFS_NAME = "health_diet_prefs"
-    private const val KEY_LEGACY_PROFILE = "user_profile"
-    private const val KEY_ALL_USERS = "all_users"
+    private const val KEY_USER_ARCHIVE_IDS = "user_archive_ids_v1"
+    private const val KEY_USER_METADATA_INDEX = "user_metadata_index_v1"
     private const val KEY_CURRENT_USER_ID = "current_user_id"
     private val profileGson = GsonBuilder()
         .registerTypeAdapter(
@@ -40,13 +41,13 @@ object ProfilePrefs {
                     typeOfTarget: Type,
                     context: JsonDeserializationContext,
                 ): ArchiveSchemaVersion = when {
-                    source.isJsonPrimitive -> archiveSchemaVersionFromLegacy(source.asInt)
+                    source.isJsonPrimitive -> error("Archive schema version must be an object")
                     source.isJsonObject -> ArchiveSchemaVersion(
                         major = source.asJsonObject.get("major")?.asInt ?: 0,
                         minor = source.asJsonObject.get("minor")?.asInt ?: 0,
                         patch = source.asJsonObject.get("patch")?.asInt ?: 0,
                     )
-                    else -> ArchiveSchemaVersion.Unversioned
+                    else -> error("Invalid archive schema version")
                 }
             },
         )
@@ -55,132 +56,104 @@ object ProfilePrefs {
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    private fun ensureMigrated(context: Context) {
-        val p = prefs(context)
-        if (p.contains(KEY_ALL_USERS)) {
-            // 二次迁移：把老版本里仅存的 `province: String`（省名或 2 位代码）
-            // 在 load 时封装成 RegionSnapshot。这里只触发一次：探测首条用户
-            // 数据中是否还有遗留的 'province' 字段。
-            migrateLegacyProvinceField(context)
-            migrateArchiveSchema(context)
-            return
-        }
-        val legacyJson = p.getString(KEY_LEGACY_PROFILE, null) ?: return
-        try {
-            val legacy: UserProfile = profileGson.fromJson(legacyJson, UserProfile::class.java)
-            val migrated = legacy.copy(id = "default")
-            saveUserMap(context, listOf(migrated))
-            setCurrentUserId(context, "default")
-            p.edit().remove(KEY_LEGACY_PROFILE).apply()
-        } catch (_: Exception) {}
-    }
-
-    private fun migrateArchiveSchema(context: Context) {
-        val users = readUsersWithoutMigration(context)
-        if (users.isEmpty()) return
-        val migratedUsers = users.map { migrateArchiveChain(it, context) }
-        if (migratedUsers != users) saveUserMap(context, migratedUsers)
-    }
-
-    private fun migrateArchiveChain(user: UserProfile, context: Context): UserProfile {
-        var migrated = user
-        val schemaVersion = migrateArchiveSchemaVersion(migrated.archiveSchemaVersion)
-        if (migrated.archiveSchemaVersion == null || migrated.archiveSchemaVersion < ArchiveSchemaVersion.BodyRecordDateTime) {
-            migrated = migrated.copy(
-                heightRecords = migrated.heightRecords.map(::migrateBodyRecordDateTime),
-                weightRecords = migrated.weightRecords.map(::migrateBodyRecordDateTime),
-                circumferenceRecords = migrated.circumferenceRecords.mapValues { (_, records) ->
-                    records.map(::migrateBodyRecordDateTime)
-                },
-            )
-        }
-        if (migrated.archiveSchemaVersion != schemaVersion) {
-            migrated = migrated.copy(archiveSchemaVersion = schemaVersion)
-        }
-        val installedVersion = appVersion(context)
-        if (migrated.archiveAppVersion != installedVersion) {
-            migrated = migrated.copy(archiveAppVersion = installedVersion)
-        }
-        return migrated
-    }
-
-    /**
-     * 二次：旧版本 UserProfile 在 SharedPreferences 里以 `province: String`
-     * 存储省名/省代码；新版本直接用 RegionSnapshot。这里是迁移的进入点：
-     * 读原始 JSON 把 `province` 字段抽出，构造 RegionSnapshot，再写回。
-     */
-    private var legacyMigrationDone = false
-    private fun migrateLegacyProvinceField(context: Context) {
-        if (legacyMigrationDone) return
-        val raw = prefs(context).getString(KEY_ALL_USERS, null) ?: run {
-            legacyMigrationDone = true; return
-        }
-        if (!raw.contains("\"province\"")) {
-            legacyMigrationDone = true; return
-        }
-        try {
-            // 把每条 user JSON 中的 province 字段拼到 region.provinceCode 上，
-            // 同时移除老旧 province 顶层键。
-            val arr = com.google.gson.JsonParser.parseString(raw).asJsonArray
-            for (i in 0 until arr.size()) {
-                val obj = arr[i].asJsonObject
-                if (obj.has("province")) {
-                    val prov = obj.get("province").asString ?: ""
-                    obj.remove("province")
-                    val region = obj.getAsJsonObject("region") ?: com.google.gson.JsonObject().also { obj.add("region", it) }
-                    val code = normalizeProvinceCode(prov)
-                    if (code.isNotEmpty()) {
-                        region.addProperty("provinceCode", code)
-                    }
-                }
-            }
-            prefs(context).edit().putString(KEY_ALL_USERS, arr.toString()).apply()
-        } catch (_: Exception) {}
-        legacyMigrationDone = true
-    }
-
-    /** 把任意旧 province 值（中文省名 / 2 位码 / 空）统一成 2 位码。 */
-    private fun normalizeProvinceCode(stored: String?): String {
-        if (stored.isNullOrEmpty()) return ""
-        if (stored.length == 2 && stored.all { it.isDigit() }) return stored
-        val map = mapOf(
-            "北京" to "11", "天津" to "12", "河北省" to "13", "山西省" to "14", "内蒙古" to "15",
-            "辽宁省" to "21", "吉林省" to "22", "黑龙江省" to "23", "上海" to "31", "江苏省" to "32",
-            "浙江省" to "33", "安徽省" to "34", "福建省" to "35", "江西省" to "36", "山东省" to "37",
-            "河南省" to "41", "湖北省" to "42", "湖南省" to "43", "广东省" to "44", "广西" to "45",
-            "海南省" to "46", "重庆" to "50", "四川省" to "51", "贵州省" to "52", "云南省" to "53",
-            "西藏" to "54", "陕西省" to "61", "甘肃省" to "62", "青海省" to "63", "宁夏" to "64",
-            "新疆" to "65", "台湾省" to "71", "香港" to "81", "澳门" to "82"
-        )
-        return map[stored] ?: ""
-    }
+    private fun archiveStore(context: Context) = UserProfileArchiveStore(context.applicationContext)
 
     private fun loadUserMap(context: Context): List<UserProfile> {
-        ensureMigrated(context)
         return readUsersWithoutMigration(context)
     }
 
-    private fun readUsersWithoutMigration(context: Context): List<UserProfile> {
-        val json = prefs(context).getString(KEY_ALL_USERS, null) ?: return emptyList()
-        return try {
-            val type = object : TypeToken<List<UserProfile>>() {}.type
-            profileGson.fromJson(json, type) ?: emptyList()
-        } catch (_: Exception) {
-            emptyList()
+    private fun readUserMetadata(context: Context): List<UserMetadata> {
+        val raw = prefs(context).getString(KEY_USER_METADATA_INDEX, null) ?: return emptyList()
+        val type = object : TypeToken<List<UserMetadata>>() {}.type
+        val parsed = runCatching { profileGson.fromJson<List<UserMetadata>>(raw, type) }
+            .getOrNull()
+            .orEmpty()
+            .filter { it.id.isNotBlank() }
+        val normalized = parsed.distinctBy(UserMetadata::id).map { metadata ->
+            val fallbackTime = metadata.updatedAtMillis.takeIf { it > 0L } ?: System.currentTimeMillis()
+            metadata.copy(
+                createdAtMillis = metadata.createdAtMillis.takeIf { it > 0L } ?: fallbackTime,
+                lastActiveAtMillis = metadata.lastActiveAtMillis.takeIf { it > 0L } ?: fallbackTime,
+                updatedAtMillis = fallbackTime,
+            )
         }
+        if (normalized != parsed) saveUserMetadata(context, normalized)
+        return normalized
+    }
+
+    private fun saveUserMetadata(context: Context, users: List<UserMetadata>) {
+        prefs(context).edit().putString(KEY_USER_METADATA_INDEX, profileGson.toJson(users)).apply()
+    }
+
+    private fun readUsersWithoutMigration(context: Context): List<UserProfile> {
+        return prefs(context).getStringSet(KEY_USER_ARCHIVE_IDS, emptySet())
+            .orEmpty()
+            .sorted()
+            .mapNotNull { id -> readArchiveUser(context, id) }
+    }
+
+    private fun readArchiveUser(context: Context, userId: String): UserProfile? = runCatching {
+        archiveStore(context).load(userId)
+            ?.let { profileGson.fromJson(it, UserProfile::class.java) }
+            ?.takeIf { it.id == userId }
+    }.getOrNull()
+
+    private fun writeArchiveUser(context: Context, user: UserProfile): UserProfile {
+        val normalized = user.copy(
+            avatarFileName = migrateAvatarReference(context, user.id, user.avatarFileName),
+            heightRecords = emptyList(),
+            weightRecords = emptyList(),
+            circumferenceRecords = emptyMap(),
+        )
+        archiveStore(context).save(normalized.id, profileGson.toJson(normalized))
+        return normalized
+    }
+
+    /** Rebuilds missing public index entries from profile archives without reading any domain data. */
+    private fun repairUserMetadataIndex(context: Context) {
+        val archiveIds = prefs(context).getStringSet(KEY_USER_ARCHIVE_IDS, emptySet()).orEmpty()
+        val existing = readUserMetadata(context).associateBy(UserMetadata::id)
+        val repaired = archiveIds.mapNotNull { userId ->
+            val profile = readArchiveUser(context, userId) ?: return@mapNotNull existing[userId]
+            val prior = existing[userId]
+            val fallbackTime = prior?.updatedAtMillis ?: System.currentTimeMillis()
+            profile.toMetadata(
+                createdAtMillis = prior?.createdAtMillis ?: fallbackTime,
+                lastActiveAtMillis = prior?.lastActiveAtMillis ?: fallbackTime,
+                updatedAtMillis = prior?.updatedAtMillis ?: fallbackTime,
+            )
+        }
+        if (repaired.associateBy(UserMetadata::id) != existing) saveUserMetadata(context, repaired)
     }
 
     private fun saveUserMap(context: Context, users: List<UserProfile>) {
-        prefs(context).edit().putString(KEY_ALL_USERS, profileGson.toJson(users)).apply()
+        val normalizedUsers = users.map { writeArchiveUser(context, it) }
+        prefs(context).edit().putStringSet(KEY_USER_ARCHIVE_IDS, normalizedUsers.map { it.id }.toSet()).apply()
+        val existing = readUserMetadata(context).associateBy(UserMetadata::id)
+        val now = System.currentTimeMillis()
+        saveUserMetadata(context, normalizedUsers.map { user ->
+            val prior = existing[user.id]
+            user.toMetadata(
+                createdAtMillis = prior?.createdAtMillis ?: now,
+                lastActiveAtMillis = prior?.lastActiveAtMillis ?: now,
+                updatedAtMillis = prior?.updatedAtMillis ?: now,
+            )
+        })
     }
 
-    fun getAllUsers(context: Context): List<UserProfile> = loadUserMap(context)
+    fun getAllUserMetadata(context: Context): List<UserMetadata> {
+        repairUserMetadataIndex(context)
+        return readUserMetadata(context).sortedByDescending { it.updatedAtMillis }
+    }
+
+    internal fun getUserMetadata(context: Context, userId: String): UserMetadata? {
+        return readUserMetadata(context).firstOrNull { it.id == userId }
+    }
 
     fun getCurrentUserId(context: Context): String {
-        ensureMigrated(context)
         val id = prefs(context).getString(KEY_CURRENT_USER_ID, null)
         if (!id.isNullOrEmpty()) return id
-        val users = loadUserMap(context)
+        val users = getAllUserMetadata(context)
         if (users.isNotEmpty()) {
             setCurrentUserId(context, users.first().id)
             return users.first().id
@@ -194,21 +167,77 @@ object ProfilePrefs {
     }
 
     fun setCurrentUserId(context: Context, id: String) {
+        val users = readUserMetadata(context)
+        require(id.isEmpty() || users.any { it.id == id }) { "Unknown user id" }
+        updateUserActivity(context, id, users, force = true)
         prefs(context).edit().putString(KEY_CURRENT_USER_ID, id).apply()
     }
 
+    /** Records user activity without loading a profile or any domain archive. */
+    fun noteCurrentUserActivity(context: Context) {
+        val userId = prefs(context).getString(KEY_CURRENT_USER_ID, null).orEmpty()
+        if (userId.isNotEmpty()) noteUserActivity(context, userId)
+    }
+
+    /** Records a cold application open even when the prior activity was within the write window. */
+    fun noteApplicationOpened(context: Context) {
+        val userId = prefs(context).getString(KEY_CURRENT_USER_ID, null).orEmpty()
+        if (userId.isNotEmpty()) {
+            updateUserActivity(context, userId, readUserMetadata(context), force = true)
+        }
+    }
+
+    /** Records activity only when the saved domain belongs to the current user. */
+    fun noteUserActivity(context: Context, userId: String) {
+        if (userId.isBlank() || prefs(context).getString(KEY_CURRENT_USER_ID, null) != userId) return
+        updateUserActivity(context, userId, readUserMetadata(context), force = false)
+    }
+
+    private fun updateUserActivity(
+        context: Context,
+        userId: String,
+        users: List<UserMetadata>,
+        force: Boolean,
+    ) {
+        val now = System.currentTimeMillis()
+        val updated = users.map { metadata ->
+            if (metadata.id == userId && (force || now - metadata.lastActiveAtMillis >= ACTIVITY_WRITE_INTERVAL_MILLIS)) {
+                metadata.copy(lastActiveAtMillis = now)
+            } else {
+                metadata
+            }
+        }
+        if (updated != users) saveUserMetadata(context, updated)
+    }
+
     fun getProfile(context: Context, userId: String): UserProfile? {
-        return loadUserMap(context).find { it.id == userId }
+        return readArchiveUser(context, userId)
     }
 
     fun save(context: Context, profile: UserProfile) {
-        val upgraded = migrateArchiveChain(profile, context)
-        val withId = if (upgraded.id.isEmpty()) upgraded.copy(id = genId()) else upgraded
-        val users = loadUserMap(context).toMutableList()
-        val idx = users.indexOfFirst { it.id == withId.id }
-        if (idx >= 0) users[idx] = withId else users.add(withId)
-        saveUserMap(context, users)
-        setCurrentUserId(context, withId.id)
+        val withId = if (profile.id.isEmpty()) profile.copy(id = genId()) else profile
+        val profileOnly = withId.copy(
+            heightRecords = emptyList(),
+            weightRecords = emptyList(),
+            circumferenceRecords = emptyMap(),
+        )
+        val savedProfile = writeArchiveUser(context, profileOnly)
+        val existingMetadata = readUserMetadata(context).firstOrNull { it.id == savedProfile.id }
+        val now = System.currentTimeMillis()
+        val publicProfileChanged = existingMetadata?.let { existing ->
+            existing.name != savedProfile.name ||
+                existing.gender != savedProfile.gender ||
+                existing.avatarFileName != savedProfile.avatarFileName
+        } ?: true
+        val metadata = readUserMetadata(context).filterNot { it.id == savedProfile.id } + savedProfile.toMetadata(
+            createdAtMillis = existingMetadata?.createdAtMillis ?: now,
+            lastActiveAtMillis = existingMetadata?.lastActiveAtMillis ?: now,
+            updatedAtMillis = if (publicProfileChanged) now else existingMetadata?.updatedAtMillis ?: now,
+        )
+        saveUserMetadata(context, metadata)
+        val archiveIds = prefs(context).getStringSet(KEY_USER_ARCHIVE_IDS, emptySet()).orEmpty() + savedProfile.id
+        prefs(context).edit().putStringSet(KEY_USER_ARCHIVE_IDS, archiveIds).apply()
+        setCurrentUserId(context, savedProfile.id)
     }
 
     /**
@@ -216,12 +245,12 @@ object ProfilePrefs {
      * Gson 仅保留在这个历史存储边界内，新归档模块不直接依赖 Gson。
      */
     internal fun exportCurrentUserJson(context: Context): String =
-        profileGson.toJson(migrateArchiveChain(load(context), context))
+        profileGson.toJson(load(context))
 
     /** 解析并升级归档中的用户资料，供完整校验通过后再替换当前用户使用。 */
     internal fun parseArchiveProfile(context: Context, rawJson: String): UserProfile? = try {
         profileGson.fromJson(rawJson, UserProfile::class.java)
-            ?.let { migrateArchiveChain(it, context) }
+            ?.copy(archiveSchemaVersion = ArchiveSchemaVersion.Current)
     } catch (_: Exception) {
         null
     }
@@ -233,99 +262,69 @@ object ProfilePrefs {
     internal fun replaceCurrentUserFromArchive(context: Context, profile: UserProfile): String {
         val currentUser = getProfile(context, getCurrentUserId(context))
         val targetUserId = currentUser?.id ?: profile.id.ifEmpty { genId() }
-        val replacement = migrateArchiveChain(profile.copy(id = targetUserId), context)
+        val replacement = profile.copy(id = targetUserId, archiveSchemaVersion = ArchiveSchemaVersion.Current)
         save(context, replacement)
         if (
             currentUser != null &&
             currentUser.avatarFileName.isNotEmpty() &&
             currentUser.avatarFileName != replacement.avatarFileName
         ) {
-            File(context.filesDir, "avatars/${currentUser.avatarFileName}").delete()
+            deleteAvatarReference(context, targetUserId, currentUser.avatarFileName)
         }
         return targetUserId
     }
 
-    internal fun snapshotLegacyUserPreferences(context: Context, userId: String): Map<String, Map<String, Any>> {
-        val suffix = "_${userId}"
-        return legacyPreferenceFiles.mapNotNull { fileName ->
-            val values = context.getSharedPreferences(fileName, Context.MODE_PRIVATE).all
-                .mapNotNull { (key, value) ->
-                    key.takeIf { it.endsWith(suffix) }
-                        ?.removeSuffix(suffix)
-                        ?.let { baseKey -> value?.let { baseKey to it } }
-                }
-                .toMap()
-            fileName.takeIf { values.isNotEmpty() }?.let { it to values }
-        }.toMap()
-    }
-
-    internal fun replaceLegacyUserPreferences(
-        context: Context,
-        userId: String,
-        valuesByFile: Map<String, Map<String, Any>>,
-    ): Boolean {
-        val suffix = "_${userId}"
-        return legacyPreferenceFiles.all { fileName ->
-            val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
-            val editor = preferences.edit()
-            preferences.all.keys.filter { it.endsWith(suffix) }.forEach(editor::remove)
-            valuesByFile[fileName].orEmpty().forEach { (baseKey, value) ->
-                when (value) {
-                    is Boolean -> editor.putBoolean(baseKey + suffix, value)
-                    is Int -> editor.putInt(baseKey + suffix, value)
-                    is Long -> editor.putLong(baseKey + suffix, value)
-                    is Float -> editor.putFloat(baseKey + suffix, value)
-                    is String -> editor.putString(baseKey + suffix, value)
-                    is Set<*> -> @Suppress("UNCHECKED_CAST") editor.putStringSet(baseKey + suffix, value as Set<String>)
-                }
-            }
-            editor.commit()
-        }
-    }
-
 fun load(context: Context): UserProfile {
         val current = getProfile(context, getCurrentUserId(context))
+        val metrics = BodyMetricsRepository.current(context).load()
         return UserProfile(
             id = current?.id ?: "",
-            archiveSchemaVersion = migrateArchiveSchemaVersion(current?.archiveSchemaVersion),
+            archiveSchemaVersion = ArchiveSchemaVersion.Current,
             archiveAppVersion = current?.archiveAppVersion ?: appVersion(context),
             name = current?.name.orEmpty(),
             gender = current?.gender ?: Gender.MALE,
             birthday = current?.birthday,
             region = current?.region ?: com.woshiwangnima.healthdietpro.model.region.RegionSnapshot(),
             diseaseIds = current?.diseaseIds.orEmpty(),
-            heightRecords = current?.heightRecords.orEmpty().map { fixUnit(it, false) },
-            weightRecords = current?.weightRecords.orEmpty().map { fixUnit(it, true) },
-            circumferenceRecords = current?.circumferenceRecords.orEmpty().mapValues { (_, records) -> records.map { fixUnit(it, false) } },
+            heightRecords = metrics.heightRecords.map { fixUnit(it, false) },
+            weightRecords = metrics.weightRecords.map { fixUnit(it, true) },
+            circumferenceRecords = metrics.circumferenceRecords.mapValues { (_, records) -> records.map { fixUnit(it, false) } },
             avatarFileName = current?.avatarFileName ?: ""
         )
     }
 
     fun deleteUser(context: Context, id: String) {
-        // Clean up per-user data before removing from list
+        require(id.isNotBlank())
         val user = getProfile(context, id)
-        val users = loadUserMap(context).filter { it.id != id }
-        saveUserMap(context, users)
+        val metadata = readUserMetadata(context).filterNot { it.id == id }
+        saveUserMetadata(context, metadata)
+        val archiveIds = prefs(context).getStringSet(KEY_USER_ARCHIVE_IDS, emptySet()).orEmpty() - id
+        prefs(context).edit().putStringSet(KEY_USER_ARCHIVE_IDS, archiveIds).apply()
         if (getCurrentUserId(context) == id) {
-            val next = users.firstOrNull()
+            val next = metadata.maxByOrNull { it.lastActiveAtMillis }
             setCurrentUserId(context, next?.id ?: "")
         }
-        if (user != null) {
-            cleanupPerUserData(context, user)
-        }
+        removeUserStorage(context, id, user?.avatarFileName.orEmpty())
     }
 
-    fun cleanupPerUserData(context: Context, user: UserProfile) {
-        // Delete avatar file
-        if (user.avatarFileName.isNotEmpty()) {
-            File(context.filesDir, "avatars/${user.avatarFileName}").delete()
+    private fun removeUserStorage(context: Context, userId: String, avatarFileName: String) {
+        archiveStore(context).delete(userId)
+        File(context.filesDir, "user_archives/${userId.replace(Regex("[^A-Za-z0-9_-]"), "_")}").deleteRecursively()
+        cleanupPerUserData(context, userId, avatarFileName)
+    }
+
+
+    private fun cleanupPerUserData(context: Context, userId: String, avatarFileName: String) {
+        if (avatarFileName.isNotEmpty()) {
+            deleteAvatarReference(context, userId, avatarFileName)
         }
         // Custom food cover images are stored in a user-scoped private directory.
-        File(context.filesDir, "food_images/${user.id}").deleteRecursively()
+        File(context.filesDir, "food_images/$userId").deleteRecursively()
         // Delete per-user settings file (user_prefs_<uid>)
-        com.woshiwangnima.healthdietpro.model.prefs.UserPrefs.deleteUserFile(context, user.id)
+        com.woshiwangnima.healthdietpro.model.prefs.UserPrefs.deleteUserFile(context, userId)
+        deleteLegacyUserPreferenceBackups(context, userId)
         // Delete per-user chart/medication prefs (keys ending _${userId}) in both legacy files
-        val suffix = "_${user.id}"
+        val suffix = "_$userId"
         for (file in listOf("health_diet_prefs", "app_prefs")) {
             val sp = context.getSharedPreferences(file, Context.MODE_PRIVATE)
             val editor = sp.edit()
@@ -336,11 +335,22 @@ fun load(context: Context): UserProfile {
         }
     }
 
+    private fun deleteLegacyUserPreferenceBackups(context: Context, userId: String) {
+        val baseName = "user_prefs_${userId}.xml"
+        val sharedPrefsDirectory = File(context.applicationInfo.dataDir, "shared_prefs")
+        sharedPrefsDirectory.listFiles()
+            .orEmpty()
+            .filter { file -> file.name == baseName || file.name.startsWith("$baseName.") }
+            .forEach(File::delete)
+    }
+
     fun createDefaultIfEmpty(context: Context): UserProfile {
-        val users = loadUserMap(context)
+        val users = getAllUserMetadata(context)
         if (users.isNotEmpty()) {
             val currentUserId = getCurrentUserId(context)
-            return users.firstOrNull { it.id == currentUserId } ?: users.first()
+            return getProfile(context, currentUserId)
+                ?: getProfile(context, users.first().id)
+                ?: error("User metadata has no matching archive")
         }
         val profile = load(context).copy(id = genId())
         save(context, profile)
@@ -349,12 +359,12 @@ fun load(context: Context): UserProfile {
 
     private fun genId(): String = (System.currentTimeMillis() xor Math.random().toLong().and(0xFFFF)).toString()
 
+    private const val ACTIVITY_WRITE_INTERVAL_MILLIS = 5 * 60 * 1000L
+
     private fun fixUnit(record: BodyRecord, isWeight: Boolean): BodyRecord {
         val u = record.unit
         if (u != null && u.isNotEmpty()) return record
         return record.copy(unit = if (isWeight) UnitCategoryType.Weight.defaultUnitId else UnitCategoryType.Length.defaultUnitId)
     }
-
-    private val legacyPreferenceFiles = listOf("health_diet_prefs", "app_prefs")
 
 }

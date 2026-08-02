@@ -76,7 +76,6 @@ import com.woshiwangnima.healthdietpro.util.image.WatermarkUtil
 import com.woshiwangnima.healthdietpro.util.location.CurrentLocationProvider
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.io.File
-import java.io.FileOutputStream
 
 class MedicationRecordActivity : DirtyFormActivity() {
 
@@ -211,7 +210,7 @@ class MedicationRecordActivity : DirtyFormActivity() {
     }
 
     private fun launchCamera() {
-        val dir = File(filesDir, "medication_photos").apply { if (!exists()) mkdirs() }
+        val dir = File(cacheDir, "medication_camera").apply { if (!exists()) mkdirs() }
         val tmpFile = File(dir, "camera_${System.currentTimeMillis()}.jpg")
         pendingCameraUri = FileProvider.getUriForFile(
             this,
@@ -262,26 +261,20 @@ class MedicationRecordActivity : DirtyFormActivity() {
 
     private fun saveAndPreview(bitmap: Bitmap) {
         if (formState.photoBitmaps.any { it.sameAs(bitmap) }) return
-        val dir = File(filesDir, "medication_photos").apply { if (!exists()) mkdirs() }
-        val fileName = "med_${System.currentTimeMillis()}.jpg"
-        val file = File(dir, fileName)
-        FileOutputStream(file).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
-        }
+        val path = MedicationPrefs.saveRecordPhoto(this, bitmap)
         formState = formState.copy(
-            photoFileNames = formState.photoFileNames + "medication_photos/$fileName",
+            photoFileNames = formState.photoFileNames + path,
             photoBitmaps = formState.photoBitmaps + bitmap,
         )
     }
 
     private fun loadBitmap(relativePath: String): Bitmap? {
-        val file = File(filesDir, relativePath)
-        return if (file.exists()) BitmapFactory.decodeFile(file.absolutePath) else null
+        return MedicationPrefs.loadAttachment(this, relativePath)
     }
 
     private fun removePhoto(index: Int) {
         val path = formState.photoFileNames.getOrNull(index) ?: return
-        File(filesDir, path).delete()
+        MedicationPrefs.deleteAttachment(this, path)
         formState = formState.copy(
             photoFileNames = formState.photoFileNames.filterIndexed { i, _ -> i != index },
             photoBitmaps = formState.photoBitmaps.filterIndexed { i, _ -> i != index },

@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
+import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 
 @Composable
 internal fun ProfileUserInfoCard(
@@ -58,21 +59,13 @@ internal fun ProfileUserInfoCard(
                 verticalArrangement = Arrangement.Center,
             ) {
                 ProfileAvatar(state = state)
-                IconButton(
+                AppIconTextButton(
+                    text = stringResource(R.string.profile_switch_user),
+                    iconRes = R.drawable.ic_switch_user,
                     onClick = onSwitchUser,
                     modifier = Modifier
-                        .width(44.dp)
-                        .height(32.dp),
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_switch_user),
-                        contentDescription = stringResource(R.string.profile_switch_user),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier
-                            .width(30.dp)
-                            .height(24.dp),
-                    )
-                }
+                        .height(36.dp),
+                )
             }
 
             Spacer(Modifier.width(14.dp))
