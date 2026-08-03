@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -51,10 +52,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
@@ -87,8 +94,13 @@ import com.woshiwangnima.healthdietpro.model.food.PreparedFood
 import com.woshiwangnima.healthdietpro.model.food.ResolvedNutrition
 import com.woshiwangnima.healthdietpro.model.food.classifyGlycemicIndex
 import com.woshiwangnima.healthdietpro.model.food.classifyGlycemicLoad
+import com.woshiwangnima.healthdietpro.model.food.glycemicLevel
 import com.woshiwangnima.healthdietpro.model.food.glycemicIndexClassificationBands
 import com.woshiwangnima.healthdietpro.model.food.glycemicLoadClassificationBands
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 private fun FoodItem.categoryTagsOrEmpty(): List<String> = (this as? CategorizedFood)?.categoryTags.orEmpty()
 
@@ -145,12 +157,57 @@ private fun FoodKind.nameColors(): Pair<androidx.compose.ui.graphics.Color, andr
 }
 
 @Composable
+private fun systemTagPresentation(tag: String): Pair<String, androidx.compose.ui.graphics.Color> = when (tag) {
+    "common" -> stringResource(R.string.nutrition_tag_common) to androidx.compose.ui.graphics.Color(0xFF2E7D32)
+    "favorite" -> stringResource(R.string.nutrition_tag_favorite) to androidx.compose.ui.graphics.Color(0xFFC62828)
+    "recent" -> stringResource(R.string.nutrition_tag_recent) to androidx.compose.ui.graphics.Color(0xFF1565C0)
+    else -> tag to androidx.compose.ui.graphics.Color(0xFF6A1B9A)
+}
+
+@Composable
+private fun FoodImageWithSystemTags(
+    food: FoodItem,
+    image: ImageBitmap,
+    isFavorite: Boolean,
+    isRecent: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val tags = buildList {
+        addAll(food.systemTags)
+        if (isFavorite) add("favorite")
+        if (isRecent) add("recent")
+    }.distinct()
+    Box(modifier = modifier) {
+        FoodImage(image, Modifier.fillMaxSize())
+        if (tags.isNotEmpty()) {
+            Row(
+                modifier = Modifier.align(Alignment.TopStart).fillMaxWidth().padding(horizontal = 1.dp, vertical = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(1.dp),
+            ) {
+                tags.forEach { tag ->
+                    val (label, color) = systemTagPresentation(tag)
+                    Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(4.dp), color = color) {
+                        TextOverflowText(text = label, modifier = Modifier.fillMaxWidth().padding(horizontal = 1.dp), style = TextStyle(fontSize = 9.sp), color = androidx.compose.ui.graphics.Color.White, maxLines = 1, textAlign = TextAlign.Center)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     when {
         state.editor != null -> NutritionEditorScreen(requireNotNull(state.editor), viewModel)
-        state.comparisonReturnTarget != null -> ComparisonPlaceholder(state.selectedFood?.kind ?: state.selectedKind, onBack = viewModel::closeComparison)
-        state.selectedFood != null -> FoodDetailScreen(requireNotNull(state.selectedFood), viewModel, viewModel::closeFood) { viewModel.openComparison(NutritionDestination.FoodDetail) }
+        state.comparisonReturnTarget != null -> FoodComparisonScreen(requireNotNull(state.selectedFood), state.foods, viewModel.nutrientMetas(), viewModel::resolvePer100g, viewModel::closeComparison)
+        state.selectedFood != null -> FoodDetailScreen(
+            food = requireNotNull(state.selectedFood),
+            isFavorite = requireNotNull(state.selectedFood).id in state.favoriteFoodIds,
+            isRecent = requireNotNull(state.selectedFood).id in state.recentFoodIds,
+            viewModel = viewModel,
+            onBack = viewModel::closeFood,
+        ) { viewModel.openComparison(NutritionDestination.FoodDetail) }
         else -> FoodBrowseScreen(state, viewModel, modifier)
     }
 }
@@ -194,7 +251,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                 if (!showSidebar) {
                     AddCustomButton(state.selectedKind, Modifier.fillMaxWidth().padding(bottom = 4.dp)) { viewModel.openEditor(state.selectedKind) }
                 }
-                TagRow(stringResource(R.string.nutrition_system_tags), listOf("common" to stringResource(R.string.nutrition_tag_common), "favorite" to stringResource(R.string.nutrition_tag_favorite), "recent" to stringResource(R.string.nutrition_tag_recent)), state.selectedSystemTag?.let(::setOf).orEmpty(), viewModel::toggleSystemTag)
+                TagRow(stringResource(R.string.nutrition_system_tags), listOf("common" to stringResource(R.string.nutrition_tag_common), "favorite" to stringResource(R.string.nutrition_tag_favorite), "recent" to stringResource(R.string.nutrition_tag_recent)), state.selectedSystemTags, viewModel::toggleSystemTag)
                 TagRow(stringResource(R.string.nutrition_user_tags), state.userTags.map { it.id to it.label }, state.selectedUserTags, viewModel::toggleUserTag, { addingTag = true })
                 if (foods.isEmpty()) Text(stringResource(R.string.nutrition_no_foods), modifier = Modifier.padding(top = 20.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 else LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { items(foods, key = { it.id }) { FoodRow(it, language, viewModel, viewModel::openFood) } }
@@ -364,7 +421,60 @@ private fun FoodNameHeader(
 }
 
 @Composable
-private fun FoodRow(food: FoodItem, language: String, viewModel: NutritionViewModel, onClick: (FoodItem) -> Unit) {
+private fun FoodCardNameHeader(
+    food: FoodItem,
+    language: String,
+    isCustom: Boolean,
+    cookingSuffix: String?,
+    modifier: Modifier = Modifier,
+) {
+    val colors = food.kind.nameColors()
+    Row(modifier = modifier, verticalAlignment = Alignment.Top) {
+        if (isCustom) {
+            Icon(
+                Icons.Filled.Edit,
+                contentDescription = stringResource(R.string.nutrition_custom_marker),
+                modifier = Modifier.size(14.dp).padding(top = 2.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.width(2.dp))
+        }
+        Surface(modifier = Modifier.fillMaxWidth(0.8f).height(28.dp), shape = RoundedCornerShape(6.dp), color = colors.first) {
+            Row(Modifier.padding(horizontal = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.weight(0.6f)) {
+                    TextOverflowText(
+                        text = food.displayName(language),
+                        modifier = Modifier.fillMaxWidth(),
+                        style = TextStyle(fontSize = FontTokens.subtitle),
+                        color = colors.second,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                cookingSuffix?.let { Text(" ($it)", style = TextStyle(fontSize = FontTokens.subtitle), color = colors.second, maxLines = 1, softWrap = false) }
+                val aliases = food.allNames(language).drop(1).joinToString(" / ")
+                if (aliases.isNotEmpty()) {
+                    TextOverflowText(
+                        text = aliases,
+                        modifier = Modifier.weight(0.4f),
+                        style = TextStyle(fontSize = FontTokens.body),
+                        color = colors.second.copy(alpha = 0.9f),
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FoodRow(
+    food: FoodItem,
+    language: String,
+    viewModel: NutritionViewModel,
+    onClick: (FoodItem) -> Unit,
+) {
     val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
     val energy = resolved?.nutrients?.get("ENERGY")?.value ?: 0.0
     val image = viewModel.foodImages.image(food.image?.localKey)
@@ -385,7 +495,6 @@ private fun FoodRow(food: FoodItem, language: String, viewModel: NutritionViewMo
             viewModel.cookingMethodFor(techniqueId)?.displayLabel(language)
         }
     }
-    val aliases = food.allNames(language).drop(1)
     val secondaryLine: String? = when (food) {
         is Dish -> stringResource(R.string.nutrition_dish_components) + ": " + food.components.size
         is PreparedFood -> food.components.takeIf { it.isNotEmpty() }?.let {
@@ -393,18 +502,26 @@ private fun FoodRow(food: FoodItem, language: String, viewModel: NutritionViewMo
         }
         else -> null
     }
+    val glycemic = glycemicLevel(
+        resolved?.healthMetrics?.glycemicIndex?.value ?: food.healthMetrics.glycemicIndex?.value,
+        resolved?.healthMetrics?.glycemicLoadPer100g?.value ?: food.healthMetrics.glycemicLoadPer100g?.value,
+    )
     var previewing by remember { mutableStateOf(false) }
     Row(modifier = Modifier.fillMaxWidth().clickable { onClick(food) }.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-        FoodImage(image, Modifier.size(64.dp).clickable { previewing = true })
+        FoodImageWithSystemTags(
+            food = food,
+            image = image,
+            isFavorite = viewModel.isFavorite(food.id),
+            isRecent = food.id in viewModel.state.value.recentFoodIds,
+            modifier = Modifier.size(64.dp).clickable { previewing = true },
+        )
         Spacer(Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
-            FoodNameHeader(
+            FoodCardNameHeader(
                 food = food,
                 language = language,
                 isCustom = viewModel.isCustom(food.id),
-                nameFontSize = FontTokens.subtitle,
                 cookingSuffix = cookingSuffix,
-                aliases = aliases,
             )
             Text(stringResource(R.string.nutrition_energy_per_100g, energy), style = MaterialTheme.typography.bodyMedium)
             secondaryLine?.let {
@@ -418,13 +535,93 @@ private fun FoodRow(food: FoodItem, language: String, viewModel: NutritionViewMo
                 )
             }
         }
+        GlycemicGlass(glycemic)
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
     if (previewing) FoodImagePreview(image, onDismiss = { previewing = false })
 }
 
 @Composable
-private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBack: () -> Unit, onCompare: () -> Unit) {
+private fun GlycemicGlass(level: com.woshiwangnima.healthdietpro.model.food.GlycemicLevel?) {
+    val color = when (level?.classification) {
+        GlycemicClassification.Low -> androidx.compose.ui.graphics.Color(0xFF2E7D32)
+        GlycemicClassification.Medium -> androidx.compose.ui.graphics.Color(0xFFF9A825)
+        GlycemicClassification.High -> androidx.compose.ui.graphics.Color(0xFFC62828)
+        null -> MaterialTheme.colorScheme.outlineVariant
+    }
+    val background = MaterialTheme.colorScheme.surfaceVariant
+    Box(Modifier.width(20.dp).height(30.dp), contentAlignment = Alignment.Center) {
+    androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+        val path = glycemicDropPath(size.width, size.height)
+        drawPath(path, color = background)
+        if (level != null) {
+            clipPath(path) {
+                drawRect(color, topLeft = androidx.compose.ui.geometry.Offset(0f, size.height * (1f - level.fillPercent)), size = androidx.compose.ui.geometry.Size(size.width, size.height * level.fillPercent))
+            }
+        }
+        drawPath(path, color = color, style = Stroke(1.5f))
+    }
+    if (level == null) Text("?", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/**
+ * Samples the requested implicit curve in polar form.
+ *
+ * (x^2 + y^2)^2 - 2x(x^2 + y^2) + 3y^2 = 0
+ * becomes r = cos(t) +/- sqrt(4cos(t)^2 - 3). The positive lobe is
+ * rotated 90 degrees so its cusp points upward in the device coordinate system.
+ */
+private fun glycemicDropPath(width: Float, height: Float): androidx.compose.ui.graphics.Path {
+    val halfAngle = PI / 6.0
+    val samples = 96
+    val mathematicalPoints = buildList {
+        fun addPolarPoint(angle: Double, outer: Boolean) {
+            val cosine = cos(angle)
+            val discriminant = (4.0 * cosine * cosine - 3.0).coerceAtLeast(0.0)
+            val radius = cosine + if (outer) sqrt(discriminant) else -sqrt(discriminant)
+            val originalX = radius * cosine
+            val originalY = radius * sin(angle)
+            // Rotate the lobe so the cusp is on the mathematical positive Y axis.
+            add(androidx.compose.ui.geometry.Offset((-originalY).toFloat(), originalX.toFloat()))
+        }
+
+        for (index in 0..samples) {
+            val angle = -halfAngle + 2.0 * halfAngle * index / samples
+            addPolarPoint(angle, outer = true)
+        }
+        for (index in samples downTo 0) {
+            val angle = -halfAngle + 2.0 * halfAngle * index / samples
+            addPolarPoint(angle, outer = false)
+        }
+    }
+    val minX = mathematicalPoints.minOf { it.x }
+    val maxX = mathematicalPoints.maxOf { it.x }
+    val minY = mathematicalPoints.minOf { it.y }
+    val maxY = mathematicalPoints.maxOf { it.y }
+    val scale = minOf(width * 0.86f / (maxX - minX), height * 0.86f / (maxY - minY))
+    val middleX = (minX + maxX) / 2f
+    val middleY = (minY + maxY) / 2f
+    val path = androidx.compose.ui.graphics.Path()
+    mathematicalPoints.forEachIndexed { index, point ->
+        val px = width / 2f + (point.x - middleX) * scale
+        // Keep the mathematical positive Y direction when mapping the droplet to the card.
+        val py = height / 2f + (point.y - middleY) * scale
+        if (index == 0) path.moveTo(px, py) else path.lineTo(px, py)
+    }
+    path.close()
+    return path
+}
+
+@Composable
+private fun FoodDetailScreen(
+    food: FoodItem,
+    isFavorite: Boolean,
+    isRecent: Boolean,
+    viewModel: NutritionViewModel,
+    onBack: () -> Unit,
+    onCompare: () -> Unit,
+) {
     val imageStore = viewModel.foodImages
     var tab by remember { mutableIntStateOf(0) }
     val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
@@ -450,7 +647,13 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
     ) { padding ->
     Column(Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
         Row(verticalAlignment = Alignment.Top) {
-            FoodImage(imageStore.image(food.image?.localKey), Modifier.size(96.dp).clickable { previewing = true })
+            FoodImageWithSystemTags(
+                food = food,
+                image = imageStore.image(food.image?.localKey),
+                isFavorite = isFavorite,
+                isRecent = isRecent,
+                modifier = Modifier.size(96.dp).clickable { previewing = true },
+            )
             Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) {
                 FoodNameHeader(
                     food = food,
@@ -473,8 +676,16 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
                     }
                 }
                 Row {
-                    IconButton(onClick = { }) { Icon(Icons.Filled.FavoriteBorder, stringResource(R.string.nutrition_favorite)) }
-                    IconButton(onClick = onCompare) { Icon(painterResource(R.drawable.ic_chart), stringResource(R.string.nutrition_compare)) }
+                    IconButton(onClick = { viewModel.toggleFavorite(food) }) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = stringResource(R.string.nutrition_favorite),
+                            tint = if (isFavorite) androidx.compose.ui.graphics.Color(0xFFC62828) else MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                        IconButton(onClick = onCompare) {
+                            Icon(painterResource(R.drawable.ic_vs), stringResource(R.string.nutrition_compare))
+                        }
                 }
             }
         }
@@ -491,6 +702,10 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
         if (tab == 0) Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
             DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_basic_information))
             KindInfoSection(food, viewModel, language, onOpenFood = { viewModel.openFood(it) })
+            if (food.sources.isNotEmpty()) {
+                DetailSectionTitle(R.drawable.ic_description, stringResource(R.string.nutrition_sources), Modifier.padding(top = 8.dp))
+                food.sources.forEach { source -> SourceLink(source.dataset, source.reference) }
+            }
             DetailSectionTitle(R.drawable.ic_chart, stringResource(R.string.nutrition_health_metrics)) {
                 IconButton(onClick = { showHealthMetricsHelp = true }) {
                     Icon(painterResource(R.drawable.ic_help), contentDescription = stringResource(R.string.nutrition_health_metrics_help))
@@ -530,15 +745,7 @@ private fun FoodDetailScreen(food: FoodItem, viewModel: NutritionViewModel, onBa
             )
             if (relatedDishes.isNotEmpty()) {
                 DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_related_dishes), Modifier.padding(top = 12.dp))
-                relatedDishes.forEach { dish ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth().clickable { viewModel.openFood(dish) }.padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(dish.displayName(language), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
+                relatedDishes.forEach { dish -> FoodNavigationLink(dish.displayName(language)) { viewModel.openFood(dish) } }
             }
         }
         else if (tab == 1 && food is Dish) {
@@ -692,14 +899,8 @@ private fun DishComponentLine(
     val amount = stringResource(R.string.nutrition_component_amount, component.quantity.value, component.quantity.unitId)
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
         if (item != null) {
-            Text(
-                item.displayName(language),
-                modifier = Modifier.weight(1f).clickable { onOpenFood(item) },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            FoodNavigationLink(item.displayName(language), Modifier.weight(1f)) { onOpenFood(item) }
             Text(amount, style = MaterialTheme.typography.bodyMedium)
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.nutrition_jump_to_ingredient), modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             Text(component.foodId, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
             Text(amount, style = MaterialTheme.typography.bodyMedium)
@@ -710,11 +911,38 @@ private fun DishComponentLine(
 /** 可跳转的来源行（食物→来源食材）。 */
 @Composable
 private fun IngredientJumpLine(label: String, value: String, onClick: () -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.width(8.dp))
-        Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.nutrition_jump_to_ingredient), modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        FoodNavigationLink(value, Modifier.weight(1f), onClick)
+    }
+}
+
+@Composable
+private fun FoodNavigationLink(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    TextOverflowText(
+        text = text,
+        modifier = modifier.clickable(onClick = onClick),
+        style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
+        color = MaterialTheme.colorScheme.primary,
+        maxLines = 1,
+    )
+}
+
+@Composable
+private fun SourceLink(dataset: String, reference: String) {
+    val context = LocalContext.current
+    Column(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+        TextOverflowText(dataset, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        TextOverflowText(
+            reference,
+            modifier = Modifier.clickable {
+                val query = android.net.Uri.encode("$dataset $reference")
+                context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.google.com/search?q=$query")))
+            },
+            style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
+            color = MaterialTheme.colorScheme.primary,
+        )
     }
 }
 
@@ -745,8 +973,20 @@ private fun RecipeStepRow(number: Int, step: com.woshiwangnima.healthdietpro.mod
             Spacer(Modifier.width(8.dp))
             Text(step.text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
         }
+        step.heatLevel?.let { Text(stringResource(heatLabelRes(it)), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        step.waterTemperatureC?.let { Text(stringResource(R.string.nutrition_water_temperature_value, it), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        step.oilTemperatureC?.let { Text(stringResource(R.string.nutrition_oil_temperature_value, it), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         step.minutes?.let { StepTimer(it) }
     }
+}
+
+@StringRes
+private fun heatLabelRes(id: String): Int = when (id) {
+    "low" -> R.string.nutrition_heat_low
+    "medium_low" -> R.string.nutrition_heat_medium_low
+    "medium" -> R.string.nutrition_heat_medium
+    "medium_high" -> R.string.nutrition_heat_medium_high
+    else -> R.string.nutrition_heat_high
 }
 
 @Composable
@@ -996,10 +1236,98 @@ internal fun FoodImage(image: ImageBitmap, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ComparisonPlaceholder(kind: FoodKind, onBack: () -> Unit) {
-    BaseScreen(title = stringResource(kind.comparisonTitleRes()), onBack = onBack, includeStatusBarPadding = false) { padding ->
-        Text(stringResource(R.string.nutrition_detail_placeholder), modifier = Modifier.fillMaxSize().padding(padding).padding(12.dp))
+private fun FoodComparisonScreen(
+    food: FoodItem,
+    foods: List<FoodItem>,
+    nutrientMetas: List<com.woshiwangnima.healthdietpro.model.food.NutrientMeta>,
+    resolve: (FoodItem) -> ResolvedNutrition,
+    onBack: () -> Unit,
+) {
+    var opponentId by remember(food.id) { mutableStateOf<String?>(null) }
+    var kindFilter by remember(food.id) { mutableStateOf<FoodKind?>(null) }
+    var query by remember(food.id) { mutableStateOf("") }
+    val opponents = remember(food.id, foods, kindFilter, query) {
+        foods.filter { candidate ->
+            candidate.id != food.id &&
+                (kindFilter == null || candidate.kind == kindFilter) &&
+                candidate.searchableNames().any { it.contains(query, ignoreCase = true) }
+        }
     }
+    val opponent = opponents.firstOrNull { it.id == opponentId }
+    val language = LocalConfiguration.current.locales[0]?.language ?: "en"
+    BaseScreen(title = stringResource(food.kind.comparisonTitleRes()), onBack = onBack, includeStatusBarPadding = false) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(food.displayName(language), style = MaterialTheme.typography.titleMedium)
+            EqualWidthSegmentedTabs(
+                tabs = listOf<FoodKind?>(null, FoodKind.INGREDIENT, FoodKind.FOOD, FoodKind.DISH).map { kind ->
+                    EqualWidthTab.text(if (kind == null) stringResource(R.string.nutrition_compare_all) else stringResource(kind.detailTitleRes()))
+                },
+                selectedIndex = listOf<FoodKind?>(null, FoodKind.INGREDIENT, FoodKind.FOOD, FoodKind.DISH).indexOf(kindFilter),
+                onSelected = { kindFilter = listOf<FoodKind?>(null, FoodKind.INGREDIENT, FoodKind.FOOD, FoodKind.DISH)[it] },
+            )
+            OutlinedTextField(query, { query = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, label = { Text(stringResource(R.string.nutrition_compare_search)) })
+            Text(stringResource(R.string.nutrition_compare_candidates), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            AppDataTable(
+                rows = opponents,
+                rowKey = { _, candidate -> candidate.id },
+                showRowNumber = false,
+                showPager = false,
+                modifier = Modifier.height(150.dp),
+                columns = listOf(
+                    AppDataTableColumn("name", { AppDataTableHeaderText(stringResource(R.string.nutrition_compare_target)) }, ColumnWidth.Flex(1f, 140.dp)) { candidate ->
+                        AppDataTableText(candidate.displayName(language))
+                    },
+                    AppDataTableColumn("kind", { AppDataTableHeaderText(stringResource(R.string.nutrition_compare_type)) }, ColumnWidth.Fixed(88.dp)) { candidate ->
+                        AppDataTableText(stringResource(candidate.kind.detailTitleRes()))
+                    },
+                ),
+                onRowClick = { opponentId = it.id },
+            )
+            if (opponent == null) {
+                Text(stringResource(R.string.nutrition_compare_choose_target), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                val left = runCatching { resolve(food) }.getOrNull()
+                val right = runCatching { resolve(opponent) }.getOrNull()
+                val metaByCode = nutrientMetas.associateBy { it.code }
+                val rows = (left?.nutrients?.keys.orEmpty() + right?.nutrients?.keys.orEmpty())
+                    .distinct()
+                    .filter { it in metaByCode }
+                    .sortedBy { nutrientMetas.indexOf(metaByCode.getValue(it)) }
+                    .map { code -> ComparisonRow(metaByCode.getValue(code), left?.nutrients?.get(code), right?.nutrients?.get(code)) }
+                Surface(modifier = Modifier.fillMaxWidth().weight(1f), shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) {
+                    Column(Modifier.padding(6.dp)) {
+                        Text(stringResource(R.string.nutrition_compare_results), style = MaterialTheme.typography.titleSmall)
+                        AppDataTable(
+                            rows = rows,
+                            rowKey = { _, row -> row.meta.code },
+                            showPager = false,
+                            showRowNumber = false,
+                            modifier = Modifier.weight(1f),
+                            columns = listOf(
+                                AppDataTableColumn("left", { AppDataTableHeaderText(food.displayName(language)) }, ColumnWidth.Flex(1f, 96.dp)) { ComparisonValue(it.left, it.right) },
+                                AppDataTableColumn("metric", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 96.dp)) { AppDataTableText(it.meta.displayName(language)) },
+                                AppDataTableColumn("right", { AppDataTableHeaderText(opponent.displayName(language)) }, ColumnWidth.Flex(1f, 96.dp)) { ComparisonValue(it.right, it.left) },
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private data class ComparisonRow(val meta: com.woshiwangnima.healthdietpro.model.food.NutrientMeta, val left: com.woshiwangnima.healthdietpro.model.food.FoodAmount?, val right: com.woshiwangnima.healthdietpro.model.food.FoodAmount?)
+
+@Composable
+private fun ComparisonValue(value: com.woshiwangnima.healthdietpro.model.food.FoodAmount?, other: com.woshiwangnima.healthdietpro.model.food.FoodAmount?) {
+    val isHigher = value != null && (other == null || value.value > other.value)
+    Text(
+        text = value?.let { "${it.value.formatTableValue()} ${it.unitId}" } ?: "-",
+        style = if (isHigher) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium,
+        fontWeight = if (isHigher) FontWeight.Bold else FontWeight.Normal,
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center,
+    )
 }
 
 @Composable

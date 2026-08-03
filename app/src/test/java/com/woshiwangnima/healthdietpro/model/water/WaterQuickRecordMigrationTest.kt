@@ -3,6 +3,7 @@ package com.woshiwangnima.healthdietpro.model.water
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 class WaterQuickRecordMigrationTest {
@@ -39,5 +40,37 @@ class WaterQuickRecordMigrationTest {
         assertEquals(2, archive.quickRecords.size)
         assertEquals(1, archive.quickRecords.map(WaterQuickRecord::beverageId).distinct().size)
         assertNotEquals(archive.quickRecords[0].id, archive.quickRecords[1].id)
+    }
+
+    @Test
+    fun reorderPreservesEveryPresetAndMakesFirstItemTheDefault() {
+        val quickRecords = listOf(
+            WaterQuickRecord(id = "tea-small", beverageId = "food:tea:green", volume = 250.0),
+            WaterQuickRecord(id = "water-large", beverageId = "food:water:drinking", volume = 500.0),
+            WaterQuickRecord(id = "tea-large", beverageId = "food:tea:green", volume = 450.0),
+        )
+
+        val reordered = reorderWaterQuickRecords(quickRecords, listOf("water-large", "tea-small", "tea-large"))
+
+        assertEquals("water-large", reordered.first().id)
+        assertEquals(listOf("water-large", "tea-small", "tea-large"), reordered.map(WaterQuickRecord::id))
+        assertEquals(quickRecords.toSet(), reordered.toSet())
+    }
+
+    @Test
+    fun reorderRejectsMissingDuplicateOrUnknownIds() {
+        val quickRecords = listOf(
+            WaterQuickRecord(id = "first", beverageId = "food:water:drinking"),
+            WaterQuickRecord(id = "second", beverageId = "food:tea:green"),
+        )
+
+        listOf(listOf("first"), listOf("first", "first"), listOf("first", "unknown")).forEach { ids ->
+            try {
+                reorderWaterQuickRecords(quickRecords, ids)
+                fail("Expected invalid order to be rejected")
+            } catch (_: IllegalArgumentException) {
+                // Expected: a persisted order must be a permutation of the current preset ids.
+            }
+        }
     }
 }

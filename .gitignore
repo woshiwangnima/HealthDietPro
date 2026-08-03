@@ -76,6 +76,9 @@ Thumbs.db
 
 # Opencode
 docs/
+!docs/
+docs/*
+!docs/APP_DATA_TABLE_REORDER_DESIGN.md
 
 # Hidden directories
 .*/

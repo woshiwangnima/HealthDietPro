@@ -58,6 +58,18 @@ internal fun migrateWaterArchive(archive: WaterArchive): WaterArchive {
     return archive.copy(schemaVersion = WATER_ARCHIVE_SCHEMA_VERSION, quickRecords = quickRecords)
 }
 
+internal fun reorderWaterQuickRecords(
+    quickRecords: List<WaterQuickRecord>,
+    orderedIds: List<String>,
+): List<WaterQuickRecord> {
+    val currentIds = quickRecords.map(WaterQuickRecord::id)
+    require(orderedIds.size == currentIds.size) { "Incomplete water quick record order" }
+    require(orderedIds.distinct().size == orderedIds.size) { "Duplicate water quick record id" }
+    require(orderedIds.toSet() == currentIds.toSet()) { "Unknown water quick record id" }
+    val byId = quickRecords.associateBy(WaterQuickRecord::id)
+    return orderedIds.map { requireNotNull(byId[it]) }
+}
+
 internal fun recommendedWaterMl(
     gender: Gender,
     age: Int?,

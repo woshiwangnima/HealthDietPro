@@ -28,6 +28,7 @@ import com.woshiwangnima.healthdietpro.model.food.UserFoodTag
 import com.woshiwangnima.healthdietpro.model.food.UserFoodTagRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
+import com.woshiwangnima.healthdietpro.model.prefs.UserItemCollectionRepository
 import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
@@ -46,11 +47,12 @@ internal data class NutritionUiState(
     val keyword: String = "",
     val searchHistory: List<String> = emptyList(),
     val recentFoodIds: List<String> = emptyList(),
+    val favoriteFoodIds: List<String> = emptyList(),
     val selectedKind: FoodKind = FoodKind.INGREDIENT,
     val selectedRoots: Set<String> = emptySet(),
     val customOnly: Boolean = false,
     val selectedChildren: Set<String> = emptySet(),
-    val selectedSystemTag: String? = null,
+    val selectedSystemTags: Set<String> = emptySet(),
     val userTags: List<UserFoodTag> = emptyList(),
     val selectedUserTags: Set<String> = emptySet(),
     val selectedFood: FoodItem? = null,
@@ -73,6 +75,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     private val nutrientMetaRepository = NutrientMetaRepository.fromContext(application)
     private var tagRepository = UserFoodTagRepository.fromContext(application)
     private var customRepository = UserCustomFoodRepository.fromContext(application)
+    private var foodCollections = UserItemCollectionRepository.fromContext(application, NUTRITION_FOOD_COLLECTIONS_KEY)
     val foodImages = FoodImageStore(
         context = application,
         cacheRegistry = (application as HealthDietProApplication).cacheRegistry,
@@ -103,11 +106,13 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
                 containers = loadedContainers
                 nutrientMetas = metas
                 rebuild(customs)
+                val collections = loadFoodCollections()
                 _state.value = _state.value.copy(
                     foods = foodsById.values.toList(),
                     userTags = tags,
                     searchHistory = loadSearchHistory(),
-                    recentFoodIds = loadRecentFoodIds(),
+                    recentFoodIds = collections.recentIds,
+                    favoriteFoodIds = collections.favoriteIds,
                 )
             }
         }
@@ -182,14 +187,13 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         saveSearchHistory(emptyList())
     }
     fun removeRecentFood(id: String) {
-        val recent = _state.value.recentFoodIds - id
-        _state.value = _state.value.copy(recentFoodIds = recent)
-        saveRecentFoodIds(recent)
+        updateCollections(foodCollections.removeRecent(id, foodsById.keys))
     }
     fun clearRecentFoods() {
-        _state.value = _state.value.copy(recentFoodIds = emptyList())
-        saveRecentFoodIds(emptyList())
+        updateCollections(foodCollections.clearRecents(foodsById.keys))
     }
+    fun toggleFavorite(food: FoodItem) = updateCollections(foodCollections.toggleFavorite(food.id, foodsById.keys))
+    fun isFavorite(id: String): Boolean = id in _state.value.favoriteFoodIds
     fun toggleRoot(tag: String) {
         val state = _state.value
         val selectedRoots = state.selectedRoots.toggle(tag)
@@ -216,7 +220,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     }
     fun toggleSystemTag(tag: String) {
         _state.value = _state.value.copy(
-            selectedSystemTag = if (_state.value.selectedSystemTag == tag) null else tag,
+            selectedSystemTags = _state.value.selectedSystemTags.toggle(tag),
         )
     }
     fun toggleUserTag(tag: String) { _state.value = _state.value.let { it.copy(selectedUserTags = it.selectedUserTags.toggle(tag)) } }
@@ -232,6 +236,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         userId = targetUserId
         tagRepository = UserFoodTagRepository.fromContext(getApplication())
         customRepository = UserCustomFoodRepository.fromContext(getApplication())
+        foodCollections = UserItemCollectionRepository.fromContext(getApplication(), NUTRITION_FOOD_COLLECTIONS_KEY)
         val targetRepository = tagRepository
         val targetCustom = customRepository
         viewModelScope.launch {
@@ -239,12 +244,14 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
             val customs = withContext(Dispatchers.IO) { targetCustom.load() }
             if (userId == targetUserId) {
                 rebuild(customs)
+                val collections = loadFoodCollections()
                 _state.value = _state.value.copy(
                     foods = foodsById.values.toList(),
                     userTags = tags,
                     selectedUserTags = emptySet(),
                     searchHistory = loadSearchHistory(),
-                    recentFoodIds = loadRecentFoodIds(),
+                    recentFoodIds = collections.recentIds,
+                    favoriteFoodIds = collections.favoriteIds,
                 )
             }
         }
@@ -254,10 +261,15 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         val history = if (keyword.isBlank()) _state.value.searchHistory else {
             (listOf(keyword) + _state.value.searchHistory.filterNot { it.equals(keyword, true) })
         }
-        val recent = (listOf(food.id) + _state.value.recentFoodIds.filterNot { it == food.id }).take(6)
-        _state.value = _state.value.copy(selectedFood = food, comparisonReturnTarget = null, searchHistory = history, recentFoodIds = recent)
+        val collections = foodCollections.recordRecent(food.id, foodsById.keys)
+        _state.value = _state.value.copy(
+            selectedFood = food,
+            comparisonReturnTarget = null,
+            searchHistory = history,
+            recentFoodIds = collections.recentIds,
+            favoriteFoodIds = collections.favoriteIds,
+        )
         if (keyword.isNotBlank()) saveSearchHistory(history)
-        saveRecentFoodIds(recent)
     }
     fun closeFood() { _state.value = _state.value.copy(selectedFood = null) }
     fun openComparison(from: NutritionDestination) { _state.value = _state.value.copy(comparisonReturnTarget = from) }
@@ -280,10 +292,13 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         val updated = targetCustom.upsert(dto)
         if (previousImageKey != dto.image?.localKey) deleteCustomImage(previousImageKey)
         rebuild(updated.map { it.toDomain() })
+        val collections = foodCollections.load(foodsById.keys)
         _state.value = _state.value.copy(
             foods = foodsById.values.toList(),
             editor = null,
             selectedFood = _state.value.selectedFood?.let { selected -> foodsById[selected.id] ?: selected },
+            favoriteFoodIds = collections.favoriteIds,
+            recentFoodIds = collections.recentIds,
         )
     }
 
@@ -307,10 +322,13 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         val updated = targetCustom.delete(id)
         deleteCustomImage(imageKey)
         rebuild(updated.map { it.toDomain() })
+        val collections = foodCollections.load(foodsById.keys)
         _state.value = _state.value.copy(
             foods = foodsById.values.toList(),
             editor = null,
             selectedFood = _state.value.selectedFood?.takeIf { it.id != id },
+            favoriteFoodIds = collections.favoriteIds,
+            recentFoodIds = collections.recentIds,
         )
     }
 
@@ -365,8 +383,14 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
             val categoryTags = (food as? CategorizedFood)?.categoryTags.orEmpty()
             val root = FoodCategories.hasTagWithinAny(categoryTags, state.selectedRoots)
             val child = state.selectedChildren.isEmpty() || state.selectedChildren.any { FoodCategories.hasTagWithin(categoryTags, it) }
-            val systemTag = state.selectedSystemTag != "common" ||
-                "common" in food.systemTags || food.commonness >= 4
+            val systemTag = state.selectedSystemTags.isEmpty() || state.selectedSystemTags.all { tag ->
+                when (tag) {
+                    "common" -> "common" in food.systemTags
+                    "favorite" -> food.id in state.favoriteFoodIds
+                    "recent" -> food.id in state.recentFoodIds
+                    else -> false
+                }
+            }
             val custom = !state.customOnly || isCustom(food.id)
             searchable.contains(state.keyword.lowercase()) && root && child && systemTag && custom
         }
@@ -376,17 +400,25 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     private fun loadSearchHistory(): List<String> = deserializeSearchHistory(
         UserPrefs.current(getApplication()).getString(NUTRITION_SEARCH_HISTORY_KEY, "[]"),
     )
-    private fun loadRecentFoodIds(): List<String> = deserializeSearchHistory(
-        UserPrefs.current(getApplication()).getString(NUTRITION_RECENT_FOODS_KEY, "[]"),
-    ).filter { it in foodsById }
     private fun saveSearchHistory(history: List<String>) {
         UserPrefs.current(getApplication()).putString(NUTRITION_SEARCH_HISTORY_KEY, serializeSearchHistory(history))
     }
-    private fun saveRecentFoodIds(ids: List<String>) {
-        UserPrefs.current(getApplication()).putString(NUTRITION_RECENT_FOODS_KEY, serializeSearchHistory(ids))
+    private fun updateCollections(collections: com.woshiwangnima.healthdietpro.model.prefs.UserItemCollectionState) {
+        _state.value = _state.value.copy(
+            favoriteFoodIds = collections.favoriteIds,
+            recentFoodIds = collections.recentIds,
+        )
+    }
+    private fun loadFoodCollections(): com.woshiwangnima.healthdietpro.model.prefs.UserItemCollectionState {
+        val prefs = UserPrefs.current(getApplication())
+        val legacyRecentIds = deserializeSearchHistory(prefs.getString(NUTRITION_RECENT_FOODS_KEY, "[]"))
+        val collections = foodCollections.load(foodsById.keys, legacyRecentIds)
+        if (prefs.contains(NUTRITION_RECENT_FOODS_KEY)) prefs.remove(NUTRITION_RECENT_FOODS_KEY)
+        return collections
     }
     private companion object {
         const val NUTRITION_SEARCH_HISTORY_KEY = "nutrition_search_history_v1"
+        const val NUTRITION_FOOD_COLLECTIONS_KEY = "nutrition_food_collections_v1"
         const val NUTRITION_RECENT_FOODS_KEY = "nutrition_recent_foods_v1"
     }
 }

@@ -104,6 +104,9 @@ internal data class Dish(
 internal data class RecipeStep(
     val text: String,
     val minutes: Int? = null,
+    val heatLevel: String? = null,
+    val waterTemperatureC: Double? = null,
+    val oilTemperatureC: Double? = null,
 )
 
 internal data class FoodDerivation(

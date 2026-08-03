@@ -1,5 +1,6 @@
 package com.woshiwangnima.healthdietpro.ui.nutrition
 
+import androidx.annotation.StringRes
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -480,7 +481,7 @@ private fun IngredientPickerDialog(
 // ---------------- Dish ----------------
 
 private data class ComponentDraft(val foodId: String, val grams: String)
-private data class StepDraft(val text: String, val minutes: String)
+private data class StepDraft(val text: String, val minutes: String, val heatLevel: String?, val waterTemperatureC: String, val oilTemperatureC: String)
 
 @Composable
 private fun DishEditor(existing: Dish?, editingId: String?, viewModel: NutritionViewModel, language: String) {
@@ -496,7 +497,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
     }
     val steps = remember {
         mutableStateListOf<StepDraft>().apply {
-            existing?.recipeSteps?.forEach { add(StepDraft(it.text, it.minutes?.toString().orEmpty())) }
+            existing?.recipeSteps?.forEach { add(StepDraft(it.text, it.minutes?.toString().orEmpty(), it.heatLevel, it.waterTemperatureC?.toString().orEmpty(), it.oilTemperatureC?.toString().orEmpty())) }
         }
     }
     var cuisine by remember { mutableStateOf(existing?.cuisine) }
@@ -540,7 +541,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
                     image = imageKey?.let { com.woshiwangnima.healthdietpro.model.food.FoodImageDto(localKey = it, attribution = "user") },
                     cuisine = cuisine,
                     dishCategories = dishCategories.toList(),
-                    recipeSteps = steps.filter { it.text.isNotBlank() }.map { RecipeStepDto(it.text.trim(), it.minutes.toIntOrNull()) },
+                    recipeSteps = steps.filter { it.text.isNotBlank() }.map { RecipeStepDto(it.text.trim(), it.minutes.toIntOrNull(), it.heatLevel, it.waterTemperatureC.toDoubleOrNull(), it.oilTemperatureC.toDoubleOrNull()) },
                     difficulty = difficulty.takeIf { it > 0 },
                     servesPeople = serves.toIntOrNull(),
                     tastes = tastes.toList(),
@@ -624,7 +625,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
         // 制作教程/菜谱，逐步（可选每步分钟）
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_recipe))
         Text(stringResource(R.string.nutrition_editor_recipe), style = MaterialTheme.typography.labelMedium)
-        steps.forEachIndexed { index, step ->
+            steps.forEachIndexed { index, step ->
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.nutrition_editor_step_number, index + 1), style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
@@ -636,6 +637,14 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
                     label = { Text(stringResource(R.string.nutrition_editor_step_hint)) },
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Text(stringResource(R.string.nutrition_editor_heat_level), style = MaterialTheme.typography.labelMedium)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf("low", "medium_low", "medium", "medium_high", "high").forEach { heat ->
+                        FilterChip(selected = step.heatLevel == heat, onClick = { steps[index] = step.copy(heatLevel = if (step.heatLevel == heat) null else heat); markDirty() }, label = { Text(stringResource(heatLabelRes(heat))) })
+                    }
+                }
+                OutlinedTextField(value = step.waterTemperatureC, onValueChange = { steps[index] = step.copy(waterTemperatureC = it); markDirty() }, label = { Text(stringResource(R.string.nutrition_editor_water_temperature)) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = step.oilTemperatureC, onValueChange = { steps[index] = step.copy(oilTemperatureC = it); markDirty() }, label = { Text(stringResource(R.string.nutrition_editor_oil_temperature)) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(
                     value = step.minutes,
                     onValueChange = { steps[index] = step.copy(minutes = it); markDirty() },
@@ -646,7 +655,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
                 )
             }
         }
-        OutlinedButton(onClick = { steps.add(StepDraft("", "")); markDirty() }, modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(onClick = { steps.add(StepDraft("", "", null, "", "")); markDirty() }, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.nutrition_editor_add_step))
         }
     }
@@ -661,6 +670,15 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
             onSelect = { id -> components.add(ComponentDraft(id, "100")); selectingIngredient = false; markDirty() },
         )
     }
+}
+
+@StringRes
+private fun heatLabelRes(id: String): Int = when (id) {
+    "low" -> R.string.nutrition_heat_low
+    "medium_low" -> R.string.nutrition_heat_medium_low
+    "medium" -> R.string.nutrition_heat_medium
+    "medium_high" -> R.string.nutrition_heat_medium_high
+    else -> R.string.nutrition_heat_high
 }
 
 private fun toggle(list: MutableList<String>, value: String) {

@@ -22,6 +22,19 @@
     <string name="nutrition_food_image">Food image</string>
     <string name="nutrition_favorite">Favorite</string>
     <string name="nutrition_compare">Compare foods</string>
+    <string name="nutrition_compare_all">All</string>
+    <string name="nutrition_compare_search">Search comparison target</string>
+    <string name="nutrition_compare_choose_target">Choose a target to compare.</string>
+    <string name="nutrition_compare_selected">Selected</string>
+    <string name="nutrition_compare_results">Comparison results</string>
+    <string name="nutrition_compare_candidates">Comparison targets (scroll vertically)</string>
+    <string name="nutrition_compare_target">Target</string>
+    <string name="nutrition_compare_type">Type</string>
+    <string name="nutrition_editor_heat_level">Heat level (optional)</string>
+    <string name="nutrition_editor_water_temperature">Water temperature °C (optional)</string>
+    <string name="nutrition_editor_oil_temperature">Oil temperature °C (optional)</string>
+    <string name="nutrition_heat_low">Low</string><string name="nutrition_heat_medium_low">Medium-low</string><string name="nutrition_heat_medium">Medium</string><string name="nutrition_heat_medium_high">Medium-high</string><string name="nutrition_heat_high">High</string>
+    <string name="nutrition_water_temperature_value">Water %1$.0f °C</string><string name="nutrition_oil_temperature_value">Oil %1$.0f °C</string>
     <string name="nutrition_tab_profile">Nutrition profile</string>
     <string name="nutrition_tab_ranking">Food ranking</string>
     <string name="nutrition_tab_ingredient_ranking">Ingredient ranking</string>
@@ -36,6 +49,7 @@
     <string name="nutrition_custom_meal_set">Custom meal sets</string>
     <string name="nutrition_health_metrics">Health metrics</string>
     <string name="nutrition_nutrients">Nutrients</string>
+    <string name="nutrition_sources">Sources</string>
     <string name="nutrition_profile_item">Item</string>
     <string name="nutrition_profile_amount">Amount</string>
     <string name="nutrition_profile_classification">Classification</string>

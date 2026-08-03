@@ -22,6 +22,19 @@
     <string name="nutrition_food_image">食物图片</string>
     <string name="nutrition_favorite">收藏</string>
     <string name="nutrition_compare">对比食物</string>
+    <string name="nutrition_compare_all">全部</string>
+    <string name="nutrition_compare_search">搜索对比目标</string>
+    <string name="nutrition_compare_choose_target">请选择一个对比目标。</string>
+    <string name="nutrition_compare_selected">已选</string>
+    <string name="nutrition_compare_results">对比结果</string>
+    <string name="nutrition_compare_candidates">对比目标（可上下滑动）</string>
+    <string name="nutrition_compare_target">目标</string>
+    <string name="nutrition_compare_type">类型</string>
+    <string name="nutrition_editor_heat_level">火候（可选）</string>
+    <string name="nutrition_editor_water_temperature">水温 °C（可选）</string>
+    <string name="nutrition_editor_oil_temperature">油温 °C（可选）</string>
+    <string name="nutrition_heat_low">小火</string><string name="nutrition_heat_medium_low">中小火</string><string name="nutrition_heat_medium">中火</string><string name="nutrition_heat_medium_high">中大火</string><string name="nutrition_heat_high">大火</string>
+    <string name="nutrition_water_temperature_value">水温 %1$.0f °C</string><string name="nutrition_oil_temperature_value">油温 %1$.0f °C</string>
     <string name="nutrition_tab_profile">营养档案</string>
     <string name="nutrition_tab_ranking">食物排行</string>
     <string name="nutrition_tab_ingredient_ranking">食材排行</string>
@@ -36,6 +49,7 @@
     <string name="nutrition_custom_meal_set">自定义套餐</string>
     <string name="nutrition_health_metrics">健康指标</string>
     <string name="nutrition_nutrients">营养素</string>
+    <string name="nutrition_sources">数据来源</string>
     <string name="nutrition_profile_item">项目</string>
     <string name="nutrition_profile_amount">含量</string>
     <string name="nutrition_profile_classification">分类</string>

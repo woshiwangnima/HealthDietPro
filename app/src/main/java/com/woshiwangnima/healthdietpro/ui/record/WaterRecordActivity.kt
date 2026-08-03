@@ -51,6 +51,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableDeleteAction
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableText
+import com.woshiwangnima.healthdietpro.common.ui.AppDataTableReorder
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
@@ -136,7 +137,7 @@ private fun WaterRecordRoute(onFinish: () -> Unit, openEditorInitially: Boolean)
         WaterRoute.SETTINGS -> WaterSettingsScreen({ route = WaterRoute.HOME }, { route = WaterRoute.RECOMMENDATION }, { route = WaterRoute.HYDRATION }, { route = WaterRoute.QUICK_RECORDS })
         WaterRoute.RECOMMENDATION -> WaterRecommendationScreen(archive.activityLevel, { route = WaterRoute.SETTINGS }) { level -> repository.saveSettings(level, archive.quickRecords); refresh() }
         WaterRoute.HYDRATION -> BeverageHydrationScreen(beverages, { route = WaterRoute.SETTINGS })
-        WaterRoute.QUICK_RECORDS -> QuickRecordSettingsScreen(beverages, archive.quickRecords, { route = WaterRoute.SETTINGS }, { editingQuickRecordId = null; route = WaterRoute.QUICK_EDITOR }, { quick -> editingQuickRecordId = quick.id; route = WaterRoute.QUICK_EDITOR }, { quickRecordId -> repository.saveSettings(archive.activityLevel, archive.quickRecords.filterNot { it.id == quickRecordId }); refresh() })
+        WaterRoute.QUICK_RECORDS -> QuickRecordSettingsScreen(beverages, archive.quickRecords, { route = WaterRoute.SETTINGS }, { editingQuickRecordId = null; route = WaterRoute.QUICK_EDITOR }, { quick -> editingQuickRecordId = quick.id; route = WaterRoute.QUICK_EDITOR }, { quickRecordId -> repository.saveSettings(archive.activityLevel, archive.quickRecords.filterNot { it.id == quickRecordId }); refresh() }, { ordered -> repository.reorderQuickRecords(ordered.map(WaterQuickRecord::id)); refresh() })
         WaterRoute.QUICK_EDITOR -> QuickRecordEditorScreen(beverages, archive.quickRecords.firstOrNull { it.id == editingQuickRecordId }, { route = WaterRoute.QUICK_RECORDS }) { originalId, quick -> repository.saveSettings(archive.activityLevel, archive.quickRecords.filterNot { it.id == originalId } + quick); refresh(); route = WaterRoute.QUICK_RECORDS }
     }
 }
@@ -387,12 +388,12 @@ private fun WaterDataPage(records: List<WaterRecord>, onAdd: () -> Unit, onEdit:
 
 @Composable
 private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, quickRecords: List<WaterQuickRecord>, onBack: () -> Unit, onSave: (WaterRecord) -> Unit) {
+    val defaultQuick = if (record == null) quickRecords.firstOrNull() else null
     val defaultBeverage = beverages.firstOrNull { it.id == "food:water:drinking" } ?: beverages.firstOrNull()
-    var beverageId by rememberSaveable(record?.id) { mutableStateOf(record?.beverageId ?: defaultBeverage?.id.orEmpty()) }
-    val initialQuick = quickRecords.firstOrNull { it.beverageId == beverageId }
+    var beverageId by rememberSaveable(record?.id) { mutableStateOf(record?.beverageId ?: defaultQuick?.beverageId ?: defaultBeverage?.id.orEmpty()) }
     var selectedQuickRecordId by rememberSaveable(record?.id) { mutableStateOf<String?>(null) }
-    var volume by rememberSaveable(record?.id) { mutableStateOf(record?.volumeMl?.toString() ?: initialQuick?.volume?.toString() ?: "250") }
-    var unit by rememberSaveable(record?.id) { mutableStateOf(if (record != null) WaterVolumeUnit.ML else initialQuick?.unit ?: WaterVolumeUnit.ML) }
+    var volume by rememberSaveable(record?.id) { mutableStateOf(record?.volumeMl?.toString() ?: defaultQuick?.volume?.toString() ?: "250") }
+    var unit by rememberSaveable(record?.id) { mutableStateOf(if (record != null) WaterVolumeUnit.ML else defaultQuick?.unit ?: WaterVolumeUnit.ML) }
     var timestamp by rememberSaveable(record?.id) { mutableStateOf(record?.timestamp ?: normalizeRecordTimestamp(System.currentTimeMillis(), RecordTimePrecision.MINUTE)) }
     var pickTime by rememberSaveable { mutableStateOf(false) }
     val beverage = beverages.firstOrNull { it.id == beverageId }
@@ -497,8 +498,10 @@ private fun QuickRecordSettingsScreen(
     onAdd: () -> Unit,
     onEdit: (WaterQuickRecord) -> Unit,
     onDelete: (String) -> Unit,
+    onReorder: (List<WaterQuickRecord>) -> Unit,
 ) {
     var deleting by remember { mutableStateOf<WaterQuickRecord?>(null) }
+    var orderedQuickRecords by remember(quickRecords) { mutableStateOf(quickRecords) }
     BaseScreen(title = stringResource(R.string.water_quick_records), onBack = onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             Column(Modifier.weight(1f).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -506,19 +509,27 @@ private fun QuickRecordSettingsScreen(
                     Text(stringResource(R.string.water_quick_records_hint), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     AppIconTextButton(stringResource(R.string.water_quick_add), R.drawable.ic_add, onAdd)
                 }
-                if (quickRecords.isEmpty()) Text(stringResource(R.string.water_quick_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (orderedQuickRecords.isEmpty()) Text(stringResource(R.string.water_quick_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 else AppDataTable(
-                    rows = quickRecords,
-                    rowKey = { _, item -> item.id },
-                    modifier = Modifier.weight(1f),
+                    rows = orderedQuickRecords,
+                     rowKey = { _, item -> item.id },
+                     modifier = Modifier.weight(1f),
+                     showPager = false,
+                     actionsWidth = 128.dp,
                     columns = listOf(
                         AppDataTableColumn("beverage", { AppDataTableHeaderText(stringResource(R.string.water_beverage)) }, ColumnWidth.Flex(1f, 140.dp)) { quick -> AppDataTableText(beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId) },
                         AppDataTableColumn("volume", { AppDataTableHeaderText(stringResource(R.string.water_volume)) }, ColumnWidth.Fixed(110.dp)) { quick -> AppDataTableText("${quick.volume} ${quick.unit.name.lowercase()}") },
                     ),
                     actionsHeader = { AppDataTableHeaderText(stringResource(R.string.body_record_delete)) },
-                    rowActions = { quick -> AppDataTableDeleteAction(stringResource(R.string.body_record_delete), { deleting = quick }) },
-                    onRowClick = onEdit,
-                )
+                     rowActions = { quick -> AppDataTableDeleteAction(stringResource(R.string.body_record_delete), { deleting = quick }) },
+                     onRowClick = onEdit,
+                     reorder = AppDataTableReorder(
+                         onMove = { from, to ->
+                             orderedQuickRecords = orderedQuickRecords.toMutableList().apply { add(to, removeAt(from)) }
+                         },
+                         onMoveFinished = { onReorder(orderedQuickRecords) },
+                     ),
+                 )
             }
         }
     }

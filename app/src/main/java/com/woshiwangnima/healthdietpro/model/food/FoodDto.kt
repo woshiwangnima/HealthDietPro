@@ -157,8 +157,11 @@ internal data class DishComponentDto(
 internal data class RecipeStepDto(
     val text: String = "",
     val minutes: Int? = null,
+    val heatLevel: String? = null,
+    val waterTemperatureC: Double? = null,
+    val oilTemperatureC: Double? = null,
 ) {
-    fun toDomain() = RecipeStep(text, minutes)
+    fun toDomain() = RecipeStep(text, minutes, heatLevel, waterTemperatureC, oilTemperatureC)
 }
 
 @Serializable

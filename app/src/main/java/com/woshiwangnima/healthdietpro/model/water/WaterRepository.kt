@@ -19,6 +19,10 @@ internal class WaterRepository private constructor(context: Context) {
         current.copy(activityLevel = activityLevel, quickRecords = quickRecords)
     }
 
+    fun reorderQuickRecords(orderedIds: List<String>) = archive.update { current ->
+        current.copy(quickRecords = reorderWaterQuickRecords(current.quickRecords, orderedIds))
+    }
+
     companion object {
         fun fromContext(context: Context) = WaterRepository(context.applicationContext)
     }

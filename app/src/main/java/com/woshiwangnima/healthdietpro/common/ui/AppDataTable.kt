@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -41,7 +44,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 data class AppDataTableColumn<T>(
     val key: String,
@@ -95,6 +101,12 @@ data class AppDataTableStyle(
     val dividerHeight: Dp = 1.dp,
 )
 
+@Immutable
+data class AppDataTableReorder<T>(
+    val onMove: (fromIndex: Int, toIndex: Int) -> Unit,
+    val onMoveFinished: (() -> Unit)? = null,
+)
+
 @Stable
 class AppDataTableCellScope<T> internal constructor(
     val column: AppDataTableColumn<T>,
@@ -123,8 +135,19 @@ fun <T> AppDataTable(
     initialRowsPerPage: Int = 20,
     selectionEnabled: Boolean = false,
     onEditSelected: ((List<T>) -> Unit)? = null,
+    reorder: AppDataTableReorder<T>? = null,
     style: AppDataTableStyle = AppDataTableStyle(),
 ) {
+    require(reorder == null || rowKey != null) { "Reorderable tables require rowKey." }
+    require(reorder == null || !showPager) { "Reorderable tables cannot paginate." }
+    require(reorder == null || !selectionEnabled) { "Reorderable tables cannot enable selection." }
+    require(reorder == null || layoutPolicy is AppDataTableLayoutPolicy.HorizontalScroll) {
+        "Reorderable tables require HorizontalScroll layout."
+    }
+    if (reorder != null) {
+        val keys = rows.mapIndexed { index, row -> requireNotNull(rowKey)(index, row) }
+        require(keys.distinct().size == keys.size) { "Reorderable table rowKey values must be unique." }
+    }
     var rowsPerPageText by remember { mutableStateOf(initialRowsPerPage.coerceAtLeast(1).toString()) }
     var rowsPerPage by remember { mutableIntStateOf(initialRowsPerPage.coerceAtLeast(1)) }
     var currentPage by remember { mutableIntStateOf(0) }
@@ -135,7 +158,8 @@ fun <T> AppDataTable(
         selectedRows = selectedRows.filterTo(linkedSetOf()) { it in rows.indices }
     }
     val pageStart = currentPage * rowsPerPage
-    val pageRows = rows.drop(pageStart).take(rowsPerPage).mapIndexed { index, row -> IndexedValue(pageStart + index, row) }
+    val pageEnd = minOf(pageStart + rowsPerPage, rows.size)
+    val pageRows = (pageStart until pageEnd).map { index -> IndexedValue(index, rows[index]) }
     val enableSelection = selectionEnabled && onEditSelected != null
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -171,6 +195,7 @@ fun <T> AppDataTable(
                 selectionEnabled = enableSelection,
                 selectedRows = selectedRows,
                 onToggleSelection = { index -> selectedRows = selectedRows.toggle(index) },
+                reorder = reorder,
                 style = style,
             )
         }
@@ -264,13 +289,23 @@ private fun <T> HorizontalDataTable(
     selectionEnabled: Boolean,
     selectedRows: Set<Int>,
     onToggleSelection: (Int) -> Unit,
+    reorder: AppDataTableReorder<T>?,
     style: AppDataTableStyle,
 ) {
     val horizontalScroll = rememberScrollState()
+    val lazyListState = rememberLazyListState()
+    val reorderableState = reorder?.let { config ->
+        rememberReorderableLazyListState(lazyListState) { from, to ->
+            config.onMove(rows[from.index].index, rows[to.index].index)
+        }
+    }
     val hasActions = rowActions != null
-    val widths = calculateColumnWidths(columns, maxWidth, if (hasActions) actionsWidth else 0.dp)
+    val widths = remember(columns, maxWidth, actionsWidth, hasActions) {
+        calculateColumnWidths(columns, maxWidth, if (hasActions) actionsWidth else 0.dp)
+    }
     val sequenceWidth = if (showRowNumber) 48.dp else 0.dp
-    val contentWidth = (sequenceWidth + widths.fold(0.dp) { acc, width -> acc + width } + if (hasActions) actionsWidth else 0.dp)
+    val handleWidth = if (reorder != null) REORDER_HANDLE_WIDTH else 0.dp
+    val contentWidth = (sequenceWidth + widths.fold(0.dp) { acc, width -> acc + width } + if (hasActions) actionsWidth else 0.dp + handleWidth)
         .coerceAtLeast(maxWidth)
         .coerceAtLeast(minTableWidth)
     val rowEven = MaterialTheme.colorScheme.surface
@@ -301,6 +336,7 @@ private fun <T> HorizontalDataTable(
                     .padding(vertical = style.headerVerticalPadding),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (reorder != null) Box(Modifier.width(handleWidth))
                 if (showRowNumber) {
                     Box(Modifier.width(sequenceWidth).padding(horizontal = style.cellHorizontalPadding), contentAlignment = Alignment.Center) {
                         AppDataTableHeaderText("#")
@@ -323,6 +359,7 @@ private fun <T> HorizontalDataTable(
         }
 
         LazyColumn(
+            state = lazyListState,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 0.dp)
@@ -343,12 +380,15 @@ private fun <T> HorizontalDataTable(
                     rowIndex % 2 == 0 -> rowEven
                     else -> rowOdd
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(horizontalScroll)
-                        .background(bg),
-                ) {
+                val rowContent: @Composable (Boolean, Modifier) -> Unit = { isDragging, handleModifier ->
+                    Box(
+                        modifier = Modifier
+                            .zIndex(if (isDragging) 1f else 0f)
+                            .shadow(if (isDragging) 6.dp else 0.dp)
+                            .fillMaxWidth()
+                            .horizontalScroll(horizontalScroll)
+                            .background(if (isDragging) MaterialTheme.colorScheme.primaryContainer else bg),
+                    ) {
                     Row(
                         modifier = Modifier
                             .width(contentWidth)
@@ -362,6 +402,14 @@ private fun <T> HorizontalDataTable(
                             .padding(vertical = style.rowVerticalPadding),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        if (reorder != null) {
+                            androidx.compose.material3.Icon(
+                                painter = androidx.compose.ui.res.painterResource(com.woshiwangnima.healthdietpro.R.drawable.ic_list),
+                                contentDescription = null,
+                                modifier = handleModifier.size(REORDER_HANDLE_WIDTH),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         if (showRowNumber) {
                             Box(Modifier.width(sequenceWidth).padding(horizontal = style.cellHorizontalPadding), contentAlignment = Alignment.Center) {
                                 AppDataTableText((rowIndex + 1).toString())
@@ -390,7 +438,16 @@ private fun <T> HorizontalDataTable(
                         }
                     }
                 }
-                Divider(border = border, style = style)
+                }
+                if (reorderableState == null) {
+                    rowContent(false, Modifier)
+                    Divider(border = border, style = style)
+                } else {
+                    ReorderableItem(reorderableState, key = requireNotNull(rowKey)(rowIndex, row)) { isDragging ->
+                        rowContent(isDragging, Modifier.draggableHandle(onDragStopped = { reorder?.onMoveFinished?.invoke() }))
+                        Divider(border = border, style = style)
+                    }
+                }
             }
         }
     }
@@ -517,6 +574,7 @@ private fun <T> CompactDataTable(
 }
 
 private val COMPACT_SEQUENCE_WIDTH = 36.dp
+private val REORDER_HANDLE_WIDTH = 40.dp
 
 @Composable
 private fun <T> HeaderCell(

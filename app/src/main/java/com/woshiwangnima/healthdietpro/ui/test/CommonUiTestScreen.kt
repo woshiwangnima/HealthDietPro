@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -185,7 +186,50 @@ private fun DataTableSamples() {
             com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn<Pair<String, String>>("name", { com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText("名称") }, com.woshiwangnima.healthdietpro.common.ui.ColumnWidth.Flex(1f, 120.dp)) { com.woshiwangnima.healthdietpro.common.ui.AppDataTableText(it.first) },
             com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn<Pair<String, String>>("status", { com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText("状态") }, com.woshiwangnima.healthdietpro.common.ui.ColumnWidth.Fixed(80.dp)) { com.woshiwangnima.healthdietpro.common.ui.AppDataTableText(it.second) },
         ),
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().height(220.dp).padding(vertical = 8.dp),
+    )
+    Text("基类表格 + 拖动排序库压力演示：共 300 条复杂行。按住每行最左侧手柄拖动，跨屏时会自动滚动；该演示不写入任何业务存档。")
+    ReorderableDataTableDemo()
+}
+
+private data class ReorderableDemoRow(
+    val id: String,
+    val beverage: String,
+    val volume: String,
+    val category: String,
+    val updatedAt: String,
+)
+
+@Composable
+private fun ReorderableDataTableDemo() {
+    var rows by remember {
+        mutableStateOf(
+            List(300) { index ->
+                ReorderableDemoRow(
+                    id = "demo-$index",
+                    beverage = "第 ${index + 1} 条复杂饮品预设：${listOf("冷萃咖啡", "无糖乌龙茶", "电解质饮料", "低脂牛奶", "柠檬气泡水")[index % 5]}",
+                    volume = "${150 + index % 8 * 50} ${if (index % 9 == 0) "ml（含长说明）" else "ml"}",
+                    category = listOf("日常饮水", "运动补水", "餐后饮品", "自定义来源")[index % 4],
+                    updatedAt = "2026-08-${(index % 28 + 1).toString().padStart(2, '0')}  ${"%02d".format(index % 24)}:${"%02d".format(index % 60)}",
+                )
+            },
+        )
+    }
+    com.woshiwangnima.healthdietpro.common.ui.AppDataTable(
+        rows = rows,
+        columns = listOf(
+            com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn<ReorderableDemoRow>("beverage", { com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText("饮品与预设") }, com.woshiwangnima.healthdietpro.common.ui.ColumnWidth.Flex(1.5f, 180.dp)) { com.woshiwangnima.healthdietpro.common.ui.AppDataTableText(it.beverage, maxLines = 2) },
+            com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn<ReorderableDemoRow>("volume", { com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText("容量") }, com.woshiwangnima.healthdietpro.common.ui.ColumnWidth.Fixed(120.dp)) { com.woshiwangnima.healthdietpro.common.ui.AppDataTableText(it.volume, maxLines = 2) },
+            com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn<ReorderableDemoRow>("category", { com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText("分类") }, com.woshiwangnima.healthdietpro.common.ui.ColumnWidth.Fixed(120.dp)) { com.woshiwangnima.healthdietpro.common.ui.AppDataTableText(it.category, maxLines = 2) },
+            com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn<ReorderableDemoRow>("updated", { com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText("更新时间") }, com.woshiwangnima.healthdietpro.common.ui.ColumnWidth.Fixed(140.dp)) { com.woshiwangnima.healthdietpro.common.ui.AppDataTableText(it.updatedAt, maxLines = 2) },
+        ),
+        modifier = Modifier.fillMaxWidth().height(480.dp).padding(vertical = 8.dp),
+        rowKey = { _, row -> row.id },
+        showPager = false,
+        initialRowsPerPage = rows.size,
+        reorder = com.woshiwangnima.healthdietpro.common.ui.AppDataTableReorder(
+            onMove = { from, to -> rows = rows.toMutableList().apply { add(to, removeAt(from)) } },
+        ),
     )
 }
 
