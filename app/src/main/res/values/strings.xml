@@ -40,6 +40,7 @@
     <string name="nutrition_tab_ingredient_ranking">Ingredient ranking</string>
     <string name="nutrition_tab_recipe_steps">Preparation steps</string>
     <string name="nutrition_tab_estimate">Portion estimate</string>
+    <string name="nutrition_tab_sources">Sources</string>
     <string name="nutrition_detail_placeholder">This section is planned but not available yet.</string>
     <string name="nutrition_comparison_title">Food comparison</string>
     <string name="nutrition_food_detail_title">Food detail</string>
@@ -50,6 +51,13 @@
     <string name="nutrition_health_metrics">Health metrics</string>
     <string name="nutrition_nutrients">Nutrients</string>
     <string name="nutrition_sources">Sources</string>
+    <string name="nutrition_sources_empty">No source is available for this item.</string>
+    <string name="nutrition_macronutrient_energy">Nutrient energy</string>
+    <string name="nutrition_macronutrient_energy_center">Carbohydrate, protein and fat</string>
+    <string name="nutrition_energy_carbohydrate">Carbohydrate %.1f%%</string>
+    <string name="nutrition_energy_protein">Protein %.1f%%</string>
+    <string name="nutrition_energy_fat">Fat %.1f%%</string>
+    <string name="nutrition_energy_kcal_value">%.0f kcal</string>
     <string name="nutrition_profile_item">Item</string>
     <string name="nutrition_profile_amount">Amount</string>
     <string name="nutrition_profile_classification">Classification</string>
@@ -61,6 +69,8 @@
     <string name="nutrition_metric_range_more_than_to_at_most">&gt; %1$s and ≤ %2$s</string>
     <string name="nutrition_metric_range_more_than">&gt; %1$s</string>
     <string name="nutrition_metric_gi">Glycemic index (GI)</string>
+    <string name="nutrition_metric_glycemic">Glycemic response</string>
+    <string name="nutrition_metric_glycemic_icon">Glycemic</string>
     <string name="nutrition_metric_gl">Glycemic load (GL) / 100 g</string>
     <string name="nutrition_metric_inflammatory_potential">Inflammation index</string>
     <string name="nutrition_health_metrics_help">About health metrics</string>
@@ -105,6 +115,9 @@
     <string name="nutrition_edible_ratio_value">%1$d%%</string>
     <string name="nutrition_derived_from">Source</string>
     <string name="nutrition_cooking_method">Cooking method</string>
+    <string name="nutrition_botanical_family">Family</string>
+    <string name="nutrition_botanical_genus">Genus</string>
+    <string name="nutrition_botanical_species">Species</string>
     <string name="nutrition_dish_components">Components</string>
     <string name="nutrition_related_dishes">Related dishes</string>
     <string name="nutrition_component_amount">%1$.0f %2$s</string>
@@ -227,6 +240,10 @@
     <string name="nutrition_dish_serves">Serves</string>
     <string name="nutrition_dish_serves_value">%1$d people</string>
     <string name="nutrition_basic_information">Basic information</string>
+    <string name="nutrition_header_introduction">Introduction</string>
+    <string name="nutrition_header_introduction_empty">No introduction is available for this item.</string>
+    <string name="nutrition_header_previous">Show previous detail</string>
+    <string name="nutrition_header_next">Show next detail</string>
     <string name="nutrition_recipe_basic_information">Preparation information</string>
     <string name="nutrition_editor_discard">Discard</string>
     <string name="nutrition_editor_ingredient_label">Ingredient</string>

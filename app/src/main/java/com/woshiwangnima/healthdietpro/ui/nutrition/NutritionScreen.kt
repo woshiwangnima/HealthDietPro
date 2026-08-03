@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.ui.nutrition
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -78,6 +80,9 @@ import com.woshiwangnima.healthdietpro.common.ui.SearchActivityPanel
 import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
 import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
+import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
+import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
+import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
@@ -624,6 +629,7 @@ private fun FoodDetailScreen(
 ) {
     val imageStore = viewModel.foodImages
     var tab by remember { mutableIntStateOf(0) }
+    var headerPage by remember(food.id) { mutableIntStateOf(0) }
     val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
     val servings = remember(food.id, resolved) { food.defaultServings(resolved) }
     var selectedServingId by remember(food.id, servings) { mutableStateOf(servings.first().id) }
@@ -646,7 +652,7 @@ private fun FoodDetailScreen(
         includeStatusBarPadding = false,
     ) { padding ->
     Column(Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
-        Row(verticalAlignment = Alignment.Top) {
+        Row(modifier = Modifier.height(96.dp), verticalAlignment = Alignment.Top) {
             FoodImageWithSystemTags(
                 food = food,
                 image = imageStore.image(food.image?.localKey),
@@ -654,21 +660,16 @@ private fun FoodDetailScreen(
                 isRecent = isRecent,
                 modifier = Modifier.size(96.dp).clickable { previewing = true },
             )
-            Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) {
-                FoodNameHeader(
+            Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f).fillMaxHeight()) {
+                FoodCardNameHeader(
                     food = food,
                     language = language,
                     isCustom = isCustom,
-                    nameFontSize = MaterialTheme.typography.headlineSmall.fontSize,
                     cookingSuffix = cookingSuffix,
-                    aliases = food.allNames(language).drop(1),
                 )
-                food.displayDescription(language).takeIf { it.isNotBlank() }?.let { description ->
-                    Text(description, modifier = Modifier.padding(top = 4.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                FoodHeaderPages(food, viewModel, language, headerPage, { headerPage = if (headerPage == 0) 1 else 0 }, { headerPage = (headerPage + 1) % 2 }, Modifier.weight(1f)) { viewModel.openFood(it) }
             }
-            // 右侧图标分两行：上行 编辑/删除（自定义时），下行 收藏/对比。
-            Column(horizontalAlignment = Alignment.End) {
+            Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.SpaceBetween) {
                 if (isCustom) {
                     Row {
                         IconButton(onClick = { viewModel.openEditor(food.kind, food.id) }) { Icon(Icons.Filled.Edit, stringResource(R.string.nutrition_editor_edit)) }
@@ -694,37 +695,20 @@ private fun FoodDetailScreen(
                 EqualWidthTab(R.string.nutrition_tab_profile),
                 EqualWidthTab(food.rankingTabLabelRes()),
                 EqualWidthTab(R.string.nutrition_tab_estimate),
+                EqualWidthTab(R.string.nutrition_tab_sources),
             ),
             selectedIndex = tab,
             onSelected = { tab = it },
             modifier = Modifier.padding(top = 16.dp),
         )
         if (tab == 0) Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
-            DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_basic_information))
-            KindInfoSection(food, viewModel, language, onOpenFood = { viewModel.openFood(it) })
-            if (food.sources.isNotEmpty()) {
-                DetailSectionTitle(R.drawable.ic_description, stringResource(R.string.nutrition_sources), Modifier.padding(top = 8.dp))
-                food.sources.forEach { source -> SourceLink(source.dataset, source.reference) }
-            }
+            MacronutrientEnergyChart(resolved, Modifier.padding(top = 12.dp))
             DetailSectionTitle(R.drawable.ic_chart, stringResource(R.string.nutrition_health_metrics)) {
                 IconButton(onClick = { showHealthMetricsHelp = true }) {
                     Icon(painterResource(R.drawable.ic_help), contentDescription = stringResource(R.string.nutrition_health_metrics_help))
                 }
             }
-            AppDataTable(
-                rows = (resolved?.healthMetrics ?: food.healthMetrics).healthMetricRows(stringResource(R.string.nutrition_metric_no_data)),
-                columns = listOf(
-                    AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 94.dp)) { AppDataTableText(stringResource(it.labelRes)) },
-                    AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount)) }, ColumnWidth.Flex(0.8f, 74.dp)) { AppDataTableText(it.value) },
-                    AppDataTableColumn("classification", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_classification)) }, ColumnWidth.Flex(0.8f, 74.dp)) {
-                        if (it.classification != null) GlycemicClassificationText(it.classification)
-                    },
-                ),
-                rowKey = { _, row -> row.key },
-                showRowNumber = false,
-                showPager = false,
-                modifier = Modifier.fillMaxWidth().height(154.dp),
-            )
+            HealthMetricsTable(resolved?.healthMetrics ?: food.healthMetrics, stringResource(R.string.nutrition_metric_no_data))
             DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_nutrients), Modifier.padding(top = 12.dp))
             FoodServingSelector(
                 servings = servings,
@@ -733,9 +717,9 @@ private fun FoodDetailScreen(
             )
             val selectedServing = servings.first { it.id == selectedServingId }
             AppDataTable(
-                rows = nutrientRows(resolved, selectedServing),
+                rows = nutrientRows(resolved, selectedServing, viewModel.nutrientMetas(), language),
                 columns = listOf(
-                    AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 110.dp)) { AppDataTableText(stringResource(it.labelRes)) },
+                    AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 110.dp)) { AppDataTableText(it.labelText ?: stringResource(requireNotNull(it.labelRes))) },
                     AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount)) }, ColumnWidth.Flex(1f, 110.dp)) { AppDataTableText(it.value) },
                 ),
                 rowKey = { _, row -> row.key },
@@ -755,6 +739,14 @@ private fun FoodDetailScreen(
         } else if (tab == 1 && food is PreparedFood && food.components.isNotEmpty()) {
             Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
                 FoodRecipeSection(food, viewModel, language) { viewModel.openFood(it) }
+            }
+        } else if (tab == 3) {
+            Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
+                if (food.sources.isEmpty()) {
+                    Text(stringResource(R.string.nutrition_sources_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                } else {
+                    food.sources.forEach { source -> SourceLink(source.dataset, source.reference) }
+                }
             }
         } else {
             Text(stringResource(R.string.nutrition_detail_placeholder), modifier = Modifier.padding(top = 24.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -797,10 +789,88 @@ private fun FoodDetailScreen(
 }
 
 @Composable
-private fun KindInfoSection(food: FoodItem, viewModel: NutritionViewModel, language: String, onOpenFood: (FoodItem) -> Unit) {
+private fun FoodHeaderPages(
+    food: FoodItem,
+    viewModel: NutritionViewModel,
+    language: String,
+    page: Int,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    modifier: Modifier,
+    onOpenFood: (FoodItem) -> Unit,
+) {
+    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = onPrevious, modifier = Modifier.size(22.dp)) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, stringResource(R.string.nutrition_header_previous))
+        }
+        AnimatedPageContent(page, Modifier.weight(1f), direction = { from, to -> to - from }) { currentPage ->
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                if (currentPage == 0) {
+                    Text(
+                        food.displayDescription(language).ifBlank { stringResource(R.string.nutrition_header_introduction_empty) },
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                } else {
+                    KindInfoSection(food, viewModel, language, onOpenFood, MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        IconButton(onClick = onNext, modifier = Modifier.size(22.dp)) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, stringResource(R.string.nutrition_header_next))
+        }
+    }
+}
+
+private data class MacronutrientEnergy(
+    val carbohydrateKcal: Double,
+    val proteinKcal: Double,
+    val fatKcal: Double,
+) {
+    val totalKcal: Double get() = carbohydrateKcal + proteinKcal + fatKcal
+}
+
+private fun ResolvedNutrition?.macronutrientEnergy(): MacronutrientEnergy? {
+    val nutrients = this?.nutrients ?: return null
+    return MacronutrientEnergy(
+        carbohydrateKcal = (nutrients["CHO"]?.value ?: 0.0) * 4.0,
+        proteinKcal = (nutrients["PROTEIN"]?.value ?: 0.0) * 4.0,
+        fatKcal = (nutrients["FAT"]?.value ?: 0.0) * 9.0,
+    ).takeIf { it.totalKcal > 0.0 }
+}
+
+@Composable
+private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?, modifier: Modifier = Modifier) {
+    val energy = resolved.macronutrientEnergy() ?: return
+    DetailSectionTitle(R.drawable.ic_chart, stringResource(R.string.nutrition_macronutrient_energy), modifier)
+    AnimatedDonutChart(
+        segments = listOf(
+            DonutChartSegment("carbohydrate", stringResource(R.string.nutrition_energy_carbohydrate, energy.carbohydrateKcal / energy.totalKcal * 100.0), energy.carbohydrateKcal.toFloat(), androidx.compose.ui.graphics.Color(0xFFF9A825)),
+            DonutChartSegment("protein", stringResource(R.string.nutrition_energy_protein, energy.proteinKcal / energy.totalKcal * 100.0), energy.proteinKcal.toFloat(), androidx.compose.ui.graphics.Color(0xFF43A047)),
+            DonutChartSegment("fat", stringResource(R.string.nutrition_energy_fat, energy.fatKcal / energy.totalKcal * 100.0), energy.fatKcal.toFloat(), androidx.compose.ui.graphics.Color(0xFFE53935)),
+        ),
+        centerValue = stringResource(R.string.nutrition_energy_kcal_value, energy.totalKcal),
+        centerLabel = stringResource(R.string.nutrition_macronutrient_energy_center),
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun KindInfoSection(
+    food: FoodItem,
+    viewModel: NutritionViewModel,
+    language: String,
+    onOpenFood: (FoodItem) -> Unit,
+    textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
+) {
+    food.botanicalTaxonomy?.let { taxonomy ->
+        val labels = viewModel.botanicalTaxonomy()
+        InfoLine(stringResource(R.string.nutrition_botanical_family), labels.familyName(taxonomy.family, language), textStyle)
+        InfoLine(stringResource(R.string.nutrition_botanical_genus), labels.genusName(taxonomy.genus, language), textStyle)
+        taxonomy.species?.let { InfoLine(stringResource(R.string.nutrition_botanical_species), it, textStyle) }
+    }
     when (food) {
         is Ingredient -> food.edibleRatio?.let { ratio ->
-            InfoLine(stringResource(R.string.nutrition_edible_ratio), stringResource(R.string.nutrition_edible_ratio_value, (ratio * 100).toInt()))
+            InfoLine(stringResource(R.string.nutrition_edible_ratio), stringResource(R.string.nutrition_edible_ratio_value, (ratio * 100).toInt()), textStyle)
         }
         is PreparedFood -> {
             food.derivedFrom?.let { derivation ->
@@ -809,11 +879,11 @@ private fun KindInfoSection(food: FoodItem, viewModel: NutritionViewModel, langu
                 source?.let { src ->
                     IngredientJumpLine(stringResource(R.string.nutrition_derived_from), src.displayName(language)) { onOpenFood(src) }
                 }
-                method?.let { InfoLine(stringResource(R.string.nutrition_cooking_method), it.displayLabel(language)) }
+                method?.let { InfoLine(stringResource(R.string.nutrition_cooking_method), it.displayLabel(language), textStyle) }
             }
             food.techniqueId?.let { techniqueId ->
                 viewModel.cookingMethodFor(techniqueId)?.let { method ->
-                    InfoLine(stringResource(R.string.nutrition_cooking_method), method.displayLabel(language))
+                    InfoLine(stringResource(R.string.nutrition_cooking_method), method.displayLabel(language), textStyle)
                 }
             }
         }
@@ -1073,11 +1143,11 @@ private fun PauseBars() {
 }
 
 @Composable
-private fun InfoLine(label: String, value: String) {
+private fun InfoLine(label: String, value: String, textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium) {
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(label, style = textStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.width(8.dp))
-        Text(value, style = MaterialTheme.typography.bodyMedium)
+        Text(value, style = textStyle)
     }
 }
 
@@ -1093,23 +1163,69 @@ private fun DetailSectionTitle(iconRes: Int, title: String, modifier: Modifier =
 
 private data class FoodProfileRow(
     val key: String,
-    @param:StringRes val labelRes: Int,
+    @param:StringRes val labelRes: Int?,
     val value: String,
     val classification: GlycemicClassification? = null,
+    val labelText: String? = null,
 )
 
-// GI/GL/炎症指数缺失时仍显示该行，数据填占位符「-」。
-private fun com.woshiwangnima.healthdietpro.model.food.FoodHealthMetrics.healthMetricRows(noData: String): List<FoodProfileRow> = listOf(
-    glycemicIndex.let {
-        FoodProfileRow("gi", R.string.nutrition_metric_gi, it?.let { m -> "${m.value.formatTableValue()} ${m.unit}" } ?: noData, it?.let { m -> classifyGlycemicIndex(m.value) })
-    },
-    glycemicLoadPer100g.let {
-        FoodProfileRow("gl", R.string.nutrition_metric_gl, it?.let { m -> "${m.value.formatTableValue()} ${m.unit}" } ?: noData, it?.let { m -> classifyGlycemicLoad(m.value) })
-    },
-    inflammatoryPotential.let {
-        FoodProfileRow("inflammatory", R.string.nutrition_metric_inflammatory_potential, it?.let { m -> "${m.value.formatTableValue()} ${m.unit}" } ?: noData)
-    },
-)
+@Composable
+private fun HealthMetricsTable(
+    metrics: com.woshiwangnima.healthdietpro.model.food.FoodHealthMetrics,
+    noData: String,
+) {
+    val gi = metrics.glycemicIndex
+    val gl = metrics.glycemicLoadPer100g
+    val border = MaterialTheme.colorScheme.outlineVariant
+    Surface(
+        modifier = Modifier.fillMaxWidth().height(184.dp),
+        shape = RoundedCornerShape(6.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .42f),
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth().height(40.dp).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .72f)),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                HealthMetricHeader(stringResource(R.string.nutrition_profile_item), Modifier.weight(1.3f), border)
+                HealthMetricHeader(stringResource(R.string.nutrition_profile_amount), Modifier.weight(.9f), border)
+                HealthMetricHeader(stringResource(R.string.nutrition_profile_classification), Modifier.weight(.5f), border)
+                HealthMetricHeader(stringResource(R.string.nutrition_metric_glycemic_icon), Modifier.width(64.dp), border)
+            }
+            Row(Modifier.fillMaxWidth().weight(1f)) {
+                Column(Modifier.weight(1f)) {
+                    HealthMetricDataRow(stringResource(R.string.nutrition_metric_gi), gi?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, gi?.let { classifyGlycemicIndex(it.value) }, border)
+                    HealthMetricDataRow(stringResource(R.string.nutrition_metric_gl), gl?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, gl?.let { classifyGlycemicLoad(it.value) }, border)
+                    HealthMetricDataRow(stringResource(R.string.nutrition_metric_inflammatory_potential), metrics.inflammatoryPotential?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, null, border)
+                }
+                Column(Modifier.width(64.dp)) {
+                    Box(Modifier.height(96.dp).fillMaxWidth().border(1.dp, border), contentAlignment = Alignment.Center) {
+                        GlycemicGlass(glycemicLevel(gi?.value, gl?.value))
+                    }
+                    Box(Modifier.height(48.dp).fillMaxWidth().border(1.dp, border))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HealthMetricHeader(text: String, modifier: Modifier, border: androidx.compose.ui.graphics.Color) {
+    Box(modifier.border(1.dp, border), contentAlignment = Alignment.Center) {
+        Text(text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, maxLines = 2)
+    }
+}
+
+@Composable
+private fun HealthMetricDataRow(label: String, value: String, classification: GlycemicClassification?, border: androidx.compose.ui.graphics.Color) {
+    Row(modifier = Modifier.fillMaxWidth().height(48.dp).border(1.dp, border), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, modifier = Modifier.weight(1.3f).padding(horizontal = 12.dp), style = MaterialTheme.typography.bodyMedium)
+        Text(value, modifier = Modifier.weight(.9f).padding(horizontal = 6.dp), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center, maxLines = 1)
+        Box(Modifier.weight(.5f), contentAlignment = Alignment.Center) {
+            classification?.let { GlycemicClassificationText(it) }
+        }
+    }
+}
 
 @Composable
 private fun HealthMetricInfoSection(
@@ -1178,12 +1294,25 @@ private fun metricRangeText(band: RangeBand<Double, GlycemicClassification>): St
 private fun Double.formatMetricThreshold(): String =
     if (this % 1.0 == 0.0) toInt().toString() else toString()
 
-private fun nutrientRows(resolved: ResolvedNutrition?, serving: FoodServing): List<FoodProfileRow> {
+private fun nutrientRows(
+    resolved: ResolvedNutrition?,
+    serving: FoodServing,
+    nutrientMetas: List<com.woshiwangnima.healthdietpro.model.food.NutrientMeta>,
+    language: String,
+): List<FoodProfileRow> {
     val nutrients = resolved?.nutrients ?: return emptyList()
     val multiplier = serving.ratioToTable
-    return nutrients.entries.map { (code, amount) ->
-        FoodProfileRow(code, code.nutrientLabelRes(), "${(amount.value * multiplier).formatTableValue()} ${amount.unitId}")
-    }
+    val metaByCode = nutrientMetas.associateBy { it.code }
+    return nutrients.entries
+        .sortedBy { (code, _) -> nutrientMetas.indexOf(metaByCode[code]).let { if (it < 0) Int.MAX_VALUE else it } }
+        .map { (code, amount) ->
+            FoodProfileRow(
+                key = code,
+                labelRes = null,
+                value = "${(amount.value * multiplier).formatTableValue()} ${amount.unitId}",
+                labelText = metaByCode[code]?.displayName(language) ?: code,
+            )
+        }
 }
 
 private fun Double.formatTableValue(): String = "%.1f".format(java.util.Locale.ROOT, this)
@@ -1205,15 +1334,6 @@ private fun FoodServingSelector(servings: List<FoodServing>, selectedServingId: 
     }
 }
 
-@StringRes
-private fun String.nutrientLabelRes(): Int = when (this) {
-    "ENERGY" -> R.string.nutrition_nutrient_energy
-    "PROTEIN" -> R.string.nutrition_nutrient_protein
-    "FAT" -> R.string.nutrition_nutrient_fat
-    "CHO" -> R.string.nutrition_nutrient_carbohydrate
-    "FIBER" -> R.string.nutrition_nutrient_fiber
-    else -> R.string.nutrition_nutrient_other
-}
 
 @Composable
 private fun FoodImagePreview(image: ImageBitmap, onDismiss: () -> Unit) {

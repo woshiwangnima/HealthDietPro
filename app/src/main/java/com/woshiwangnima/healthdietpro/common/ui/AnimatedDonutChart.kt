@@ -1,6 +1,5 @@
 package com.woshiwangnima.healthdietpro.common.ui
 
-import android.graphics.Paint
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -8,9 +7,13 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,14 +21,21 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
@@ -38,13 +48,14 @@ internal data class DonutChartSegment(
     val color: Color? = null,
 )
 
-/** A compact animated donut chart with a center summary and accessible text legend. */
+/** A compact animated donut chart with a bounded text legend for narrow layouts. */
 @Composable
 internal fun AnimatedDonutChart(
     segments: List<DonutChartSegment>,
     centerValue: String,
     centerLabel: String,
     modifier: Modifier = Modifier,
+    showLegend: Boolean = true,
 ) {
     val scheme = MaterialTheme.colorScheme
     val palette = remember(scheme) {
@@ -62,11 +73,12 @@ internal fun AnimatedDonutChart(
         animation.snapTo(0f)
         animation.animateTo(if (hasData) 1f else 0f, tween(900, easing = FastOutSlowInEasing))
     }
+    var labelLayouts by remember(normalized) { androidx.compose.runtime.mutableStateOf<List<DonutLabelLayout>>(emptyList()) }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().height(240.dp)) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().height(216.dp)) {
             Canvas(Modifier.matchParentSize()) {
-                val stroke = 28.dp.toPx()
-                val diameter = size.minDimension - 56.dp.toPx()
+                val stroke = minOf(28.dp.toPx(), size.minDimension * .16f)
+                val diameter = ((size.minDimension - stroke * 2f) * .9f).coerceAtLeast(0f)
                 val topLeft = androidx.compose.ui.geometry.Offset((size.width - diameter) / 2f, (size.height - diameter) / 2f)
                 drawArc(scheme.surfaceVariant.copy(alpha = .65f), -90f, 360f, false, topLeft, androidx.compose.ui.geometry.Size(diameter, diameter), style = Stroke(stroke, cap = StrokeCap.Round))
                 var startAngle = -90f
@@ -75,40 +87,181 @@ internal fun AnimatedDonutChart(
                     val gap = minOf(3f, sweep / 4f)
                     val displayedSweep = (sweep - gap) * animation.value
                     drawArc(requireNotNull(segment.color), startAngle + gap / 2f, displayedSweep, false, topLeft, androidx.compose.ui.geometry.Size(diameter, diameter), style = Stroke(stroke, cap = StrokeCap.Round))
-                    if (sweep >= 16f && animation.value > .86f) {
-                        val middle = Math.toRadians((startAngle + sweep / 2f).toDouble())
-                        val radius = diameter / 2f
-                        val directionX = kotlin.math.cos(middle).toFloat()
-                        val directionY = kotlin.math.sin(middle).toFloat()
-                        val lineStart = androidx.compose.ui.geometry.Offset(size.width / 2f + directionX * (radius + stroke / 2f), size.height / 2f + directionY * (radius + stroke / 2f))
-                        val elbow = androidx.compose.ui.geometry.Offset(size.width / 2f + directionX * (radius + 16.dp.toPx()), size.height / 2f + directionY * (radius + 16.dp.toPx()))
-                        // Keep the text anchor within the Canvas; drawText clips anything beyond it.
-                        val labelEnd = androidx.compose.ui.geometry.Offset(if (directionX >= 0f) size.width - 72.dp.toPx() else 72.dp.toPx(), elbow.y)
-                        drawLine(requireNotNull(segment.color), lineStart, elbow, 1.5.dp.toPx())
-                        drawLine(requireNotNull(segment.color), elbow, labelEnd, 1.5.dp.toPx())
-                        drawCircle(color = requireNotNull(segment.color), radius = 4.dp.toPx(), center = labelEnd)
-                        drawContext.canvas.nativeCanvas.drawText(
-                            segment.label,
-                            labelEnd.x + if (directionX >= 0f) 8.dp.toPx() else -8.dp.toPx(),
-                            labelEnd.y + 4.dp.toPx(),
-                            Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                                color = scheme.onSurface.toArgb()
-                                textAlign = if (directionX >= 0f) Paint.Align.LEFT else Paint.Align.RIGHT
-                                textSize = 11.dp.toPx()
-                            },
-                        )
-                    }
                     startAngle += sweep
                 }
+                labelLayouts.forEach { layout ->
+                    val center = Offset(size.width / 2f, size.height / 2f)
+                    val direction = Offset(layout.anchor.x - center.x, layout.anchor.y - center.y)
+                    val length = kotlin.math.sqrt(direction.x * direction.x + direction.y * direction.y).coerceAtLeast(1f)
+                    val start = Offset(
+                        center.x + direction.x / length * (diameter / 2f + stroke / 2f),
+                        center.y + direction.y / length * (diameter / 2f + stroke / 2f),
+                    )
+                    val labelEdge = layout.bounds.closestPointTo(start)
+                    val gap = 6.dp.toPx()
+                    val toStart = Offset(start.x - labelEdge.x, start.y - labelEdge.y)
+                    val edgeDistance = kotlin.math.sqrt(toStart.x * toStart.x + toStart.y * toStart.y).coerceAtLeast(1f)
+                    val end = Offset(
+                        labelEdge.x + toStart.x / edgeDistance * minOf(gap, edgeDistance),
+                        labelEdge.y + toStart.y / edgeDistance * minOf(gap, edgeDistance),
+                    )
+                    drawLine(layout.color, start, end, 1.dp.toPx())
+                    drawCircle(layout.color, 3.dp.toPx(), end)
+                }
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 32.dp)) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.widthIn(max = 136.dp).padding(horizontal = 8.dp)) {
                 Text(
                     text = if (hasData) centerValue else stringResource(R.string.no_record),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
-                if (hasData) Text(centerLabel, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                if (hasData) Text(centerLabel, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+            DynamicDonutLabels(
+                segments = normalized,
+                onLayoutsChanged = { labelLayouts = it },
+            )
+        }
+        if (showLegend) {
+            normalized.forEach { segment ->
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+                    androidx.compose.foundation.Canvas(Modifier.padding(end = 8.dp).height(10.dp).widthIn(min = 10.dp, max = 10.dp)) {
+                        drawCircle(requireNotNull(segment.color))
+                    }
+                    Text(segment.label, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
             }
         }
     }
 }
+
+private data class DonutLabelLayout(
+    val id: String,
+    val anchor: Offset,
+    val bounds: Rect,
+    val color: Color,
+)
+
+private fun Rect.closestPointTo(point: Offset): Offset = Offset(
+    point.x.coerceIn(left, right),
+    point.y.coerceIn(top, bottom),
+)
+
+@Composable
+private fun DynamicDonutLabels(
+    segments: List<DonutChartSegment>,
+    onLayoutsChanged: (List<DonutLabelLayout>) -> Unit,
+) {
+    val density = LocalDensity.current
+    val textStyle = MaterialTheme.typography.labelSmall
+    val textMeasurer = rememberTextMeasurer()
+    var size by remember { androidx.compose.runtime.mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
+    val layouts = remember(segments, size, textStyle, density) {
+        donutLabelLayouts(
+            segments = segments,
+            width = size.width.toFloat(),
+            height = size.height.toFloat(),
+            radius = donutOuterRadius(size.width.toFloat(), size.height.toFloat(), with(density) { 28.dp.toPx() }),
+            textMeasure = { text -> textMeasurer.measure(AnnotatedString(text), textStyle).size },
+        )
+    }
+    androidx.compose.runtime.LaunchedEffect(layouts) { onLayoutsChanged(layouts) }
+    Box(Modifier.fillMaxSize().onSizeChanged { size = it }) {
+        layouts.forEach { layout ->
+            val width = layout.bounds.width.toInt().coerceAtLeast(1)
+            val height = layout.bounds.height.toInt().coerceAtLeast(1)
+            TextOverflowText(
+                text = segments.first { it.id == layout.id }.label,
+                modifier = Modifier
+                    .offset { IntOffset(layout.bounds.left.toInt(), layout.bounds.top.toInt()) }
+                    .widthIn(min = with(density) { width.toDp() }, max = with(density) { width.toDp() })
+                    .height(with(density) { height.toDp() }),
+                style = textStyle,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = if (layout.bounds.center.x < size.width / 2f) TextAlign.End else TextAlign.Start,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+private fun donutOuterRadius(width: Float, height: Float, preferredStroke: Float): Float {
+    val minimum = minOf(width, height)
+    val stroke = minOf(preferredStroke, minimum * .16f)
+    val diameter = ((minimum - stroke * 2f) * .9f).coerceAtLeast(0f)
+    return diameter / 2f + stroke / 2f
+}
+
+private fun donutLabelLayouts(
+    segments: List<DonutChartSegment>,
+    width: Float,
+    height: Float,
+    radius: Float,
+    textMeasure: (String) -> androidx.compose.ui.unit.IntSize,
+): List<DonutLabelLayout> {
+    if (width <= 0f || height <= 0f || segments.isEmpty()) return emptyList()
+    val minLabelWidth = 52f
+    val maxLabelWidth = width * .38f
+    val gap = 10f
+    val center = Offset(width / 2f, height / 2f)
+    val total = segments.sumOf { it.value.toDouble() }.toFloat().coerceAtLeast(1f)
+    var angle = -90f
+    val candidates = segments.map { segment ->
+        val sweep = segment.value / total * 360f
+        val middle = Math.toRadians((angle + sweep / 2f).toDouble())
+        angle += sweep
+        val direction = Offset(kotlin.math.cos(middle).toFloat(), kotlin.math.sin(middle).toFloat())
+        val anchor = Offset(center.x + direction.x * radius, center.y + direction.y * radius)
+        val leftSide = direction.x < 0f
+        val measured = textMeasure(segment.label)
+        val labelWidth = measured.width.toFloat().coerceIn(minLabelWidth, maxLabelWidth)
+        val labelHeight = measured.height.toFloat().coerceAtLeast(20f)
+        val x = if (leftSide) {
+            center.x - radius - gap - labelWidth
+        } else {
+            center.x + radius + gap
+        }.coerceIn(6f, width - labelWidth - 6f)
+        DonutLabelCandidate(
+            segment = segment,
+            anchor = anchor,
+            direction = direction,
+            width = labelWidth,
+            height = labelHeight,
+            x = x,
+            y = (anchor.y - labelHeight / 2f).coerceIn(6f, height - labelHeight - 6f),
+            leftSide = leftSide,
+        )
+    }
+    return candidates.groupBy { it.leftSide }.flatMap { (_, side) ->
+        var previousBottom = 6f
+        side.sortedBy { it.y }.map { candidate ->
+            val placedY = candidate.y.coerceAtLeast(previousBottom).coerceAtMost(height - candidate.height - 6f)
+            previousBottom = placedY + candidate.height + 4f
+            val initial = Rect(candidate.x, placedY, candidate.x + candidate.width, placedY + candidate.height)
+            val nearest = initial.closestPointTo(center)
+            val distance = kotlin.math.sqrt((nearest.x - center.x) * (nearest.x - center.x) + (nearest.y - center.y) * (nearest.y - center.y))
+            val push = (radius + gap - distance).coerceAtLeast(0f)
+            val pushed = initial.translate(candidate.direction.x * push, candidate.direction.y * push)
+            val bounds = Rect(
+                pushed.left.coerceIn(6f, width - candidate.width - 6f),
+                pushed.top.coerceIn(6f, height - candidate.height - 6f),
+                pushed.left.coerceIn(6f, width - candidate.width - 6f) + candidate.width,
+                pushed.top.coerceIn(6f, height - candidate.height - 6f) + candidate.height,
+            )
+            DonutLabelLayout(candidate.segment.id, candidate.anchor, bounds, requireNotNull(candidate.segment.color))
+        }
+    }
+}
+
+private data class DonutLabelCandidate(
+    val segment: DonutChartSegment,
+    val anchor: Offset,
+    val direction: Offset,
+    val width: Float,
+    val height: Float,
+    val x: Float,
+    val y: Float,
+    val leftSide: Boolean,
+)

@@ -40,6 +40,7 @@
     <string name="nutrition_tab_ingredient_ranking">食材排行</string>
     <string name="nutrition_tab_recipe_steps">制作步骤</string>
     <string name="nutrition_tab_estimate">如何估重</string>
+    <string name="nutrition_tab_sources">数据来源</string>
     <string name="nutrition_detail_placeholder">此内容正在规划中。</string>
     <string name="nutrition_comparison_title">食物对比</string>
     <string name="nutrition_food_detail_title">食物详情</string>
@@ -50,6 +51,13 @@
     <string name="nutrition_health_metrics">健康指标</string>
     <string name="nutrition_nutrients">营养素</string>
     <string name="nutrition_sources">数据来源</string>
+    <string name="nutrition_sources_empty">该条目暂无数据来源。</string>
+    <string name="nutrition_macronutrient_energy">营养素供能</string>
+    <string name="nutrition_macronutrient_energy_center">碳水、蛋白质、脂肪</string>
+    <string name="nutrition_energy_carbohydrate">碳水供能 %.1f%%</string>
+    <string name="nutrition_energy_protein">蛋白供能 %.1f%%</string>
+    <string name="nutrition_energy_fat">脂肪供能 %.1f%%</string>
+    <string name="nutrition_energy_kcal_value">%.0f 千卡</string>
     <string name="nutrition_profile_item">项目</string>
     <string name="nutrition_profile_amount">含量</string>
     <string name="nutrition_profile_classification">分类</string>
@@ -61,6 +69,8 @@
     <string name="nutrition_metric_range_more_than_to_at_most">&gt; %1$s 且 ≤ %2$s</string>
     <string name="nutrition_metric_range_more_than">&gt; %1$s</string>
     <string name="nutrition_metric_gi">升糖指数（GI）</string>
+    <string name="nutrition_metric_glycemic">血糖指标</string>
+    <string name="nutrition_metric_glycemic_icon">血糖</string>
     <string name="nutrition_metric_gl">血糖负荷（GL）/ 100 克</string>
     <string name="nutrition_metric_inflammatory_potential">炎症指数</string>
     <string name="nutrition_health_metrics_help">健康指标说明</string>
@@ -86,6 +96,10 @@
     <string name="nutrition_editor_section_dish_profile">菜肴档案</string>
     <string name="nutrition_editor_section_recipe">制作步骤</string>
     <string name="nutrition_basic_information">基础信息</string>
+    <string name="nutrition_header_introduction">介绍</string>
+    <string name="nutrition_header_introduction_empty">该条目暂无介绍。</string>
+    <string name="nutrition_header_previous">查看上一项内容</string>
+    <string name="nutrition_header_next">查看下一项内容</string>
     <string name="nutrition_recipe_basic_information">制作基础信息</string>
     <string name="nutrition_nutrient_energy">能量</string>
     <string name="nutrition_nutrient_protein">蛋白质</string>
@@ -126,6 +140,9 @@
     <string name="nutrition_edible_ratio_value">%1$d%%</string>
     <string name="nutrition_derived_from">来源</string>
     <string name="nutrition_cooking_method">烹饪方式</string>
+    <string name="nutrition_botanical_family">科</string>
+    <string name="nutrition_botanical_genus">属</string>
+    <string name="nutrition_botanical_species">种</string>
     <string name="nutrition_dish_components">组分</string>
     <string name="nutrition_related_dishes">相关菜肴</string>
     <string name="nutrition_component_amount">%1$.0f %2$s</string>

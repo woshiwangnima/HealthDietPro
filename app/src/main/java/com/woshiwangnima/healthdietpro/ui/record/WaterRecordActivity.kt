@@ -204,7 +204,7 @@ private fun WaterStatisticsPage(records: List<WaterRecord>, beverages: List<Beve
         item { WaterGlassProgress((todayActualWater / recommendation).toFloat().coerceIn(0f, 1f), formatMl(todayActualWater), stringResource(R.string.water_statistics_progress, (todayActualWater / recommendation * 100).toInt())) }
         item { Text(stringResource(R.string.water_statistics_breakdown), modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium) }
         item { RecordTimeRangeFilter(rangeSelection, { rangeSelection = it }) }
-        item { AnimatedDonutChart(segments, formatMl(totalActualWater), stringResource(R.string.water_statistics_actual_water), Modifier.fillMaxWidth()) }
+        item { AnimatedDonutChart(segments, formatMl(totalActualWater), stringResource(R.string.water_statistics_actual_water), Modifier.fillMaxWidth(), showLegend = false) }
         if (rows.isNotEmpty()) {
             item { WaterCompositionTable(rows, totalActualWater) }
         } else {

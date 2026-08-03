@@ -25,6 +25,7 @@ internal data class FoodDto(
     val description: Map<String, String> = emptyMap(),
     val image: FoodImageDto? = null,
     val sources: List<FoodSourceDto> = emptyList(),
+    val botanicalTaxonomy: BotanicalTaxonomyDto? = null,
     // 菜肴扩展字段
     val cuisine: String? = null,
     val dishCategories: List<String> = emptyList(),
@@ -51,6 +52,7 @@ internal data class FoodDto(
             description = description,
             image = image?.toDomain(),
             sources = sources.map { it.toDomain() },
+            botanicalTaxonomy = botanicalTaxonomy?.toDomain(),
             recipeSteps = recipeSteps.map { it.toDomain() },
             techniqueId = techniqueId,
             servesPeople = servesPeople,
@@ -67,6 +69,7 @@ internal data class FoodDto(
             description = description,
             image = image?.toDomain(),
             sources = sources.map { it.toDomain() },
+            botanicalTaxonomy = botanicalTaxonomy?.toDomain(),
             cuisine = cuisine,
             dishCategories = dishCategories,
             recipeSteps = recipeSteps.map { it.toDomain() },
@@ -91,6 +94,7 @@ internal data class FoodDto(
             description = description,
             image = image?.toDomain(),
             sources = sources.map { it.toDomain() },
+            botanicalTaxonomy = botanicalTaxonomy?.toDomain(),
         )
     }
 
@@ -213,4 +217,13 @@ internal data class FoodSourceDto(
     val reference: String,
 ) {
     fun toDomain() = FoodSource(dataset, reference)
+}
+
+@Serializable
+internal data class BotanicalTaxonomyDto(
+    val family: String,
+    val genus: String,
+    val species: String? = null,
+) {
+    fun toDomain() = BotanicalTaxonomy(family, genus, species)
 }

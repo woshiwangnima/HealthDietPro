@@ -7,6 +7,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.HealthDietProApplication
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
+import com.woshiwangnima.healthdietpro.model.food.BotanicalTaxonomyLabels
+import com.woshiwangnima.healthdietpro.model.food.BotanicalTaxonomyRepository
 import com.woshiwangnima.healthdietpro.model.food.CookingMethod
 import com.woshiwangnima.healthdietpro.model.food.CookingMethodRepository
 import com.woshiwangnima.healthdietpro.model.food.Dish
@@ -73,6 +75,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     private val cookingMethodRepository = CookingMethodRepository.fromContext(application)
     private val servingContainerRepository = ServingContainerRepository.fromContext(application)
     private val nutrientMetaRepository = NutrientMetaRepository.fromContext(application)
+    private val botanicalTaxonomyRepository = BotanicalTaxonomyRepository.fromContext(application)
     private var tagRepository = UserFoodTagRepository.fromContext(application)
     private var customRepository = UserCustomFoodRepository.fromContext(application)
     private var foodCollections = UserItemCollectionRepository.fromContext(application, NUTRITION_FOOD_COLLECTIONS_KEY)
@@ -89,6 +92,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     private var containers: List<ServingContainer> = emptyList()
     private var builtInFoods: List<FoodItem> = emptyList()
     private var nutrientMetas: List<NutrientMeta> = emptyList()
+    private var botanicalTaxonomy: BotanicalTaxonomyLabels = BotanicalTaxonomyLabels(emptyMap(), emptyMap())
     init {
         val initialUserId = userId
         val initialTagRepository = tagRepository
@@ -100,11 +104,13 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
             val tags = withContext(Dispatchers.IO) { initialTagRepository.load() }
             val customs = withContext(Dispatchers.IO) { initialCustomRepository.load() }
             val metas = withContext(Dispatchers.IO) { nutrientMetaRepository.nutrients() }
+            val taxonomy = withContext(Dispatchers.IO) { botanicalTaxonomyRepository.labels() }
             if (userId == initialUserId) {
                 builtInFoods = foods
                 cookingMethodsById = methods
                 containers = loadedContainers
                 nutrientMetas = metas
+                botanicalTaxonomy = taxonomy
                 rebuild(customs)
                 val collections = loadFoodCollections()
                 _state.value = _state.value.copy(
@@ -131,6 +137,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     fun foodById(id: String): FoodItem? = foodsById[id]
     fun availableContainers(): List<ServingContainer> = containers
     fun nutrientMetas(): List<NutrientMeta> = nutrientMetas
+    fun botanicalTaxonomy(): BotanicalTaxonomyLabels = botanicalTaxonomy
 
     /** Ingredients + prepared foods usable as dish components / derivation sources. */
     fun selectableIngredients(): List<Ingredient> = foodsById.values

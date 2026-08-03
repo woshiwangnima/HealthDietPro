@@ -14,6 +14,7 @@ internal sealed interface FoodItem {
     val image: FoodImage?
     val sources: List<FoodSource>
     val servings: List<FoodServing>
+    val botanicalTaxonomy: BotanicalTaxonomy?
 
     fun displayName(language: String): String = names[language]?.firstOrNull()
         ?: names["en"]?.firstOrNull()
@@ -49,6 +50,7 @@ internal data class Ingredient(
     override val description: Map<String, String> = emptyMap(),
     override val image: FoodImage? = null,
     override val sources: List<FoodSource> = emptyList(),
+    override val botanicalTaxonomy: BotanicalTaxonomy? = null,
 ) : CategorizedFood {
     override val kind: FoodKind get() = FoodKind.INGREDIENT
 }
@@ -68,6 +70,7 @@ internal data class PreparedFood(
     override val description: Map<String, String> = emptyMap(),
     override val image: FoodImage? = null,
     override val sources: List<FoodSource> = emptyList(),
+    override val botanicalTaxonomy: BotanicalTaxonomy? = null,
     val recipeSteps: List<RecipeStep> = emptyList(),
     val techniqueId: String? = null,
     val servesPeople: Int? = null,
@@ -87,6 +90,7 @@ internal data class Dish(
     override val description: Map<String, String> = emptyMap(),
     override val image: FoodImage? = null,
     override val sources: List<FoodSource> = emptyList(),
+    override val botanicalTaxonomy: BotanicalTaxonomy? = null,
     // 菜肴扩展元数据（全部可选，缺省不影响既有数据）。
     val cuisine: String? = null,                       // 菜系 id（见 DishTaxonomy.cuisines）
     val dishCategories: List<String> = emptyList(),     // 菜品分类：家常/宴客/甜品…
@@ -170,4 +174,10 @@ internal data class FoodImage(
 internal data class FoodSource(
     val dataset: String,
     val reference: String,
+)
+
+internal data class BotanicalTaxonomy(
+    val family: String,
+    val genus: String,
+    val species: String? = null,
 )

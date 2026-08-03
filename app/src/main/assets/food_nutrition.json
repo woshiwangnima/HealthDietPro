@@ -755,6 +755,7 @@
     },
     {
       "id": "food:taxon:solanum_tuberosum:boiled",
+      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum tuberosum" },
       "names": {
         "zh": [
           "煮土豆",
@@ -811,6 +812,7 @@
     },
     {
       "id": "food:taxon:cucumis_sativus:commercial:raw",
+      "botanicalTaxonomy": { "family": "Cucurbitaceae", "genus": "Cucumis", "species": "Cucumis sativus" },
       "names": {
         "zh": [
           "黄瓜",
@@ -897,6 +899,7 @@
     },
     {
       "id": "food:taxon:cucumis_sativus:landrace:raw",
+      "botanicalTaxonomy": { "family": "Cucurbitaceae", "genus": "Cucumis", "species": "Cucumis sativus" },
       "names": {
         "zh": [
           "本地黄瓜",
@@ -982,6 +985,7 @@
     },
     {
       "id": "food:taxon:solanum_lycopersicum:raw",
+      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum lycopersicum" },
       "names": {
         "zh": [
           "番茄",
@@ -1069,6 +1073,7 @@
     },
     {
       "id": "food:taxon:brassica_oleracea:broccoli:raw",
+      "botanicalTaxonomy": { "family": "Brassicaceae", "genus": "Brassica", "species": "Brassica oleracea" },
       "names": {
         "zh": [
           "西兰花",
@@ -2117,6 +2122,7 @@
     },
     {
       "id": "food:taxon:ipomoea_batatas:steamed",
+      "botanicalTaxonomy": { "family": "Convolvulaceae", "genus": "Ipomoea", "species": "Ipomoea batatas" },
       "names": {
         "zh": [
           "红薯",
@@ -2164,6 +2170,7 @@
     },
     {
       "id": "food:taxon:colocasia_esculenta:boiled",
+      "botanicalTaxonomy": { "family": "Araceae", "genus": "Colocasia", "species": "Colocasia esculenta" },
       "names": {
         "zh": [
           "芋头",
@@ -3120,6 +3127,110 @@
       "hydrationMlPer100g": 100
     },
     {
+      "id": "food:taxon:triticum_aestivum:flour:cake",
+      "kind": "ingredient",
+      "names": { "zh": ["低筋面粉", "蛋糕粉"], "en": ["Cake flour", "Low-protein flour"] },
+      "categoryTags": ["food.staple", "food.staple.grain"],
+      "systemTags": ["common"],
+      "edibleRatio": 1,
+      "botanicalTaxonomy": { "family": "Poaceae", "genus": "Triticum", "species": "Triticum aestivum" },
+      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 351, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 8.5, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 1.0, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 77.0, "unitCategory": "weight", "unitId": "g" } } } },
+      "healthMetrics": { "glycemicIndex": { "value": 85, "unit": "GI", "note": "Dry flour; GI is a reference estimate and not a diagnosis." }, "glycemicLoadPer100g": { "value": 65.5, "unit": "GL" } },
+      "sources": [
+        { "dataset": "USDA FoodData Central", "reference": "Cake flour, dry; values normalized per 100 g" },
+        { "dataset": "Encyclopaedia Britannica, Wheat", "reference": "Soft wheat is used for cakes and pastries; https://www.britannica.com/plant/wheat" }
+      ],
+      "description": { "zh": "低筋面粉通常来自较软小麦，蛋白质含量较低，面筋形成能力较弱，适合蛋糕、饼干和酥点。与中筋、高筋面粉的区别主要是小麦硬度和蛋白质/面筋强度，不是营养学上的低碳水食品。", "en": "Cake flour is generally milled from softer wheat and has lower protein and weaker gluten development than all-purpose or bread flour. The baking distinction is wheat hardness and gluten strength, not low carbohydrate content." },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:flour:bread",
+      "kind": "ingredient",
+      "names": { "zh": ["高筋面粉", "面包粉"], "en": ["Bread flour", "High-protein flour"] },
+      "categoryTags": ["food.staple", "food.staple.grain"],
+      "systemTags": ["common"],
+      "edibleRatio": 1,
+      "botanicalTaxonomy": { "family": "Poaceae", "genus": "Triticum", "species": "Triticum aestivum" },
+      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 364, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 13.7, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 1.5, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 71.0, "unitCategory": "weight", "unitId": "g" } } } },
+      "healthMetrics": { "glycemicIndex": { "value": 85, "unit": "GI", "note": "Dry flour; GI is a reference estimate and not a diagnosis." }, "glycemicLoadPer100g": { "value": 60.4, "unit": "GL" } },
+      "sources": [
+        { "dataset": "USDA FoodData Central", "reference": "Bread flour, dry; values normalized per 100 g" },
+        { "dataset": "Encyclopaedia Britannica, Wheat", "reference": "Hard wheat commonly has 11-15% protein and strong gluten; https://www.britannica.com/plant/wheat" }
+      ],
+      "description": { "zh": "高筋面粉通常来自硬质小麦，蛋白质和面筋形成能力较高，适合面包、吐司和需要较强支撑力的面团。", "en": "Bread flour is generally milled from hard wheat and has higher protein and stronger gluten development for bread and other elastic doughs." },
+      "commonness": 4
+    },
+    {
+      "id": "food:starch:corn",
+      "kind": "ingredient",
+      "names": { "zh": ["玉米淀粉", "生粉"], "en": ["Cornstarch", "Corn flour starch"] },
+      "categoryTags": ["food.staple", "food.staple.processed"],
+      "systemTags": ["common"],
+      "edibleRatio": 1,
+      "botanicalTaxonomy": { "family": "Poaceae", "genus": "Zea", "species": "Zea mays" },
+      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 381, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0.3, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0.1, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 91.3, "unitCategory": "weight", "unitId": "g" } } } },
+      "healthMetrics": { "glycemicIndex": { "value": 70, "unit": "GI", "note": "Reference for isolated dry starch; preparation changes glucose response." }, "glycemicLoadPer100g": { "value": 63.9, "unit": "GL" } },
+      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Cornstarch, dry; values normalized per 100 g" } ],
+      "description": { "zh": "玉米淀粉是从玉米胚乳分离出的淀粉，主要用于增稠、上浆和烘焙；与玉米粉或玉米粒不是同一食材。", "en": "Cornstarch is starch isolated from the maize endosperm. It is used for thickening, coating and baking and is distinct from whole corn flour or kernels." },
+      "commonness": 4
+    },
+    {
+      "id": "food:starch:potato",
+      "kind": "ingredient",
+      "names": { "zh": ["马铃薯淀粉", "土豆淀粉"], "en": ["Potato starch"] },
+      "categoryTags": ["food.staple", "food.staple.processed"],
+      "systemTags": ["common"],
+      "edibleRatio": 1,
+      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum tuberosum" },
+      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 357, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0.1, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0.1, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 88.2, "unitCategory": "weight", "unitId": "g" } } } },
+      "healthMetrics": { "glycemicIndex": { "value": 70, "unit": "GI", "note": "Reference for isolated dry starch; preparation changes glucose response." }, "glycemicLoadPer100g": { "value": 61.7, "unit": "GL" } },
+      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Potato starch, dry; values normalized per 100 g" } ],
+      "description": { "zh": "马铃薯淀粉是从马铃薯块茎中提取的纯淀粉，糊化后黏度和透明度与玉米淀粉不同。", "en": "Potato starch is purified starch extracted from potato tubers; its gelatinization and viscosity differ from cornstarch." },
+      "commonness": 3
+    },
+    {
+      "id": "food:starch:tapioca",
+      "kind": "ingredient",
+      "names": { "zh": ["木薯淀粉", "木薯粉"], "en": ["Tapioca starch", "Cassava starch"] },
+      "categoryTags": ["food.staple", "food.staple.processed"],
+      "systemTags": ["common"],
+      "edibleRatio": 1,
+      "botanicalTaxonomy": { "family": "Euphorbiaceae", "genus": "Manihot", "species": "Manihot esculenta" },
+      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 358, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0.2, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0.0, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 88.7, "unitCategory": "weight", "unitId": "g" } } } },
+      "healthMetrics": { "glycemicIndex": { "value": 70, "unit": "GI", "note": "Reference for isolated dry starch; preparation changes glucose response." }, "glycemicLoadPer100g": { "value": 62.1, "unit": "GL" } },
+      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Tapioca starch, dry; values normalized per 100 g" } ],
+      "description": { "zh": "木薯淀粉来自木薯块根，常用于珍珠、勾芡和无麸质配方；木薯粉与木薯全粉的组成可能不同。", "en": "Tapioca starch is extracted from cassava roots and is used in pearls, thickening and gluten-free formulations; cassava flour is a different product." },
+      "commonness": 3
+    },
+    {
+      "id": "food:dairy:butter",
+      "kind": "ingredient",
+      "names": { "zh": ["黄油", "乳脂黄油", "咸黄油"], "en": ["Salted butter", "Dairy butter"] },
+      "categoryTags": ["food.dairy", "food.oil"],
+      "systemTags": ["common"],
+      "edibleRatio": 1,
+      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 717, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0.85, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 81.1, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 0.06, "unitCategory": "weight", "unitId": "g" }, "VITA": { "value": 684, "unitCategory": "weight", "unitId": "μg" }, "VITE": { "value": 2.32, "unitCategory": "weight", "unitId": "mg" }, "VITK": { "value": 7, "unitCategory": "weight", "unitId": "μg" }, "VITB1": { "value": 0.005, "unitCategory": "weight", "unitId": "mg" }, "VITB2": { "value": 0.034, "unitCategory": "weight", "unitId": "mg" }, "NIACIN": { "value": 0.042, "unitCategory": "weight", "unitId": "mg" }, "VITB6": { "value": 0.003, "unitCategory": "weight", "unitId": "mg" }, "FOLATE": { "value": 3, "unitCategory": "weight", "unitId": "μg" }, "VITB12": { "value": 0.17, "unitCategory": "weight", "unitId": "μg" }, "PANTOTHENIC": { "value": 0.11, "unitCategory": "weight", "unitId": "mg" }, "CHOLINE": { "value": 18.8, "unitCategory": "weight", "unitId": "mg" }, "CA": { "value": 24, "unitCategory": "weight", "unitId": "mg" }, "P": { "value": 24, "unitCategory": "weight", "unitId": "mg" }, "K": { "value": 24, "unitCategory": "weight", "unitId": "mg" }, "NA": { "value": 643, "unitCategory": "weight", "unitId": "mg" }, "MG": { "value": 2, "unitCategory": "weight", "unitId": "mg" }, "FE": { "value": 0.02, "unitCategory": "weight", "unitId": "mg" }, "ZN": { "value": 0.09, "unitCategory": "weight", "unitId": "mg" }, "SE": { "value": 1, "unitCategory": "weight", "unitId": "μg" }, "ALA": { "value": 0.315, "unitCategory": "weight", "unitId": "g" }, "LA": { "value": 2.17, "unitCategory": "weight", "unitId": "g" }, "ILE": { "value": 51, "unitCategory": "weight", "unitId": "mg" }, "LEU": { "value": 83, "unitCategory": "weight", "unitId": "mg" }, "LYS": { "value": 67, "unitCategory": "weight", "unitId": "mg" }, "MET": { "value": 21, "unitCategory": "weight", "unitId": "mg" }, "PHE": { "value": 41, "unitCategory": "weight", "unitId": "mg" }, "THR": { "value": 38, "unitCategory": "weight", "unitId": "mg" }, "TRP": { "value": 12, "unitCategory": "weight", "unitId": "mg" }, "VAL": { "value": 57, "unitCategory": "weight", "unitId": "mg" }, "HIS": { "value": 23, "unitCategory": "weight", "unitId": "mg" } } } },
+      "healthMetrics": { "glycemicIndex": { "value": 0, "unit": "GI", "note": "Not applicable as a GI test food; negligible available carbohydrate." }, "glycemicLoadPer100g": { "value": 0, "unit": "GL", "note": "Not applicable as a GI test food; negligible available carbohydrate." } },
+      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Butter, salted; per 100 g" }, { "dataset": "International Tables of Glycemic Index and Glycemic Load Values", "reference": "Pure fats are not assigned a meaningful GI because they contain negligible available carbohydrate." } ],
+      "description": { "zh": "黄油是乳脂制品，主要提供脂肪和能量；纯黄油几乎不含可利用碳水，因此不能把其 GI=0 理解为进行过有效的 GI 试验。", "en": "Butter is a milk-fat product providing mostly fat and energy. Pure butter has negligible available carbohydrate, so GI 0 here means not applicable rather than a clinical GI test result." },
+      "commonness": 4
+    },
+    {
+      "id": "food:beverage:cola:sugar_free",
+      "kind": "ingredient",
+      "names": { "zh": ["无糖可乐", "零糖可乐"], "en": ["Sugar-free cola", "Diet cola"] },
+      "categoryTags": ["food.beverage"],
+      "systemTags": ["common"],
+      "edibleRatio": 1,
+      "hydrationMlPer100g": 99.8,
+      "densityGramsPerMl": 1,
+      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 0, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 0, "unitCategory": "weight", "unitId": "g" } } } },
+      "healthMetrics": { "glycemicIndex": { "value": 0, "unit": "GI", "note": "No available carbohydrate in the reference formulation; product labels vary." }, "glycemicLoadPer100g": { "value": 0, "unit": "GL" } },
+      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Carbonated beverage, cola, diet; verify against the product label" } ],
+      "description": { "zh": "无糖可乐通常用高强度甜味剂替代蔗糖，具体能量、碳水和咖啡因含量随品牌配方变化；记录时应以包装营养标签为准。", "en": "Sugar-free cola generally replaces sugar with high-intensity sweeteners. Energy, carbohydrate and caffeine vary by brand; use the package label for the consumed product." },
+      "commonness": 4
+    },
+    {
       "id": "food:taxon:triticum_aestivum:meat_bun",
       "kind": "food",
       "names": {
@@ -3202,6 +3313,7 @@
     },
     {
       "id": "food:taxon:solanum_melongena:raw",
+      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum melongena" },
       "names": {
         "zh": [
           "茄子"
@@ -3273,6 +3385,7 @@
     },
     {
       "id": "food:taxon:lactuca_sativa:raw",
+      "botanicalTaxonomy": { "family": "Asteraceae", "genus": "Lactuca", "species": "Lactuca sativa" },
       "names": {
         "zh": [
           "生菜"
@@ -3344,6 +3457,7 @@
     },
     {
       "id": "food:taxon:daucus_carota:raw",
+      "botanicalTaxonomy": { "family": "Apiaceae", "genus": "Daucus", "species": "Daucus carota" },
       "names": {
         "zh": [
           "胡萝卜"
@@ -3415,6 +3529,7 @@
     },
     {
       "id": "food:taxon:solanum_melongena:local_round_raw",
+      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum melongena" },
       "names": {
         "zh": [
           "本地圆茄",
@@ -3488,6 +3603,7 @@
     },
     {
       "id": "food:taxon:vigna_unguiculata:raw",
+      "botanicalTaxonomy": { "family": "Fabaceae", "genus": "Vigna", "species": "Vigna unguiculata" },
       "names": {
         "zh": [
           "豆角"
@@ -3560,6 +3676,7 @@
     },
     {
       "id": "food:taxon:phaseolus_vulgaris:raw",
+      "botanicalTaxonomy": { "family": "Fabaceae", "genus": "Phaseolus", "species": "Phaseolus vulgaris" },
       "names": {
         "zh": [
           "四季豆"
@@ -3632,6 +3749,7 @@
     },
     {
       "id": "food:taxon:lactuca_sativa:asparagus_lettuce",
+      "botanicalTaxonomy": { "family": "Asteraceae", "genus": "Lactuca", "species": "Lactuca sativa" },
       "names": {
         "zh": [
           "莴苣"
@@ -3704,6 +3822,7 @@
     },
     {
       "id": "food:taxon:zingiber_mioga:raw",
+      "botanicalTaxonomy": { "family": "Poaceae", "genus": "Zizania", "species": "Zizania latifolia" },
       "names": {
         "zh": [
           "茭白"
@@ -3775,6 +3894,7 @@
     },
     {
       "id": "food:taxon:dioscorea_polystachya:raw",
+      "botanicalTaxonomy": { "family": "Dioscoreaceae", "genus": "Dioscorea", "species": "Dioscorea polystachya" },
       "names": {
         "zh": [
           "山药"
@@ -3846,6 +3966,7 @@
     },
     {
       "id": "food:taxon:apium_graveolens:raw",
+      "botanicalTaxonomy": { "family": "Apiaceae", "genus": "Apium", "species": "Apium graveolens" },
       "names": {
         "zh": [
           "芹菜"
@@ -3917,6 +4038,7 @@
     },
     {
       "id": "food:taxon:capsicum_annuum:chili",
+      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Capsicum", "species": "Capsicum annuum" },
       "names": {
         "zh": [
           "小米辣"
@@ -3989,6 +4111,7 @@
     },
     {
       "id": "food:taxon:coriandrum_sativum:raw",
+      "botanicalTaxonomy": { "family": "Apiaceae", "genus": "Coriandrum", "species": "Coriandrum sativum" },
       "names": {
         "zh": [
           "香菜"
@@ -4062,6 +4185,7 @@
     },
     {
       "id": "food:taxon:allium_sativum:raw",
+      "botanicalTaxonomy": { "family": "Amaryllidaceae", "genus": "Allium", "species": "Allium sativum" },
       "names": {
         "zh": [
           "大蒜"
@@ -4134,6 +4258,7 @@
     },
     {
       "id": "food:taxon:zingiber_officinale:raw",
+      "botanicalTaxonomy": { "family": "Zingiberaceae", "genus": "Zingiber", "species": "Zingiber officinale" },
       "names": {
         "zh": [
           "生姜"
@@ -4206,6 +4331,7 @@
     },
     {
       "id": "food:taxon:solanum_lycopersicum:cherry_raw",
+      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum lycopersicum" },
       "names": {
         "zh": [
           "圣女果",
@@ -4834,6 +4960,7 @@
     },
     {
       "id": "food:taxon:solanum_tuberosum:raw",
+      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum tuberosum" },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -5138,6 +5265,7 @@
     },
     {
       "id": "food:taxon:ipomoea_batatas:raw",
+      "botanicalTaxonomy": { "family": "Convolvulaceae", "genus": "Ipomoea", "species": "Ipomoea batatas" },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -5211,6 +5339,7 @@
     },
     {
       "id": "food:taxon:colocasia_esculenta:raw",
+      "botanicalTaxonomy": { "family": "Araceae", "genus": "Colocasia", "species": "Colocasia esculenta" },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -5871,6 +6000,7 @@
     },
     {
       "id": "food:taxon:allium_fistulosum:raw",
+      "botanicalTaxonomy": { "family": "Amaryllidaceae", "genus": "Allium", "species": "Allium fistulosum" },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -5944,6 +6074,7 @@
     },
     {
       "id": "food:taxon:allium_fistulosum:scallion",
+      "botanicalTaxonomy": { "family": "Amaryllidaceae", "genus": "Allium", "species": "Allium fistulosum" },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -6017,6 +6148,7 @@
     },
     {
       "id": "food:taxon:houttuynia_cordata:raw",
+      "botanicalTaxonomy": { "family": "Saururaceae", "genus": "Houttuynia", "species": "Houttuynia cordata" },
       "kind": "ingredient",
       "names": {
         "zh": [

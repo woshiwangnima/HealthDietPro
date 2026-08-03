@@ -199,6 +199,32 @@ class FoodNutrientRepositoryTest {
     }
 
     @Test
+    fun bakingIngredientsStarchesButterAndSugarFreeColaAreDistinct() {
+        val foods = foods().associateBy { it.id }
+
+        val cakeFlour = foods.getValue("food:taxon:triticum_aestivum:flour:cake") as Ingredient
+        val allPurposeFlour = foods.getValue("food:taxon:triticum_aestivum:flour:refined") as Ingredient
+        val breadFlour = foods.getValue("food:taxon:triticum_aestivum:flour:bread") as Ingredient
+        assertTrue(cakeFlour.nutritionTables.values.single().nutrients.getValue("PROTEIN").value < allPurposeFlour.nutritionTables.values.single().nutrients.getValue("PROTEIN").value)
+        assertTrue(breadFlour.nutritionTables.values.single().nutrients.getValue("PROTEIN").value > allPurposeFlour.nutritionTables.values.single().nutrients.getValue("PROTEIN").value)
+        assertTrue(setOf("food:starch:corn", "food:starch:potato", "food:starch:tapioca").all(foods::containsKey))
+        assertEquals(81.1, (foods.getValue("food:dairy:butter") as Ingredient).nutritionTables.values.single().nutrients.getValue("FAT").value, 0.0001)
+        assertEquals(0.0, (foods.getValue("food:beverage:cola:sugar_free") as Ingredient).nutritionTables.values.single().nutrients.getValue("CHO").value, 0.0001)
+    }
+
+    @Test
+    fun vegetablesExposeBotanicalFamilyAndGenus() {
+        val foods = foods().associateBy { it.id }
+
+        val broccoli = foods.getValue("food:taxon:brassica_oleracea:broccoli:raw").botanicalTaxonomy
+        val cucumber = foods.getValue("food:taxon:cucumis_sativus:commercial:raw").botanicalTaxonomy
+        val carrot = foods.getValue("food:taxon:daucus_carota:raw").botanicalTaxonomy
+        assertEquals("Brassicaceae", broccoli?.family)
+        assertEquals("Cucumis", cucumber?.genus)
+        assertEquals("Apiaceae", carrot?.family)
+    }
+
+    @Test
     fun categoryMatchingIncludesDescendantsOnly() {
         assertTrue(FoodCategories.isWithin("food.staple.grain", "food.staple"))
         assertTrue(FoodCategories.isWithin("food.aquatic.fish", "food.aquatic"))

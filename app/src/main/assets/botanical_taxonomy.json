@@ -1,0 +1,40 @@
+{
+  "families": {
+    "Amaryllidaceae": { "zh": "石蒜科", "en": "Amaryllis family" },
+    "Apiaceae": { "zh": "伞形科", "en": "Carrot family" },
+    "Araceae": { "zh": "天南星科", "en": "Arum family" },
+    "Asteraceae": { "zh": "菊科", "en": "Aster family" },
+    "Brassicaceae": { "zh": "十字花科", "en": "Mustard family" },
+    "Convolvulaceae": { "zh": "旋花科", "en": "Morning glory family" },
+    "Cucurbitaceae": { "zh": "葫芦科", "en": "Gourd family" },
+    "Dioscoreaceae": { "zh": "薯蓣科", "en": "Yam family" },
+    "Euphorbiaceae": { "zh": "大戟科", "en": "Spurge family" },
+    "Fabaceae": { "zh": "豆科", "en": "Pea family" },
+    "Poaceae": { "zh": "禾本科", "en": "Grass family" },
+    "Saururaceae": { "zh": "三白草科", "en": "Lizard's-tail family" },
+    "Solanaceae": { "zh": "茄科", "en": "Nightshade family" },
+    "Zingiberaceae": { "zh": "姜科", "en": "Ginger family" }
+  },
+  "genera": {
+    "Allium": { "zh": "葱属", "en": "Allium" },
+    "Apium": { "zh": "芹属", "en": "Apium" },
+    "Brassica": { "zh": "芸薹属", "en": "Brassica" },
+    "Capsicum": { "zh": "辣椒属", "en": "Capsicum" },
+    "Colocasia": { "zh": "芋属", "en": "Colocasia" },
+    "Coriandrum": { "zh": "芫荽属", "en": "Coriandrum" },
+    "Cucumis": { "zh": "黄瓜属", "en": "Cucumis" },
+    "Daucus": { "zh": "胡萝卜属", "en": "Daucus" },
+    "Dioscorea": { "zh": "薯蓣属", "en": "Dioscorea" },
+    "Houttuynia": { "zh": "蕺菜属", "en": "Houttuynia" },
+    "Ipomoea": { "zh": "番薯属", "en": "Ipomoea" },
+    "Lactuca": { "zh": "莴苣属", "en": "Lactuca" },
+    "Manihot": { "zh": "木薯属", "en": "Manihot" },
+    "Phaseolus": { "zh": "菜豆属", "en": "Phaseolus" },
+    "Solanum": { "zh": "茄属", "en": "Solanum" },
+    "Triticum": { "zh": "小麦属", "en": "Triticum" },
+    "Vigna": { "zh": "豇豆属", "en": "Vigna" },
+    "Zea": { "zh": "玉蜀黍属", "en": "Zea" },
+    "Zingiber": { "zh": "姜属", "en": "Zingiber" },
+    "Zizania": { "zh": "菰属", "en": "Zizania" }
+  }
+}
