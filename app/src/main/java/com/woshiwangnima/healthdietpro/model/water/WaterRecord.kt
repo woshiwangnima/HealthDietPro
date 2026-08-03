@@ -14,6 +14,7 @@ internal data class WaterRecord(
 
 @Serializable
 internal data class WaterQuickRecord(
+    val id: String = "",
     val beverageId: String,
     val volume: Double = 250.0,
     val unit: WaterVolumeUnit = WaterVolumeUnit.ML,
@@ -36,11 +37,26 @@ internal enum class WaterVolumeUnit(val milliliters: Double) {
 
 @Serializable
 internal data class WaterArchive(
-    val schemaVersion: Int = 1,
+    val schemaVersion: Int = WATER_ARCHIVE_SCHEMA_VERSION,
     val records: List<WaterRecord> = emptyList(),
     val activityLevel: ActivityLevel = ActivityLevel.NONE,
     val quickRecords: List<WaterQuickRecord> = emptyList(),
 )
+
+internal const val WATER_ARCHIVE_SCHEMA_VERSION = 2
+
+/** Assigns stable identities to v1 presets, which were uniquely addressed only by beverage ID. */
+internal fun migrateWaterArchive(archive: WaterArchive): WaterArchive {
+    val usedIds = mutableSetOf<String>()
+    val quickRecords = archive.quickRecords.mapIndexed { index, record ->
+        val id = record.id.takeIf { it.isNotBlank() && usedIds.add(it) }
+            ?: java.util.UUID.nameUUIDFromBytes(
+                "${record.beverageId}\u0000${record.volume}\u0000${record.unit.name}\u0000$index".toByteArray(Charsets.UTF_8),
+            ).toString().also(usedIds::add)
+        record.copy(id = id)
+    }
+    return archive.copy(schemaVersion = WATER_ARCHIVE_SCHEMA_VERSION, quickRecords = quickRecords)
+}
 
 internal fun recommendedWaterMl(
     gender: Gender,

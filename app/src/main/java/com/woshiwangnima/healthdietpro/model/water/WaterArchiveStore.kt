@@ -40,12 +40,20 @@ internal class WaterArchiveStore private constructor(
         file().takeIf(File::isFile)?.readText(Charsets.UTF_8)?.let {
             json.decodeDomain(it, DOMAIN_ID, WaterArchive.serializer())
         }
-    }.getOrNull()
+    }.getOrNull()?.let { archive ->
+        val migrated = migrateWaterArchive(archive)
+        // Persist the v1-to-v2 identity migration before callers can edit a preset.
+        if (migrated != archive) save(migrated)
+        migrated
+    }
 
     private fun validate(archive: WaterArchive) {
         val recordIds = archive.records.map(WaterRecord::id)
         require(recordIds.all(String::isNotBlank) && recordIds.distinct().size == recordIds.size) { "Invalid water record ids" }
         require(archive.records.all { it.beverageId.isNotBlank() && it.beverageName.isNotBlank() && it.volumeMl > 0.0 }) { "Invalid water record" }
+        require(archive.schemaVersion == WATER_ARCHIVE_SCHEMA_VERSION) { "Unsupported water archive schema" }
+        val quickRecordIds = archive.quickRecords.map(WaterQuickRecord::id)
+        require(quickRecordIds.all(String::isNotBlank) && quickRecordIds.distinct().size == quickRecordIds.size) { "Invalid water quick record ids" }
         require(archive.quickRecords.all { it.beverageId.isNotBlank() && it.volume > 0.0 }) { "Invalid water quick record" }
     }
 

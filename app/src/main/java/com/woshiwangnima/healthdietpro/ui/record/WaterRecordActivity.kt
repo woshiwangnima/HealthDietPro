@@ -116,7 +116,7 @@ private fun WaterRecordRoute(onFinish: () -> Unit, openEditorInitially: Boolean)
     var route by rememberSaveable { mutableStateOf(if (openEditorInitially) WaterRoute.EDITOR else WaterRoute.HOME) }
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var editingRecord by remember { mutableStateOf<WaterRecord?>(null) }
-    var editingQuickBeverageId by remember { mutableStateOf<String?>(null) }
+    var editingQuickRecordId by remember { mutableStateOf<String?>(null) }
     fun refresh() { archive = repository.load() }
     fun navigateBack() {
         route = when (route) {
@@ -136,8 +136,8 @@ private fun WaterRecordRoute(onFinish: () -> Unit, openEditorInitially: Boolean)
         WaterRoute.SETTINGS -> WaterSettingsScreen({ route = WaterRoute.HOME }, { route = WaterRoute.RECOMMENDATION }, { route = WaterRoute.HYDRATION }, { route = WaterRoute.QUICK_RECORDS })
         WaterRoute.RECOMMENDATION -> WaterRecommendationScreen(archive.activityLevel, { route = WaterRoute.SETTINGS }) { level -> repository.saveSettings(level, archive.quickRecords); refresh() }
         WaterRoute.HYDRATION -> BeverageHydrationScreen(beverages, { route = WaterRoute.SETTINGS })
-        WaterRoute.QUICK_RECORDS -> QuickRecordSettingsScreen(beverages, archive.quickRecords, { route = WaterRoute.SETTINGS }, { editingQuickBeverageId = null; route = WaterRoute.QUICK_EDITOR }, { quick -> editingQuickBeverageId = quick.beverageId; route = WaterRoute.QUICK_EDITOR }, { beverageId -> repository.saveSettings(archive.activityLevel, archive.quickRecords.filterNot { it.beverageId == beverageId }); refresh() })
-        WaterRoute.QUICK_EDITOR -> QuickRecordEditorScreen(beverages, archive.quickRecords.firstOrNull { it.beverageId == editingQuickBeverageId }, { route = WaterRoute.QUICK_RECORDS }) { originalId, quick -> repository.saveSettings(archive.activityLevel, archive.quickRecords.filterNot { it.beverageId == originalId || it.beverageId == quick.beverageId } + quick); refresh(); route = WaterRoute.QUICK_RECORDS }
+        WaterRoute.QUICK_RECORDS -> QuickRecordSettingsScreen(beverages, archive.quickRecords, { route = WaterRoute.SETTINGS }, { editingQuickRecordId = null; route = WaterRoute.QUICK_EDITOR }, { quick -> editingQuickRecordId = quick.id; route = WaterRoute.QUICK_EDITOR }, { quickRecordId -> repository.saveSettings(archive.activityLevel, archive.quickRecords.filterNot { it.id == quickRecordId }); refresh() })
+        WaterRoute.QUICK_EDITOR -> QuickRecordEditorScreen(beverages, archive.quickRecords.firstOrNull { it.id == editingQuickRecordId }, { route = WaterRoute.QUICK_RECORDS }) { originalId, quick -> repository.saveSettings(archive.activityLevel, archive.quickRecords.filterNot { it.id == originalId } + quick); refresh(); route = WaterRoute.QUICK_RECORDS }
     }
 }
 
@@ -390,7 +390,7 @@ private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, q
     val defaultBeverage = beverages.firstOrNull { it.id == "food:water:drinking" } ?: beverages.firstOrNull()
     var beverageId by rememberSaveable(record?.id) { mutableStateOf(record?.beverageId ?: defaultBeverage?.id.orEmpty()) }
     val initialQuick = quickRecords.firstOrNull { it.beverageId == beverageId }
-    var selectedQuickBeverageId by rememberSaveable(record?.id) { mutableStateOf<String?>(null) }
+    var selectedQuickRecordId by rememberSaveable(record?.id) { mutableStateOf<String?>(null) }
     var volume by rememberSaveable(record?.id) { mutableStateOf(record?.volumeMl?.toString() ?: initialQuick?.volume?.toString() ?: "250") }
     var unit by rememberSaveable(record?.id) { mutableStateOf(if (record != null) WaterVolumeUnit.ML else initialQuick?.unit ?: WaterVolumeUnit.ML) }
     var timestamp by rememberSaveable(record?.id) { mutableStateOf(record?.timestamp ?: normalizeRecordTimestamp(System.currentTimeMillis(), RecordTimePrecision.MINUTE)) }
@@ -411,17 +411,17 @@ private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, q
                 item { RecordTimePickerField(stringResource(R.string.water_time), timestamp, RecordTimePrecision.MINUTE, { pickTime = true }) }
                 if (quickRecords.isNotEmpty()) {
                     item {
-                        val selectedQuick = quickRecords.firstOrNull { it.beverageId == selectedQuickBeverageId }
+                        val selectedQuick = quickRecords.firstOrNull { it.id == selectedQuickRecordId }
                         AppDropdownField(
                             label = stringResource(R.string.water_quick_record_select),
                             value = selectedQuick?.let { quick -> beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId }.orEmpty(),
                             options = quickRecords.map { quick ->
                                 val name = beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId
-                                AppDropdownOption(quick.beverageId, name, "${quick.volume} ${quick.unit.name.lowercase()}")
+                                AppDropdownOption(quick.id, name, "${quick.volume} ${quick.unit.name.lowercase()}")
                             },
                             onSelect = { option ->
-                                val quick = quickRecords.firstOrNull { it.beverageId == option.id } ?: return@AppDropdownField
-                                selectedQuickBeverageId = quick.beverageId
+                                val quick = quickRecords.firstOrNull { it.id == option.id } ?: return@AppDropdownField
+                                selectedQuickRecordId = quick.id
                                 beverageId = quick.beverageId
                                 volume = quick.volume.toString()
                                 unit = quick.unit
@@ -429,7 +429,7 @@ private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, q
                         )
                     }
                 }
-                item { AppDropdownField(stringResource(R.string.water_beverage), beverage?.name.orEmpty(), beverages.map { AppDropdownOption(it.id, it.name, it.hydrationMlPer100g?.let { value -> stringResource(R.string.water_hydration_option, value) }) }, { beverageId = it.id; selectedQuickBeverageId = null }) }
+                item { AppDropdownField(stringResource(R.string.water_beverage), beverage?.name.orEmpty(), beverages.map { AppDropdownOption(it.id, it.name, it.hydrationMlPer100g?.let { value -> stringResource(R.string.water_hydration_option, value) }) }, { beverageId = it.id; selectedQuickRecordId = null }) }
                 item { EditorTextField(label = stringResource(R.string.water_volume), value = volume, onValueChange = { volume = it }, required = true, numeric = true, range = NumericInputRange(minimum = 0.001)) }
                 item { AppDropdownField(stringResource(R.string.water_unit), unit.name.lowercase(), WaterVolumeUnit.entries.map { AppDropdownOption(it.name, it.name.lowercase()) }, { unit = WaterVolumeUnit.valueOf(it.id) }) }
             }
@@ -509,7 +509,7 @@ private fun QuickRecordSettingsScreen(
                 if (quickRecords.isEmpty()) Text(stringResource(R.string.water_quick_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 else AppDataTable(
                     rows = quickRecords,
-                    rowKey = { _, item -> item.beverageId },
+                    rowKey = { _, item -> item.id },
                     modifier = Modifier.weight(1f),
                     columns = listOf(
                         AppDataTableColumn("beverage", { AppDataTableHeaderText(stringResource(R.string.water_beverage)) }, ColumnWidth.Flex(1f, 140.dp)) { quick -> AppDataTableText(beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId) },
@@ -522,22 +522,22 @@ private fun QuickRecordSettingsScreen(
             }
         }
     }
-    deleting?.let { quick -> AlertDialog(onDismissRequest = { deleting = null }, title = { Text(stringResource(R.string.body_record_delete_confirm_title)) }, text = { Text(stringResource(R.string.water_quick_delete_message)) }, confirmButton = { TextButton(onClick = { onDelete(quick.beverageId); deleting = null }) { Text(stringResource(R.string.body_record_delete)) } }, dismissButton = { TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } }) }
+    deleting?.let { quick -> AlertDialog(onDismissRequest = { deleting = null }, title = { Text(stringResource(R.string.body_record_delete_confirm_title)) }, text = { Text(stringResource(R.string.water_quick_delete_message)) }, confirmButton = { TextButton(onClick = { onDelete(quick.id); deleting = null }) { Text(stringResource(R.string.body_record_delete)) } }, dismissButton = { TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } }) }
 }
 
 @Composable
 private fun QuickRecordEditorScreen(beverages: List<Beverage>, quickRecord: WaterQuickRecord?, onBack: () -> Unit, onSave: (String?, WaterQuickRecord) -> Unit) {
     val defaultBeverageId = beverages.firstOrNull { it.id == "food:water:drinking" }?.id.orEmpty()
-    var beverageId by rememberSaveable(quickRecord?.beverageId) { mutableStateOf(quickRecord?.beverageId ?: defaultBeverageId) }
-    var volume by rememberSaveable(quickRecord?.beverageId) { mutableStateOf(quickRecord?.volume?.toString() ?: "250") }
-    var unit by rememberSaveable(quickRecord?.beverageId) { mutableStateOf(quickRecord?.unit ?: WaterVolumeUnit.ML) }
+    var beverageId by rememberSaveable(quickRecord?.id) { mutableStateOf(quickRecord?.beverageId ?: defaultBeverageId) }
+    var volume by rememberSaveable(quickRecord?.id) { mutableStateOf(quickRecord?.volume?.toString() ?: "250") }
+    var unit by rememberSaveable(quickRecord?.id) { mutableStateOf(quickRecord?.unit ?: WaterVolumeUnit.ML) }
     val selected = beverages.firstOrNull { it.id == beverageId }
     val volumeValue = volume.toDoubleOrNull()
-    val current = if (selected != null && volumeValue != null && volumeValue > 0.0) WaterQuickRecord(beverageId, volumeValue, unit) else null
+    val current = if (selected != null && volumeValue != null && volumeValue > 0.0) WaterQuickRecord(quickRecord?.id ?: UUID.randomUUID().toString(), beverageId, volumeValue, unit) else null
     val hasChanges = current != quickRecord
     val saveEnabled = current != null && hasChanges
-    var showDiscardDialog by rememberSaveable(quickRecord?.beverageId) { mutableStateOf(false) }
-    fun save() { current?.let { onSave(quickRecord?.beverageId, it) } }
+    var showDiscardDialog by rememberSaveable(quickRecord?.id) { mutableStateOf(false) }
+    fun save() { current?.let { onSave(quickRecord?.id, it) } }
     fun requestBack() { if (hasChanges) showDiscardDialog = true else onBack() }
     BackHandler(onBack = ::requestBack)
     BaseScreen(title = stringResource(if (quickRecord == null) R.string.water_quick_add else R.string.water_quick_edit), onBack = ::requestBack) { padding ->
