@@ -1047,6 +1047,7 @@
     <string name="water_kind_ingredient">Ingredient</string>
     <string name="water_kind_food">Food</string>
     <string name="water_quick_records_hint">The selected beverage and amount are used as the default for a new water record.</string>
+    <string name="water_quick_record_select">Quick record</string>
     <string name="water_edit">Edit water record</string>
     <string name="water_quick_add">Add quick record</string>
     <string name="water_quick_edit">Edit quick record</string>
@@ -1062,6 +1063,12 @@
     <string name="water_statistics_actual_water">Actual water</string>
     <string name="water_statistics_volume_water">Beverage / water</string>
     <string name="water_statistics_percent_water">Beverage %% / water %%</string>
+    <string name="water_statistics_trend">Daily water trend</string>
+    <string name="water_statistics_7_days">7 days</string>
+    <string name="water_statistics_30_days">30 days</string>
+    <string name="water_statistics_daily_water">Water</string>
+    <string name="water_statistics_selected_day">%1$s: %2$s</string>
+    <string name="water_statistics_selected_day_empty">No water records on this day</string>
     <string name="nutrition_ingredient_main">Main ingredients</string>
     <string name="nutrition_ingredient_auxiliary">Auxiliary (seasoning / oil)</string>
     <string name="nutrition_jump_to_ingredient">View ingredient</string>

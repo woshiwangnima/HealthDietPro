@@ -7,11 +7,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,7 +63,7 @@ internal fun AnimatedDonutChart(
         animation.animateTo(if (hasData) 1f else 0f, tween(900, easing = FastOutSlowInEasing))
     }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center, modifier = Modifier.size(240.dp)) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().height(240.dp)) {
             Canvas(Modifier.matchParentSize()) {
                 val stroke = 28.dp.toPx()
                 val diameter = size.minDimension - 56.dp.toPx()
@@ -83,7 +82,8 @@ internal fun AnimatedDonutChart(
                         val directionY = kotlin.math.sin(middle).toFloat()
                         val lineStart = androidx.compose.ui.geometry.Offset(size.width / 2f + directionX * (radius + stroke / 2f), size.height / 2f + directionY * (radius + stroke / 2f))
                         val elbow = androidx.compose.ui.geometry.Offset(size.width / 2f + directionX * (radius + 16.dp.toPx()), size.height / 2f + directionY * (radius + 16.dp.toPx()))
-                        val labelEnd = androidx.compose.ui.geometry.Offset(if (directionX >= 0f) size.width - 4.dp.toPx() else 4.dp.toPx(), elbow.y)
+                        // Keep the text anchor within the Canvas; drawText clips anything beyond it.
+                        val labelEnd = androidx.compose.ui.geometry.Offset(if (directionX >= 0f) size.width - 72.dp.toPx() else 72.dp.toPx(), elbow.y)
                         drawLine(requireNotNull(segment.color), lineStart, elbow, 1.5.dp.toPx())
                         drawLine(requireNotNull(segment.color), elbow, labelEnd, 1.5.dp.toPx())
                         drawCircle(color = requireNotNull(segment.color), radius = 4.dp.toPx(), center = labelEnd)

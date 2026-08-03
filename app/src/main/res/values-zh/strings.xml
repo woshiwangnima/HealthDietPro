@@ -1047,6 +1047,7 @@
     <string name="water_kind_ingredient">食材</string>
     <string name="water_kind_food">食物</string>
     <string name="water_quick_records_hint">选定饮品与份量会作为新建饮水记录的默认值。</string>
+    <string name="water_quick_record_select">饮品快捷记录</string>
     <string name="water_edit">编辑饮水记录</string>
     <string name="water_quick_add">添加快捷记录</string>
     <string name="water_quick_edit">编辑快捷记录</string>
@@ -1062,6 +1063,12 @@
     <string name="water_statistics_actual_water">实际水量</string>
     <string name="water_statistics_volume_water">饮水体积 / 实际水量</string>
     <string name="water_statistics_percent_water">饮水百分比 / 实际水量百分比</string>
+    <string name="water_statistics_trend">每日饮水趋势</string>
+    <string name="water_statistics_7_days">7天</string>
+    <string name="water_statistics_30_days">30天</string>
+    <string name="water_statistics_daily_water">饮水量</string>
+    <string name="water_statistics_selected_day">%1$s：%2$s</string>
+    <string name="water_statistics_selected_day_empty">当天暂无饮水记录</string>
     <string name="nutrition_ingredient_main">主料</string>
     <string name="nutrition_ingredient_auxiliary">辅料（调味品/油脂）</string>
     <string name="nutrition_jump_to_ingredient">查看食材</string>

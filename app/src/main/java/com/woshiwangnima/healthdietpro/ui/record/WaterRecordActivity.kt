@@ -17,6 +17,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -39,6 +43,9 @@ import com.woshiwangnima.healthdietpro.common.time.normalizeRecordTimestamp
 import com.woshiwangnima.healthdietpro.common.time.resolve
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
+import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarChart
+import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarEntry
+import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarSegment
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableDeleteAction
@@ -77,6 +84,9 @@ import com.woshiwangnima.healthdietpro.model.water.WaterRepository
 import com.woshiwangnima.healthdietpro.model.water.WaterVolumeUnit
 import com.woshiwangnima.healthdietpro.model.water.recommendedWaterMl
 import java.util.UUID
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 class WaterRecordActivity : BaseActivity() {
     companion object { const val EXTRA_OPEN_EDITOR = "open_editor" }
@@ -161,6 +171,7 @@ private fun WaterStatisticsPage(records: List<WaterRecord>, beverages: List<Beve
     val rows = remember(rangeRecords, beverageById, palette) {
         rangeRecords.groupBy { it.beverageId }.map { (id, items) ->
             WaterCompositionRow(
+                beverageId = id,
                 beverageName = items.first().beverageName,
                 beverageVolumeMl = items.sumOf(WaterRecord::volumeMl),
                 actualWaterMl = items.sumOf { it.actualWaterMl(beverageById[id]) ?: 0.0 },
@@ -169,7 +180,19 @@ private fun WaterStatisticsPage(records: List<WaterRecord>, beverages: List<Beve
         }.sortedByDescending(WaterCompositionRow::actualWaterMl).mapIndexed { index, row -> row.copy(color = palette[index % palette.size]) }
     }
     val totalActualWater = rows.sumOf(WaterCompositionRow::actualWaterMl)
-    val segments = remember(rows) { rows.filter { it.actualWaterMl > 0.0 }.map { DonutChartSegment(it.beverageName, it.beverageName, it.actualWaterMl.toFloat()) } }
+    val segments = remember(rows) { rows.filter { it.actualWaterMl > 0.0 }.map { DonutChartSegment(it.beverageId, it.beverageName, it.actualWaterMl.toFloat(), it.color) } }
+    val trendColorsByBeverageId = remember(rows, records, beverageById, palette) {
+        buildMap {
+            rows.forEach { put(it.beverageId, requireNotNull(it.color)) }
+            records.asSequence()
+                .filter { it.actualWaterMl(beverageById[it.beverageId]) != null }
+                .map(WaterRecord::beverageId)
+                .distinct()
+                .sorted()
+                .forEach { id -> putIfAbsent(id, palette[size % palette.size]) }
+        }
+    }
+    var trendDays by rememberSaveable { mutableIntStateOf(7) }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp), horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -183,11 +206,22 @@ private fun WaterStatisticsPage(records: List<WaterRecord>, beverages: List<Beve
         item { AnimatedDonutChart(segments, formatMl(totalActualWater), stringResource(R.string.water_statistics_actual_water), Modifier.fillMaxWidth()) }
         if (rows.isNotEmpty()) {
             item { WaterCompositionTable(rows, totalActualWater) }
+        } else {
+            item { Text(stringResource(R.string.water_statistics_empty), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        }
+        item {
+            WaterTrendChart(
+                records = records,
+                beverageById = beverageById,
+                colorsByBeverageId = trendColorsByBeverageId,
+                days = trendDays,
+                onDaysChanged = { trendDays = it },
+            )
         }
     }
 }
 
-private data class WaterCompositionRow(val beverageName: String, val beverageVolumeMl: Double, val actualWaterMl: Double, val hasKnownWaterContent: Boolean, val color: androidx.compose.ui.graphics.Color? = null)
+private data class WaterCompositionRow(val beverageId: String, val beverageName: String, val beverageVolumeMl: Double, val actualWaterMl: Double, val hasKnownWaterContent: Boolean, val color: Color? = null)
 
 private fun WaterRecord.actualWaterMl(beverage: Beverage?): Double? {
     val hydration = beverage?.hydrationMlPer100g ?: return null
@@ -254,6 +288,84 @@ private fun WaterCompositionTableRow(beverage: String, amount: String, percent: 
 }
 
 @Composable
+private fun WaterTrendChart(
+    records: List<WaterRecord>,
+    beverageById: Map<String, Beverage>,
+    colorsByBeverageId: Map<String, Color?>,
+    days: Int,
+    onDaysChanged: (Int) -> Unit,
+) {
+    val zone = remember { ZoneId.systemDefault() }
+    val endDate = remember(days) { LocalDate.now(zone) }
+    val dates = remember(endDate, days) { (0 until days).map { offsetDays: Int -> endDate.minusDays(offsetDays.toLong()) } }
+    val startMillis = remember(endDate, days, zone) { endDate.minusDays((days - 1).toLong()).atStartOfDay(zone).toInstant().toEpochMilli() }
+    val endMillis = remember(endDate, zone) { endDate.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() }
+    val valuesByDate = remember(records, beverageById, dates, zone, startMillis, endMillis) {
+        records.asSequence()
+            .filter { it.timestamp in startMillis until endMillis }
+            .mapNotNull { record ->
+                record.actualWaterMl(beverageById[record.beverageId])?.takeIf { it > 0.0 }?.let { water ->
+                    Instant.ofEpochMilli(record.timestamp).atZone(zone).toLocalDate() to (record.beverageId to water)
+                }
+            }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (_, entries) -> entries.groupBy({ it.first }, { it.second }).mapValues { it.value.sum() } }
+    }
+    val entries = remember(dates, valuesByDate, colorsByBeverageId) {
+        dates.map { date ->
+            DateStackedBarEntry(
+                date = date,
+                label = "%02d-%02d".format(date.monthValue, date.dayOfMonth),
+                segments = valuesByDate[date].orEmpty().toSortedMap().map { (beverageId, amount) ->
+                    DateStackedBarSegment(beverageId, amount, colorsByBeverageId[beverageId] ?: Color.Transparent)
+                },
+            )
+        }
+    }
+    var selectedDate by remember(days) { mutableStateOf(dates.firstOrNull()) }
+    val selectedEntry = entries.firstOrNull { it.date == selectedDate }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+        Text(stringResource(R.string.water_statistics_trend), style = MaterialTheme.typography.titleMedium)
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+            listOf(7, 30).forEachIndexed { index, optionDays ->
+                SegmentedButton(
+                    selected = days == optionDays,
+                    onClick = { onDaysChanged(optionDays) },
+                    shape = SegmentedButtonDefaults.itemShape(index, 2),
+                    label = { Text(stringResource(if (optionDays == 7) R.string.water_statistics_7_days else R.string.water_statistics_30_days)) },
+                )
+            }
+        }
+        DateStackedBarChart(
+            entries = entries,
+            yAxisTitle = stringResource(R.string.water_statistics_daily_water),
+            formatValue = ::formatMl,
+            labelEvery = if (days == 7) 1 else 7,
+            selectedEntry = selectedEntry,
+            onEntrySelected = { selectedDate = it.date },
+        )
+        selectedEntry?.let { entry ->
+            val total = entry.segments.sumOf(DateStackedBarSegment::value)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(R.string.water_statistics_selected_day, entry.label, formatMl(total)), style = MaterialTheme.typography.titleSmall)
+                if (entry.segments.isEmpty()) {
+                    Text(stringResource(R.string.water_statistics_selected_day_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                } else {
+                    entry.segments.forEach { segment ->
+                        val name = beverageById[segment.id]?.name ?: segment.id
+                        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            androidx.compose.foundation.Canvas(Modifier.size(10.dp)) { drawCircle(segment.color) }
+                            Text("$name ${formatMl(segment.value)}", modifier = Modifier.padding(start = 6.dp), style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun WaterDataPage(records: List<WaterRecord>, onAdd: () -> Unit, onEdit: (WaterRecord) -> Unit, onDelete: (String) -> Unit) {
     // RecordTimeRangeSelection is a sealed domain type and has no Compose Saver.
     // The filter can reset when this transient page is recreated.
@@ -277,9 +389,10 @@ private fun WaterDataPage(records: List<WaterRecord>, onAdd: () -> Unit, onEdit:
 private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, quickRecords: List<WaterQuickRecord>, onBack: () -> Unit, onSave: (WaterRecord) -> Unit) {
     val defaultBeverage = beverages.firstOrNull { it.id == "food:water:drinking" } ?: beverages.firstOrNull()
     var beverageId by rememberSaveable(record?.id) { mutableStateOf(record?.beverageId ?: defaultBeverage?.id.orEmpty()) }
-    val quick = quickRecords.firstOrNull { it.beverageId == beverageId }
-    var volume by rememberSaveable(record?.id, beverageId) { mutableStateOf(record?.volumeMl?.toString() ?: quick?.volume?.toString() ?: "250") }
-    var unit by rememberSaveable(record?.id, beverageId) { mutableStateOf(if (record != null) WaterVolumeUnit.ML else quick?.unit ?: WaterVolumeUnit.ML) }
+    val initialQuick = quickRecords.firstOrNull { it.beverageId == beverageId }
+    var selectedQuickBeverageId by rememberSaveable(record?.id) { mutableStateOf<String?>(null) }
+    var volume by rememberSaveable(record?.id) { mutableStateOf(record?.volumeMl?.toString() ?: initialQuick?.volume?.toString() ?: "250") }
+    var unit by rememberSaveable(record?.id) { mutableStateOf(if (record != null) WaterVolumeUnit.ML else initialQuick?.unit ?: WaterVolumeUnit.ML) }
     var timestamp by rememberSaveable(record?.id) { mutableStateOf(record?.timestamp ?: normalizeRecordTimestamp(System.currentTimeMillis(), RecordTimePrecision.MINUTE)) }
     var pickTime by rememberSaveable { mutableStateOf(false) }
     val beverage = beverages.firstOrNull { it.id == beverageId }
@@ -296,7 +409,27 @@ private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, q
         Column(Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item { RecordTimePickerField(stringResource(R.string.water_time), timestamp, RecordTimePrecision.MINUTE, { pickTime = true }) }
-                item { AppDropdownField(stringResource(R.string.water_beverage), beverage?.name.orEmpty(), beverages.map { AppDropdownOption(it.id, it.name, it.hydrationMlPer100g?.let { value -> stringResource(R.string.water_hydration_option, value) }) }, { beverageId = it.id }) }
+                if (quickRecords.isNotEmpty()) {
+                    item {
+                        val selectedQuick = quickRecords.firstOrNull { it.beverageId == selectedQuickBeverageId }
+                        AppDropdownField(
+                            label = stringResource(R.string.water_quick_record_select),
+                            value = selectedQuick?.let { quick -> beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId }.orEmpty(),
+                            options = quickRecords.map { quick ->
+                                val name = beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId
+                                AppDropdownOption(quick.beverageId, name, "${quick.volume} ${quick.unit.name.lowercase()}")
+                            },
+                            onSelect = { option ->
+                                val quick = quickRecords.firstOrNull { it.beverageId == option.id } ?: return@AppDropdownField
+                                selectedQuickBeverageId = quick.beverageId
+                                beverageId = quick.beverageId
+                                volume = quick.volume.toString()
+                                unit = quick.unit
+                            },
+                        )
+                    }
+                }
+                item { AppDropdownField(stringResource(R.string.water_beverage), beverage?.name.orEmpty(), beverages.map { AppDropdownOption(it.id, it.name, it.hydrationMlPer100g?.let { value -> stringResource(R.string.water_hydration_option, value) }) }, { beverageId = it.id; selectedQuickBeverageId = null }) }
                 item { EditorTextField(label = stringResource(R.string.water_volume), value = volume, onValueChange = { volume = it }, required = true, numeric = true, range = NumericInputRange(minimum = 0.001)) }
                 item { AppDropdownField(stringResource(R.string.water_unit), unit.name.lowercase(), WaterVolumeUnit.entries.map { AppDropdownOption(it.name, it.name.lowercase()) }, { unit = WaterVolumeUnit.valueOf(it.id) }) }
             }
