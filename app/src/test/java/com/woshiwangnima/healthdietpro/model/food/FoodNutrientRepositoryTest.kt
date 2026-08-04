@@ -257,6 +257,102 @@ class FoodNutrientRepositoryTest {
         )
     }
 
+    @Test
+    fun categoryCatalogRegistersEveryAssetTagAndProvidesSubcategories() {
+        val repository = FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json")
+        val catalogTags = repository.categoryTree().mapTo(mutableSetOf()) { it.tag }
+        val assetTags = repository.foods().filterIsInstance<CategorizedFood>()
+            .flatMapTo(mutableSetOf()) { it.categoryTags }
+
+        assertTrue(assetTags.all(catalogTags::contains))
+        assertEquals(
+            setOf("food.oil.plant", "food.oil.animal_fat"),
+            repository.categoryChildren("food.oil").mapTo(mutableSetOf()) { it.tag },
+        )
+        assertTrue(repository.categoryChildren("food.seasoning").map { it.tag }.containsAll(
+            setOf(
+                "food.seasoning.fresh_aromatic",
+                "food.seasoning.dry_spice",
+                "food.seasoning.salt",
+                "food.seasoning.savory_sauce",
+                "food.seasoning.acid",
+                "food.seasoning.sweetener",
+                "food.seasoning.cooking_alcohol",
+            ),
+        ))
+        assertTrue(repository.categoryChildren("food.beverage").map { it.tag }.containsAll(
+            setOf(
+                "food.beverage.water",
+                "food.beverage.carbonated",
+                "food.beverage.tea",
+                "food.beverage.coffee",
+                "food.beverage.juice",
+                "food.beverage.soy",
+                "food.beverage.mixed",
+            ),
+        ))
+        assertTrue(repository.categoryChildren("food.nut").map { it.tag }.containsAll(
+            setOf("food.nut.peanut", "food.nut.tree_nut", "food.nut.seed"),
+        ))
+    }
+
+    @Test
+    fun refinedCategoriesKeepParentCompatibilityAndCorrectCrossClassification() {
+        val foods = foods().associateBy { it.id }
+
+        assertTrue((foods.getValue("food:taxon:arachis_hypogaea:raw") as CategorizedFood).categoryTags.containsAll(
+            listOf("food.nut", "food.nut.peanut"),
+        ))
+        assertTrue("food.soy" !in (foods.getValue("food:taxon:arachis_hypogaea:raw") as CategorizedFood).categoryTags)
+        assertTrue((foods.getValue("food:dairy:butter") as CategorizedFood).categoryTags.containsAll(
+            listOf("food.dairy", "food.oil", "food.oil.animal_fat"),
+        ))
+        assertEquals(
+            listOf("food.dairy", "food.dairy.fermented"),
+            (foods.getValue("food:beverage:yogurt:plain") as CategorizedFood).categoryTags,
+        )
+        assertTrue(
+            FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json")
+                .hasCategory((foods.getValue("food:beverage:coffee:black") as CategorizedFood).categoryTags, "food.beverage"),
+        )
+    }
+
+    @Test
+    fun roastedSnackCatalogSeparatesKindsAndFlavorTags() {
+        val foods = foods().associateBy { it.id }
+        val requiredIds = setOf(
+            "food:snack:peanut:plain",
+            "food:snack:peanut:five_spice",
+            "food:snack:peanut:garlic",
+            "food:snack:peanut:brined",
+            "food:snack:sunflower_seed:plain",
+            "food:snack:sunflower_seed:caramel",
+            "food:snack:sunflower_seed:five_spice",
+            "food:snack:sunflower_seed:hickory",
+            "food:snack:chestnut:plain",
+            "food:snack:chestnut:sugar_roasted",
+            "food:snack:fava_bean:plain",
+            "food:snack:black_soybean:plain",
+            "food:snack:soybean:plain",
+            "food:snack:green_pea:plain",
+        )
+        assertTrue(requiredIds.all(foods::containsKey))
+        foods.filterKeys { it in requiredIds }.values.forEach { food ->
+            val categorized = food as? CategorizedFood
+            assertTrue(categorized != null)
+            assertTrue(categorized!!.categoryTags.contains("food.nut"))
+            assertTrue(categorized.flavorTags.isNotEmpty())
+        }
+        assertEquals(setOf("plain", "five_spice", "garlic", "brined"), setOf(
+            "food:snack:peanut:plain",
+            "food:snack:peanut:five_spice",
+            "food:snack:peanut:garlic",
+            "food:snack:peanut:brined",
+        ).map { (foods.getValue(it) as CategorizedFood).flavorTags.single() }.toSet())
+        assertTrue(foods.getValue("food:snack:peanut:five_spice") is PreparedFood)
+        assertTrue((foods.getValue("food:snack:peanut:five_spice") as PreparedFood).components.sumOf { it.quantity.value } == 100.0)
+    }
+
     private fun resolverFor(foods: List<FoodItem>): NutritionResolver {
         val methods = CookingMethodRepository
             .fromAsset("src/main/assets/cooking_methods.json")

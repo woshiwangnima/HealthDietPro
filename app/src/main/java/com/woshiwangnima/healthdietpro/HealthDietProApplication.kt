@@ -4,10 +4,12 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.woshiwangnima.healthdietpro.common.cache.AppCacheRegistry
+import com.woshiwangnima.healthdietpro.model.food.FoodNutrientRepository
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 
 class HealthDietProApplication : Application() {
     internal val cacheRegistry by lazy { AppCacheRegistry(this) }
+    internal val foodNutrientRepository by lazy { FoodNutrientRepository.fromContext(this) }
 
     override fun onCreate() {
         super.onCreate()

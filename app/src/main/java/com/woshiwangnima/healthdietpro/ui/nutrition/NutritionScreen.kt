@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -79,6 +80,8 @@ import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
 import com.woshiwangnima.healthdietpro.common.ui.SearchActivityPanel
 import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
+import com.woshiwangnima.healthdietpro.common.ui.FilterCollapseAxis
+import com.woshiwangnima.healthdietpro.common.ui.FilterCollapseButton
 import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
@@ -89,7 +92,6 @@ import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.Dish
 import com.woshiwangnima.healthdietpro.model.food.DishTaxonomy
 import com.woshiwangnima.healthdietpro.model.food.RecipeStep
-import com.woshiwangnima.healthdietpro.model.food.FoodCategories
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
 import com.woshiwangnima.healthdietpro.model.food.FoodServing
@@ -222,6 +224,8 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
     val foods = viewModel.filteredFoods(language)
     var addingTag by remember { mutableStateOf(false) }
+    var tagsExpanded by remember { mutableStateOf(true) }
+    var categoriesExpanded by remember { mutableStateOf(true) }
     var searchFocused by remember { mutableStateOf(false) }
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val showSidebar = state.selectedKind != FoodKind.DISH
@@ -243,27 +247,88 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
         }
         KindSegmenter(state.selectedKind, viewModel::selectKind)
         val browseAreaModifier = if (showSearchActivity) Modifier.height(screenHeight) else Modifier.weight(1f)
-        Row(modifier = browseAreaModifier, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            // 左列：由上至下为「添加自定义XX」按钮 + 「自定义XX」与其他一级分类组合区域，同宽。
-            if (showSidebar) {
-                Column(modifier = Modifier.width(80.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    AddCustomButton(state.selectedKind) { viewModel.openEditor(state.selectedKind) }
-                    CategorySidebar(state, viewModel, Modifier.weight(1f))
+        Column(modifier = browseAreaModifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            when {
+                tagsExpanded && showSidebar && categoriesExpanded -> {
+                    // 2 x 2: controls / tags on top, categories / cards below.
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
+                        BrowseFilterControls(state.selectedKind, true, true, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.width(80.dp).height(88.dp)) { viewModel.openEditor(state.selectedKind) }
+                        TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
+                    }
+                    Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CategorySidebar(state, viewModel, Modifier.width(80.dp))
+                        FoodResults(foods, language, viewModel, Modifier.weight(1f))
+                    }
                 }
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                // 菜肴无侧栏，添加按钮独立置顶。
-                if (!showSidebar) {
-                    AddCustomButton(state.selectedKind, Modifier.fillMaxWidth().padding(bottom = 4.dp)) { viewModel.openEditor(state.selectedKind) }
+                tagsExpanded -> {
+                    // Category filters are collapsed: cards span the entire lower row.
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
+                        BrowseFilterControls(state.selectedKind, true, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.width(80.dp).height(88.dp)) { viewModel.openEditor(state.selectedKind) }
+                        TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
+                    }
+                    FoodResults(foods, language, viewModel, Modifier.weight(1f))
                 }
-                TagRow(stringResource(R.string.nutrition_system_tags), listOf("common" to stringResource(R.string.nutrition_tag_common), "favorite" to stringResource(R.string.nutrition_tag_favorite), "recent" to stringResource(R.string.nutrition_tag_recent)), state.selectedSystemTags, viewModel::toggleSystemTag)
-                TagRow(stringResource(R.string.nutrition_user_tags), state.userTags.map { it.id to it.label }, state.selectedUserTags, viewModel::toggleUserTag, { addingTag = true })
-                if (foods.isEmpty()) Text(stringResource(R.string.nutrition_no_foods), modifier = Modifier.padding(top = 20.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                else LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { items(foods, key = { it.id }) { FoodRow(it, language, viewModel, viewModel::openFood) } }
+                showSidebar && categoriesExpanded -> {
+                    // Tag filters are collapsed: cards span the right-hand column.
+                    Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Column(modifier = Modifier.width(80.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            BrowseFilterControls(state.selectedKind, false, true, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth().height(88.dp)) { viewModel.openEditor(state.selectedKind) }
+                            CategorySidebar(state, viewModel, Modifier.weight(1f))
+                        }
+                        FoodResults(foods, language, viewModel, Modifier.weight(1f))
+                    }
+                }
+                else -> {
+                    // Both filter areas are collapsed: only the flat control row remains above cards.
+                    BrowseFilterControls(state.selectedKind, false, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth()) { viewModel.openEditor(state.selectedKind) }
+                    FoodResults(foods, language, viewModel, Modifier.weight(1f))
+                }
             }
         }
     }
     if (addingTag) AddTagDialog({ addingTag = false }) { viewModel.addUserTag(it); addingTag = false }
+}
+
+@Composable
+private fun BrowseFilterControls(
+    kind: FoodKind,
+    tagsExpanded: Boolean,
+    categoriesExpanded: Boolean,
+    onToggleTags: () -> Unit,
+    onToggleCategories: () -> Unit,
+    modifier: Modifier = Modifier,
+    onAddCustom: () -> Unit,
+) {
+    val showCategories = kind != FoodKind.DISH
+    val flat = !tagsExpanded && !categoriesExpanded
+    if (flat) {
+        Row(modifier = modifier.height(30.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+            AddCustomButton(kind, Modifier.weight(1f), onAddCustom)
+            FilterCollapseButton(tagsExpanded, FilterCollapseAxis.Vertical, stringResource(R.string.nutrition_collapse_tags), stringResource(R.string.nutrition_expand_tags), onToggleTags, Modifier.weight(1f))
+            if (showCategories) FilterCollapseButton(categoriesExpanded, FilterCollapseAxis.Horizontal, stringResource(R.string.nutrition_collapse_categories), stringResource(R.string.nutrition_expand_categories), onToggleCategories, Modifier.weight(1f))
+        }
+    } else {
+        val buttonCount = if (showCategories) 3 else 2
+        Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            AddCustomButton(kind, Modifier.weight(1f / buttonCount), onAddCustom)
+            FilterCollapseButton(tagsExpanded, FilterCollapseAxis.Vertical, stringResource(R.string.nutrition_collapse_tags), stringResource(R.string.nutrition_expand_tags), onToggleTags, Modifier.weight(1f / buttonCount))
+            if (showCategories) FilterCollapseButton(categoriesExpanded, FilterCollapseAxis.Horizontal, stringResource(R.string.nutrition_collapse_categories), stringResource(R.string.nutrition_expand_categories), onToggleCategories, Modifier.weight(1f / buttonCount))
+        }
+    }
+}
+
+@Composable
+private fun TagFilters(state: NutritionUiState, viewModel: NutritionViewModel, onAddTag: () -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        TagRow(stringResource(R.string.nutrition_system_tags), listOf("common" to stringResource(R.string.nutrition_tag_common), "favorite" to stringResource(R.string.nutrition_tag_favorite), "recent" to stringResource(R.string.nutrition_tag_recent)), state.selectedSystemTags, viewModel::toggleSystemTag)
+        TagRow(stringResource(R.string.nutrition_user_tags), state.userTags.map { it.id to it.label }, state.selectedUserTags, viewModel::toggleUserTag, onAddTag)
+    }
+}
+
+@Composable
+private fun FoodResults(foods: List<FoodItem>, language: String, viewModel: NutritionViewModel, modifier: Modifier = Modifier) {
+    if (foods.isEmpty()) Text(stringResource(R.string.nutrition_no_foods), modifier = modifier.padding(top = 20.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    else LazyColumn(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) { items(foods, key = { it.id }) { FoodRow(it, language, viewModel, viewModel::openFood) } }
 }
 
 @Composable
@@ -285,7 +350,7 @@ private fun KindSegmenter(selected: FoodKind, onSelected: (FoodKind) -> Unit) {
 private fun AddCustomButton(kind: FoodKind, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val colors = kind.nameColors()
     Surface(
-        modifier = modifier.fillMaxWidth().height(30.dp).clickable(onClick = onClick),
+        modifier = modifier.fillMaxWidth().fillMaxHeight().clickable(onClick = onClick),
         shape = RoundedCornerShape(6.dp),
         color = colors.first,
     ) {
@@ -299,7 +364,7 @@ private fun AddCustomButton(kind: FoodKind, modifier: Modifier = Modifier, onCli
 
 @Composable
 private fun CategorySidebar(state: NutritionUiState, viewModel: NutritionViewModel, modifier: Modifier = Modifier) {
-    val children = FoodCategories.childrenForRoots(state.selectedRoots)
+    val children = state.selectedRoots.flatMap(viewModel::categoryChildren)
     Surface(
         modifier = modifier.fillMaxWidth().fillMaxHeight(),
         shape = RoundedCornerShape(6.dp),
@@ -308,13 +373,15 @@ private fun CategorySidebar(state: NutritionUiState, viewModel: NutritionViewMod
         if (children.isEmpty()) {
             CategoryRootList(state, viewModel, Modifier.fillMaxWidth().padding(2.dp))
         } else {
-            Row(Modifier.padding(2.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            Row(Modifier.fillMaxSize().padding(2.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                 CategoryRootList(state, viewModel, Modifier.width(39.dp))
-                LazyColumn(modifier = Modifier.width(35.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    items(children, key = { it.tag }) { category ->
-                        CompactFilterChip(category.tag in state.selectedChildren, { viewModel.toggleChild(category.tag) }, Modifier.fillMaxWidth()) {
-                            CategoryLabel(stringResource(category.labelRes))
-                        }
+                CategoryChildList(
+                    children = children,
+                    rootCount = viewModel.categoryRoots().size,
+                    modifier = Modifier.width(35.dp).fillMaxHeight(),
+                ) { category ->
+                    CompactFilterChip(category.tag in state.selectedChildren, { viewModel.toggleChild(category.tag) }, Modifier.fillMaxWidth()) {
+                        CategoryLabel(stringResource(category.labelRes))
                     }
                 }
             }
@@ -324,25 +391,53 @@ private fun CategorySidebar(state: NutritionUiState, viewModel: NutritionViewMod
 
 @Composable
 private fun CategoryRootList(state: NutritionUiState, viewModel: NutritionViewModel, modifier: Modifier) {
-    LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        item {
-            val colors = state.selectedKind.nameColors()
-            Surface(
-                modifier = Modifier.fillMaxWidth().height(28.dp).clickable(onClick = viewModel::toggleCustomOnly),
-                shape = RoundedCornerShape(6.dp),
-                color = if (state.customOnly) colors.first else colors.first.copy(alpha = 0.4f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, if (state.customOnly) colors.second else MaterialTheme.colorScheme.outlineVariant),
-            ) {
-                Box(modifier = Modifier.padding(horizontal = 2.dp), contentAlignment = Alignment.Center) {
-                    TextOverflowText(stringResource(state.selectedKind.customLabelRes()), style = TextStyle(fontSize = FontTokens.body), color = colors.second, maxLines = 1)
-                }
+    val colors = state.selectedKind.nameColors()
+    val roots = viewModel.categoryRoots()
+    BoxWithConstraints(modifier = modifier.fillMaxHeight()) {
+        val gap = categoryGap(maxHeight - 28.dp - 12.dp, roots.size)
+        Column(Modifier.fillMaxHeight()) {
+        Surface(
+            modifier = Modifier.fillMaxWidth().height(28.dp).clickable(onClick = viewModel::toggleCustomOnly),
+            shape = RoundedCornerShape(6.dp),
+            color = if (state.customOnly) colors.first else colors.first.copy(alpha = 0.4f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, if (state.customOnly) colors.second else MaterialTheme.colorScheme.outlineVariant),
+        ) {
+            Box(modifier = Modifier.padding(horizontal = 2.dp), contentAlignment = Alignment.Center) {
+                TextOverflowText(stringResource(state.selectedKind.customLabelRes()), style = TextStyle(fontSize = FontTokens.body), color = colors.second, maxLines = 1)
             }
         }
-        item { Spacer(Modifier.height(10.dp)) }
-        items(FoodCategories.roots, key = { it.tag }) { category ->
-            CompactFilterChip(category.tag in state.selectedRoots, { viewModel.toggleRoot(category.tag) }, Modifier.fillMaxWidth()) { CategoryLabel(stringResource(category.labelRes)) }
+        // Keep the custom category visually distinct from the static category tree.
+        Spacer(Modifier.height(12.dp))
+        Column(modifier = Modifier.weight(1f).padding(vertical = gap), verticalArrangement = Arrangement.spacedBy(gap)) {
+            roots.forEach { category ->
+                CompactFilterChip(category.tag in state.selectedRoots, { viewModel.toggleRoot(category.tag) }, Modifier.fillMaxWidth()) { CategoryLabel(stringResource(category.labelRes)) }
+            }
         }
     }
+    }
+}
+
+@Composable
+private fun CategoryChildList(
+    children: List<com.woshiwangnima.healthdietpro.model.food.FoodCategory>,
+    rootCount: Int,
+    modifier: Modifier,
+    content: @Composable (com.woshiwangnima.healthdietpro.model.food.FoodCategory) -> Unit,
+) {
+    BoxWithConstraints(modifier = modifier) {
+        val gap = categoryGap(maxHeight - 28.dp - 12.dp, rootCount)
+        Column(
+            modifier = Modifier.fillMaxHeight().padding(top = 28.dp + 12.dp + gap),
+            verticalArrangement = Arrangement.spacedBy(gap),
+        ) {
+            children.forEach { category -> content(category) }
+        }
+    }
+}
+
+private fun categoryGap(height: androidx.compose.ui.unit.Dp, itemCount: Int): androidx.compose.ui.unit.Dp {
+    if (itemCount <= 0) return 0.dp
+    return ((height - (itemCount * 28).dp) / (itemCount + 1)).coerceAtLeast(0.dp)
 }
 
 @Composable
@@ -434,12 +529,12 @@ private fun FoodCardNameHeader(
     modifier: Modifier = Modifier,
 ) {
     val colors = food.kind.nameColors()
-    Row(modifier = modifier, verticalAlignment = Alignment.Top) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         if (isCustom) {
             Icon(
                 Icons.Filled.Edit,
                 contentDescription = stringResource(R.string.nutrition_custom_marker),
-                modifier = Modifier.size(14.dp).padding(top = 2.dp),
+                modifier = Modifier.size(14.dp),
                 tint = MaterialTheme.colorScheme.primary,
             )
             Spacer(Modifier.width(2.dp))
@@ -486,7 +581,7 @@ private fun FoodRow(
     val categoryLabels = mutableListOf<String>()
     for (tag in food.categoryTagsOrEmpty()) {
         val pathLabels = mutableListOf<String>()
-        for (labelRes in FoodCategories.displayTagPath(tag)) {
+        for (labelRes in viewModel.categoryDisplayPath(tag)) {
             pathLabels += stringResource(labelRes)
         }
         if (pathLabels.isNotEmpty()) {
@@ -630,6 +725,7 @@ private fun FoodDetailScreen(
     val imageStore = viewModel.foodImages
     var tab by remember { mutableIntStateOf(0) }
     var headerPage by remember(food.id) { mutableIntStateOf(0) }
+    var headerDirection by remember(food.id) { mutableIntStateOf(1) }
     val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
     val servings = remember(food.id, resolved) { food.defaultServings(resolved) }
     var selectedServingId by remember(food.id, servings) { mutableStateOf(servings.first().id) }
@@ -667,7 +763,22 @@ private fun FoodDetailScreen(
                     isCustom = isCustom,
                     cookingSuffix = cookingSuffix,
                 )
-                FoodHeaderPages(food, viewModel, language, headerPage, { headerPage = if (headerPage == 0) 1 else 0 }, { headerPage = (headerPage + 1) % 2 }, Modifier.weight(1f)) { viewModel.openFood(it) }
+                FoodHeaderPages(
+                    food = food,
+                    viewModel = viewModel,
+                    language = language,
+                    page = headerPage,
+                    direction = headerDirection,
+                    onPrevious = {
+                        headerDirection = -1
+                        headerPage = if (headerPage == 0) 2 else headerPage - 1
+                    },
+                    onNext = {
+                        headerDirection = 1
+                        headerPage = (headerPage + 1) % 3
+                    },
+                    modifier = Modifier.weight(1f),
+                ) { viewModel.openFood(it) }
             }
             Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.SpaceBetween) {
                 if (isCustom) {
@@ -695,7 +806,6 @@ private fun FoodDetailScreen(
                 EqualWidthTab(R.string.nutrition_tab_profile),
                 EqualWidthTab(food.rankingTabLabelRes()),
                 EqualWidthTab(R.string.nutrition_tab_estimate),
-                EqualWidthTab(R.string.nutrition_tab_sources),
             ),
             selectedIndex = tab,
             onSelected = { tab = it },
@@ -703,13 +813,13 @@ private fun FoodDetailScreen(
         )
         if (tab == 0) Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
             MacronutrientEnergyChart(resolved, Modifier.padding(top = 12.dp))
-            DetailSectionTitle(R.drawable.ic_chart, stringResource(R.string.nutrition_health_metrics)) {
+            DetailSectionTitle(R.drawable.ic_health_metrics, stringResource(R.string.nutrition_health_metrics)) {
                 IconButton(onClick = { showHealthMetricsHelp = true }) {
                     Icon(painterResource(R.drawable.ic_help), contentDescription = stringResource(R.string.nutrition_health_metrics_help))
                 }
             }
             HealthMetricsTable(resolved?.healthMetrics ?: food.healthMetrics, stringResource(R.string.nutrition_metric_no_data))
-            DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_nutrients), Modifier.padding(top = 12.dp))
+            DetailSectionTitle(R.drawable.ic_nutrients, stringResource(R.string.nutrition_nutrients), Modifier.padding(top = 12.dp))
             FoodServingSelector(
                 servings = servings,
                 selectedServingId = selectedServingId,
@@ -739,14 +849,6 @@ private fun FoodDetailScreen(
         } else if (tab == 1 && food is PreparedFood && food.components.isNotEmpty()) {
             Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
                 FoodRecipeSection(food, viewModel, language) { viewModel.openFood(it) }
-            }
-        } else if (tab == 3) {
-            Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
-                if (food.sources.isEmpty()) {
-                    Text(stringResource(R.string.nutrition_sources_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                } else {
-                    food.sources.forEach { source -> SourceLink(source.dataset, source.reference) }
-                }
             }
         } else {
             Text(stringResource(R.string.nutrition_detail_placeholder), modifier = Modifier.padding(top = 24.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -794,30 +896,61 @@ private fun FoodHeaderPages(
     viewModel: NutritionViewModel,
     language: String,
     page: Int,
+    direction: Int,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     modifier: Modifier,
     onOpenFood: (FoodItem) -> Unit,
 ) {
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onPrevious, modifier = Modifier.size(22.dp)) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, stringResource(R.string.nutrition_header_previous))
+        Box(
+            modifier = Modifier.width(24.dp).clickable(onClick = onPrevious),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                stringResource(R.string.nutrition_header_previous),
+                modifier = Modifier.size(20.dp),
+            )
         }
-        AnimatedPageContent(page, Modifier.weight(1f), direction = { from, to -> to - from }) { currentPage ->
+        AnimatedPageContent(page, Modifier.weight(1f), direction = { _, _ -> direction }) { currentPage ->
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                val textStyle = MaterialTheme.typography.bodySmall
                 if (currentPage == 0) {
                     Text(
                         food.displayDescription(language).ifBlank { stringResource(R.string.nutrition_header_introduction_empty) },
-                        style = MaterialTheme.typography.bodySmall,
+                        style = textStyle,
                     )
+                } else if (currentPage == 1) {
+                    KindInfoSection(food, viewModel, language, onOpenFood, textStyle)
                 } else {
-                    KindInfoSection(food, viewModel, language, onOpenFood, MaterialTheme.typography.bodySmall)
+                    FoodSourcesSection(food, textStyle)
                 }
             }
         }
-        IconButton(onClick = onNext, modifier = Modifier.size(22.dp)) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, stringResource(R.string.nutrition_header_next))
+        Box(
+            modifier = Modifier.width(24.dp).clickable(onClick = onNext),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                stringResource(R.string.nutrition_header_next),
+                modifier = Modifier.size(20.dp),
+            )
         }
+    }
+}
+
+@Composable
+private fun FoodSourcesSection(food: FoodItem, textStyle: androidx.compose.ui.text.TextStyle) {
+    if (food.sources.isEmpty()) {
+        Text(
+            stringResource(R.string.nutrition_sources_empty),
+            style = textStyle,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    } else {
+        food.sources.forEach { source -> SourceLink(source.dataset, source.reference, textStyle) }
     }
 }
 
@@ -841,7 +974,7 @@ private fun ResolvedNutrition?.macronutrientEnergy(): MacronutrientEnergy? {
 @Composable
 private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?, modifier: Modifier = Modifier) {
     val energy = resolved.macronutrientEnergy() ?: return
-    DetailSectionTitle(R.drawable.ic_chart, stringResource(R.string.nutrition_macronutrient_energy), modifier)
+    DetailSectionTitle(R.drawable.ic_energy_distribution, stringResource(R.string.nutrition_macronutrient_energy), modifier)
     AnimatedDonutChart(
         segments = listOf(
             DonutChartSegment("carbohydrate", stringResource(R.string.nutrition_energy_carbohydrate, energy.carbohydrateKcal / energy.totalKcal * 100.0), energy.carbohydrateKcal.toFloat(), androidx.compose.ui.graphics.Color(0xFFF9A825)),
@@ -877,7 +1010,7 @@ private fun KindInfoSection(
                 val source = viewModel.foodById(derivation.ingredientId)
                 val method = viewModel.cookingMethodFor(derivation.cookingMethodId)
                 source?.let { src ->
-                    IngredientJumpLine(stringResource(R.string.nutrition_derived_from), src.displayName(language)) { onOpenFood(src) }
+                    IngredientJumpLine(stringResource(R.string.nutrition_derived_from), src.displayName(language), textStyle) { onOpenFood(src) }
                 }
                 method?.let { InfoLine(stringResource(R.string.nutrition_cooking_method), it.displayLabel(language), textStyle) }
             }
@@ -887,22 +1020,28 @@ private fun KindInfoSection(
                 }
             }
         }
-        is Dish -> DishInfoSection(food, viewModel, language, onOpenFood)
+        is Dish -> DishInfoSection(food, viewModel, language, onOpenFood, textStyle)
     }
 }
 
 @Composable
-private fun DishInfoSection(dish: Dish, viewModel: NutritionViewModel, language: String, onOpenFood: (FoodItem) -> Unit) {
+private fun DishInfoSection(
+    dish: Dish,
+    viewModel: NutritionViewModel,
+    language: String,
+    onOpenFood: (FoodItem) -> Unit,
+    textStyle: androidx.compose.ui.text.TextStyle,
+) {
     // 营养档案仅呈现描述菜肴本身的基础分类信息。
-    dish.cuisine?.let { DishTaxonomy.labelRes(it)?.let { res -> InfoLine(stringResource(R.string.nutrition_editor_cuisine), stringResource(res)) } }
+    dish.cuisine?.let { DishTaxonomy.labelRes(it)?.let { res -> InfoLine(stringResource(R.string.nutrition_editor_cuisine), stringResource(res), textStyle) } }
     dish.dishCategories.mapNotNull { DishTaxonomy.labelRes(it) }.map { stringResource(it) }.takeIf { it.isNotEmpty() }?.let { labels ->
-        InfoLine(stringResource(R.string.nutrition_editor_dish_category), labels.joinToString(" / "))
+        InfoLine(stringResource(R.string.nutrition_editor_dish_category), labels.joinToString(" / "), textStyle)
     }
     dish.tastes.mapNotNull { DishTaxonomy.labelRes(it) }.map { stringResource(it) }.takeIf { it.isNotEmpty() }?.let { labels ->
-        InfoLine(stringResource(R.string.nutrition_editor_taste), labels.joinToString(" / "))
+        InfoLine(stringResource(R.string.nutrition_editor_taste), labels.joinToString(" / "), textStyle)
     }
     dish.seasons.mapNotNull { DishTaxonomy.labelRes(it) }.map { stringResource(it) }.takeIf { it.isNotEmpty() }?.let { labels ->
-        InfoLine(stringResource(R.string.nutrition_editor_season), labels.joinToString(" / "))
+        InfoLine(stringResource(R.string.nutrition_editor_season), labels.joinToString(" / "), textStyle)
     }
 }
 
@@ -980,37 +1119,47 @@ private fun DishComponentLine(
 
 /** 可跳转的来源行（食物→来源食材）。 */
 @Composable
-private fun IngredientJumpLine(label: String, value: String, onClick: () -> Unit) {
+private fun IngredientJumpLine(
+    label: String,
+    value: String,
+    textStyle: androidx.compose.ui.text.TextStyle,
+    onClick: () -> Unit,
+) {
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(label, style = textStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.width(8.dp))
-        FoodNavigationLink(value, Modifier.weight(1f), onClick)
+        FoodNavigationLink(value, Modifier.weight(1f), textStyle, onClick)
     }
 }
 
 @Composable
-private fun FoodNavigationLink(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun FoodNavigationLink(
+    text: String,
+    modifier: Modifier = Modifier,
+    textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
+    onClick: () -> Unit,
+) {
     TextOverflowText(
         text = text,
         modifier = modifier.clickable(onClick = onClick),
-        style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
+        style = textStyle.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
         color = MaterialTheme.colorScheme.primary,
         maxLines = 1,
     )
 }
 
 @Composable
-private fun SourceLink(dataset: String, reference: String) {
+private fun SourceLink(dataset: String, reference: String, textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium) {
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
-        TextOverflowText(dataset, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        TextOverflowText(dataset, style = textStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
         TextOverflowText(
             reference,
             modifier = Modifier.clickable {
                 val query = android.net.Uri.encode("$dataset $reference")
                 context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.google.com/search?q=$query")))
             },
-            style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
+            style = textStyle.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
             color = MaterialTheme.colorScheme.primary,
         )
     }
@@ -1187,10 +1336,10 @@ private fun HealthMetricsTable(
                 modifier = Modifier.fillMaxWidth().height(40.dp).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .72f)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                HealthMetricHeader(stringResource(R.string.nutrition_profile_item), Modifier.weight(1.3f), border)
-                HealthMetricHeader(stringResource(R.string.nutrition_profile_amount), Modifier.weight(.9f), border)
-                HealthMetricHeader(stringResource(R.string.nutrition_profile_classification), Modifier.weight(.5f), border)
-                HealthMetricHeader(stringResource(R.string.nutrition_metric_glycemic_icon), Modifier.width(64.dp), border)
+                HealthMetricHeader(stringResource(R.string.nutrition_profile_item), Modifier.weight(1.3f))
+                HealthMetricHeader(stringResource(R.string.nutrition_profile_amount), Modifier.weight(.9f))
+                HealthMetricHeader(stringResource(R.string.nutrition_profile_classification), Modifier.weight(.5f))
+                HealthMetricHeader(stringResource(R.string.nutrition_metric_glycemic_icon), Modifier.width(64.dp))
             }
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 Column(Modifier.weight(1f)) {
@@ -1210,8 +1359,8 @@ private fun HealthMetricsTable(
 }
 
 @Composable
-private fun HealthMetricHeader(text: String, modifier: Modifier, border: androidx.compose.ui.graphics.Color) {
-    Box(modifier.border(1.dp, border), contentAlignment = Alignment.Center) {
+private fun HealthMetricHeader(text: String, modifier: Modifier) {
+    Box(modifier, contentAlignment = Alignment.Center) {
         Text(text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, maxLines = 2)
     }
 }

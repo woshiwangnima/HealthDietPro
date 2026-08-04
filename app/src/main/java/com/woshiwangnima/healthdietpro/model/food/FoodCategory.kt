@@ -37,7 +37,29 @@ internal object FoodCategories {
         FoodCategory("food.aquatic.shrimp_crab", R.string.food_category_shrimp_crab, "food.aquatic"),
         FoodCategory("food.aquatic.shellfish", R.string.food_category_shellfish, "food.aquatic"),
         FoodCategory("food.aquatic.mollusk", R.string.food_category_mollusk, "food.aquatic"),
+        FoodCategory("food.nut.peanut", R.string.food_category_peanut, "food.nut"),
+        FoodCategory("food.nut.tree_nut", R.string.food_category_tree_nut, "food.nut"),
+        FoodCategory("food.nut.seed", R.string.food_category_edible_seed, "food.nut"),
+        FoodCategory("food.nut.legume_snack", R.string.food_category_legume_snack, "food.nut"),
+        FoodCategory("food.oil.plant", R.string.food_category_plant_oil, "food.oil"),
+        FoodCategory("food.oil.animal_fat", R.string.food_category_animal_fat, "food.oil"),
+        FoodCategory("food.beverage.water", R.string.food_category_drinking_water, "food.beverage"),
+        FoodCategory("food.beverage.carbonated", R.string.food_category_carbonated, "food.beverage"),
+        FoodCategory("food.beverage.tea", R.string.food_category_tea, "food.beverage"),
+        FoodCategory("food.beverage.coffee", R.string.food_category_coffee, "food.beverage"),
+        FoodCategory("food.beverage.juice", R.string.food_category_juice, "food.beverage"),
+        FoodCategory("food.beverage.soy", R.string.food_category_soy_beverage, "food.beverage"),
+        FoodCategory("food.beverage.mixed", R.string.food_category_mixed_beverage, "food.beverage"),
+        FoodCategory("food.dairy.fermented", R.string.food_category_fermented_dairy, "food.dairy"),
+        FoodCategory("food.seasoning.fresh_aromatic", R.string.food_category_fresh_aromatic, "food.seasoning"),
+        FoodCategory("food.seasoning.dry_spice", R.string.food_category_dry_spice, "food.seasoning"),
+        FoodCategory("food.seasoning.salt", R.string.food_category_salt, "food.seasoning"),
+        FoodCategory("food.seasoning.savory_sauce", R.string.food_category_savory_sauce, "food.seasoning"),
+        FoodCategory("food.seasoning.acid", R.string.food_category_acid, "food.seasoning"),
+        FoodCategory("food.seasoning.sweetener", R.string.food_category_sweetener, "food.seasoning"),
+        FoodCategory("food.seasoning.cooking_alcohol", R.string.food_category_cooking_alcohol, "food.seasoning"),
     )
+    private val byTag = (roots + children).associateBy { it.tag }
     fun isWithin(tag: String, ancestor: String): Boolean = tag == ancestor || tag.startsWith("$ancestor.")
     fun hasTagWithin(tags: List<String>, ancestor: String): Boolean = tags.any { isWithin(it, ancestor) }
     fun hasTagWithinAny(tags: List<String>, ancestors: Set<String>): Boolean =
@@ -45,12 +67,14 @@ internal object FoodCategories {
     fun childrenForRoots(roots: Set<String>): List<FoodCategory> = children.filter { category ->
         category.parentTag?.let(roots::contains) == true
     }
+    fun childrenOf(parentTag: String): List<FoodCategory> = children.filter { it.parentTag == parentTag }
+    fun descendantsOf(ancestor: String): List<FoodCategory> = children.filter { isWithin(it.tag, ancestor) }
     fun retainChildrenForRoots(selectedChildren: Set<String>, roots: Set<String>): Set<String> =
-        selectedChildren.intersect(childrenForRoots(roots).mapTo(mutableSetOf()) { it.tag })
-    fun labelRes(tag: String): Int? = (roots + children).firstOrNull { it.tag == tag }?.labelRes
+        selectedChildren.filterTo(mutableSetOf()) { child -> roots.any { isWithin(child, it) } }
+    fun labelRes(tag: String): Int? = byTag[tag]?.labelRes
     fun displayTagPath(tag: String): List<Int> = buildList {
-        roots.firstOrNull { isWithin(tag, it.tag) }?.let { add(it.labelRes) }
-        labelRes(tag)?.let { if (it !in this) add(it) }
+        val path = generateSequence(tag) { current -> byTag[current]?.parentTag }.toList().asReversed()
+        path.mapNotNullTo(this) { byTag[it]?.labelRes }
     }
     fun displayTags(tags: List<String>): List<Int> = tags.flatMap { tag ->
         displayTagPath(tag)

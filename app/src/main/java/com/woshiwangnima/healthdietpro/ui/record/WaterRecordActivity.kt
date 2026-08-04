@@ -73,9 +73,7 @@ import com.woshiwangnima.healthdietpro.common.ui.WaterGlassProgress
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputRange
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
-import com.woshiwangnima.healthdietpro.model.food.FoodCategories
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
-import com.woshiwangnima.healthdietpro.model.food.FoodNutrientRepository
 import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.water.ActivityLevel
@@ -112,7 +110,8 @@ private data class Beverage(
 private fun WaterRecordRoute(onFinish: () -> Unit, openEditorInitially: Boolean) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val repository = remember { WaterRepository.fromContext(context) }
-    val beverages = remember { loadBeverages(context) }
+    val currentUserId = ProfilePrefs.getCurrentUserId(context)
+    val beverages = remember(currentUserId) { loadBeverages(context) }
     var archive by remember { mutableStateOf(repository.load()) }
     var route by rememberSaveable { mutableStateOf(if (openEditorInitially) WaterRoute.EDITOR else WaterRoute.HOME) }
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -565,10 +564,11 @@ private fun QuickRecordEditorScreen(beverages: List<Beverage>, quickRecord: Wate
 }
 
 private fun loadBeverages(context: android.content.Context): List<Beverage> {
-    val foods = FoodNutrientRepository.fromContext(context).foods() + UserCustomFoodRepository.fromContext(context).load()
+    val repository = (context.applicationContext as com.woshiwangnima.healthdietpro.HealthDietProApplication).foodNutrientRepository
+    val foods = repository.foodsWithin("food.beverage") + UserCustomFoodRepository.fromContext(context).load()
     val language = context.resources.configuration.locales[0].language
     return foods.filterIsInstance<CategorizedFood>()
-        .filter { it.kind != FoodKind.DISH && FoodCategories.hasTagWithin(it.categoryTags, "food.beverage") }
+        .filter { it.kind != FoodKind.DISH && repository.hasCategory(it.categoryTags, "food.beverage") }
         .map { Beverage(it.id, it.displayName(language), it.kind, it.hydrationMlPer100g, when (it) {
             is com.woshiwangnima.healthdietpro.model.food.Ingredient -> it.densityGramsPerMl
             is com.woshiwangnima.healthdietpro.model.food.PreparedFood -> it.densityGramsPerMl

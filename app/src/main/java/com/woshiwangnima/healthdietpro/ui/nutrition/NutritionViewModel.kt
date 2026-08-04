@@ -12,7 +12,6 @@ import com.woshiwangnima.healthdietpro.model.food.BotanicalTaxonomyRepository
 import com.woshiwangnima.healthdietpro.model.food.CookingMethod
 import com.woshiwangnima.healthdietpro.model.food.CookingMethodRepository
 import com.woshiwangnima.healthdietpro.model.food.Dish
-import com.woshiwangnima.healthdietpro.model.food.FoodCategories
 import com.woshiwangnima.healthdietpro.model.food.FoodDto
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
@@ -71,7 +70,7 @@ internal data class NutritionEditorState(
 internal enum class NutritionDestination { Browse, FoodDetail, Editor }
 
 internal class NutritionViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = FoodNutrientRepository.fromContext(application)
+    private val repository = (application as HealthDietProApplication).foodNutrientRepository
     private val cookingMethodRepository = CookingMethodRepository.fromContext(application)
     private val servingContainerRepository = ServingContainerRepository.fromContext(application)
     private val nutrientMetaRepository = NutrientMetaRepository.fromContext(application)
@@ -138,6 +137,10 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     fun availableContainers(): List<ServingContainer> = containers
     fun nutrientMetas(): List<NutrientMeta> = nutrientMetas
     fun botanicalTaxonomy(): BotanicalTaxonomyLabels = botanicalTaxonomy
+    fun categoryRoots(): List<com.woshiwangnima.healthdietpro.model.food.FoodCategory> = repository.categoryRoots()
+    fun categoryChildren(parentTag: String): List<com.woshiwangnima.healthdietpro.model.food.FoodCategory> = repository.categoryChildren(parentTag)
+    fun categoryDisplayPath(tag: String): List<Int> = repository.categoryDisplayPath(tag)
+    fun hasCategory(tags: List<String>, categoryTag: String): Boolean = repository.hasCategory(tags, categoryTag)
 
     /** Ingredients + prepared foods usable as dish components / derivation sources. */
     fun selectableIngredients(): List<Ingredient> = foodsById.values
@@ -160,14 +163,10 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     }
 
     /** True when the food is categorized as a seasoning (调味品). */
-    fun isSeasoning(food: FoodItem): Boolean =
-        (food as? CategorizedFood)?.categoryTags?.any { it.startsWith("food.seasoning") } == true
+    fun isSeasoning(food: FoodItem): Boolean = repository.isSeasoning(food)
 
     /** 辅料判定：调味品或油脂（其余为主料）。菜肴食材清单据此排序：主料在前，辅料在后。 */
-    fun isAuxiliary(food: FoodItem): Boolean =
-        (food as? CategorizedFood)?.categoryTags?.any {
-            it.startsWith("food.seasoning") || it.startsWith("food.oil")
-        } == true
+    fun isAuxiliary(food: FoodItem): Boolean = repository.isAuxiliary(food)
 
     /** Every dish whose components reference [foodId] (for the "related dishes" section). */
     fun relatedDishes(foodId: String): List<Dish> = foodsById.values
@@ -207,10 +206,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         _state.value = state.copy(
             selectedRoots = selectedRoots,
             customOnly = false,
-            selectedChildren = FoodCategories.retainChildrenForRoots(
-                selectedChildren = state.selectedChildren,
-                roots = selectedRoots,
-            ),
+            selectedChildren = repository.retainCategoryChildren(state.selectedChildren, selectedRoots),
         )
     }
     fun toggleCustomOnly() {
@@ -222,7 +218,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     }
     fun toggleChild(tag: String) {
         val state = _state.value
-        if (tag !in FoodCategories.childrenForRoots(state.selectedRoots).map { it.tag }) return
+        if (tag !in state.selectedRoots.flatMap(repository::categoryChildren).map { it.tag }) return
         _state.value = state.copy(selectedChildren = state.selectedChildren.toggle(tag))
     }
     fun toggleSystemTag(tag: String) {
@@ -388,8 +384,8 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
             if (food.kind != state.selectedKind) return@filter false
             val searchable = food.searchableNames().joinToString(" ").lowercase()
             val categoryTags = (food as? CategorizedFood)?.categoryTags.orEmpty()
-            val root = FoodCategories.hasTagWithinAny(categoryTags, state.selectedRoots)
-            val child = state.selectedChildren.isEmpty() || state.selectedChildren.any { FoodCategories.hasTagWithin(categoryTags, it) }
+            val root = repository.hasAnyCategory(categoryTags, state.selectedRoots)
+            val child = state.selectedChildren.isEmpty() || state.selectedChildren.any { repository.hasCategory(categoryTags, it) }
             val systemTag = state.selectedSystemTags.isEmpty() || state.selectedSystemTags.all { tag ->
                 when (tag) {
                     "common" -> "common" in food.systemTags

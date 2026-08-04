@@ -29,6 +29,33 @@ internal class FoodNutrientRepository private constructor(
 
     fun find(id: String): FoodItem? = byId()[id]
 
+    fun categoryRoots(): List<FoodCategory> = FoodCategories.roots
+
+    fun categoryChildren(parentTag: String): List<FoodCategory> = FoodCategories.childrenOf(parentTag)
+
+    fun categoryTree(): List<FoodCategory> = FoodCategories.roots + FoodCategories.children
+
+    fun categoryDisplayPath(tag: String): List<Int> = FoodCategories.displayTagPath(tag)
+
+    fun hasCategory(tags: List<String>, ancestor: String): Boolean = FoodCategories.hasTagWithin(tags, ancestor)
+
+    fun hasAnyCategory(tags: List<String>, ancestors: Set<String>): Boolean =
+        FoodCategories.hasTagWithinAny(tags, ancestors)
+
+    fun retainCategoryChildren(selected: Set<String>, roots: Set<String>): Set<String> =
+        FoodCategories.retainChildrenForRoots(selected, roots)
+
+    fun isSeasoning(food: FoodItem): Boolean =
+        hasCategory((food as? CategorizedFood)?.categoryTags.orEmpty(), "food.seasoning")
+
+    fun isAuxiliary(food: FoodItem): Boolean =
+        hasCategory((food as? CategorizedFood)?.categoryTags.orEmpty(), "food.seasoning") ||
+            hasCategory((food as? CategorizedFood)?.categoryTags.orEmpty(), "food.oil")
+
+    fun foodsWithin(categoryTag: String): List<FoodItem> = foods().filter { food ->
+        hasCategory((food as? CategorizedFood)?.categoryTags.orEmpty(), categoryTag)
+    }
+
     companion object {
         fun fromContext(context: Context) = FoodNutrientRepository(
             source = { context.assets.open("food_nutrition.json").bufferedReader().use { it.readText() } },

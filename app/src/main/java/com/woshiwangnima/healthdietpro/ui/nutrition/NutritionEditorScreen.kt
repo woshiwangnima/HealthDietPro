@@ -58,7 +58,6 @@ import com.woshiwangnima.healthdietpro.common.ui.TagNode
 import com.woshiwangnima.healthdietpro.model.food.DishComponentDto
 import com.woshiwangnima.healthdietpro.model.food.DishTaxonomy
 import com.woshiwangnima.healthdietpro.model.food.FoodAmountDto
-import com.woshiwangnima.healthdietpro.model.food.FoodCategories
 import com.woshiwangnima.healthdietpro.model.food.FoodDerivationDto
 import com.woshiwangnima.healthdietpro.model.food.FoodDto
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
@@ -209,21 +208,21 @@ private fun EditorScaffold(
 
 /** 用公共多级 Tag 选择器选分类，可多选多个多级 Tag。 */
 @Composable
-private fun CategoryTagSelector(selected: List<String>, onChange: (List<String>) -> Unit) {
+private fun CategoryTagSelector(viewModel: NutritionViewModel, selected: List<String>, onChange: (List<String>) -> Unit) {
     MultiLevelTagSelector(
         title = stringResource(R.string.nutrition_editor_category),
-        roots = foodCategoryTagTree(),
+        roots = foodCategoryTagTree(viewModel),
         selectedTags = selected,
         onSelectionChange = onChange,
     )
 }
 
 @Composable
-private fun foodCategoryTagTree(): List<TagNode> = FoodCategories.roots.map { root ->
+private fun foodCategoryTagTree(viewModel: NutritionViewModel): List<TagNode> = viewModel.categoryRoots().map { root ->
     TagNode(
         tag = root.tag,
         label = stringResource(root.labelRes),
-        children = FoodCategories.childrenForRoots(setOf(root.tag)).map { child ->
+        children = viewModel.categoryChildren(root.tag).map { child ->
             TagNode(child.tag, stringResource(child.labelRes))
         },
     )
@@ -313,7 +312,7 @@ private fun IngredientEditor(existing: Ingredient?, editingId: String?, viewMode
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_identity))
         EditorTextField(stringResource(R.string.nutrition_editor_name), name, { name = it; markDirty() }, required = true)
         AliasEditor(aliases) { markDirty() }
-        CategoryTagSelector(categoryTags) { categoryTags.clear(); categoryTags.addAll(it); markDirty() }
+        CategoryTagSelector(viewModel, categoryTags) { categoryTags.clear(); categoryTags.addAll(it); markDirty() }
 
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_nutrition))
         required.forEach { meta ->
@@ -390,7 +389,7 @@ private fun FoodEditor(existing: PreparedFood?, editingId: String?, viewModel: N
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_identity))
         EditorTextField(stringResource(R.string.nutrition_editor_name), name, { name = it; markDirty() }, required = true)
         AliasEditor(aliases) { markDirty() }
-        CategoryTagSelector(categoryTags) { categoryTags.clear(); categoryTags.addAll(it); markDirty() }
+        CategoryTagSelector(viewModel, categoryTags) { categoryTags.clear(); categoryTags.addAll(it); markDirty() }
         EditorTextField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, showRequirementMarker = false, singleLine = false)
 
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_derivation))
@@ -433,6 +432,9 @@ private fun FoodEditor(existing: PreparedFood?, editingId: String?, viewModel: N
             title = stringResource(R.string.nutrition_editor_select_ingredient),
             onDismiss = { selectingIngredient = false },
             onSelect = { id -> ingredientId = id; selectingIngredient = false; markDirty() },
+            categoryRoots = viewModel.categoryRoots(),
+            categoryChildren = viewModel::categoryChildren,
+            hasCategory = viewModel::hasCategory,
         )
     }
 }
@@ -446,6 +448,9 @@ private fun IngredientPickerDialog(
     title: String,
     onDismiss: () -> Unit,
     onSelect: (String) -> Unit,
+    categoryRoots: List<com.woshiwangnima.healthdietpro.model.food.FoodCategory>,
+    categoryChildren: (String) -> List<com.woshiwangnima.healthdietpro.model.food.FoodCategory>,
+    hasCategory: (List<String>, String) -> Boolean,
 ) {
     var keyword by remember { mutableStateOf("") }
     var selectedRoot by remember { mutableStateOf<String?>(null) }
@@ -457,12 +462,12 @@ private fun IngredientPickerDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 FoodSearchField(keyword, { keyword = it }, stringResource(R.string.nutrition_editor_search_ingredient))
-                FoodCategoryFilterRows(selectedRoot, selectedChild, { root -> selectedRoot = root; selectedChild = null }, { selectedChild = it })
+                FoodCategoryFilterRows(categoryRoots, categoryChildren, selectedRoot, selectedChild, { root -> selectedRoot = root; selectedChild = null }, { selectedChild = it })
                 val filtered = ingredients.filter { ing ->
                     val kw = keyword.trim().lowercase()
                     val matchesKw = kw.isEmpty() || ing.searchableNames().any { it.lowercase().contains(kw) }
-                    val matchesRoot = selectedRoot == null || FoodCategories.hasTagWithin(ing.categoryTags, selectedRoot!!)
-                    val matchesChild = selectedChild == null || FoodCategories.hasTagWithin(ing.categoryTags, selectedChild!!)
+                    val matchesRoot = selectedRoot == null || hasCategory(ing.categoryTags, selectedRoot!!)
+                    val matchesChild = selectedChild == null || hasCategory(ing.categoryTags, selectedChild!!)
                     matchesKw && matchesRoot && matchesChild
                 }
                 Column(Modifier.heightIn(max = 260.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -668,6 +673,9 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
             title = stringResource(R.string.nutrition_editor_add_ingredient),
             onDismiss = { selectingIngredient = false },
             onSelect = { id -> components.add(ComponentDraft(id, "100")); selectingIngredient = false; markDirty() },
+            categoryRoots = viewModel.categoryRoots(),
+            categoryChildren = viewModel::categoryChildren,
+            hasCategory = viewModel::hasCategory,
         )
     }
 }

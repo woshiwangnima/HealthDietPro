@@ -35,7 +35,7 @@ internal fun <T> AnimatedPageContent(
     AnimatedContent(
         targetState = targetState,
         transitionSpec = {
-            val isForward = direction(initialState, targetState) >= 0
+            val isForward = direction(initialState, targetState) > 0
             ContentTransform(
                 targetContentEnter = slideInHorizontally(
                     animationSpec = tween(PAGE_ENTER_DURATION_MILLIS, easing = FastOutSlowInEasing),

@@ -33,12 +33,14 @@ internal sealed interface FoodItem {
 
 internal sealed interface CategorizedFood : FoodItem {
     val categoryTags: List<String>
+    val flavorTags: List<String>
 }
 
 internal data class Ingredient(
     override val id: String,
     override val names: Map<String, List<String>>,
     override val categoryTags: List<String>,
+    override val flavorTags: List<String> = emptyList(),
     val nutritionTables: Map<String, FoodNutrientTable>,
     val edibleRatio: Double? = null,
     val densityGramsPerMl: Double? = null,
@@ -59,6 +61,7 @@ internal data class PreparedFood(
     override val id: String,
     override val names: Map<String, List<String>>,
     override val categoryTags: List<String>,
+    override val flavorTags: List<String> = emptyList(),
     val derivedFrom: FoodDerivation? = null,
     val components: List<DishComponent> = emptyList(),
     val densityGramsPerMl: Double? = null,

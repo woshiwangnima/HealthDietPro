@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.onFocusChanged
 import com.woshiwangnima.healthdietpro.R
-import com.woshiwangnima.healthdietpro.model.food.FoodCategories
 
 @Composable
 internal fun FoodSearchField(value: String, onValueChange: (String) -> Unit, placeholder: String, onSearch: (() -> Unit)? = null, onFocusChanged: ((Boolean) -> Unit)? = null) {
@@ -150,17 +149,19 @@ internal fun <T> LazyOptionalFields(items: List<T>, key: (T) -> String, field: @
     }
 }
 
-/** Shared compact two-level category filter: fixed left labels and horizontally scrollable tag values. */
+/** Shared compact category filter backed by the repository-provided tree. */
 @Composable
 internal fun FoodCategoryFilterRows(
+    roots: List<com.woshiwangnima.healthdietpro.model.food.FoodCategory>,
+    childrenFor: (String) -> List<com.woshiwangnima.healthdietpro.model.food.FoodCategory>,
     selectedRoot: String?,
     selectedChild: String?,
     onRootSelected: (String?) -> Unit,
     onChildSelected: (String?) -> Unit,
 ) {
-    val children = selectedRoot?.let { FoodCategories.childrenForRoots(setOf(it)) }.orEmpty()
+    val children = selectedRoot?.let(childrenFor).orEmpty()
     CategoryFilterRow(stringResource(R.string.nutrition_editor_category_level_one)) {
-        FoodCategories.roots.forEach { root ->
+        roots.forEach { root ->
             FilterChip(
                 selected = selectedRoot == root.tag,
                 onClick = { onRootSelected(if (selectedRoot == root.tag) null else root.tag) },
