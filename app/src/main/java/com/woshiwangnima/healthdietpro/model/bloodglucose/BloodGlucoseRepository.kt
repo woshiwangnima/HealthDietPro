@@ -7,8 +7,18 @@ internal class BloodGlucoseRepository private constructor(private val context: C
 
     fun load(): List<BloodGlucoseRecord> = archive.load().records
 
+    fun loadArchive(): BloodGlucoseArchive = archive.load()
+
     fun save(records: List<BloodGlucoseRecord>) {
         archive.update { it.copy(records = records.sortedByDescending(BloodGlucoseRecord::timestamp)) }
+    }
+
+    fun saveSources(sources: List<BloodGlucoseSource>) {
+        archive.update { it.copy(sources = sources) }
+    }
+
+    fun reorderSources(orderedIds: List<String>) {
+        archive.update { current -> current.copy(sources = reorderBloodGlucoseSources(current.sources, orderedIds)) }
     }
 
     companion object {

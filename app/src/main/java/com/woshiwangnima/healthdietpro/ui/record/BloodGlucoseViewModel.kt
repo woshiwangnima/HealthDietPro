@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartViewModel
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseSource
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRepository
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseDiabetesType
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTargetRepository
@@ -29,6 +30,8 @@ internal class BloodGlucoseViewModel(application: Application) : BaseChartViewMo
     private val alertNotifier = BloodGlucoseAlertNotifier(application)
     private val _records = MutableStateFlow<List<BloodGlucoseRecord>>(emptyList())
     val records: StateFlow<List<BloodGlucoseRecord>> = _records.asStateFlow()
+    private val _sources = MutableStateFlow<List<BloodGlucoseSource>>(emptyList())
+    val sources: StateFlow<List<BloodGlucoseSource>> = _sources.asStateFlow()
     private val _diabetesType = MutableStateFlow(BloodGlucoseDiabetesType.Normal)
     val diabetesType: StateFlow<BloodGlucoseDiabetesType> = _diabetesType.asStateFlow()
     private val _reminderSettings = MutableStateFlow(BloodGlucoseReminderSettings())
@@ -46,7 +49,9 @@ internal class BloodGlucoseViewModel(application: Application) : BaseChartViewMo
 
     fun refresh() {
         viewModelScope.launch {
-            _records.value = withContext(Dispatchers.IO) { repository.load() }
+            val archive = withContext(Dispatchers.IO) { repository.loadArchive() }
+            _records.value = archive.records
+            _sources.value = archive.sources
         }
     }
 
@@ -75,6 +80,17 @@ internal class BloodGlucoseViewModel(application: Application) : BaseChartViewMo
         val updated = _records.value.filterNot { it.id == id }
         _records.value = updated
         viewModelScope.launch(Dispatchers.IO) { repository.save(updated) }
+    }
+
+    fun saveSources(sources: List<BloodGlucoseSource>) {
+        _sources.value = sources
+        viewModelScope.launch(Dispatchers.IO) { repository.saveSources(sources) }
+    }
+
+    fun reorderSources(orderedIds: List<String>) {
+        val sources = com.woshiwangnima.healthdietpro.model.bloodglucose.reorderBloodGlucoseSources(_sources.value, orderedIds)
+        _sources.value = sources
+        viewModelScope.launch(Dispatchers.IO) { repository.reorderSources(orderedIds) }
     }
 
     fun setDiabetesType(type: BloodGlucoseDiabetesType) {

@@ -24,7 +24,7 @@ internal class BloodGlucoseArchiveStore private constructor(
     fun replace(archive: BloodGlucoseArchive) = synchronized(lock) { save(archive) }
 
     internal fun validateJson(raw: String) {
-        synchronized(lock) { validateRecordIds(json.decodeDomain(raw, DOMAIN_ID, BloodGlucoseArchive.serializer()).records) }
+        synchronized(lock) { validate(json.decodeDomain(raw, DOMAIN_ID, BloodGlucoseArchive.serializer())) }
     }
 
     internal fun replaceJson(raw: String) = synchronized(lock) {
@@ -42,7 +42,7 @@ internal class BloodGlucoseArchiveStore private constructor(
     }.getOrNull()
 
     private fun save(archive: BloodGlucoseArchive) {
-        validateRecordIds(archive.records)
+        validate(archive)
         val target = file()
         target.parentFile?.mkdirs()
         val temporary = File(target.parentFile, "${target.name}.tmp")
@@ -59,6 +59,14 @@ internal class BloodGlucoseArchiveStore private constructor(
         val ids = records.map(BloodGlucoseRecord::id)
         require(ids.all { it.isNotBlank() }) { "Blood glucose record id is blank" }
         require(ids.distinct().size == ids.size) { "Duplicate blood glucose record id" }
+    }
+
+    private fun validate(archive: BloodGlucoseArchive) {
+        validateRecordIds(archive.records)
+        val sourceIds = archive.sources.map(BloodGlucoseSource::id)
+        require(sourceIds.all { it.isNotBlank() }) { "Blood glucose source id is blank" }
+        require(sourceIds.distinct().size == sourceIds.size) { "Duplicate blood glucose source id" }
+        require(archive.sources.all { it.note.isNotBlank() }) { "Blood glucose source note is blank" }
     }
 
     private fun nextId(usedIds: MutableSet<String>): String {
@@ -79,8 +87,9 @@ internal class BloodGlucoseArchiveStore private constructor(
 
 @Serializable
 internal data class BloodGlucoseArchive(
-    val schemaVersion: Int = 1,
+    val schemaVersion: Int = 2,
     val records: List<BloodGlucoseRecord> = emptyList(),
+    val sources: List<BloodGlucoseSource> = emptyList(),
     val diabetesType: BloodGlucoseDiabetesType = BloodGlucoseDiabetesType.Normal,
     val reminder: BloodGlucoseReminderSettings = BloodGlucoseReminderSettings(),
     val lastAlertAt: Map<BloodGlucoseAlertKind, Long> = emptyMap(),

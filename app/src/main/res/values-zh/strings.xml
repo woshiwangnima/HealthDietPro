@@ -366,6 +366,15 @@
     <string name="record_add_action">添加%1$s</string>
     <string name="blood_glucose_title">血糖记录</string>
     <string name="blood_glucose_settings_title">血糖设置</string>
+    <string name="blood_glucose_source_settings">血糖值来源设置</string>
+    <string name="blood_glucose_source_settings_desc">管理记血糖时可选择的血糖值来源。</string>
+    <string name="blood_glucose_source_settings_hint">可拖动排序，新记录默认选择排序第一项。</string>
+    <string name="blood_glucose_source_add">添加来源</string>
+    <string name="blood_glucose_source_edit">编辑来源</string>
+    <string name="blood_glucose_source_empty">暂无血糖值来源。</string>
+    <string name="blood_glucose_source_delete_message">删除这条血糖值来源？</string>
+    <string name="blood_glucose_source">血糖值来源</string>
+    <string name="blood_glucose_source_note">来源备注</string>
     <string name="blood_glucose_target_range_settings">目标范围</string>
     <string name="blood_glucose_target_range_settings_desc">设置血糖记录使用的目标范围。</string>
     <string name="blood_glucose_reminder_settings">提醒设置</string>
@@ -411,6 +420,8 @@
     <string name="blood_glucose_unit">mmol/L</string>
     <string name="blood_glucose_value_unit">血糖值单位</string>
     <string name="blood_glucose_period">时段</string>
+    <string name="blood_glucose_period_anchor">参照时刻</string>
+    <string name="blood_glucose_period_relation">时段关系</string>
     <string name="blood_glucose_default_time">默认时刻</string>
     <string name="blood_glucose_relative_minutes">相对分钟</string>
     <string name="blood_glucose_minutes">分钟</string>

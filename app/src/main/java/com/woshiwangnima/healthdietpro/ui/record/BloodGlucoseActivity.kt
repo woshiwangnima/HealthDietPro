@@ -8,7 +8,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,10 +21,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +38,7 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +61,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableDeleteAction
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableText
+import com.woshiwangnima.healthdietpro.common.ui.AppDataTableReorder
 import com.woshiwangnima.healthdietpro.common.ui.AppFormSubtitle
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
@@ -87,6 +86,8 @@ import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.range.UnitRange
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartEvent
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseSource
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingDefaults
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingAnchor
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseDiabetesType
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseAlertMode
@@ -150,9 +151,11 @@ private fun BloodGlucoseScreen(
     openEditorInitially: Boolean,
 ) {
     val records by viewModel.records.collectAsStateWithLifecycle()
+    val sources by viewModel.sources.collectAsStateWithLifecycle()
     val chartState by viewModel.chartState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var editingRecord by remember { mutableStateOf<BloodGlucoseRecord?>(null) }
+    var editingSourceId by remember { mutableStateOf<String?>(null) }
     var showEditor by remember { mutableStateOf(openEditorInitially) }
     var route by rememberSaveable { mutableStateOf(BloodGlucoseRoute.Records) }
     val tabs = remember {
@@ -165,6 +168,8 @@ private fun BloodGlucoseScreen(
     if (showEditor) {
         BloodGlucoseEditorScreen(
             record = editingRecord,
+            sources = sources,
+            timingDefaults = BloodGlucoseTimingDefaults(),
             onBack = { if (openEditorInitially) onBack() else showEditor = false },
             onSave = { record ->
                 viewModel.upsert(record)
@@ -177,12 +182,14 @@ private fun BloodGlucoseScreen(
         route = when (route) {
             BloodGlucoseRoute.Targets -> BloodGlucoseRoute.Settings
             BloodGlucoseRoute.Reminders -> BloodGlucoseRoute.Settings
+            BloodGlucoseRoute.Sources -> BloodGlucoseRoute.Settings
+            BloodGlucoseRoute.SourceEditor -> BloodGlucoseRoute.Sources
             BloodGlucoseRoute.Settings, BloodGlucoseRoute.Records -> BloodGlucoseRoute.Records
         }
     }
 
     if (route == BloodGlucoseRoute.Settings) {
-        BloodGlucoseSettingsScreen(onBack = { route = BloodGlucoseRoute.Records }, onOpenTargets = { route = BloodGlucoseRoute.Targets }, onOpenReminders = { route = BloodGlucoseRoute.Reminders })
+        BloodGlucoseSettingsScreen(onBack = { route = BloodGlucoseRoute.Records }, onOpenTargets = { route = BloodGlucoseRoute.Targets }, onOpenReminders = { route = BloodGlucoseRoute.Reminders }, onOpenSources = { route = BloodGlucoseRoute.Sources })
         return
     }
     if (route == BloodGlucoseRoute.Targets) {
@@ -200,6 +207,31 @@ private fun BloodGlucoseScreen(
             settings = reminderSettings,
             onBack = { route = BloodGlucoseRoute.Settings },
             onSettingsChange = viewModel::setReminderSettings,
+        )
+        return
+    }
+    if (route == BloodGlucoseRoute.Sources) {
+        BloodGlucoseSourceSettingsScreen(
+            sources = sources,
+            onBack = { route = BloodGlucoseRoute.Settings },
+            onAdd = { editingSourceId = null; route = BloodGlucoseRoute.SourceEditor },
+            onEdit = { editingSourceId = it.id; route = BloodGlucoseRoute.SourceEditor },
+            onDelete = { id -> viewModel.saveSources(sources.filterNot { it.id == id }) },
+            onReorder = { ordered -> viewModel.reorderSources(ordered.map(BloodGlucoseSource::id)) },
+        )
+        return
+    }
+    if (route == BloodGlucoseRoute.SourceEditor) {
+        BloodGlucoseSourceEditorScreen(
+            source = sources.firstOrNull { it.id == editingSourceId },
+            onBack = { route = BloodGlucoseRoute.Sources },
+            onSave = { originalId, source ->
+                viewModel.saveSources(
+                    if (originalId == null) sources + source
+                    else sources.map { existing -> if (existing.id == originalId) source else existing },
+                )
+                route = BloodGlucoseRoute.Sources
+            },
         )
         return
     }
@@ -240,10 +272,10 @@ private fun BloodGlucoseScreen(
     }
 }
 
-private enum class BloodGlucoseRoute { Records, Settings, Targets, Reminders }
+private enum class BloodGlucoseRoute { Records, Settings, Targets, Reminders, Sources, SourceEditor }
 
 @Composable
-private fun BloodGlucoseSettingsScreen(onBack: () -> Unit, onOpenTargets: () -> Unit, onOpenReminders: () -> Unit) {
+private fun BloodGlucoseSettingsScreen(onBack: () -> Unit, onOpenTargets: () -> Unit, onOpenReminders: () -> Unit, onOpenSources: () -> Unit) {
     BaseScreen(title = stringResource(R.string.blood_glucose_settings_title), onBack = onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             SettingRow(
@@ -251,6 +283,13 @@ private fun BloodGlucoseSettingsScreen(onBack: () -> Unit, onOpenTargets: () -> 
                 subtitle = stringResource(R.string.blood_glucose_target_range_settings_desc),
                 leadingIconRes = R.drawable.ic_blood_glucose,
                 onClick = onOpenTargets,
+            )
+            HorizontalDivider()
+            SettingRow(
+                title = stringResource(R.string.blood_glucose_source_settings),
+                subtitle = stringResource(R.string.blood_glucose_source_settings_desc),
+                leadingIconRes = R.drawable.ic_edit,
+                onClick = onOpenSources,
             )
             HorizontalDivider()
             SettingRow(
@@ -268,6 +307,88 @@ private fun BloodGlucoseSettingsScreen(onBack: () -> Unit, onOpenTargets: () -> 
             )
         }
     }
+}
+
+@Composable
+private fun BloodGlucoseSourceSettingsScreen(
+    sources: List<BloodGlucoseSource>,
+    onBack: () -> Unit,
+    onAdd: () -> Unit,
+    onEdit: (BloodGlucoseSource) -> Unit,
+    onDelete: (String) -> Unit,
+    onReorder: (List<BloodGlucoseSource>) -> Unit,
+) {
+    var deleting by remember { mutableStateOf<BloodGlucoseSource?>(null) }
+    var orderedSources by remember(sources) { mutableStateOf(sources) }
+    BaseScreen(title = stringResource(R.string.blood_glucose_source_settings), onBack = onBack) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.blood_glucose_source_settings_hint), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                AppIconTextButton(stringResource(R.string.blood_glucose_source_add), R.drawable.ic_add, onAdd)
+            }
+            if (orderedSources.isEmpty()) {
+                Text(stringResource(R.string.blood_glucose_source_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                AppDataTable(
+                    rows = orderedSources,
+                    rowKey = { _, source -> source.id },
+                    modifier = Modifier.weight(1f),
+                    showPager = false,
+                    actionsWidth = 104.dp,
+                    columns = listOf(
+                        AppDataTableColumn("source", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_source_note)) }, ColumnWidth.Flex(1f, 180.dp)) { source -> AppDataTableText(source.note) },
+                    ),
+                    actionsHeader = { AppDataTableHeaderText(stringResource(R.string.body_record_delete)) },
+                    rowActions = { source -> AppDataTableDeleteAction(stringResource(R.string.body_record_delete), { deleting = source }) },
+                    onRowClick = onEdit,
+                    reorder = AppDataTableReorder(
+                        onMove = { from, to -> orderedSources = orderedSources.toMutableList().apply { add(to, removeAt(from)) } },
+                        onMoveFinished = { onReorder(orderedSources) },
+                    ),
+                )
+            }
+        }
+    }
+    deleting?.let { source ->
+        AlertDialog(
+            onDismissRequest = { deleting = null },
+            title = { Text(stringResource(R.string.body_record_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.blood_glucose_source_delete_message)) },
+            confirmButton = { TextButton(onClick = { onDelete(source.id); deleting = null }) { Text(stringResource(R.string.body_record_delete)) } },
+            dismissButton = { TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } },
+        )
+    }
+}
+
+@Composable
+private fun BloodGlucoseSourceEditorScreen(
+    source: BloodGlucoseSource?,
+    onBack: () -> Unit,
+    onSave: (String?, BloodGlucoseSource) -> Unit,
+) {
+    var note by rememberSaveable(source?.id) { mutableStateOf(source?.note.orEmpty()) }
+    val current = note.trim().takeIf(String::isNotBlank)?.let { BloodGlucoseSource(source?.id ?: UUID.randomUUID().toString(), it) }
+    val hasChanges = current != source
+    val saveEnabled = current != null && hasChanges
+    var showDiscardDialog by rememberSaveable(source?.id) { mutableStateOf(false) }
+    fun save() { current?.let { onSave(source?.id, it) } }
+    fun requestBack() { if (hasChanges) showDiscardDialog = true else onBack() }
+    BackHandler(onBack = ::requestBack)
+    BaseScreen(title = stringResource(if (source == null) R.string.blood_glucose_source_add else R.string.blood_glucose_source_edit), onBack = ::requestBack) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp)) {
+                item {
+                    TextInputField(
+                        label = stringResource(R.string.blood_glucose_source_note),
+                        value = note,
+                        onValueChange = { note = it },
+                    )
+                }
+            }
+            FormSaveBar(stringResource(R.string.blood_glucose_save), saveEnabled, ::save)
+        }
+    }
+    if (showDiscardDialog) DiscardChangesDialog(onDiscard = onBack, onSave = ::save, onDismiss = { showDiscardDialog = false }, saveEnabled = saveEnabled)
 }
 
 @Composable
@@ -658,6 +779,8 @@ private fun BloodGlucoseDataPage(
 @Composable
 private fun BloodGlucoseEditorScreen(
     record: BloodGlucoseRecord?,
+    sources: List<BloodGlucoseSource>,
+    timingDefaults: BloodGlucoseTimingDefaults,
     onBack: () -> Unit,
     onSave: (BloodGlucoseRecord) -> Unit,
 ) {
@@ -671,9 +794,13 @@ private fun BloodGlucoseEditorScreen(
     }
     var unitId by rememberSaveable(record?.id) { mutableStateOf(initialUnitId) }
     var value by rememberSaveable(record?.id) { mutableStateOf(record?.valueMmolPerL?.let { UnitConverter.fromBase(UnitCategoryType.Glucose.id, it.toFloat(), unitId).toString() }.orEmpty()) }
-    var anchor by rememberSaveable(record?.id) { mutableStateOf(record?.timingAnchor) }
+    var anchor by rememberSaveable(record?.id) { mutableStateOf(record?.timingAnchor ?: timingDefaults.preferredAnchor()) }
     var relativeMinutes by rememberSaveable(record?.id) { mutableStateOf(record?.relativeMinutes?.let { kotlin.math.abs(it).toString() }.orEmpty()) }
     var timingRelation by rememberSaveable(record?.id) { mutableStateOf(record?.relativeMinutes?.timingRelation() ?: BloodGlucoseTimingRelation.At) }
+    var sourceId by rememberSaveable(record?.id) { mutableStateOf(record?.sourceId ?: sources.firstOrNull()?.id) }
+    LaunchedEffect(record?.id, sources) {
+        if (record == null && sourceId == null) sourceId = sources.firstOrNull()?.id
+    }
     var note by rememberSaveable(record?.id) { mutableStateOf(record?.note.orEmpty()) }
     var showDateTimePicker by rememberSaveable { mutableStateOf(false) }
     val validValue = value.toDoubleOrNull()?.let { UnitConverter.toBase(UnitCategoryType.Glucose.id, it.toFloat(), unitId).toDouble() }?.takeIf(::isValidBloodGlucoseValue)
@@ -688,7 +815,7 @@ private fun BloodGlucoseEditorScreen(
         BloodGlucoseTimingRelation.At -> 0
     }
     val editedRecord = validValue?.let {
-        BloodGlucoseRecord(record?.id.orEmpty(), timestamp, it, anchor, relativeMinutesValue, note.trim())
+        BloodGlucoseRecord(record?.id.orEmpty(), timestamp, it, anchor, relativeMinutesValue, note.trim(), sourceId)
     }
     val initialDraft = remember(record?.id) {
         BloodGlucoseEditorDraft(
@@ -701,6 +828,7 @@ private fun BloodGlucoseEditorScreen(
             relativeMinutesText = record?.relativeMinutes?.let { kotlin.math.abs(it).toString() }.orEmpty(),
             timingRelation = record?.relativeMinutes?.timingRelation() ?: BloodGlucoseTimingRelation.At,
             note = record?.note.orEmpty(),
+            sourceId = record?.sourceId,
         )
     }
     val currentDraft = BloodGlucoseEditorDraft(
@@ -711,6 +839,7 @@ private fun BloodGlucoseEditorScreen(
         relativeMinutesText = relativeMinutes,
         timingRelation = timingRelation,
         note = note,
+        sourceId = sourceId,
     )
     val hasChanges = bloodGlucoseDraftChanged(
         initial = initialDraft,
@@ -790,21 +919,21 @@ private fun BloodGlucoseEditorScreen(
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }
-                item { Text(stringResource(R.string.blood_glucose_period), style = MaterialTheme.typography.titleSmall) }
                 item {
-                    Text(stringResource(R.string.blood_glucose_default_time), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        BloodGlucoseTimingAnchor.entries.forEach { item ->
-                            FilterChip(selected = anchor == item, onClick = { anchor = if (anchor == item) null else item }, label = { Text(stringResource(item.labelRes())) })
-                        }
-                    }
+                    AppDropdownField(
+                        label = stringResource(R.string.blood_glucose_period_anchor),
+                        value = anchor?.let { stringResource(it.labelRes()) }.orEmpty(),
+                        options = BloodGlucoseTimingAnchor.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
+                        onSelect = { anchor = BloodGlucoseTimingAnchor.valueOf(it.id) },
+                    )
                 }
                 item {
-                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        BloodGlucoseTimingRelation.entries.forEach { relation ->
-                            FilterChip(selected = timingRelation == relation, onClick = { timingRelation = relation }, label = { Text(stringResource(relation.labelRes())) })
-                        }
-                    }
+                    AppDropdownField(
+                        label = stringResource(R.string.blood_glucose_period_relation),
+                        value = stringResource(timingRelation.labelRes()),
+                        options = BloodGlucoseTimingRelation.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
+                        onSelect = { timingRelation = BloodGlucoseTimingRelation.valueOf(it.id) },
+                    )
                 }
                 if (timingRelation != BloodGlucoseTimingRelation.At) item {
                     NumericInputField(
@@ -812,6 +941,15 @@ private fun BloodGlucoseEditorScreen(
                         value = relativeMinutes,
                         onValueChange = { relativeMinutes = it },
                         spec = NumericInputSpec(kind = NumericInputKind.Integer),
+                    )
+                }
+                if (sources.isNotEmpty()) item {
+                    val source = sources.firstOrNull { it.id == sourceId }
+                    AppDropdownField(
+                        label = stringResource(R.string.blood_glucose_source),
+                        value = source?.note.orEmpty(),
+                        options = sources.map { AppDropdownOption(it.id, it.note) },
+                        onSelect = { sourceId = it.id },
                     )
                 }
                 item {
@@ -882,6 +1020,7 @@ internal data class BloodGlucoseEditorDraft(
     val relativeMinutesText: String,
     val timingRelation: BloodGlucoseTimingRelation,
     val note: String,
+    val sourceId: String? = null,
 )
 
 internal fun bloodGlucoseDraftChanged(
@@ -892,14 +1031,14 @@ internal fun bloodGlucoseDraftChanged(
 ): Boolean = when {
     currentRecord != null && initialRecord != null -> !currentRecord.hasSameContentAs(initialRecord)
     currentRecord != null -> current.valueText.isNotBlank() || current.timingAnchor != null ||
-        current.timingRelation != BloodGlucoseTimingRelation.At || current.note.isNotBlank() ||
+        current.timingRelation != BloodGlucoseTimingRelation.At || current.note.isNotBlank() || current.sourceId != null ||
         current.timestamp != initial.timestamp
     else -> current.copy(unitId = initial.unitId) != initial.copy(unitId = initial.unitId)
 }
 
 internal fun BloodGlucoseRecord.hasSameContentAs(other: BloodGlucoseRecord): Boolean =
     id == other.id && timestamp == other.timestamp && abs(valueMmolPerL - other.valueMmolPerL) <= 0.000001 &&
-        timingAnchor == other.timingAnchor && (relativeMinutes ?: 0) == (other.relativeMinutes ?: 0) && note == other.note
+        timingAnchor == other.timingAnchor && (relativeMinutes ?: 0) == (other.relativeMinutes ?: 0) && note == other.note && sourceId == other.sourceId
 
 @Composable
 private fun glucoseUnitOptions(): List<AppDropdownOption> = UnitConverter.getRepository()?.getCategory(UnitCategoryType.Glucose.id)?.units

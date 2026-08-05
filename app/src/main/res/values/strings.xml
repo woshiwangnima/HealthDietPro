@@ -369,6 +369,15 @@
     <string name="record_add_action">Add %1$s</string>
     <string name="blood_glucose_title">Blood Glucose</string>
     <string name="blood_glucose_settings_title">Blood glucose settings</string>
+    <string name="blood_glucose_source_settings">Blood glucose value sources</string>
+    <string name="blood_glucose_source_settings_desc">Manage sources available when logging blood glucose.</string>
+    <string name="blood_glucose_source_settings_hint">Drag to reorder. The first source is selected by default for new records.</string>
+    <string name="blood_glucose_source_add">Add source</string>
+    <string name="blood_glucose_source_edit">Edit source</string>
+    <string name="blood_glucose_source_empty">No blood glucose value sources yet.</string>
+    <string name="blood_glucose_source_delete_message">Delete this blood glucose value source?</string>
+    <string name="blood_glucose_source">Blood glucose value source</string>
+    <string name="blood_glucose_source_note">Source note</string>
     <string name="blood_glucose_target_range_settings">Target range</string>
     <string name="blood_glucose_target_range_settings_desc">Set the target range used for blood glucose records.</string>
     <string name="blood_glucose_reminder_settings">Alert reminders</string>
@@ -414,6 +423,8 @@
     <string name="blood_glucose_unit">mmol/L</string>
     <string name="blood_glucose_value_unit">Blood glucose unit</string>
     <string name="blood_glucose_period">Period</string>
+    <string name="blood_glucose_period_anchor">Reference time</string>
+    <string name="blood_glucose_period_relation">Timing relation</string>
     <string name="blood_glucose_default_time">Default time</string>
     <string name="blood_glucose_relative_minutes">Relative minutes</string>
     <string name="blood_glucose_minutes">Minutes</string>

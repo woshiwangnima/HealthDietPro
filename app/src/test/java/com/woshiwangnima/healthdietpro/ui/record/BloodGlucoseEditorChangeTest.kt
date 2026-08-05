@@ -42,4 +42,11 @@ class BloodGlucoseEditorChangeTest {
     fun `changing display unit alone is not a record edit`() {
         assertFalse(bloodGlucoseDraftChanged(initial, initial.copy(unitId = "mg_dl"), record, record))
     }
+
+    @Test
+    fun `changing source is a record edit`() {
+        val sourcedRecord = record.copy(sourceId = "meter")
+        val sourcedDraft = initial.copy(sourceId = "meter")
+        assertTrue(bloodGlucoseDraftChanged(sourcedDraft, sourcedDraft.copy(sourceId = "hospital"), sourcedRecord, sourcedRecord.copy(sourceId = "hospital")))
+    }
 }
