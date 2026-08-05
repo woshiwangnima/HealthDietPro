@@ -22,6 +22,21 @@ class DiseaseI18nTest {
         assertEquals("type2_diabetes", repository.findByIcd11Code("5A11").single().id)
         assertEquals("fatty_liver", repository.search("脂肪肝", Locale.SIMPLIFIED_CHINESE).single().id)
         assertEquals("pcos", repository.search("PCOS", Locale.ENGLISH).single().id)
+        assertEquals("common_cold", repository.search("感冒", Locale.SIMPLIFIED_CHINESE).single().id)
+        assertEquals("influenza", repository.search("flu", Locale.ENGLISH).single().id)
+        assertEquals("influenza", repository.findByIcd11Code("1E30").single().id)
+    }
+
+    @Test fun coldAndInfluenzaCatalogEntriesExplainTheirDifference() {
+        val commonCold = repository.findById("common_cold")!!
+        val influenza = repository.findById("influenza")!!
+
+        assertEquals(DiseaseCourse.ACUTE, commonCold.course)
+        assertEquals(DiseaseCourse.ACUTE, influenza.course)
+        assertTrue(commonCold.i18n.getValue("zh").description.contains("逐渐"))
+        assertTrue(commonCold.i18n.getValue("zh").description.contains("流感"))
+        assertTrue(influenza.i18n.getValue("zh").description.contains("突然"))
+        assertTrue(influenza.i18n.getValue("zh").description.contains("普通感冒"))
     }
 
     @Test fun classificationAndDepartmentQueriesUseCatalogReferences() {

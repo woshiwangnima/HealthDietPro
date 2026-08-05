@@ -12,6 +12,7 @@ import com.woshiwangnima.healthdietpro.model.food.BotanicalTaxonomyRepository
 import com.woshiwangnima.healthdietpro.model.food.CookingMethod
 import com.woshiwangnima.healthdietpro.model.food.CookingMethodRepository
 import com.woshiwangnima.healthdietpro.model.food.Dish
+import com.woshiwangnima.healthdietpro.model.food.DriNrvRepository
 import com.woshiwangnima.healthdietpro.model.food.FoodDto
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
@@ -20,6 +21,7 @@ import com.woshiwangnima.healthdietpro.model.food.PreparedFood
 import com.woshiwangnima.healthdietpro.model.food.FoodNutrientRepository
 import com.woshiwangnima.healthdietpro.model.food.NutrientMeta
 import com.woshiwangnima.healthdietpro.model.food.NutrientMetaRepository
+import com.woshiwangnima.healthdietpro.model.food.NrvReference
 import com.woshiwangnima.healthdietpro.model.food.NutritionResolver
 import com.woshiwangnima.healthdietpro.model.food.ResolvedNutrition
 import com.woshiwangnima.healthdietpro.model.food.ServingContainer
@@ -59,7 +61,14 @@ internal data class NutritionUiState(
     val selectedFood: FoodItem? = null,
     val comparisonReturnTarget: NutritionDestination? = null,
     val editor: NutritionEditorState? = null,
+    val nrvReference: NrvReference? = null,
+    val nrvReferences: List<NrvReference> = emptyList(),
+    val exerciseRequest: NutritionExerciseRequest? = null,
 )
+
+internal data class NutritionExerciseServing(val label: String, val kilocalories: Double)
+
+internal data class NutritionExerciseRequest(val servings: List<NutritionExerciseServing>)
 
 /** Which custom editor is open, and the item being edited (null = create new). */
 internal data class NutritionEditorState(
@@ -74,6 +83,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     private val cookingMethodRepository = CookingMethodRepository.fromContext(application)
     private val servingContainerRepository = ServingContainerRepository.fromContext(application)
     private val nutrientMetaRepository = NutrientMetaRepository.fromContext(application)
+    private val driNrvRepository = DriNrvRepository.fromContext(application)
     private val botanicalTaxonomyRepository = BotanicalTaxonomyRepository.fromContext(application)
     private var tagRepository = UserFoodTagRepository.fromContext(application)
     private var customRepository = UserCustomFoodRepository.fromContext(application)
@@ -104,6 +114,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
             val customs = withContext(Dispatchers.IO) { initialCustomRepository.load() }
             val metas = withContext(Dispatchers.IO) { nutrientMetaRepository.nutrients() }
             val taxonomy = withContext(Dispatchers.IO) { botanicalTaxonomyRepository.labels() }
+            val nrvReferences = withContext(Dispatchers.IO) { driNrvRepository.referencesFor(ProfilePrefs.load(application)) }
             if (userId == initialUserId) {
                 builtInFoods = foods
                 cookingMethodsById = methods
@@ -118,6 +129,8 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
                     searchHistory = loadSearchHistory(),
                     recentFoodIds = collections.recentIds,
                     favoriteFoodIds = collections.favoriteIds,
+                    nrvReference = nrvReferences.firstOrNull(),
+                    nrvReferences = nrvReferences,
                 )
             }
         }
@@ -245,6 +258,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         viewModelScope.launch {
             val tags = withContext(Dispatchers.IO) { targetRepository.load() }
             val customs = withContext(Dispatchers.IO) { targetCustom.load() }
+            val nrvReferences = withContext(Dispatchers.IO) { driNrvRepository.referencesFor(ProfilePrefs.load(getApplication())) }
             if (userId == targetUserId) {
                 rebuild(customs)
                 val collections = loadFoodCollections()
@@ -255,6 +269,8 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
                     searchHistory = loadSearchHistory(),
                     recentFoodIds = collections.recentIds,
                     favoriteFoodIds = collections.favoriteIds,
+                    nrvReference = nrvReferences.firstOrNull(),
+                    nrvReferences = nrvReferences,
                 )
             }
         }
@@ -275,6 +291,15 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         if (keyword.isNotBlank()) saveSearchHistory(history)
     }
     fun closeFood() { _state.value = _state.value.copy(selectedFood = null) }
+    fun selectNrvReference(id: String) {
+        _state.value.nrvReferences.firstOrNull { it.id == id }?.let { reference ->
+            _state.value = _state.value.copy(nrvReference = reference)
+        }
+    }
+    fun openExerciseExpenditure(servings: List<NutritionExerciseServing>) {
+        _state.value = _state.value.copy(exerciseRequest = NutritionExerciseRequest(servings))
+    }
+    fun closeExerciseExpenditure() { _state.value = _state.value.copy(exerciseRequest = null) }
     fun openComparison(from: NutritionDestination) { _state.value = _state.value.copy(comparisonReturnTarget = from) }
     fun closeComparison() {
         _state.value = _state.value.copy(
@@ -368,10 +393,12 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
 
     fun canNavigateBack(): Boolean = _state.value.selectedFood != null ||
         _state.value.comparisonReturnTarget != null ||
-        _state.value.editor != null
+        _state.value.editor != null ||
+        _state.value.exerciseRequest != null
     fun navigateBack(): Boolean {
         val state = _state.value
         when {
+            state.exerciseRequest != null -> closeExerciseExpenditure()
             state.comparisonReturnTarget != null -> closeComparison()
             state.editor != null -> closeEditor()
             state.selectedFood != null -> closeFood()

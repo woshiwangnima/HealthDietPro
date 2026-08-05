@@ -64,6 +64,15 @@
     <string name="nutrition_energy_kcal_value">%.0f 千卡</string>
     <string name="nutrition_profile_item">项目</string>
     <string name="nutrition_profile_amount">含量</string>
+    <string name="nutrition_profile_amount_for_serving">每 %1$s</string>
+    <string name="nutrition_profile_nrv">NRV</string>
+    <string name="nutrition_nrv_current_user">当前用户标准</string>
+    <string name="nutrition_nrv_adult_standard">成人标准</string>
+    <string name="nutrition_serving_100g_edible">100克可食部</string>
+    <string name="nutrition_measurement_basis">营养计量基准</string>
+    <string name="nutrition_energy_kcal_kj">%1$.0f千卡 / %2$.0f千焦</string>
+    <string name="nutrition_exercise_consumption">运动消耗</string>
+    <string name="nutrition_exercise_consumption_steps">大约需走%1$d步</string>
     <string name="nutrition_profile_classification">分类</string>
     <string name="nutrition_profile_range">范围</string>
     <string name="nutrition_classification_low">低</string>
@@ -1140,6 +1149,7 @@
     <string name="water_statistics_7_days">7天</string>
     <string name="water_statistics_30_days">30天</string>
     <string name="water_statistics_daily_water">饮水量</string>
+    <string name="water_statistics_average">平均 %1$s</string>
     <string name="water_statistics_selected_day">%1$s：%2$s</string>
     <string name="water_statistics_selected_day_empty">当天暂无饮水记录</string>
     <string name="nutrition_ingredient_main">主料</string>

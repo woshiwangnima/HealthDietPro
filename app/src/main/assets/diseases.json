@@ -63,6 +63,13 @@
         "zh": "肿瘤",
         "en": "Neoplasms"
       }
+    },
+    {
+      "id": "respiratory_system",
+      "i18n": {
+        "zh": "呼吸系统",
+        "en": "Respiratory system"
+      }
     }
   ],
   "departments": [
@@ -238,6 +245,26 @@
       "url": "https://icd.who.int/browse11/l-m/en",
       "version": "2025-01",
       "accessedOn": "2026-07-28"
+    },
+    {
+      "id": "nhs_common_cold_2024",
+      "title": {
+        "zh": "英国国民保健署：普通感冒",
+        "en": "NHS: Common cold"
+      },
+      "url": "https://www.nhs.uk/conditions/common-cold/",
+      "version": "2024-03-22",
+      "accessedOn": "2026-08-06"
+    },
+    {
+      "id": "nhs_flu_2026",
+      "title": {
+        "zh": "英国国民保健署：流感",
+        "en": "NHS: Flu"
+      },
+      "url": "https://www.nhs.uk/conditions/flu/",
+      "version": "2026-02-03",
+      "accessedOn": "2026-08-06"
     }
   ],
   "diseases": [
@@ -1635,6 +1662,113 @@
           "recommendation": "LIMIT"
         }
       ]
+    },
+    {
+      "id": "common_cold",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "respiratory_system"
+      ],
+      "course": "ACUTE",
+      "careDepartmentIds": [
+        "general_medicine",
+        "respiratory_medicine",
+        "otolaryngology"
+      ],
+      "sourceIds": [
+        "who_icd11_2025",
+        "nhs_common_cold_2024"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "普通感冒",
+          "aliases": [
+            "感冒",
+            "急性鼻咽炎",
+            "伤风"
+          ],
+          "description": "通常由多种病毒引起的急性上呼吸道感染，症状多在 1 至 2 天内逐渐出现，以流涕或鼻塞、喷嚏、咽痛和咳嗽等鼻咽部症状为主。它与流感可有重叠，但流感往往在数小时内突然起病，发热、全身酸痛和明显乏力通常更突出；仅凭症状不能自行判定。"
+        },
+        "en": {
+          "label": "Common Cold",
+          "aliases": [
+            "Acute nasopharyngitis",
+            "Acute coryza"
+          ],
+          "description": "An acute upper-respiratory infection usually caused by one of many viruses. Symptoms commonly develop gradually over 1 to 2 days and mainly involve the nose and throat, such as a runny or blocked nose, sneezing, sore throat, and cough. Symptoms overlap with influenza, but influenza usually begins abruptly within hours and more often features fever, body aches, and marked exhaustion; symptoms alone cannot confirm either condition."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "12",
+          "chapterTitle": {
+            "zh": "呼吸系统疾病",
+            "en": "Diseases of the respiratory system"
+          },
+          "blockCode": "CA00-CA0Z",
+          "code": "CA00",
+          "title": {
+            "zh": "急性鼻咽炎",
+            "en": "Acute nasopharyngitis"
+          },
+          "mappingType": "PRIMARY"
+        }
+      ],
+      "nutrientRecommendations": []
+    },
+    {
+      "id": "influenza",
+      "clinicalKind": "DISEASE",
+      "categoryIds": [
+        "respiratory_system"
+      ],
+      "course": "ACUTE",
+      "careDepartmentIds": [
+        "general_medicine",
+        "respiratory_medicine"
+      ],
+      "sourceIds": [
+        "who_icd11_2025",
+        "nhs_flu_2026"
+      ],
+      "i18n": {
+        "zh": {
+          "label": "流行性感冒",
+          "aliases": [
+            "流感",
+            "季节性流感",
+            "influenza"
+          ],
+          "description": "由流感病毒引起的急性呼吸道传染病。与通常逐渐出现且以鼻咽部症状为主的普通感冒相比，流感常在数小时内突然起病，更常出现发热、全身酸痛、头痛和明显乏力，也可有咳嗽和咽痛。两者症状可以重叠，严重程度和风险会因人而异，不能仅靠本简介作出诊断。"
+        },
+        "en": {
+          "label": "Influenza",
+          "aliases": [
+            "Flu",
+            "Seasonal influenza"
+          ],
+          "description": "An acute contagious respiratory illness caused by influenza viruses. Unlike the common cold, which usually develops gradually and mainly affects the nose and throat, influenza often begins abruptly within hours and more commonly causes fever, body aches, headache, and marked exhaustion, along with cough or sore throat. The conditions can overlap, and severity and risk vary between people, so this summary cannot establish a diagnosis."
+        }
+      },
+      "icd11References": [
+        {
+          "release": "2025-01",
+          "chapterCode": "01",
+          "chapterTitle": {
+            "zh": "某些传染病或寄生虫病",
+            "en": "Certain infectious or parasitic diseases"
+          },
+          "blockCode": "1E30-1E32",
+          "code": "1E30",
+          "title": {
+            "zh": "季节性流感",
+            "en": "Seasonal influenza"
+          },
+          "mappingType": "PRIMARY"
+        }
+      ],
+      "nutrientRecommendations": []
     }
   ]
 }

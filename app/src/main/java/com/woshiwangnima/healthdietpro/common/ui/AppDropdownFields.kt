@@ -42,10 +42,11 @@ fun AppDropdownField(
     showOptionDividers: Boolean = false,
     largeOptionText: Boolean = false,
 ) {
+    val canExpand = enabled && options.size > 1
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { if (enabled) expanded = it },
+        onExpandedChange = { if (canExpand) expanded = it },
         modifier = modifier,
     ) {
         OutlinedTextField(
@@ -53,16 +54,18 @@ fun AppDropdownField(
             onValueChange = {},
             label = { InputLabel(label) },
             readOnly = true,
-            enabled = enabled,
+            enabled = canExpand,
             singleLine = true,
             colors = AppDropdownTextFieldColors(),
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = {
+                if (canExpand) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
             modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled)
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable, canExpand)
                 .fillMaxWidth(),
         )
         ExposedDropdownMenu(
-            expanded = expanded && enabled,
+            expanded = expanded && canExpand,
             onDismissRequest = { expanded = false },
             containerColor = AppDropdownContainerColor(),
         ) {

@@ -93,3 +93,12 @@ internal fun recommendedWaterMl(
     }
     return (baseline + activityExtra).coerceIn(1_500, 5_000)
 }
+
+internal fun averageNonZeroDailyWaterMl(
+    dailyTotals: Collection<Double>,
+    excludeCurrentDay: Boolean = false,
+): Double? {
+    val totalsWithoutCurrentDay = if (excludeCurrentDay) dailyTotals.take((dailyTotals.size - 1).coerceAtLeast(0)) else dailyTotals
+    val validTotals = totalsWithoutCurrentDay.filter { it > 0.0 }
+    return validTotals.takeIf(List<Double>::isNotEmpty)?.average()
+}

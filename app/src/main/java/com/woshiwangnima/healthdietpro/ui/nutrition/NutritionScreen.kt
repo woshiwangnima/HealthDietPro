@@ -35,7 +35,11 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -72,6 +76,8 @@ import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableHeaderText
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableText
+import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
+import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.ColumnWidth
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
@@ -91,6 +97,7 @@ import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.Dish
 import com.woshiwangnima.healthdietpro.model.food.DishTaxonomy
+import com.woshiwangnima.healthdietpro.model.food.DriNrvRepository
 import com.woshiwangnima.healthdietpro.model.food.RecipeStep
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
@@ -99,6 +106,8 @@ import com.woshiwangnima.healthdietpro.model.food.GlycemicClassification
 import com.woshiwangnima.healthdietpro.model.food.Ingredient
 import com.woshiwangnima.healthdietpro.model.food.PreparedFood
 import com.woshiwangnima.healthdietpro.model.food.ResolvedNutrition
+import com.woshiwangnima.healthdietpro.model.food.NrvReference
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.model.food.classifyGlycemicIndex
 import com.woshiwangnima.healthdietpro.model.food.classifyGlycemicLoad
 import com.woshiwangnima.healthdietpro.model.food.glycemicLevel
@@ -205,7 +214,9 @@ private fun FoodImageWithSystemTags(
 @Composable
 internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    BackHandler(enabled = state.exerciseRequest != null) { viewModel.closeExerciseExpenditure() }
     when {
+        state.exerciseRequest != null -> ExerciseExpenditureScreen(requireNotNull(state.exerciseRequest), viewModel::closeExerciseExpenditure)
         state.editor != null -> NutritionEditorScreen(requireNotNull(state.editor), viewModel)
         state.comparisonReturnTarget != null -> FoodComparisonScreen(requireNotNull(state.selectedFood), state.foods, viewModel.nutrientMetas(), viewModel::resolvePer100g, viewModel::closeComparison)
         state.selectedFood != null -> FoodDetailScreen(
@@ -213,6 +224,10 @@ internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier =
             isFavorite = requireNotNull(state.selectedFood).id in state.favoriteFoodIds,
             isRecent = requireNotNull(state.selectedFood).id in state.recentFoodIds,
             viewModel = viewModel,
+            nrvReference = state.nrvReference,
+            nrvReferences = state.nrvReferences,
+            onNrvReferenceSelected = viewModel::selectNrvReference,
+            onOpenExerciseExpenditure = viewModel::openExerciseExpenditure,
             onBack = viewModel::closeFood,
         ) { viewModel.openComparison(NutritionDestination.FoodDetail) }
         else -> FoodBrowseScreen(state, viewModel, modifier)
@@ -719,6 +734,10 @@ private fun FoodDetailScreen(
     isFavorite: Boolean,
     isRecent: Boolean,
     viewModel: NutritionViewModel,
+    nrvReference: NrvReference?,
+    nrvReferences: List<NrvReference>,
+    onNrvReferenceSelected: (String) -> Unit,
+    onOpenExerciseExpenditure: (List<NutritionExerciseServing>) -> Unit,
     onBack: () -> Unit,
     onCompare: () -> Unit,
 ) {
@@ -735,6 +754,7 @@ private fun FoodDetailScreen(
     val relatedDishes = remember(food.id) { viewModel.relatedDishes(food.id) }
     val isCustom = viewModel.isCustom(food.id)
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
+    val defaultServingLabel = stringResource(R.string.nutrition_serving_100g_edible)
     val cookingSuffix: String? = (food as? PreparedFood)?.let {
         it.derivedFrom?.let { derivation ->
             viewModel.cookingMethodFor(derivation.cookingMethodId)?.displayLabel(language)
@@ -826,11 +846,31 @@ private fun FoodDetailScreen(
                 onSelected = { selectedServingId = it },
             )
             val selectedServing = servings.first { it.id == selectedServingId }
+            val selectedServingLabel = if (selectedServing.id == "per_100g") {
+                stringResource(R.string.nutrition_serving_100g_edible)
+            } else {
+                selectedServing.displayLabel(language)
+            }
+            NutritionEnergyAndExercise(
+                resolved = resolved,
+                serving = selectedServing,
+                onClick = {
+                    onOpenExerciseExpenditure(servings.map { serving ->
+                        NutritionExerciseServing(
+                            label = if (serving.id == "per_100g") defaultServingLabel else serving.displayLabel(language),
+                            kilocalories = resolved.energyKilocalories(serving.ratioToTable) ?: 0.0,
+                        )
+                    })
+                },
+            )
             AppDataTable(
-                rows = nutrientRows(resolved, selectedServing, viewModel.nutrientMetas(), language),
+                rows = nutrientRows(resolved, selectedServing, viewModel.nutrientMetas(), language, nrvReference),
                 columns = listOf(
-                    AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 110.dp)) { AppDataTableText(it.labelText ?: stringResource(requireNotNull(it.labelRes))) },
-                    AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount)) }, ColumnWidth.Flex(1f, 110.dp)) { AppDataTableText(it.value) },
+                    AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 105.dp)) { AppDataTableText(it.labelText ?: stringResource(requireNotNull(it.labelRes))) },
+                    AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount_for_serving, selectedServingLabel)) }, ColumnWidth.Flex(1f, 130.dp)) { AppDataTableText(it.value) },
+                    AppDataTableColumn("nrv", {
+                        NrvReferenceHeader(nrvReference, nrvReferences, onNrvReferenceSelected)
+                    }, ColumnWidth.Fixed(82.dp)) { AppDataTableText(it.nrvPercent ?: "-") },
                 ),
                 rowKey = { _, row -> row.key },
                 showRowNumber = false,
@@ -971,20 +1011,85 @@ private fun ResolvedNutrition?.macronutrientEnergy(): MacronutrientEnergy? {
     ).takeIf { it.totalKcal > 0.0 }
 }
 
+private fun ResolvedNutrition?.energyKilocalories(multiplier: Double = 1.0): Double? {
+    val amount = this?.nutrients?.get("ENERGY") ?: return null
+    return UnitConverter.toBase(
+        "energy",
+        (amount.value * multiplier).toFloat(),
+        amount.unitId.lowercase(),
+    ).toDouble()
+}
+
 @Composable
 private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?, modifier: Modifier = Modifier) {
     val energy = resolved.macronutrientEnergy() ?: return
+    val totalKcal = resolved.energyKilocalories() ?: return
+    val legendItems = listOf(
+        MacronutrientLegendItem("carbohydrate", stringResource(R.string.nutrition_energy_carbohydrate, energy.carbohydrateKcal / energy.totalKcal * 100.0), energy.carbohydrateKcal, androidx.compose.ui.graphics.Color(0xFFF9A825)),
+        MacronutrientLegendItem("protein", stringResource(R.string.nutrition_energy_protein, energy.proteinKcal / energy.totalKcal * 100.0), energy.proteinKcal, androidx.compose.ui.graphics.Color(0xFF43A047)),
+        MacronutrientLegendItem("fat", stringResource(R.string.nutrition_energy_fat, energy.fatKcal / energy.totalKcal * 100.0), energy.fatKcal, androidx.compose.ui.graphics.Color(0xFFE53935)),
+    )
     DetailSectionTitle(R.drawable.ic_energy_distribution, stringResource(R.string.nutrition_macronutrient_energy), modifier)
     AnimatedDonutChart(
-        segments = listOf(
-            DonutChartSegment("carbohydrate", stringResource(R.string.nutrition_energy_carbohydrate, energy.carbohydrateKcal / energy.totalKcal * 100.0), energy.carbohydrateKcal.toFloat(), androidx.compose.ui.graphics.Color(0xFFF9A825)),
-            DonutChartSegment("protein", stringResource(R.string.nutrition_energy_protein, energy.proteinKcal / energy.totalKcal * 100.0), energy.proteinKcal.toFloat(), androidx.compose.ui.graphics.Color(0xFF43A047)),
-            DonutChartSegment("fat", stringResource(R.string.nutrition_energy_fat, energy.fatKcal / energy.totalKcal * 100.0), energy.fatKcal.toFloat(), androidx.compose.ui.graphics.Color(0xFFE53935)),
-        ),
-        centerValue = stringResource(R.string.nutrition_energy_kcal_value, energy.totalKcal),
+        segments = legendItems.map { DonutChartSegment(it.id, it.label, it.value.toFloat(), it.color) },
+        centerValue = stringResource(R.string.nutrition_energy_kcal_value, totalKcal),
         centerLabel = stringResource(R.string.nutrition_macronutrient_energy_center),
         modifier = Modifier.fillMaxWidth(),
+        showLegend = false,
     )
+    MacronutrientEnergyLegend(legendItems)
+}
+
+private data class MacronutrientLegendItem(
+    val id: String,
+    val label: String,
+    val value: Double,
+    val color: androidx.compose.ui.graphics.Color,
+)
+
+@Composable
+private fun MacronutrientEnergyLegend(items: List<MacronutrientLegendItem>) {
+    val sizes = macronutrientLegendTextSizes(items)
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+        items.forEach { item ->
+            Box(
+                modifier = Modifier.weight(1f).height(40.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                    val textSize = sizes.getValue(item.id)
+                    androidx.compose.foundation.Canvas(Modifier.size(macronutrientLegendDotSize(textSize))) { drawCircle(item.color) }
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = item.label,
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = textSize),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun macronutrientLegendTextSizes(items: List<MacronutrientLegendItem>): Map<String, androidx.compose.ui.unit.TextUnit> {
+    val distinctValues = items.map(MacronutrientLegendItem::value).distinct().sortedDescending()
+    if (distinctValues.size < 2) return items.associate { it.id to 12.sp }
+    val maximum = distinctValues.first()
+    if (maximum <= 0.0 || (maximum - distinctValues.last()) / maximum < 0.12) return items.associate { it.id to 12.sp }
+    val tierCount = minOf(3, distinctValues.size)
+    val tiers = listOf(15.sp, 12.sp, 9.sp).take(tierCount)
+    val sizesByValue = distinctValues.associateWith { value ->
+        tiers[(distinctValues.indexOf(value) * tierCount / distinctValues.size).coerceAtMost(tiers.lastIndex)]
+    }
+    return items.associate { it.id to requireNotNull(sizesByValue[it.value]) }
+}
+
+private fun macronutrientLegendDotSize(textSize: androidx.compose.ui.unit.TextUnit): androidx.compose.ui.unit.Dp = when (textSize) {
+    15.sp -> 14.dp
+    12.sp -> 10.dp
+    else -> 7.dp
 }
 
 @Composable
@@ -1316,6 +1421,7 @@ private data class FoodProfileRow(
     val value: String,
     val classification: GlycemicClassification? = null,
     val labelText: String? = null,
+    val nrvPercent: String? = null,
 )
 
 @Composable
@@ -1448,6 +1554,7 @@ private fun nutrientRows(
     serving: FoodServing,
     nutrientMetas: List<com.woshiwangnima.healthdietpro.model.food.NutrientMeta>,
     language: String,
+    nrvReference: NrvReference?,
 ): List<FoodProfileRow> {
     val nutrients = resolved?.nutrients ?: return emptyList()
     val multiplier = serving.ratioToTable
@@ -1460,6 +1567,7 @@ private fun nutrientRows(
                 labelRes = null,
                 value = "${(amount.value * multiplier).formatTableValue()} ${amount.unitId}",
                 labelText = metaByCode[code]?.displayName(language) ?: code,
+                nrvPercent = nrvReference?.percent(code, amount, multiplier)?.let { "${it.formatTableValue()}%" },
             )
         }
 }
@@ -1469,16 +1577,94 @@ private fun Double.formatTableValue(): String = "%.1f".format(java.util.Locale.R
 @Composable
 private fun FoodServingSelector(servings: List<FoodServing>, selectedServingId: String, onSelected: (String) -> Unit) {
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
-    Row(
-        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    val selectedServing = servings.first { it.id == selectedServingId }
+    val selectedLabel = if (selectedServing.id == "per_100g") {
+        stringResource(R.string.nutrition_serving_100g_edible)
+    } else {
+        selectedServing.displayLabel(language)
+    }
+    val options = servings.map { serving ->
+        AppDropdownOption(
+            id = serving.id,
+            label = if (serving.id == "per_100g") stringResource(R.string.nutrition_serving_100g_edible) else serving.displayLabel(language),
+        )
+    }
+    AppDropdownField(
+        label = stringResource(R.string.nutrition_measurement_basis),
+        value = selectedLabel,
+        options = options,
+        onSelect = { onSelected(it.id) },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        showOptionDividers = true,
+    )
+}
+
+@Composable
+private fun NutritionEnergyAndExercise(resolved: ResolvedNutrition?, serving: FoodServing, onClick: () -> Unit) {
+    val kcal = resolved.energyKilocalories(serving.ratioToTable) ?: return
+    val kilojoules = UnitConverter.fromBase("energy", kcal.toFloat(), "kj").toDouble()
+    val steps = (kcal / 0.04).toInt().coerceAtLeast(0)
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        servings.forEach { serving ->
-            FilterChip(
-                selected = serving.id == selectedServingId,
-                onClick = { onSelected(serving.id) },
-                label = { Text(serving.displayLabel(language)) },
-            )
+        Text(stringResource(R.string.nutrition_energy_kcal_kj, kcal, kilojoules), style = MaterialTheme.typography.titleSmall)
+        Row(
+            modifier = Modifier.clickable(onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(stringResource(R.string.nutrition_exercise_consumption_steps, steps), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.nutrition_exercise_consumption), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun NrvReferenceHeader(
+    selected: NrvReference?,
+    references: List<NrvReference>,
+    onSelected: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        Row(
+            modifier = Modifier.clickable(enabled = references.size > 1) { expanded = true },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AppDataTableHeaderText(stringResource(R.string.nutrition_profile_nrv))
+            if (references.size > 1) Icon(Icons.Filled.ArrowDropDown, contentDescription = null, modifier = Modifier.size(14.dp))
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            references.forEach { reference ->
+                DropdownMenuItem(
+                    text = { Text(nrvReferenceLabel(reference.id)) },
+                    onClick = { onSelected(reference.id); expanded = false },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun nrvReferenceLabel(id: String): String = when (id) {
+    DriNrvRepository.ADULT_REFERENCE_ID -> stringResource(R.string.nutrition_nrv_adult_standard)
+    else -> stringResource(R.string.nutrition_nrv_current_user)
+}
+
+@Composable
+private fun ExerciseExpenditureScreen(request: NutritionExerciseRequest, onBack: () -> Unit) {
+    BaseScreen(
+        title = stringResource(R.string.nutrition_exercise_consumption),
+        onBack = onBack,
+        includeStatusBarPadding = false,
+    ) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
+            request.servings.forEach { serving ->
+                Text(
+                    text = stringResource(R.string.nutrition_energy_for_basis, serving.kilocalories, 1.0, serving.label),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
         }
     }
 }

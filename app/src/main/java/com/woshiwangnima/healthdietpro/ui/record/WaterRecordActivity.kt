@@ -45,6 +45,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarChart
 import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarEntry
+import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarReferenceLine
 import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarSegment
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
@@ -81,6 +82,7 @@ import com.woshiwangnima.healthdietpro.model.water.WaterQuickRecord
 import com.woshiwangnima.healthdietpro.model.water.WaterRecord
 import com.woshiwangnima.healthdietpro.model.water.WaterRepository
 import com.woshiwangnima.healthdietpro.model.water.WaterVolumeUnit
+import com.woshiwangnima.healthdietpro.model.water.averageNonZeroDailyWaterMl
 import com.woshiwangnima.healthdietpro.model.water.recommendedWaterMl
 import java.util.UUID
 import java.time.Instant
@@ -324,6 +326,12 @@ private fun WaterTrendChart(
     }
     var selectedDate by remember(days) { mutableStateOf(dates.firstOrNull()) }
     val selectedEntry = entries.firstOrNull { it.date == selectedDate }
+    val averageDailyWater = remember(entries) {
+        averageNonZeroDailyWaterMl(
+            dailyTotals = entries.asReversed().map { entry -> entry.segments.sumOf(DateStackedBarSegment::value) },
+            excludeCurrentDay = true,
+        )
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(R.string.water_statistics_trend), style = MaterialTheme.typography.titleMedium)
@@ -344,6 +352,13 @@ private fun WaterTrendChart(
             labelEvery = if (days == 7) 1 else 7,
             selectedEntry = selectedEntry,
             onEntrySelected = { selectedDate = it.date },
+            referenceLine = averageDailyWater?.let { average ->
+                DateStackedBarReferenceLine(
+                    value = average,
+                    label = stringResource(R.string.water_statistics_average, formatMl(average)),
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+            },
         )
         selectedEntry?.let { entry ->
             val total = entry.segments.sumOf(DateStackedBarSegment::value)

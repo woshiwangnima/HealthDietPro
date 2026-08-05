@@ -64,6 +64,15 @@
     <string name="nutrition_energy_kcal_value">%.0f kcal</string>
     <string name="nutrition_profile_item">Item</string>
     <string name="nutrition_profile_amount">Amount</string>
+    <string name="nutrition_profile_amount_for_serving">Per %1$s</string>
+    <string name="nutrition_profile_nrv">NRV</string>
+    <string name="nutrition_nrv_current_user">Current user</string>
+    <string name="nutrition_nrv_adult_standard">Adult standard</string>
+    <string name="nutrition_serving_100g_edible">100 g edible portion</string>
+    <string name="nutrition_measurement_basis">Nutrition measurement basis</string>
+    <string name="nutrition_energy_kcal_kj">%1$.0f kcal / %2$.0f kJ</string>
+    <string name="nutrition_exercise_consumption">Exercise expenditure</string>
+    <string name="nutrition_exercise_consumption_steps">About %1$d steps needed</string>
     <string name="nutrition_profile_classification">Classification</string>
     <string name="nutrition_profile_range">Range</string>
     <string name="nutrition_classification_low">Low</string>
@@ -1140,6 +1149,7 @@
     <string name="water_statistics_7_days">7 days</string>
     <string name="water_statistics_30_days">30 days</string>
     <string name="water_statistics_daily_water">Water</string>
+    <string name="water_statistics_average">Average %1$s</string>
     <string name="water_statistics_selected_day">%1$s: %2$s</string>
     <string name="water_statistics_selected_day_empty">No water records on this day</string>
     <string name="nutrition_ingredient_main">Main ingredients</string>
