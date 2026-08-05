@@ -64,10 +64,10 @@ internal fun defaultRecordSections(): List<RecordSectionUiState> = listOf(
         titleRes = R.string.record_section_daily,
         titleIconRes = R.drawable.ic_list,
         items = listOf(
-            RecordActionItemUiState(RecordActionId.Diet, R.string.record_action_diet, R.drawable.ic_placeholder, false),
+            RecordActionItemUiState(RecordActionId.Diet, R.string.record_action_diet, R.drawable.ic_diet, false),
             RecordActionItemUiState(RecordActionId.Water, R.string.record_action_water, R.drawable.ic_volume, true),
-            RecordActionItemUiState(RecordActionId.Exercise, R.string.record_action_exercise, R.drawable.ic_placeholder, false),
-            RecordActionItemUiState(RecordActionId.Sleep, R.string.record_action_sleep, R.drawable.ic_placeholder, false),
+            RecordActionItemUiState(RecordActionId.Exercise, R.string.record_action_exercise, R.drawable.ic_exercise, false),
+            RecordActionItemUiState(RecordActionId.Sleep, R.string.record_action_sleep, R.drawable.ic_sleep, false),
             RecordActionItemUiState(RecordActionId.Bowel, R.string.record_action_bowel, R.drawable.ic_placeholder, false),
             RecordActionItemUiState(RecordActionId.Medication, R.string.record_action_medication, R.drawable.ic_medication, true),
             RecordActionItemUiState(RecordActionId.Habit, R.string.record_action_habit, R.drawable.ic_placeholder, false),

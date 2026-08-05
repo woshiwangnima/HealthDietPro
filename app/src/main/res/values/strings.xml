@@ -304,6 +304,15 @@
     <string name="nav_test">Test</string>
     <string name="tab_nutrition_title">Nutrition Table</string>
     <string name="tab_record_title">Record</string>
+    <string name="event_tab_medication">Medication</string>
+    <string name="event_tab_diet">Diet</string>
+    <string name="event_tab_exercise">Exercise</string>
+    <string name="event_tab_sleep">Sleep</string>
+    <string name="blood_glucose_events_title">Events</string>
+    <string name="blood_glucose_events_info_title">About events</string>
+    <string name="blood_glucose_events_info_description">Events show records that can affect blood glucose changes. They are read-only here and cannot be edited or deleted.</string>
+    <string name="blood_glucose_events_info_entry">Open in Record</string>
+    <string name="event_unavailable">This event type is not available yet.</string>
     <string name="tab_profile_title">Profile</string>
     <string name="tab_test_title">Test</string>
     <string name="tab_test_description">Use this page to verify new features and UI behavior.</string>

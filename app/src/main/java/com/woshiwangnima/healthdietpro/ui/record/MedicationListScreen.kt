@@ -100,6 +100,7 @@ internal fun MedicationListScreen(
                         onDelete = onDeleteRecord,
                         timeRangeSelection = timeRangeSelection,
                         onTimeRangeSelectionChanged = onTimeRangeSelectionChanged,
+                        editable = true,
                     )
                     2 -> MedicationCatalogPage(uiState.catalog, onAddCatalogItem, onEditCatalogItem, onDeleteCatalogItem)
                 }
@@ -185,14 +186,15 @@ private fun MedicationReminderPage() {
 }
 
 @Composable
-private fun MedicationRecordsPage(
+internal fun MedicationRecordsPage(
     records: List<MedicationRecord>,
-    onAdd: () -> Unit,
-    canAdd: Boolean,
-    onEdit: (MedicationRecord) -> Unit,
-    onDelete: (MedicationRecord) -> Unit,
     timeRangeSelection: RecordTimeRangeSelection,
     onTimeRangeSelectionChanged: (RecordTimeRangeSelection) -> Unit,
+    editable: Boolean,
+    onAdd: (() -> Unit)? = null,
+    canAdd: Boolean = false,
+    onEdit: ((MedicationRecord) -> Unit)? = null,
+    onDelete: ((MedicationRecord) -> Unit)? = null,
 ) {
     var pendingDeletion by remember { mutableStateOf<MedicationRecord?>(null) }
     var nowMillis by remember { mutableStateOf(System.currentTimeMillis()) }
@@ -211,7 +213,7 @@ private fun MedicationRecordsPage(
             confirmButton = {
                 TextButton(onClick = {
                     pendingDeletion = null
-                    onDelete(record)
+                    onDelete?.invoke(record)
                 }) {
                     Text(stringResource(R.string.body_record_delete))
                 }
@@ -230,18 +232,20 @@ private fun MedicationRecordsPage(
     ) {
         val timeRange = timeRangeSelection.resolve(nowMillis)
         val filteredRecords = remember(records, timeRange) { records.filter { timeRange.contains(it.timestamp) } }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Spacer(Modifier.width(1.dp))
-            AppIconTextButton(
-                text = stringResource(R.string.medication_record_add),
-                iconRes = R.drawable.ic_add,
-                onClick = onAdd,
-                modifier = Modifier.alpha(if (canAdd) 1f else 0.45f),
-            )
+        if (editable) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Spacer(Modifier.width(1.dp))
+                AppIconTextButton(
+                    text = stringResource(R.string.medication_record_add),
+                    iconRes = R.drawable.ic_add,
+                    onClick = { onAdd?.invoke() },
+                    modifier = Modifier.alpha(if (canAdd) 1f else 0.45f),
+                )
+            }
         }
         RecordTimeRangeFilter(selection = timeRangeSelection, onSelectionChanged = onTimeRangeSelectionChanged)
         if (filteredRecords.isEmpty()) {
@@ -258,7 +262,7 @@ private fun MedicationRecordsPage(
             MedicationRecordTable(
                 records = filteredRecords,
                 onEdit = onEdit,
-                onDelete = { pendingDeletion = it },
+                onDelete = if (editable) ({ pendingDeletion = it }) else null,
             )
         }
     }
@@ -267,72 +271,106 @@ private fun MedicationRecordsPage(
 @Composable
 private fun MedicationRecordTable(
     records: List<MedicationRecord>,
-    onEdit: (MedicationRecord) -> Unit,
-    onDelete: (MedicationRecord) -> Unit,
+    onEdit: ((MedicationRecord) -> Unit)?,
+    onDelete: ((MedicationRecord) -> Unit)?,
 ) {
+    val readOnly = onDelete == null
     AppDataTable(
         rows = records,
         rowKey = { _, record -> record.id },
+        showRowNumber = !readOnly,
         columns = listOf(
             AppDataTableColumn<MedicationRecord>(
                 key = "time",
-                header = { AppDataTableHeaderText(stringResource(R.string.medication_record_time)) },
-                width = ColumnWidth.Fixed(112.dp),
+                header = { MedicationTableHeader(stringResource(R.string.medication_record_time), readOnly) },
+                width = ColumnWidth.Fixed(if (readOnly) 96.dp else 112.dp),
             ) { record ->
                 Text(
                     text = formatDateTime(record.timestamp),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = if (readOnly) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodySmall,
                 )
             },
             AppDataTableColumn<MedicationRecord>(
                 key = "name",
-                header = { AppDataTableHeaderText(stringResource(R.string.medication_record_name)) },
-                width = ColumnWidth.Flex(weight = 1.6f, min = 184.dp, max = 300.dp),
-            ) { record -> AppDataTableText(record.medicationName, overflow = column.overflow) },
+                header = { MedicationTableHeader(stringResource(R.string.medication_record_name), readOnly) },
+                width = ColumnWidth.Flex(weight = 1.6f, min = if (readOnly) 128.dp else 184.dp, max = 300.dp),
+            ) { record -> MedicationTableText(record.medicationName, column.overflow, readOnly) },
             AppDataTableColumn<MedicationRecord>(
                 key = "dose",
-                header = { AppDataTableHeaderText(stringResource(R.string.medication_record_dose)) },
-                width = ColumnWidth.Fixed(96.dp),
-            ) { record -> AppDataTableText(formatDose(record)) },
+                header = { MedicationTableHeader(stringResource(R.string.medication_record_dose), readOnly) },
+                width = ColumnWidth.Fixed(if (readOnly) 72.dp else 96.dp),
+            ) { record -> MedicationTableText(formatDose(record), ColumnOverflow.Ellipsis, readOnly) },
             AppDataTableColumn<MedicationRecord>(
                 key = "method",
-                header = { AppDataTableHeaderText(stringResource(R.string.medication_record_method)) },
-                width = ColumnWidth.Fixed(96.dp),
-            ) { record -> AppDataTableText(record.method) },
+                header = { MedicationTableHeader(stringResource(R.string.medication_record_method), readOnly) },
+                width = ColumnWidth.Fixed(if (readOnly) 72.dp else 96.dp),
+            ) { record -> MedicationTableText(record.method, ColumnOverflow.Ellipsis, readOnly) },
             AppDataTableColumn<MedicationRecord>(
                 key = "feeling",
-                header = { AppDataTableHeaderText(stringResource(R.string.medication_record_feeling)) },
-                width = ColumnWidth.Flex(weight = 1f, min = 168.dp, max = 320.dp),
+                header = { MedicationTableHeader(stringResource(R.string.medication_record_feeling), readOnly) },
+                width = ColumnWidth.Flex(weight = 1f, min = if (readOnly) 112.dp else 168.dp, max = 320.dp),
                 overflow = ColumnOverflow.Wrap,
-            ) { record -> AppDataTableText(formatFeeling(record), overflow = column.overflow) },
+            ) { record -> MedicationTableText(formatFeeling(record), column.overflow, readOnly) },
         ),
         layoutPolicy = AppDataTableLayoutPolicy.Responsive(
             compactAt = 600.dp,
-            compactHeader = {
+            compactHeader = if (onDelete != null) {
+                {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     AppDataTableHeaderText(stringResource(R.string.medication_record_time), Modifier.width(108.dp))
                     AppDataTableHeaderText(stringResource(R.string.medication_record_name), Modifier.weight(1f))
                     AppDataTableHeaderText(stringResource(R.string.medication_record_actions))
                 }
+                }
+            } else {
+                {
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        AppDataTableHeaderText(stringResource(R.string.medication_record_time), Modifier.width(108.dp))
+                        AppDataTableHeaderText(stringResource(R.string.medication_record_name), Modifier.weight(1f))
+                    }
+                }
             },
             compactRow = { record -> CompactMedicationRow(record, onDelete) },
         ),
-        actionsWidth = 76.dp,
-        actionsHeader = { AppDataTableHeaderText(stringResource(R.string.medication_record_actions)) },
-        rowActions = { record ->
-            AppDataTableDeleteAction(
-                text = stringResource(R.string.body_record_delete),
-                onClick = { onDelete(record) },
-                iconSize = 14.dp,
-                textStyle = MaterialTheme.typography.labelSmall,
-            )
+        actionsWidth = if (onDelete != null) 76.dp else 0.dp,
+        actionsHeader = onDelete?.let { { AppDataTableHeaderText(stringResource(R.string.medication_record_actions)) } },
+        rowActions = onDelete?.let { delete ->
+            { record ->
+                AppDataTableDeleteAction(
+                    text = stringResource(R.string.body_record_delete),
+                    onClick = { delete(record) },
+                    iconSize = 14.dp,
+                    textStyle = MaterialTheme.typography.labelSmall,
+                )
+            }
         },
         onRowClick = onEdit,
     )
 }
 
 @Composable
-private fun CompactMedicationRow(record: MedicationRecord, onDelete: (MedicationRecord) -> Unit) {
+private fun MedicationTableHeader(text: String, compact: Boolean) {
+    if (compact) Text(text, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    else AppDataTableHeaderText(text)
+}
+
+@Composable
+private fun MedicationTableText(text: String, overflow: ColumnOverflow, compact: Boolean) {
+    if (!compact) {
+        AppDataTableText(text, overflow = overflow)
+        return
+    }
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurface,
+        maxLines = if (overflow == ColumnOverflow.Wrap) Int.MAX_VALUE else 1,
+        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+    )
+}
+
+@Composable
+private fun CompactMedicationRow(record: MedicationRecord, onDelete: ((MedicationRecord) -> Unit)?) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -343,12 +381,14 @@ private fun CompactMedicationRow(record: MedicationRecord, onDelete: (Medication
                 maxLines = 1,
             )
             AppDataTableText(record.medicationName, modifier = Modifier.weight(1f))
-            AppDataTableDeleteAction(
-                text = stringResource(R.string.body_record_delete),
-                onClick = { onDelete(record) },
-                iconSize = 14.dp,
-                textStyle = MaterialTheme.typography.labelSmall,
-            )
+            onDelete?.let { delete ->
+                AppDataTableDeleteAction(
+                    text = stringResource(R.string.body_record_delete),
+                    onClick = { delete(record) },
+                    iconSize = 14.dp,
+                    textStyle = MaterialTheme.typography.labelSmall,
+                )
+            }
         }
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Spacer(modifier = Modifier.width(108.dp))

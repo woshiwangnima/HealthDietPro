@@ -302,6 +302,15 @@
     <string name="nav_test">测试</string>
     <string name="tab_nutrition_title">营养表</string>
     <string name="tab_record_title">记录</string>
+    <string name="event_tab_medication">用药</string>
+    <string name="event_tab_diet">饮食</string>
+    <string name="event_tab_exercise">运动</string>
+    <string name="event_tab_sleep">睡眠</string>
+    <string name="blood_glucose_events_title">事件</string>
+    <string name="blood_glucose_events_info_title">事件说明</string>
+    <string name="blood_glucose_events_info_description">事件展示可能影响血糖波动的记录。本页面仅供查看和读取，无法编辑或删除。</string>
+    <string name="blood_glucose_events_info_entry">在记录中打开</string>
+    <string name="event_unavailable">此类事件暂未实现。</string>
     <string name="tab_profile_title">我的</string>
     <string name="tab_test_title">测试</string>
     <string name="tab_test_description">用于验证新功能和界面行为。</string>

@@ -114,6 +114,9 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.LineStyle
 import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
+import com.woshiwangnima.healthdietpro.ui.event.EventScreen
+import com.woshiwangnima.healthdietpro.ui.event.EventViewModel
+import com.woshiwangnima.healthdietpro.ui.event.EventInfoScreen
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalDate
@@ -129,6 +132,14 @@ class BloodGlucoseActivity : BaseActivity() {
     }
 
     private val viewModel: BloodGlucoseViewModel by viewModels()
+    private val eventViewModel: EventViewModel by viewModels { EventViewModel.Factory(application) }
+
+    private fun openRecordAction(action: RecordActionId) {
+        if (action == RecordActionId.Medication) {
+            startActivity(android.content.Intent(this, MedicationListActivity::class.java))
+        }
+        finish()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,18 +147,27 @@ class BloodGlucoseActivity : BaseActivity() {
             HealthDietProTheme {
                 BloodGlucoseScreen(
                     viewModel = viewModel,
+                    eventViewModel = eventViewModel,
                     onBack = ::finish,
+                    onOpenRecordAction = ::openRecordAction,
                     openEditorInitially = intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false),
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        eventViewModel.refresh()
     }
 }
 
 @Composable
 private fun BloodGlucoseScreen(
     viewModel: BloodGlucoseViewModel,
+    eventViewModel: EventViewModel,
     onBack: () -> Unit,
+    onOpenRecordAction: (RecordActionId) -> Unit,
     openEditorInitially: Boolean,
 ) {
     val records by viewModel.records.collectAsStateWithLifecycle()
@@ -162,6 +182,7 @@ private fun BloodGlucoseScreen(
         listOf(
             DetailTabItem("chart", R.string.detail_tab_chart, R.drawable.ic_chart),
             DetailTabItem("data", R.string.detail_tab_data, R.drawable.ic_list),
+            DetailTabItem("events", R.string.blood_glucose_events_title, R.drawable.ic_event),
         )
     }
 
@@ -184,7 +205,7 @@ private fun BloodGlucoseScreen(
             BloodGlucoseRoute.Reminders -> BloodGlucoseRoute.Settings
             BloodGlucoseRoute.Sources -> BloodGlucoseRoute.Settings
             BloodGlucoseRoute.SourceEditor -> BloodGlucoseRoute.Sources
-            BloodGlucoseRoute.Settings, BloodGlucoseRoute.Records -> BloodGlucoseRoute.Records
+            BloodGlucoseRoute.EventInfo, BloodGlucoseRoute.Settings, BloodGlucoseRoute.Records -> BloodGlucoseRoute.Records
         }
     }
 
@@ -235,12 +256,24 @@ private fun BloodGlucoseScreen(
         )
         return
     }
+    if (route == BloodGlucoseRoute.EventInfo) {
+        EventInfoScreen(
+            onBack = { route = BloodGlucoseRoute.Records },
+            onOpenRecordAction = onOpenRecordAction,
+        )
+        return
+    }
 
     BaseScreen(
         title = stringResource(R.string.blood_glucose_title),
         onBack = onBack,
         includeNavigationBarPadding = false,
         actions = {
+            if (selectedTab == 2) {
+                IconButton(onClick = { route = BloodGlucoseRoute.EventInfo }) {
+                    Icon(painterResource(R.drawable.ic_help), contentDescription = stringResource(R.string.blood_glucose_events_info_title))
+                }
+            }
             IconButton(onClick = { route = BloodGlucoseRoute.Settings }) {
                 Icon(painterResource(R.drawable.ic_settings), contentDescription = stringResource(R.string.blood_glucose_settings_title))
             }
@@ -257,12 +290,15 @@ private fun BloodGlucoseScreen(
                         viewModel.onChartEvent(BaseChartEvent.StateChanged(it))
                     }
                 } else {
-                    BloodGlucoseDataPage(
-                        records = records,
-                        onAdd = { editingRecord = null; showEditor = true },
-                        onEdit = { editingRecord = it; showEditor = true },
-                        onDelete = viewModel::delete,
-                    )
+                    when (tab) {
+                        1 -> BloodGlucoseDataPage(
+                            records = records,
+                            onAdd = { editingRecord = null; showEditor = true },
+                            onEdit = { editingRecord = it; showEditor = true },
+                            onDelete = viewModel::delete,
+                        )
+                        2 -> EventScreen(viewModel = eventViewModel)
+                    }
                 }
             }
             DetailTabBar(items = tabs, selectedId = tabs[selectedTab].id) { item ->
@@ -272,7 +308,7 @@ private fun BloodGlucoseScreen(
     }
 }
 
-private enum class BloodGlucoseRoute { Records, Settings, Targets, Reminders, Sources, SourceEditor }
+private enum class BloodGlucoseRoute { Records, Settings, Targets, Reminders, Sources, SourceEditor, EventInfo }
 
 @Composable
 private fun BloodGlucoseSettingsScreen(onBack: () -> Unit, onOpenTargets: () -> Unit, onOpenReminders: () -> Unit, onOpenSources: () -> Unit) {
