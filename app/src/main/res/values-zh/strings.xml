@@ -343,8 +343,12 @@
     <string name="record_action_height">记身高</string>
     <string name="record_search">搜索记录功能</string>
     <string name="record_no_data">暂无记录</string>
+    <string name="record_seconds_ago">%1$d 秒前</string>
+    <string name="record_minutes_ago">%1$d 分钟前</string>
     <string name="record_hours_ago">%1$d 小时前</string>
     <string name="record_days_ago">%1$d 天前</string>
+    <string name="record_months_ago">%1$d 个月前</string>
+    <string name="record_years_ago">%1$d 年前</string>
     <string name="record_latest_summary">%1$s更新 %2$s</string>
     <string name="record_search_history">搜索历史</string>
     <string name="record_search_clear_all">清空所有历史记录</string>
@@ -1104,6 +1108,8 @@
     <string name="water_kind_food">食物</string>
     <string name="water_quick_records_hint">选定饮品与份量会作为新建饮水记录的默认值。</string>
     <string name="water_quick_record_select">饮品快捷记录</string>
+    <string name="water_quick_record_name_suffix">饮品名称后缀</string>
+    <string name="water_quick_record_name_suffix_hint">可选备注，将显示在饮品名称后面。</string>
     <string name="water_edit">编辑饮水记录</string>
     <string name="water_quick_add">添加快捷记录</string>
     <string name="water_quick_edit">编辑快捷记录</string>

@@ -16,6 +16,7 @@ internal data class WaterRecord(
 internal data class WaterQuickRecord(
     val id: String = "",
     val beverageId: String,
+    val beverageNameSuffix: String = "",
     val volume: Double = 250.0,
     val unit: WaterVolumeUnit = WaterVolumeUnit.ML,
 )
@@ -43,7 +44,7 @@ internal data class WaterArchive(
     val quickRecords: List<WaterQuickRecord> = emptyList(),
 )
 
-internal const val WATER_ARCHIVE_SCHEMA_VERSION = 2
+internal const val WATER_ARCHIVE_SCHEMA_VERSION = 3
 
 /** Assigns stable identities to v1 presets, which were uniquely addressed only by beverage ID. */
 internal fun migrateWaterArchive(archive: WaterArchive): WaterArchive {
@@ -53,7 +54,7 @@ internal fun migrateWaterArchive(archive: WaterArchive): WaterArchive {
             ?: java.util.UUID.nameUUIDFromBytes(
                 "${record.beverageId}\u0000${record.volume}\u0000${record.unit.name}\u0000$index".toByteArray(Charsets.UTF_8),
             ).toString().also(usedIds::add)
-        record.copy(id = id)
+        record.copy(id = id, beverageNameSuffix = record.beverageNameSuffix.trim())
     }
     return archive.copy(schemaVersion = WATER_ARCHIVE_SCHEMA_VERSION, quickRecords = quickRecords)
 }

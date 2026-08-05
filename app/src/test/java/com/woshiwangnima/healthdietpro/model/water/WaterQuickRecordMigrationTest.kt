@@ -24,6 +24,16 @@ class WaterQuickRecordMigrationTest {
         assertTrue(migrated.quickRecords.all { it.id.isNotBlank() })
         assertEquals(2, migrated.quickRecords.map(WaterQuickRecord::id).distinct().size)
         assertEquals(migrated, migrateWaterArchive(v1Archive))
+        assertTrue(migrated.quickRecords.all { it.beverageNameSuffix.isEmpty() })
+    }
+
+    @Test
+    fun suffixIsTrimmedDuringArchiveMigration() {
+        val migrated = migrateWaterArchive(
+            WaterArchive(quickRecords = listOf(WaterQuickRecord(id = "tea", beverageId = "food:tea:green", beverageNameSuffix = "  半杯  "))),
+        )
+
+        assertEquals("半杯", migrated.quickRecords.single().beverageNameSuffix)
     }
 
     @Test

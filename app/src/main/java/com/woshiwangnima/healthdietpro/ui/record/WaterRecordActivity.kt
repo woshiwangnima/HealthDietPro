@@ -200,7 +200,7 @@ private fun WaterStatisticsPage(records: List<WaterRecord>, beverages: List<Beve
                 WaterStatAmount(stringResource(R.string.water_statistics_remaining), formatMl(remaining))
             }
         }
-        item { WaterGlassProgress((todayActualWater / recommendation).toFloat().coerceIn(0f, 1f), formatMl(todayActualWater), stringResource(R.string.water_statistics_progress, (todayActualWater / recommendation * 100).toInt())) }
+        item { WaterGlassProgress((todayActualWater / recommendation).toFloat(), formatMl(todayActualWater), stringResource(R.string.water_statistics_progress, (todayActualWater / recommendation * 100).toInt())) }
         item { Text(stringResource(R.string.water_statistics_breakdown), modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium) }
         item { RecordTimeRangeFilter(rangeSelection, { rangeSelection = it }) }
         item { AnimatedDonutChart(segments, formatMl(totalActualWater), stringResource(R.string.water_statistics_actual_water), Modifier.fillMaxWidth(), showLegend = false) }
@@ -414,9 +414,9 @@ private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, q
                         val selectedQuick = quickRecords.firstOrNull { it.id == selectedQuickRecordId }
                         AppDropdownField(
                             label = stringResource(R.string.water_quick_record_select),
-                            value = selectedQuick?.let { quick -> beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId }.orEmpty(),
+                            value = selectedQuick?.let { quick -> quickDisplayName(beverages, quick) }.orEmpty(),
                             options = quickRecords.map { quick ->
-                                val name = beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId
+                                val name = quickDisplayName(beverages, quick)
                                 AppDropdownOption(quick.id, name, "${quick.volume} ${quick.unit.name.lowercase()}")
                             },
                             onSelect = { option ->
@@ -516,7 +516,7 @@ private fun QuickRecordSettingsScreen(
                      showPager = false,
                      actionsWidth = 128.dp,
                     columns = listOf(
-                        AppDataTableColumn("beverage", { AppDataTableHeaderText(stringResource(R.string.water_beverage)) }, ColumnWidth.Flex(1f, 140.dp)) { quick -> AppDataTableText(beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId) },
+                        AppDataTableColumn("beverage", { AppDataTableHeaderText(stringResource(R.string.water_beverage)) }, ColumnWidth.Flex(1f, 140.dp)) { quick -> AppDataTableText(quickDisplayName(beverages, quick)) },
                         AppDataTableColumn("volume", { AppDataTableHeaderText(stringResource(R.string.water_volume)) }, ColumnWidth.Fixed(110.dp)) { quick -> AppDataTableText("${quick.volume} ${quick.unit.name.lowercase()}") },
                     ),
                     actionsHeader = { AppDataTableHeaderText(stringResource(R.string.body_record_delete)) },
@@ -539,11 +539,12 @@ private fun QuickRecordSettingsScreen(
 private fun QuickRecordEditorScreen(beverages: List<Beverage>, quickRecord: WaterQuickRecord?, onBack: () -> Unit, onSave: (String?, WaterQuickRecord) -> Unit) {
     val defaultBeverageId = beverages.firstOrNull { it.id == "food:water:drinking" }?.id.orEmpty()
     var beverageId by rememberSaveable(quickRecord?.id) { mutableStateOf(quickRecord?.beverageId ?: defaultBeverageId) }
+    var beverageNameSuffix by rememberSaveable(quickRecord?.id) { mutableStateOf(quickRecord?.beverageNameSuffix.orEmpty()) }
     var volume by rememberSaveable(quickRecord?.id) { mutableStateOf(quickRecord?.volume?.toString() ?: "250") }
     var unit by rememberSaveable(quickRecord?.id) { mutableStateOf(quickRecord?.unit ?: WaterVolumeUnit.ML) }
     val selected = beverages.firstOrNull { it.id == beverageId }
     val volumeValue = volume.toDoubleOrNull()
-    val current = if (selected != null && volumeValue != null && volumeValue > 0.0) WaterQuickRecord(quickRecord?.id ?: UUID.randomUUID().toString(), beverageId, volumeValue, unit) else null
+    val current = if (selected != null && volumeValue != null && volumeValue > 0.0) WaterQuickRecord(id = quickRecord?.id ?: UUID.randomUUID().toString(), beverageId = beverageId, beverageNameSuffix = beverageNameSuffix.trim(), volume = volumeValue, unit = unit) else null
     val hasChanges = current != quickRecord
     val saveEnabled = current != null && hasChanges
     var showDiscardDialog by rememberSaveable(quickRecord?.id) { mutableStateOf(false) }
@@ -554,6 +555,7 @@ private fun QuickRecordEditorScreen(beverages: List<Beverage>, quickRecord: Wate
         Column(Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item { AppDropdownField(stringResource(R.string.water_beverage), selected?.name.orEmpty(), beverages.map { AppDropdownOption(it.id, it.name) }, { beverageId = it.id }) }
+                item { EditorTextField(stringResource(R.string.water_quick_record_name_suffix), beverageNameSuffix, { beverageNameSuffix = it }, supportingTextOverride = { Text(stringResource(R.string.water_quick_record_name_suffix_hint), color = MaterialTheme.colorScheme.onSurfaceVariant) }) }
                 item { EditorTextField(stringResource(R.string.water_volume), volume, { volume = it }, required = true, numeric = true, range = NumericInputRange(minimum = 0.001)) }
                 item { AppDropdownField(stringResource(R.string.water_unit), unit.name.lowercase(), WaterVolumeUnit.entries.map { AppDropdownOption(it.name, it.name.lowercase()) }, { unit = WaterVolumeUnit.valueOf(it.id) }) }
             }
@@ -574,6 +576,11 @@ private fun loadBeverages(context: android.content.Context): List<Beverage> {
             is com.woshiwangnima.healthdietpro.model.food.PreparedFood -> it.densityGramsPerMl
         }) }
         .sortedBy(Beverage::name)
+}
+
+private fun quickDisplayName(beverages: List<Beverage>, quick: WaterQuickRecord): String {
+    val name = beverages.firstOrNull { it.id == quick.beverageId }?.name ?: quick.beverageId
+    return listOf(name, quick.beverageNameSuffix.trim()).filter(String::isNotBlank).joinToString(" ")
 }
 
 private fun formatMl(value: Double): String = if (value % 1.0 == 0.0) "${value.toInt()} ml" else "%.1f ml".format(value)

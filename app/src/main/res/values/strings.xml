@@ -355,8 +355,12 @@
     <string name="record_search_clear_all">Clear all history</string>
     <string name="record_search_remove">Remove search history item</string>
     <string name="record_no_data">No records</string>
+    <string name="record_seconds_ago">%1$d seconds ago</string>
+    <string name="record_minutes_ago">%1$d minutes ago</string>
     <string name="record_hours_ago">%1$d hours ago</string>
     <string name="record_days_ago">%1$d days ago</string>
+    <string name="record_months_ago">%1$d months ago</string>
+    <string name="record_years_ago">%1$d years ago</string>
     <string name="record_latest_summary">%1$s updated %2$s</string>
     <string name="record_action_weight">Log Weight</string>
     <string name="record_action_blood_glucose">Log Blood Glucose</string>
@@ -1104,6 +1108,8 @@
     <string name="water_kind_food">Food</string>
     <string name="water_quick_records_hint">The selected beverage and amount are used as the default for a new water record.</string>
     <string name="water_quick_record_select">Quick record</string>
+    <string name="water_quick_record_name_suffix">Beverage name suffix</string>
+    <string name="water_quick_record_name_suffix_hint">Optional note shown after the beverage name.</string>
     <string name="water_edit">Edit water record</string>
     <string name="water_quick_add">Add quick record</string>
     <string name="water_quick_edit">Edit quick record</string>

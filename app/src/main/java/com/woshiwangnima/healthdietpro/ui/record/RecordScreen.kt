@@ -33,6 +33,8 @@ import com.woshiwangnima.healthdietpro.common.ui.ActionGridItem
 import com.woshiwangnima.healthdietpro.common.ui.ActionSectionCard
 import com.woshiwangnima.healthdietpro.common.ui.SearchActivityPanel
 import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
+import com.woshiwangnima.healthdietpro.common.time.RelativeTimeUnit
+import com.woshiwangnima.healthdietpro.common.time.relativeTimeSince
 
 @Composable
 fun RecordScreen(
@@ -112,6 +114,14 @@ private val quickAddActionIds = setOf(
 
 @Composable
 private fun relativeTime(timestamp: Long): String {
-    val hours = ((System.currentTimeMillis() - timestamp).coerceAtLeast(0) / 3_600_000L)
-    return if (hours < 24) stringResource(com.woshiwangnima.healthdietpro.R.string.record_hours_ago, hours.coerceAtLeast(1)) else stringResource(com.woshiwangnima.healthdietpro.R.string.record_days_ago, hours / 24)
+    val relativeTime = relativeTimeSince(timestamp, System.currentTimeMillis())
+    val textRes = when (relativeTime.unit) {
+        RelativeTimeUnit.SECOND -> com.woshiwangnima.healthdietpro.R.string.record_seconds_ago
+        RelativeTimeUnit.MINUTE -> com.woshiwangnima.healthdietpro.R.string.record_minutes_ago
+        RelativeTimeUnit.HOUR -> com.woshiwangnima.healthdietpro.R.string.record_hours_ago
+        RelativeTimeUnit.DAY -> com.woshiwangnima.healthdietpro.R.string.record_days_ago
+        RelativeTimeUnit.MONTH -> com.woshiwangnima.healthdietpro.R.string.record_months_ago
+        RelativeTimeUnit.YEAR -> com.woshiwangnima.healthdietpro.R.string.record_years_ago
+    }
+    return stringResource(textRes, relativeTime.amount)
 }
