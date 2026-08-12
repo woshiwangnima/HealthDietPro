@@ -14,7 +14,12 @@ import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 
 @Composable
-internal fun TestLandingScreen(onOpenCommands: () -> Unit, onOpenCommonUi: () -> Unit, modifier: Modifier = Modifier) {
+internal fun TestLandingScreen(
+    onOpenCommands: () -> Unit,
+    onOpenCommonUi: () -> Unit,
+    onOpenCrossSection: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     BaseScreen(title = "测试", includeStatusBarPadding = false) { padding ->
         Column(
             modifier = modifier.fillMaxSize().padding(padding).padding(16.dp),
@@ -23,6 +28,7 @@ internal fun TestLandingScreen(onOpenCommands: () -> Unit, onOpenCommonUi: () ->
             ActionSectionCard(title = "开发验证", titleIconRes = R.drawable.ic_nav_test) {
                 AppIconTextButton("测试指令", R.drawable.ic_settings, onOpenCommands, Modifier.fillMaxWidth())
                 AppIconTextButton("通用UI功能测试", R.drawable.ic_nav_test, onOpenCommonUi, Modifier.fillMaxWidth())
+                AppIconTextButton("截面形状系统", R.drawable.ic_nav_test, onOpenCrossSection, Modifier.fillMaxWidth())
             }
         }
     }

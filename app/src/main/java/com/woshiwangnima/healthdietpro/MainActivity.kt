@@ -92,6 +92,7 @@ import com.woshiwangnima.healthdietpro.ui.test.TestGmScreen
 import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestScreen
 import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestCategory
 import com.woshiwangnima.healthdietpro.ui.test.TestLandingScreen
+import com.woshiwangnima.healthdietpro.ui.test.CrossSectionUiTestScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComponentsPreviewScreen
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabPersistence
 import com.woshiwangnima.healthdietpro.util.UnitConverter
@@ -434,10 +435,11 @@ class MainActivity : BaseActivity() {
                     val isVerified by testAccessViewModel.isVerified.collectAsState()
                     if (isVerified) {
                         when (testPage) {
-                            TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, Modifier.fillMaxSize())
+                            TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, { testPage = TestPage.CrossSection }, Modifier.fillMaxSize())
                             TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTodayWaterRecords, ::addTestSearchHistories, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                             TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
                             TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
+                            TestPage.CrossSection -> CrossSectionUiTestScreen(onBack = { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                         }
                     } else {
                         TestAccessScreen(
@@ -839,5 +841,5 @@ class MainActivity : BaseActivity() {
         const val ROUTE_TEST = "test"
     }
 
-    private enum class TestPage { Landing, Commands, Features, CommonUi }
+    private enum class TestPage { Landing, Commands, Features, CommonUi, CrossSection }
 }
