@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.model.container.CrossSection
 import com.woshiwangnima.healthdietpro.model.container.CrossSectionProfile
@@ -26,8 +27,10 @@ import com.woshiwangnima.healthdietpro.model.container.equivalentDiameterCm
  * Container side view driven by a vertical percent slider on the right.
  *
  * The silhouette width at each height is derived from the cross-section area
- * (width ∝ √area). The red slice line is read-only and follows the slider:
- * top = 100%, bottom = 0%.
+ * (width ∝ √area). The red slice line follows the slider: top = 100%, bottom = 0%.
+ *
+ * 轮廓与红线共用与右侧 [VerticalPercentSlider] 相同的 [VerticalTrack] 坐标换算
+ * （顶部/底部各留出刻度标签内边距），因此红线高度、滑块位置与预览绘制始终严格对应。
  */
 @Composable
 internal fun ContainerSideView(
@@ -37,6 +40,9 @@ internal fun ContainerSideView(
     modifier: Modifier = Modifier,
 ) {
     val scheme = MaterialTheme.colorScheme
+    val density = LocalDensity.current
+    val topInsetPx = with(density) { TRACK_LABEL_INSET_DP.dp.toPx() }
+    val bottomInsetPx = with(density) { TRACK_LABEL_INSET_DP.dp.toPx() }
     Row(
         modifier = modifier.fillMaxWidth().height(200.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -46,11 +52,17 @@ internal fun ContainerSideView(
                 val w = size.width
                 val h = size.height
                 val cx = w / 2f
+                val track = VerticalTrack(
+                    heightPx = h,
+                    topInsetPx = topInsetPx,
+                    bottomInsetPx = bottomInsetPx,
+                )
                 val maxDiaCm = profile.points.maxOf { it.shape.equivalentDiameterCm() }
                 val scale = if (maxDiaCm > 0) (w * 0.72f) / maxDiaCm.toFloat() else 1f
 
                 fun halfWidthPx(point: CrossSection): Float = (point.shape.equivalentDiameterCm() / 2.0).toFloat() * scale
-                fun yFor(point: CrossSection): Float = h * (1f - (point.heightCm / profile.totalHeightCm).toFloat())
+                fun yFor(point: CrossSection): Float =
+                    track.yForPercent((point.heightCm / profile.totalHeightCm).toFloat())
 
                 val path = Path()
                 val n = profile.points.size
@@ -76,7 +88,7 @@ internal fun ContainerSideView(
                 drawPath(path, scheme.primary.copy(alpha = 0.20f))
                 drawPath(path, scheme.primary, style = Stroke(2.dp.toPx()))
 
-                val lineY = h * (1f - currentEditPercent.coerceIn(0f, 1f))
+                val lineY = track.yForPercent(currentEditPercent.coerceIn(0f, 1f))
                 drawLine(scheme.error, Offset(0f, lineY), Offset(w, lineY), strokeWidth = 2.dp.toPx())
                 drawCircle(scheme.error, 6.dp.toPx(), Offset(cx, lineY))
             }
@@ -92,8 +104,7 @@ internal fun ContainerSideView(
             onValueChange = onHeightChanged,
             modifier = Modifier
                 .width(48.dp)
-                .fillMaxHeight()
-                .padding(vertical = 10.dp),
+                .fillMaxHeight(),
         )
     }
 }

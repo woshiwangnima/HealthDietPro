@@ -467,6 +467,7 @@
     <string name="blood_glucose_relative_minutes_invalid">请输入整数分钟数。</string>
     <string name="record_action_waist">记围度</string>
     <string name="record_search_alias_circumference">腰围、大腿围、小腿围、臀围、胸围、手臂围</string>
+    <string name="record_search_alias_container">杯、碗、盘、瓶、罐、家用容器</string>
     <string name="circumference_title">身体围度</string>
     <string name="circumference_waist">腰围</string>
     <string name="circumference_thigh">大腿围</string>
@@ -1172,4 +1173,32 @@
     <string name="body_record_table_time">记录时间</string>
     <string name="nutrition_editor_select_ingredient">选择食材</string>
     <string name="nutrition_editor_add_ingredient">添加食材</string>
+    <!-- 记容器 -->
+    <string name="container_title">记容器</string>
+    <string name="container_add">添加容器</string>
+    <string name="container_edit">编辑容器</string>
+    <string name="container_empty">还没有容器，点击上方按钮添加一个家用容器。</string>
+    <string name="container_section_basic">基本信息</string>
+    <string name="container_name">名称</string>
+    <string name="container_category">分类</string>
+    <string name="container_category_cup">杯</string>
+    <string name="container_category_bowl">碗</string>
+    <string name="container_category_plate">盘</string>
+    <string name="container_category_spoon">勺</string>
+    <string name="container_category_bottle">瓶</string>
+    <string name="container_category_custom">自定义</string>
+    <string name="container_capacity">容量</string>
+    <string name="container_capacity_value">容量：%1$.1f %2$s</string>
+    <string name="container_unit">单位</string>
+    <string name="container_empty_mass">空容器质量（选填）</string>
+    <string name="container_empty_mass_value">空容器质量：%1$.1f %2$s</string>
+    <string name="container_cross_section">2D 水平截面（选填）</string>
+    <string name="container_cross_section_hint">定义关键转折处的水平截面，可按形状估算容器容积。</string>
+    <string name="container_section_notes">备注</string>
+    <string name="container_note">备注（选填）</string>
+    <string name="container_section_images">图片</string>
+    <string name="container_save">保存容器</string>
+    <string name="container_delete_confirm_title">删除容器？</string>
+    <string name="container_delete_confirm_message">确定删除“%1$s”？</string>
+    <string name="record_action_container">记容器</string>
 </resources>

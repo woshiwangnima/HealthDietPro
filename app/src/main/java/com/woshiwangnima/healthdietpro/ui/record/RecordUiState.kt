@@ -44,6 +44,7 @@ enum class RecordActionId {
     Medication,
     Habit,
     Feeling,
+    Container,
 }
 
 internal fun defaultRecordSections(): List<RecordSectionUiState> = listOf(
@@ -66,6 +67,7 @@ internal fun defaultRecordSections(): List<RecordSectionUiState> = listOf(
         items = listOf(
             RecordActionItemUiState(RecordActionId.Diet, R.string.record_action_diet, R.drawable.ic_diet, false),
             RecordActionItemUiState(RecordActionId.Water, R.string.record_action_water, R.drawable.ic_volume, true),
+            RecordActionItemUiState(RecordActionId.Container, R.string.record_action_container, R.drawable.ic_container, true, listOf(R.string.record_search_alias_container)),
             RecordActionItemUiState(RecordActionId.Exercise, R.string.record_action_exercise, R.drawable.ic_exercise, false),
             RecordActionItemUiState(RecordActionId.Sleep, R.string.record_action_sleep, R.drawable.ic_sleep, false),
             RecordActionItemUiState(RecordActionId.Bowel, R.string.record_action_bowel, R.drawable.ic_placeholder, false),

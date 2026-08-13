@@ -81,6 +81,7 @@ import com.woshiwangnima.healthdietpro.ui.record.BloodGlucoseActivity
 import com.woshiwangnima.healthdietpro.ui.record.BloodPressureActivity
 import com.woshiwangnima.healthdietpro.ui.record.DiseaseRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.WaterRecordActivity
+import com.woshiwangnima.healthdietpro.ui.container.ContainerRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.RecordActionId
 import com.woshiwangnima.healthdietpro.ui.record.RecordScreen
 import com.woshiwangnima.healthdietpro.ui.record.RecordViewModel
@@ -728,6 +729,7 @@ class MainActivity : BaseActivity() {
             RecordActionId.Disease -> startActivity(Intent(this, DiseaseRecordActivity::class.java))
             RecordActionId.Water -> startActivity(Intent(this, WaterRecordActivity::class.java))
             RecordActionId.Medication -> startActivity(Intent(this, MedicationListActivity::class.java))
+            RecordActionId.Container -> startActivity(Intent(this, ContainerRecordActivity::class.java))
             RecordActionId.Waist -> openCircumferenceDetail()
             RecordActionId.Period,
             RecordActionId.Diet,
@@ -750,6 +752,7 @@ class MainActivity : BaseActivity() {
             RecordActionId.Waist -> openCircumferenceDetail(selectMetricForNewRecord = true)
             RecordActionId.Medication -> openMedicationRecord()
             RecordActionId.Water -> startActivity(Intent(this, WaterRecordActivity::class.java).putExtra(WaterRecordActivity.EXTRA_OPEN_EDITOR, true))
+            RecordActionId.Container -> startActivity(Intent(this, ContainerRecordActivity::class.java))
             else -> Unit
         }
     }

@@ -25,6 +25,7 @@ class RecordViewModelTest {
             listOf(
                 RecordActionId.Diet,
                 RecordActionId.Water,
+                RecordActionId.Container,
                 RecordActionId.Exercise,
                 RecordActionId.Sleep,
                 RecordActionId.Bowel,
@@ -39,6 +40,7 @@ class RecordViewModelTest {
         assertTrue(sections[0].items.first { it.id == RecordActionId.Weight }.enabled)
         assertTrue(sections[0].items.first { it.id == RecordActionId.BloodGlucose }.enabled)
         assertTrue(sections[1].items.first { it.id == RecordActionId.Medication }.enabled)
+        assertTrue(sections[1].items.first { it.id == RecordActionId.Container }.enabled)
         assertFalse(sections[1].items.first { it.id == RecordActionId.Diet }.enabled)
     }
 }

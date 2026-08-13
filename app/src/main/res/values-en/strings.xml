@@ -467,6 +467,7 @@
     <string name="blood_glucose_relative_minutes_invalid">Enter an integer number of minutes.</string>
     <string name="record_action_waist">Log circumference</string>
     <string name="record_search_alias_circumference">Waist, thigh, calf, hip, chest, upper arm</string>
+    <string name="record_search_alias_container">cup, bowl, plate, bottle, jar, household container</string>
     <string name="circumference_title">Body circumference</string>
     <string name="circumference_waist">Waist</string>
     <string name="circumference_thigh">Thigh</string>
@@ -1172,4 +1173,32 @@
     <string name="body_record_table_time">Recorded time</string>
     <string name="nutrition_editor_select_ingredient">Select ingredient</string>
     <string name="nutrition_editor_add_ingredient">Add ingredient</string>
+    <!-- 记容器 -->
+    <string name="container_title">Containers</string>
+    <string name="container_add">Add container</string>
+    <string name="container_edit">Edit container</string>
+    <string name="container_empty">No containers yet. Add one to record a household container.</string>
+    <string name="container_section_basic">Basic info</string>
+    <string name="container_name">Name</string>
+    <string name="container_category">Category</string>
+    <string name="container_category_cup">Cup</string>
+    <string name="container_category_bowl">Bowl</string>
+    <string name="container_category_plate">Plate</string>
+    <string name="container_category_spoon">Spoon</string>
+    <string name="container_category_bottle">Bottle</string>
+    <string name="container_category_custom">Custom</string>
+    <string name="container_capacity">Capacity</string>
+    <string name="container_capacity_value">Capacity: %1$.1f %2$s</string>
+    <string name="container_unit">Unit</string>
+    <string name="container_empty_mass">Empty container mass (optional)</string>
+    <string name="container_empty_mass_value">Empty mass: %1$.1f %2$s</string>
+    <string name="container_cross_section">2D cross-section (optional)</string>
+    <string name="container_cross_section_hint">Define the horizontal cross-section to estimate capacity by shape.</string>
+    <string name="container_section_notes">Notes</string>
+    <string name="container_note">Notes (optional)</string>
+    <string name="container_section_images">Photos</string>
+    <string name="container_save">Save container</string>
+    <string name="container_delete_confirm_title">Delete container?</string>
+    <string name="container_delete_confirm_message">Delete “%1$s”?</string>
+    <string name="record_action_container">Containers</string>
 </resources>
