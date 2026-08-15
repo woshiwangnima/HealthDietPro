@@ -52,3 +52,7 @@ private const val MILLIS_PER_MINUTE = 60_000L
 private val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 private val MINUTE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 private val SECOND_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+private val CLOCK_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+
+internal fun formatRecordClock(epochMillis: Long, zoneId: ZoneId = ZoneId.systemDefault()): String =
+    Instant.ofEpochMilli(epochMillis).atZone(zoneId).format(CLOCK_FORMATTER)

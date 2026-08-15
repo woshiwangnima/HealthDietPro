@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -73,6 +74,7 @@ import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.ui.WaterGlassProgress
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputRange
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
+import com.woshiwangnima.healthdietpro.common.time.formatRecordClock
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
 import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodRepository
@@ -326,6 +328,12 @@ private fun WaterTrendChart(
     }
     var selectedDate by remember(days) { mutableStateOf(dates.firstOrNull()) }
     val selectedEntry = entries.firstOrNull { it.date == selectedDate }
+    val selectedDayRecords = remember(records, selectedDate, zone) {
+        selectedDate?.let { date ->
+            records.filter { Instant.ofEpochMilli(it.timestamp).atZone(zone).toLocalDate() == date }
+                .sortedBy { it.timestamp }
+        }.orEmpty()
+    }
     val averageDailyWater = remember(entries) {
         averageNonZeroDailyWaterMl(
             dailyTotals = entries.asReversed().map { entry -> entry.segments.sumOf(DateStackedBarSegment::value) },
@@ -349,7 +357,7 @@ private fun WaterTrendChart(
             entries = entries,
             yAxisTitle = stringResource(R.string.water_statistics_daily_water),
             formatValue = ::formatMl,
-            labelEvery = if (days == 7) 1 else 7,
+            labelEvery = 1,
             selectedEntry = selectedEntry,
             onEntrySelected = { selectedDate = it.date },
             referenceLine = averageDailyWater?.let { average ->
@@ -375,9 +383,28 @@ private fun WaterTrendChart(
                         }
                     }
                 }
+                if (selectedDayRecords.isNotEmpty()) {
+                    WaterDayRecordsTable(selectedDayRecords, beverageById)
+                }
             }
         }
     }
+}
+
+@Composable
+private fun WaterDayRecordsTable(records: List<WaterRecord>, beverageById: Map<String, Beverage>) {
+    AppDataTable(
+        rows = records,
+        rowKey = { _, item -> item.id },
+        modifier = Modifier.fillMaxWidth().heightIn(max = 240.dp),
+        showRowNumber = false,
+        showPager = false,
+        columns = listOf(
+            AppDataTableColumn("time", { AppDataTableHeaderText(stringResource(R.string.water_time)) }, ColumnWidth.Fixed(120.dp)) { AppDataTableText(formatRecordClock(it.timestamp)) },
+            AppDataTableColumn("beverage", { AppDataTableHeaderText(stringResource(R.string.water_beverage)) }, ColumnWidth.Flex(1f, 100.dp)) { AppDataTableText(beverageById[it.beverageId]?.name ?: it.beverageName) },
+            AppDataTableColumn("volume", { AppDataTableHeaderText(stringResource(R.string.water_volume)) }, ColumnWidth.Fixed(96.dp)) { AppDataTableText(formatMl(it.volumeMl)) },
+        ),
+    )
 }
 
 @Composable

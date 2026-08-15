@@ -52,16 +52,7 @@ internal class ContainerArchiveStore private constructor(
     }
 
     private fun validate(archive: ContainerArchive) {
-        require(archive.schemaVersion == CONTAINER_ARCHIVE_SCHEMA_VERSION) { "Unsupported container archive schema" }
-        val ids = archive.containers.map(ContainerRecord::id)
-        require(ids.all(String::isNotBlank) && ids.distinct().size == ids.size) { "Invalid container record ids" }
-        require(archive.containers.all { it.name.isNotBlank() && it.capacityMl > 0.0 }) { "Invalid container record" }
-        require(archive.containers.all { record ->
-            record.emptyMassGrams == null || record.emptyMassGrams > 0.0
-        }) { "Invalid container empty mass" }
-        require(archive.containers.all { record ->
-            record.imagePaths.all(String::isNotBlank) && record.imagePaths.distinct().size == record.imagePaths.size
-        }) { "Invalid container image paths" }
+        validateContainerArchive(archive)
     }
 
     private fun file() = File(context.filesDir, "user_archives/${userId.replace(Regex("[^A-Za-z0-9_-]"), "_")}/containers.json")

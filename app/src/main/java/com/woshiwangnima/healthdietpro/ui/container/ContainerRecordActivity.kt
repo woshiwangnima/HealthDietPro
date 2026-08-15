@@ -28,7 +28,7 @@ class ContainerRecordActivity : BaseActivity() {
     }
 }
 
-private enum class ContainerRoute { LIST, EDITOR }
+private enum class ContainerRoute { LIST, EDITOR, SETTINGS, CAPACITY_LOOKUP }
 
 @Composable
 private fun ContainerRoute(onFinish: () -> Unit) {
@@ -37,14 +37,28 @@ private fun ContainerRoute(onFinish: () -> Unit) {
     var route by rememberSaveable { mutableStateOf(ContainerRoute.LIST) }
     var editingId by remember { mutableStateOf<String?>(null) }
 
-    BackHandler(enabled = route != ContainerRoute.LIST) { route = ContainerRoute.LIST }
+    fun navigateBack() {
+        route = when (route) {
+            ContainerRoute.EDITOR -> ContainerRoute.LIST
+            ContainerRoute.SETTINGS -> ContainerRoute.LIST
+            ContainerRoute.CAPACITY_LOOKUP -> ContainerRoute.SETTINGS
+            ContainerRoute.LIST -> ContainerRoute.LIST
+        }
+    }
+    BackHandler(enabled = route != ContainerRoute.LIST) { navigateBack() }
 
     when (route) {
         ContainerRoute.LIST -> ContainerListScreen(
             containers = uiState.containers,
+            scenarioTags = uiState.scenarioTags,
+            selectedCategories = uiState.selectedCategories,
+            selectedScenarioTags = uiState.selectedScenarioTags,
+            onToggleCategory = viewModel::toggleCategoryFilter,
+            onToggleScenarioTag = viewModel::toggleScenarioTagFilter,
             onAdd = { editingId = null; route = ContainerRoute.EDITOR },
             onEdit = { editingId = it.id; route = ContainerRoute.EDITOR },
             onDelete = viewModel::delete,
+            onSettings = { route = ContainerRoute.SETTINGS },
             onBack = onFinish,
             modifier = Modifier,
         )
@@ -52,10 +66,21 @@ private fun ContainerRoute(onFinish: () -> Unit) {
             val editingRecord = editingId?.let { id -> uiState.containers.firstOrNull { it.id == id } }
             ContainerEditorScreen(
                 existing = editingRecord,
+                scenarioTags = uiState.scenarioTags,
                 viewModel = viewModel,
                 onBack = { route = ContainerRoute.LIST },
                 modifier = Modifier,
             )
         }
+        ContainerRoute.SETTINGS -> ContainerSettingsScreen(
+            scenarioTags = uiState.scenarioTags,
+            onSaveScenarioTags = viewModel::saveScenarioTags,
+            onCapacityLookup = { route = ContainerRoute.CAPACITY_LOOKUP },
+            onBack = { route = ContainerRoute.LIST },
+        )
+        ContainerRoute.CAPACITY_LOOKUP -> ContainerCapacityLookupScreen(
+            containers = uiState.containers,
+            onBack = { route = ContainerRoute.SETTINGS },
+        )
     }
 }

@@ -29,6 +29,20 @@ internal class ContainerRepository private constructor(private val context: Cont
         current.copy(containers = current.containers.filterNot { it.id == id })
     }
 
+    /**
+     * Replaces the scenario-tag registry and removes any tag no longer registered from
+     * every container (containers may only reference registered tags).
+     */
+    fun updateScenarioTags(tags: List<String>) = archive.update { current ->
+        val normalized = tags.map(String::trim).filter(String::isNotBlank).distinct()
+        current.copy(
+            scenarioTags = normalized,
+            containers = current.containers.map { record ->
+                record.copy(scenarioTags = record.scenarioTags.filter { it in normalized })
+            },
+        )
+    }
+
     fun saveImage(bitmap: Bitmap): String {
         val directory = attachmentDirectory().apply { mkdirs() }
         val file = File(directory, "${UUID.randomUUID()}.jpg")

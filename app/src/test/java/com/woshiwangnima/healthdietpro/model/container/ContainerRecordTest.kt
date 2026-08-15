@@ -12,20 +12,24 @@ class ContainerRecordTest {
         id: String = "c1",
         name: String = "我的水杯",
         category: ContainerCategory = ContainerCategory.CUP,
+        capacityMode: ContainerCapacityMode = ContainerCapacityMode.MANUAL,
         capacityMl: Double = 250.0,
         emptyMassGrams: Double? = 120.0,
         note: String = "",
         imagePaths: List<String> = emptyList(),
         crossSections: CrossSectionProfileDto? = null,
+        scenarioTags: List<String> = emptyList(),
     ): ContainerRecord = ContainerRecord(
         id = id,
         name = name,
         category = category,
+        capacityMode = capacityMode,
         capacityMl = capacityMl,
         emptyMassGrams = emptyMassGrams,
         note = note,
         imagePaths = imagePaths,
         crossSections = crossSections,
+        scenarioTags = scenarioTags,
     )
 
     @Test
@@ -39,6 +43,20 @@ class ContainerRecordTest {
         assertEquals("杯子", migrated.containers[0].name)
         assertEquals("客厅用", migrated.containers[0].note)
         assertEquals(listOf("a.jpg", "b.jpg"), migrated.containers[0].imagePaths)
+        assertEquals(CONTAINER_ARCHIVE_SCHEMA_VERSION, migrated.schemaVersion)
+    }
+
+    @Test
+    fun `migration normalizes scenario tags and drops unregistered tags`() {
+        val archive = ContainerArchive(
+            scenarioTags = listOf("  家 ", "学校", ""),
+            containers = listOf(
+                record(scenarioTags = listOf("家", "公司", " 学校 ")),
+            ),
+        )
+        val migrated = migrateContainerArchive(archive)
+        assertEquals(listOf("家", "学校"), migrated.scenarioTags)
+        assertEquals(listOf("家", "学校"), migrated.containers[0].scenarioTags)
         assertEquals(CONTAINER_ARCHIVE_SCHEMA_VERSION, migrated.schemaVersion)
     }
 
@@ -62,6 +80,68 @@ class ContainerRecordTest {
     }
 
     @Test
+    fun `name is optional and blank names are accepted`() {
+        val store = ContainerArchiveStoreValidationHarness()
+        store.validate(ContainerArchive(containers = listOf(record(id = "c1", name = ""), record(id = "c2", name = "   "))))
+    }
+
+    @Test
+    fun `cross-section capacity mode requires a cross-section profile`() {
+        val store = ContainerArchiveStoreValidationHarness()
+        try {
+            store.validate(ContainerArchive(containers = listOf(record(capacityMode = ContainerCapacityMode.CROSS_SECTION, capacityMl = 200.0))))
+            fail("Expected IllegalArgumentException for missing cross-section profile")
+        } catch (_: IllegalArgumentException) {
+        }
+    }
+
+    @Test
+    fun `container scenario tags must be registered`() {
+        val store = ContainerArchiveStoreValidationHarness()
+        try {
+            store.validate(
+                ContainerArchive(
+                    scenarioTags = listOf("家"),
+                    containers = listOf(record(scenarioTags = listOf("学校"))),
+                ),
+            )
+            fail("Expected IllegalArgumentException for unregistered scenario tag")
+        } catch (_: IllegalArgumentException) {
+        }
+    }
+
+    @Test
+    fun `manual capacity grows linearly with height percent`() {
+        val container = record(capacityMode = ContainerCapacityMode.MANUAL, capacityMl = 250.0)
+        assertEquals(0.0, container.capacityMlAtHeightPercent(0.0)!!, 1e-9)
+        assertEquals(125.0, container.capacityMlAtHeightPercent(50.0)!!, 1e-9)
+        assertEquals(250.0, container.capacityMlAtHeightPercent(100.0)!!, 1e-9)
+        assertEquals(250.0, container.capacityMlAtHeightPercent(150.0)!!, 1e-9)
+    }
+
+    @Test
+    fun `cross-section capacity at height percent integrates the profile`() {
+        val profile = CrossSectionProfileDto(
+            totalHeightCm = 10.0,
+            lengthUnitId = "cm",
+            points = listOf(
+                CrossSectionDto(0.0, CrossSectionShapeDto(kind = "circle", diameterCm = 10.0)),
+                CrossSectionDto(10.0, CrossSectionShapeDto(kind = "circle", diameterCm = 10.0)),
+            ),
+        )
+        val container = record(capacityMode = ContainerCapacityMode.CROSS_SECTION, capacityMl = 785.4, crossSections = profile)
+        val domain = requireNotNull(profile.toDomain())
+        assertEquals(domain.volumeUpTo(5.0), container.capacityMlAtHeightPercent(50.0)!!, 1e-6)
+        assertEquals(domain.totalVolumeMl(), container.capacityMlAtHeightPercent(100.0)!!, 1e-6)
+    }
+
+    @Test
+    fun `cross-section capacity lookup returns null without profile`() {
+        val container = record(capacityMode = ContainerCapacityMode.CROSS_SECTION, capacityMl = 200.0)
+        assertNull(container.capacityMlAtHeightPercent(50.0))
+    }
+
+    @Test
     fun `cross section dto round trip preserves volume`() {
         val profile = CrossSectionProfileDto(
             totalHeightCm = 10.0,
@@ -80,7 +160,7 @@ class ContainerRecordTest {
     }
 }
 
-/** Test-only seam that exposes the private validation of [ContainerArchiveStore]. */
+/** Test-only seam that exposes the pure archive validation. */
 internal class ContainerArchiveStoreValidationHarness {
-    fun validate(archive: ContainerArchive) = validateArchive(archive)
+    fun validate(archive: ContainerArchive) = validateContainerArchive(archive)
 }
