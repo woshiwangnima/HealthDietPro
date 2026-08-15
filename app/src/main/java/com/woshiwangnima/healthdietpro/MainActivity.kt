@@ -82,6 +82,7 @@ import com.woshiwangnima.healthdietpro.ui.record.BloodPressureActivity
 import com.woshiwangnima.healthdietpro.ui.record.DiseaseRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.WaterRecordActivity
 import com.woshiwangnima.healthdietpro.ui.container.ContainerRecordActivity
+import com.woshiwangnima.healthdietpro.ui.sleep.SleepRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.RecordActionId
 import com.woshiwangnima.healthdietpro.ui.record.RecordScreen
 import com.woshiwangnima.healthdietpro.ui.record.RecordViewModel
@@ -731,13 +732,21 @@ class MainActivity : BaseActivity() {
             RecordActionId.Medication -> startActivity(Intent(this, MedicationListActivity::class.java))
             RecordActionId.Container -> startActivity(Intent(this, ContainerRecordActivity::class.java))
             RecordActionId.Waist -> openCircumferenceDetail()
+            RecordActionId.Sleep -> startActivity(Intent(this, SleepRecordActivity::class.java))
             RecordActionId.Period,
             RecordActionId.Diet,
             RecordActionId.Exercise,
-            RecordActionId.Sleep,
             RecordActionId.Bowel,
             RecordActionId.Habit,
             RecordActionId.Feeling,
+            RecordActionId.BloodType,
+            RecordActionId.Allergy,
+            RecordActionId.BodyFat,
+            RecordActionId.Teeth,
+            RecordActionId.Vision,
+            RecordActionId.Hearing,
+            RecordActionId.HeartRate,
+            RecordActionId.Temperature,
             -> Unit
         }
     }
@@ -752,7 +761,8 @@ class MainActivity : BaseActivity() {
             RecordActionId.Waist -> openCircumferenceDetail(selectMetricForNewRecord = true)
             RecordActionId.Medication -> openMedicationRecord()
             RecordActionId.Water -> startActivity(Intent(this, WaterRecordActivity::class.java).putExtra(WaterRecordActivity.EXTRA_OPEN_EDITOR, true))
-            RecordActionId.Container -> startActivity(Intent(this, ContainerRecordActivity::class.java))
+            RecordActionId.Container -> startActivity(Intent(this, ContainerRecordActivity::class.java).putExtra(ContainerRecordActivity.EXTRA_OPEN_EDITOR, true))
+            RecordActionId.Sleep -> startActivity(Intent(this, SleepRecordActivity::class.java).putExtra(SleepRecordActivity.EXTRA_OPEN_EDITOR, true))
             else -> Unit
         }
     }

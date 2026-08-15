@@ -18,6 +18,7 @@ import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.model.unit.formatGlucoseValue
+import com.woshiwangnima.healthdietpro.model.sleep.durationMinutes
 import com.woshiwangnima.healthdietpro.ui.profile.CircumferenceMetric
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.util.Locale
@@ -87,6 +88,8 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
         val circumference = profile.circumferenceRecords
             .flatMap { (metricId, records) -> records.map { metricId to it } }
             .maxByOrNull { (_, record) -> record.recordedAtMillis }
+        val sleep = com.woshiwangnima.healthdietpro.model.sleep.SleepRepository.fromContext(context)
+            .load().records.maxByOrNull { it.sleepStartAt }
         val latest = mapOf(
             RecordActionId.Height to profile.heightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} cm") },
             RecordActionId.Weight to profile.weightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} kg") },
@@ -112,6 +115,15 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
                     ?: metricId
                 val value = UnitConverter.fromBase(UnitCategoryType.Length.id, record.value, "cm")
                 RecordLatest(record.recordedAtMillis, "$metricName ${String.format(Locale.getDefault(), "%.1f cm", value)}")
+            },
+            RecordActionId.Sleep to sleep?.let { record ->
+                val minutes = record.durationMinutes()
+                val duration = minutes?.let { value ->
+                    val hours = value / 60
+                    val rest = value % 60
+                    if (hours > 0) "${hours}h ${rest}m" else "${rest}m"
+                } ?: ""
+                RecordLatest(record.sleepStartAt, duration)
             },
         )
         val prefs = UserPrefs.current(context)

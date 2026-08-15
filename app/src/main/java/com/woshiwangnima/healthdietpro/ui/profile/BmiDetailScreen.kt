@@ -49,6 +49,7 @@ import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartEvent
 import com.woshiwangnima.healthdietpro.model.chart.ComposeChartState
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
+import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartCanvasStyle
 import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartAxisKind
@@ -61,6 +62,7 @@ import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
 import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.profile.chart.YAxisBand
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -92,10 +94,10 @@ internal fun BmiDetailScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(padding),
         ) {
-            Box(modifier = Modifier.weight(1f)) {
+Box(modifier = Modifier.weight(1f)) {
                 when (uiState.selectedTab) {
                     0 -> BmiChartPage(
-                        bmiData = uiState.bmiData,
+                        bmiData = uiState.bmiData.map { it.toChartPoint() },
                         chartState = chartState,
                         chartStateKey = viewModel.chartStateKey,
                         onChartStateChanged = { viewModel.onChartEvent(BaseChartEvent.StateChanged(it)) },
@@ -393,8 +395,10 @@ private fun BmiCardTitle(
 
 @Composable
 private fun BmiDataPage(
-    bmiData: List<DataPoint>,
+    bmiData: List<BmiUtil.BmiDataPoint>,
 ) {
+    val context = LocalContext.current
+    val locale = context.resources.configuration.locales[0].toLanguageTag()
     val labels = listOf(
         stringResource(R.string.bmi_underweight),
         stringResource(R.string.bmi_normal),
@@ -426,31 +430,55 @@ private fun BmiDataPage(
             rows = rows,
             rowKey = { index, point -> "${point.timestamp}_$index" },
             columns = listOf(
-                AppDataTableColumn<DataPoint>(
+                AppDataTableColumn<BmiUtil.BmiDataPoint>(
                     key = "date",
                     header = { AppDataTableHeaderText(stringResource(R.string.body_record_table_time)) },
                     width = ColumnWidth.Fixed(156.dp),
                 ) { point ->
                     AppDataTableText(formatBmiRecordTime(point.timestamp))
                 },
-                AppDataTableColumn<DataPoint>(
+                AppDataTableColumn<BmiUtil.BmiDataPoint>(
                     key = "bmi",
                     header = { AppDataTableHeaderText(stringResource(R.string.bmi_title)) },
-                    width = ColumnWidth.Fixed(112.dp),
+                    width = ColumnWidth.Fixed(88.dp),
                 ) { point ->
-                    BmiDataChip("%.1f".format(point.value), point.value)
+                    BmiDataChip("%.1f".format(point.bmi), point.bmi)
                 },
-                AppDataTableColumn<DataPoint>(
+                AppDataTableColumn<BmiUtil.BmiDataPoint>(
+                    key = "height",
+                    header = { AppDataTableHeaderText(stringResource(R.string.bmi_table_height)) },
+                    width = ColumnWidth.Fixed(110.dp),
+                ) { point ->
+                    AppDataTableText(formatMetric(point.heightCm, point.heightUnitId, locale))
+                },
+                AppDataTableColumn<BmiUtil.BmiDataPoint>(
+                    key = "weight",
+                    header = { AppDataTableHeaderText(stringResource(R.string.bmi_table_weight)) },
+                    width = ColumnWidth.Fixed(110.dp),
+                ) { point ->
+                    AppDataTableText(formatMetric(point.weightKg, point.weightUnitId, locale))
+                },
+                AppDataTableColumn<BmiUtil.BmiDataPoint>(
                     key = "category",
                     header = { AppDataTableHeaderText(stringResource(R.string.bmi_reference_category)) },
                     width = ColumnWidth.Flex(weight = 1f, min = 120.dp),
                 ) { point ->
-                    BmiDataChip(bmiLabel(point.value, labels), point.value)
+                    BmiDataChip(bmiLabel(point.bmi, labels), point.bmi)
                 },
             ),
         )
     }
 }
+
+private fun formatMetric(baseValue: Float, unitId: String, locale: String): String =
+    UnitConverter.formatWithUnit(
+        category = if (unitId in LENGTH_UNIT_IDS) UnitCategoryType.Length.id else UnitCategoryType.Weight.id,
+        baseValue = baseValue,
+        unitId = unitId,
+        locale = locale,
+    )
+
+private val LENGTH_UNIT_IDS = setOf("cm", "m", "ft", "in")
 
 @Composable
 private fun BmiDataChip(text: String, bmi: Float) {

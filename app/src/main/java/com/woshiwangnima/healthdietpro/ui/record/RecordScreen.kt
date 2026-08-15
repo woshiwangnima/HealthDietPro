@@ -91,6 +91,7 @@ fun RecordScreen(
                             iconRes = item.iconRes,
                             enabled = item.enabled,
                             summary = item.latestTimestamp?.let { timestamp -> stringResource(com.woshiwangnima.healthdietpro.R.string.record_latest_summary, relativeTime(timestamp), item.latestValue.orEmpty()) } ?: stringResource(com.woshiwangnima.healthdietpro.R.string.record_no_data),
+                            showSummary = item.showSummary,
                             onClick = { onActionClick(item.id) },
                             onAddClick = item.id.takeIf { it in quickAddActionIds }?.let { actionId -> { onAddActionClick(actionId) } },
                             modifier = Modifier.weight(1f),
@@ -110,6 +111,8 @@ private val quickAddActionIds = setOf(
     RecordActionId.Waist,
     RecordActionId.Medication,
     RecordActionId.Water,
+    RecordActionId.Container,
+    RecordActionId.Sleep,
 )
 
 @Composable

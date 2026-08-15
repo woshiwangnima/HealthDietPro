@@ -79,6 +79,7 @@ docs/
 !docs/
 docs/*
 !docs/APP_DATA_TABLE_REORDER_DESIGN.md
+!docs/SLEEP_RECORD_DESIGN.md
 
 # Hidden directories
 .*/

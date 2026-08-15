@@ -4,9 +4,9 @@ import android.app.Application
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartViewModel
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
-import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil
+import com.woshiwangnima.healthdietpro.ui.profile.chart.BmiUtil.BmiDataPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 internal data class BmiDetailUiState(
-    val bmiData: List<DataPoint> = emptyList(),
+    val bmiData: List<BmiDataPoint> = emptyList(),
     val selectedTab: Int = 0,
 )
 

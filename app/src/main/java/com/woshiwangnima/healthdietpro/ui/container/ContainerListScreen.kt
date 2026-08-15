@@ -171,45 +171,57 @@ private fun ContainerListCard(
     onEdit: (ContainerRecord) -> Unit,
     onRequestDelete: (ContainerRecord) -> Unit,
 ) {
+    Card(onClick = { onEdit(container) }, modifier = Modifier.fillMaxWidth()) {
+        ContainerCardRow(container, showDelete = true, onRequestDelete = { onRequestDelete(container) })
+    }
+}
+
+/** Reusable 记容器卡片内容：缩略图 + 名称/分类/容量/质量/场景标签，可选删除按钮。 */
+@Composable
+internal fun ContainerCardRow(
+    container: ContainerRecord,
+    showDelete: Boolean,
+    onRequestDelete: (() -> Unit)? = null,
+) {
     val context = LocalContext.current
     val volumeUnit = AppPrefs.getUnit(context, UnitCategoryType.Volume.id, UnitCategoryType.Volume.defaultUnitId)
     val weightUnit = AppPrefs.getUnit(context, UnitCategoryType.Weight.id, UnitCategoryType.Weight.defaultUnitId)
     val capacityMl = container.capacityMlAtHeightPercent(100.0) ?: container.capacityMl
-    Card(onClick = { onEdit(container) }, modifier = Modifier.fillMaxWidth()) {
-        Row(
-            Modifier.fillMaxWidth().padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            ContainerThumbnail(container)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(container.name.ifBlank { context.getString(container.category.labelRes()) }, style = MaterialTheme.typography.titleSmall)
+    Row(
+        Modifier.fillMaxWidth().padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        ContainerThumbnail(container)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(container.name.ifBlank { context.getString(container.category.labelRes()) }, style = MaterialTheme.typography.titleSmall)
+            Text(
+                stringResource(container.category.labelRes()),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                stringResource(R.string.container_capacity_value, fromMl(capacityMl, volumeUnit), volumeUnitSymbol(volumeUnit)),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            container.emptyMassGrams?.let { grams ->
                 Text(
-                    stringResource(container.category.labelRes()),
+                    stringResource(R.string.container_empty_mass_value, fromGrams(grams, weightUnit), weightUnitSymbol(weightUnit)),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Text(
-                    stringResource(R.string.container_capacity_value, fromMl(capacityMl, volumeUnit), volumeUnitSymbol(volumeUnit)),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                container.emptyMassGrams?.let { grams ->
-                    Text(
-                        stringResource(R.string.container_empty_mass_value, fromGrams(grams, weightUnit), weightUnitSymbol(weightUnit)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (container.scenarioTags.isNotEmpty()) {
-                    Text(
-                        container.scenarioTags.joinToString(" · "),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
             }
-            IconButton(onClick = { onRequestDelete(container) }) {
+            if (container.scenarioTags.isNotEmpty()) {
+                Text(
+                    container.scenarioTags.joinToString(" · "),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+        if (showDelete) {
+            IconButton(onClick = { onRequestDelete?.invoke() }) {
                 Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.body_record_delete), tint = MaterialTheme.colorScheme.error)
             }
         }

@@ -92,6 +92,9 @@
         <activity
             android:name=".ui.container.ContainerRecordActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.sleep.SleepRecordActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

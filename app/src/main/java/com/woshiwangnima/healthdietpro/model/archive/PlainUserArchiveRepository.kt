@@ -74,6 +74,7 @@ internal class PlainUserArchiveRepository(
             water = readDomainSnapshot(profile.id, "water"),
             diseaseRecords = readDomainSnapshot(profile.id, "disease_records"),
             customFoods = imageExport.domain,
+            sleep = readDomainSnapshot(profile.id, "sleep"),
             userPreferences = preferences,
             attachments = attachments,
         )
@@ -340,6 +341,7 @@ internal class PlainUserArchiveRepository(
                 "water" -> WaterArchiveStore.forUser(context, userId).validateJson(content.toString())
                 "disease_records" -> UserDiseaseArchiveStore.forUser(context, userId).validateJson(content.toString())
                 "custom_foods" -> UserCustomFoodArchiveStore.forUser(context, userId).validateJson(content.toString())
+                "sleep" -> com.woshiwangnima.healthdietpro.model.sleep.SleepArchiveStore.forUser(context, userId).validateJson(content.toString())
                 else -> error("Unsupported user archive domain: $domainId")
             }
         }
@@ -375,6 +377,7 @@ internal class PlainUserArchiveRepository(
         water?.let { put("water", it) }
         diseaseRecords?.let { put("disease_records", it) }
         customFoods?.let { put("custom_foods", it) }
+        sleep?.let { put("sleep", it) }
     }
 
     private fun userDirectory(userId: String) = File(context.filesDir, "user_archives/${safeUserId(userId)}")
@@ -423,6 +426,7 @@ internal data class UserArchiveBundle(
     val water: JsonElement? = null,
     val diseaseRecords: JsonElement? = null,
     val customFoods: JsonElement? = null,
+    val sleep: JsonElement? = null,
     val userPreferences: Map<String, UserArchivePreference> = emptyMap(),
     val attachments: List<UserArchiveAttachment> = emptyList(),
 )

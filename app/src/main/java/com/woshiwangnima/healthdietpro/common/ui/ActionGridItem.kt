@@ -28,6 +28,7 @@ fun ActionGridItem(
     summary: String,
     onClick: () -> Unit,
     onAddClick: (() -> Unit)? = null,
+    showSummary: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val alpha = if (enabled) 1f else 0.45f
@@ -61,7 +62,7 @@ fun ActionGridItem(
                     }
                 }
             }
-            TextOverflowText(text = summary, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth(), maxLines = 1)
+            TextOverflowText(text = if (showSummary) summary else "", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth(), maxLines = 1)
         }
     }
 }

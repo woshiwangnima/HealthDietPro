@@ -12,6 +12,19 @@ object BmiUtil {
 
     data class BmiBand(val min: Float, val max: Float, val label: String, val color: Int)
 
+    /** BMI 数据点：同时携带当时使用的身高/体重（基准单位）与显示单位 id，供图表与数据列表复用。 */
+    data class BmiDataPoint(
+        val timestamp: Long,
+        val bmi: Float,
+        val heightCm: Float,
+        val weightKg: Float,
+        val heightUnitId: String,
+        val weightUnitId: String,
+        val dateLabel: String,
+    ) {
+        fun toChartPoint(): DataPoint = DataPoint(timestamp = timestamp, value = bmi, dateLabel = dateLabel)
+    }
+
     fun loadBmiBands(): List<BmiBand> {
         return listOf(
             BmiBand(-1f, 18.5f, "体重过低", Color.parseColor("#269E9E9E")),
@@ -45,39 +58,50 @@ object BmiUtil {
             },
         )?.value
 
-    fun buildBmiDataPoints(weightRecords: List<BodyRecord>, heightRecords: List<BodyRecord>): List<DataPoint> {
+    /**
+     * 以事件驱动合并身高/体重记录：每条记录都是一次「身高或体重变动」事件，
+     * 每次事件后若身高与体重均已存在即产生一个新的 BMI 数据点（同一时刻的
+     * 身高+体重事件合并为一个点）。返回按时间升序的 [BmiDataPoint]。
+     */
+    fun buildBmiDataPoints(weightRecords: List<BodyRecord>, heightRecords: List<BodyRecord>): List<BmiDataPoint> {
         if (weightRecords.isEmpty() || heightRecords.isEmpty()) return emptyList()
 
-        val sortedW = weightRecords.sortedBy { bodyRecordEpochMillis(it.date) }
-        val sortedH = heightRecords.sortedBy { bodyRecordEpochMillis(it.date) }
+        data class Event(val at: Long, val date: String, val weight: BodyRecord?, val height: BodyRecord?)
 
-        val allDates = (sortedW.map { it.date } + sortedH.map { it.date })
-            .distinct()
-            .sortedBy { bodyRecordEpochMillis(it) }
+        val events = buildList {
+            weightRecords.forEach { add(Event(bodyRecordEpochMillis(it.date), it.date, it, null)) }
+            heightRecords.forEach { add(Event(bodyRecordEpochMillis(it.date), it.date, null, it)) }
+        }.sortedBy { it.at }
 
-        val result = mutableListOf<DataPoint>()
-        var wi = 0
-        var hi = 0
+        val result = mutableListOf<BmiDataPoint>()
+        var lastWeight: BodyRecord? = null
+        var lastHeight: BodyRecord? = null
 
-        for (date in allDates) {
-            val timestamp = bodyRecordEpochMillis(date)
-            while (wi < sortedW.size && bodyRecordEpochMillis(sortedW[wi].date) <= timestamp) wi++
-            while (hi < sortedH.size && bodyRecordEpochMillis(sortedH[hi].date) <= timestamp) hi++
-
-            val w = if (wi > 0) sortedW[wi - 1] else null
-            val h = if (hi > 0) sortedH[hi - 1] else null
-
-            if (w != null && h != null) {
-                val bmi = computeBmi(w.value, h.value)
-                if (bmi > 0f) {
-                    result.add(
-                        DataPoint(
-                            timestamp = timestamp,
-                            value = bmi,
-                            dateLabel = formatBodyRecordDisplayDateTime(date),
-                        ),
-                    )
-                }
+        var i = 0
+        while (i < events.size) {
+            val at = events[i].at
+            val date = events[i].date
+            while (i < events.size && events[i].at == at) {
+                val event = events[i]
+                if (event.weight != null) lastWeight = event.weight
+                if (event.height != null) lastHeight = event.height
+                i++
+            }
+            val w = lastWeight ?: continue
+            val h = lastHeight ?: continue
+            val bmi = computeBmi(w.value, h.value)
+            if (bmi > 0f) {
+                result.add(
+                    BmiDataPoint(
+                        timestamp = at,
+                        bmi = bmi,
+                        heightCm = h.value,
+                        weightKg = w.value,
+                        heightUnitId = h.getUnit(isWeight = false),
+                        weightUnitId = w.getUnit(isWeight = true),
+                        dateLabel = formatBodyRecordDisplayDateTime(date),
+                    ),
+                )
             }
         }
         return result

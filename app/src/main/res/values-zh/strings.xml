@@ -355,9 +355,19 @@
     <!-- Common empty states -->
     <string name="no_record">暂无数据</string>
     <!-- Record module -->
-    <string name="record_section_baseline">我的基准</string>
-    <string name="record_section_daily">每日记录</string>
-    <string name="record_section_status">状态记录</string>
+    <string name="record_section_basic_profile">基础档案</string>
+    <string name="record_section_body_measurement">身体测量</string>
+    <string name="record_section_health_monitoring">健康监测</string>
+    <string name="record_section_daily">日常记录</string>
+    <string name="record_section_misc">杂项记录</string>
+    <string name="record_action_blood_type">记血型</string>
+    <string name="record_action_allergy">记过敏源</string>
+    <string name="record_action_body_fat">记体脂</string>
+    <string name="record_action_teeth">记牙齿</string>
+    <string name="record_action_vision">记视力</string>
+    <string name="record_action_hearing">记听力</string>
+    <string name="record_action_heart_rate">记心率</string>
+    <string name="record_action_temperature">记体温</string>
     <string name="record_action_height">记身高</string>
     <string name="record_search">搜索记录功能</string>
     <string name="record_no_data">暂无记录</string>
@@ -1070,6 +1080,8 @@
     <string name="bmi_calculator_help">BMI = 体重（kg）÷ 身高（m）的平方。BMI 仅用于筛查参考，不能替代临床诊断。</string>
     <string name="bmi_height_label">身高 (cm)</string>
     <string name="bmi_weight_label">体重 (kg)</string>
+    <string name="bmi_table_height">身高</string>
+    <string name="bmi_table_weight">体重</string>
     <string name="bmi_result_empty">BMI: --</string>
     <string name="bmi_result_value">BMI: %1$.1f（%2$s）</string>
     <string name="bmi_result_prefix">BMI:</string>
@@ -1214,14 +1226,50 @@
     <string name="container_capacity_manual">手动输入</string>
     <string name="container_capacity_cross_section">按截面计算</string>
     <string name="container_capacity_cross_section_derived">按截面计算的容量：%1$s</string>
+    <string name="custom_tag_settings_title">自定义标签设置</string>
     <string name="container_capacity_lookup">容量查询</string>
-    <string name="container_capacity_lookup_description">选择一个容器并输入高度百分比，计算对应容量</string>
+    <string name="container_capacity_lookup_description">选择一个容器并拖动高度进度条，计算对应容量</string>
     <string name="container_capacity_lookup_select_container">选择容器</string>
     <string name="container_capacity_lookup_capacity_hint">总容量 %1$.1f %2$s</string>
-    <string name="container_capacity_lookup_height_percent">高度百分比（0-100）</string>
-    <string name="container_capacity_lookup_result">高度 %1$.1f%% 处容量：%2$.1f %3$s</string>
+    <string name="container_capacity_lookup_height">当前高度：%1$.0f%%</string>
+    <string name="container_capacity_lookup_height_value">当前高度值：%1$.1f %2$s</string>
+    <string name="container_capacity_lookup_capacity_at_height">当前高度处容量：%1$.1f %2$s</string>
+    <string name="container_capacity_lookup_total_capacity">总容量：%1$.1f %2$s</string>
+    <string name="container_capacity_lookup_linear_hint">手动输入：容量随高度线性增长</string>
     <string name="container_capacity_lookup_empty">请先添加容器。</string>
     <string name="container_capacity_lookup_unavailable">该容器缺少截面数据，无法按截面计算。</string>
-    <string name="container_capacity_lookup_invalid">请输入有效的高度百分比。</string>
     <string name="record_action_container">记容器</string>
+    <!-- Sleep module -->
+    <string name="sleep_title">睡眠记录</string>
+    <string name="sleep_add">添加睡眠</string>
+    <string name="sleep_edit">编辑睡眠</string>
+    <string name="sleep_delete">删除睡眠记录</string>
+    <string name="sleep_delete_message">删除 %1$s 的睡眠记录？</string>
+    <string name="sleep_empty">还没有睡眠记录。添加你的第一次夜间睡眠或小憩吧。</string>
+    <string name="sleep_kind_title">睡眠类型</string>
+    <string name="sleep_kind_night">夜间睡眠</string>
+    <string name="sleep_kind_nap">小憩</string>
+    <string name="sleep_filter_all">全部</string>
+    <string name="sleep_ongoing">进行中</string>
+    <string name="sleep_history">历史</string>
+    <string name="sleep_start_time">入睡时间</string>
+    <string name="sleep_wake_time">醒来时间</string>
+    <string name="sleep_wake_time_empty">进行中（暂无醒来时间）</string>
+    <string name="sleep_note">备注</string>
+    <string name="sleep_note_hint">可选的睡眠备注。</string>
+    <string name="sleep_save">保存睡眠记录</string>
+    <string name="sleep_record_wake_up">补录醒来时间</string>
+    <string name="sleep_start_timer">启动计时器</string>
+    <string name="sleep_start_timer_hint">计时结束提醒你小憩或睡眠时间已到。</string>
+    <string name="sleep_timer_duration">计时时长</string>
+    <string name="sleep_timer_duration_value">%1$d 分钟</string>
+    <string name="sleep_timer_system">联动系统计时器</string>
+    <string name="sleep_timer_system_hint">计时结束自动打开系统计时器应用。</string>
+    <string name="sleep_timer_system_confirm_title">使用系统计时器？</string>
+    <string name="sleep_timer_system_confirm_message">倒计时结束后将打开系统计时器应用，是否继续？</string>
+    <string name="sleep_timer_nap_label">小憩提醒</string>
+    <string name="sleep_timer_night_label">睡眠计时</string>
+    <string name="timer_finished_title">计时结束</string>
+    <string name="timer_finished_message">「%1$s」计时已结束。</string>
+    <string name="timer_channel_name">倒计时提醒</string>
 </resources>

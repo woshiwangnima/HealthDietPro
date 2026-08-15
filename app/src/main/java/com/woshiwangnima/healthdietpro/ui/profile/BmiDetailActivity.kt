@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseBackActivity
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.util.UnitConverter
 
 class BmiDetailActivity : BaseBackActivity() {
 
@@ -15,6 +16,7 @@ class BmiDetailActivity : BaseBackActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        UnitConverter.init(this)
         setContent {
             HealthDietProTheme {
                 BmiDetailScreen(

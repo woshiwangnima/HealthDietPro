@@ -21,31 +21,36 @@ import com.woshiwangnima.healthdietpro.ui.container.ContainerViewModel
 
 /** 记容器：记录家庭常用容器（名称、分类、容量、可选空容器质量、备注、图片与 2D 截面）。 */
 class ContainerRecordActivity : BaseActivity() {
+    companion object { const val EXTRA_OPEN_EDITOR = "open_editor" }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         UnitConverter.init(this)
-        setContent { HealthDietProTheme { ContainerRoute(::finish) } }
+        setContent { HealthDietProTheme { ContainerRoute(::finish, intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false)) } }
     }
 }
 
-private enum class ContainerRoute { LIST, EDITOR, SETTINGS, CAPACITY_LOOKUP }
+private enum class ContainerRoute { LIST, EDITOR, SETTINGS, CUSTOM_TAGS, CAPACITY_LOOKUP }
 
 @Composable
-private fun ContainerRoute(onFinish: () -> Unit) {
+private fun ContainerRoute(onFinish: () -> Unit, openEditorInitially: Boolean) {
     val viewModel: ContainerViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var route by rememberSaveable { mutableStateOf(ContainerRoute.LIST) }
+    var route by rememberSaveable { mutableStateOf(if (openEditorInitially) ContainerRoute.EDITOR else ContainerRoute.LIST) }
     var editingId by remember { mutableStateOf<String?>(null) }
 
     fun navigateBack() {
         route = when (route) {
             ContainerRoute.EDITOR -> ContainerRoute.LIST
             ContainerRoute.SETTINGS -> ContainerRoute.LIST
+            ContainerRoute.CUSTOM_TAGS -> ContainerRoute.SETTINGS
             ContainerRoute.CAPACITY_LOOKUP -> ContainerRoute.SETTINGS
             ContainerRoute.LIST -> ContainerRoute.LIST
         }
     }
-    BackHandler(enabled = route != ContainerRoute.LIST) { navigateBack() }
+    BackHandler(enabled = route != ContainerRoute.LIST) {
+        if (openEditorInitially && route == ContainerRoute.EDITOR) onFinish() else navigateBack()
+    }
 
     when (route) {
         ContainerRoute.LIST -> ContainerListScreen(
@@ -73,10 +78,14 @@ private fun ContainerRoute(onFinish: () -> Unit) {
             )
         }
         ContainerRoute.SETTINGS -> ContainerSettingsScreen(
-            scenarioTags = uiState.scenarioTags,
-            onSaveScenarioTags = viewModel::saveScenarioTags,
+            onCustomTags = { route = ContainerRoute.CUSTOM_TAGS },
             onCapacityLookup = { route = ContainerRoute.CAPACITY_LOOKUP },
             onBack = { route = ContainerRoute.LIST },
+        )
+        ContainerRoute.CUSTOM_TAGS -> CustomTagSettingsScreen(
+            scenarioTags = uiState.scenarioTags,
+            onSaveScenarioTags = viewModel::saveScenarioTags,
+            onBack = { route = ContainerRoute.SETTINGS },
         )
         ContainerRoute.CAPACITY_LOOKUP -> ContainerCapacityLookupScreen(
             containers = uiState.containers,

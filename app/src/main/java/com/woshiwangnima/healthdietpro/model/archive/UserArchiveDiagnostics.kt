@@ -76,6 +76,7 @@ private val archiveDiagnosticFiles = linkedMapOf(
     "water" to "water.json",
     "disease_records" to "disease_records.json",
     "custom_foods" to "custom_foods.json",
+    "sleep" to "sleep.json",
     "user_preferences" to "user_preferences.json",
 )
 
