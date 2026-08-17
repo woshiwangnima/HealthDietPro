@@ -362,6 +362,7 @@
     <string name="record_section_health_monitoring">Health Monitoring</string>
     <string name="record_section_daily">Daily Records</string>
     <string name="record_section_misc">Misc Records</string>
+    <string name="record_planned_features_count">Planned features (%1$d)</string>
     <string name="record_action_blood_type">Log Blood Type</string>
     <string name="record_action_allergy">Log Allergies</string>
     <string name="record_action_body_fat">Log Body Fat</string>
@@ -1401,6 +1402,7 @@
     <string name="diet_settings_period_range_end">End</string>
     <string name="diet_settings_period_range_custom">Custom</string>
     <string name="diet_food_source_custom">Custom</string>
+    <string name="diet_food_source_all">All</string>
     <string name="diet_today_summary">Day intake</string>
     <string name="diet_summary_energy">Energy</string>
     <string name="diet_summary_protein">Protein</string>
@@ -1421,4 +1423,8 @@
     <string name="diet_statistics_goal_fraction">%1$s / %2$s %3$s</string>
     <string name="diet_statistics_goal_exceeded">%1$s / %2$s %3$s · exceeded</string>
     <string name="diet_statistics_selected_day_breakdown">%1$s · %2$s by period</string>
+    <string name="diet_meal_summary">This meal intake</string>
+    <string name="diet_meal_time_range">%1$s → %2$s</string>
+    <string name="diet_meal_goal_progress">Goal progress</string>
+    <string name="diet_meal_detail_meta">%1$d foods · net %2$s</string>
 </resources>

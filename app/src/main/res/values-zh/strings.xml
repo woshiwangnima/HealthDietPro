@@ -360,6 +360,7 @@
     <string name="record_section_health_monitoring">健康监测</string>
     <string name="record_section_daily">日常记录</string>
     <string name="record_section_misc">杂项记录</string>
+    <string name="record_planned_features_count">规划中功能（%1$d）</string>
     <string name="record_action_blood_type">记血型</string>
     <string name="record_action_allergy">记过敏源</string>
     <string name="record_action_body_fat">记体脂</string>
@@ -1402,6 +1403,7 @@
     <string name="diet_settings_period_range_end">结束时间</string>
     <string name="diet_settings_period_range_custom">自定义</string>
     <string name="diet_food_source_custom">我的</string>
+    <string name="diet_food_source_all">全部</string>
     <string name="diet_today_summary">当日摄入</string>
     <string name="diet_summary_energy">热量</string>
     <string name="diet_summary_protein">蛋白质</string>
@@ -1422,4 +1424,8 @@
     <string name="diet_statistics_goal_fraction">%1$s / %2$s %3$s</string>
     <string name="diet_statistics_goal_exceeded">%1$s / %2$s %3$s · 已超出</string>
     <string name="diet_statistics_selected_day_breakdown">%1$s · %2$s 分时段</string>
+    <string name="diet_meal_summary">本餐摄入</string>
+    <string name="diet_meal_time_range">%1$s → %2$s</string>
+    <string name="diet_meal_goal_progress">目标达成</string>
+    <string name="diet_meal_detail_meta">%1$d 项食物 · 净重 %2$s</string>
 </resources>

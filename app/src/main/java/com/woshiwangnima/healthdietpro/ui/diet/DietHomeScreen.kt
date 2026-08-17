@@ -55,6 +55,7 @@ import kotlinx.coroutines.delay
 internal fun DietHomeScreen(
     uiState: DietUiState,
     onAdd: () -> Unit,
+    onOpen: (DietRecord) -> Unit,
     onEdit: (DietRecord) -> Unit,
     onDelete: (String) -> Unit,
     onSettings: () -> Unit,
@@ -92,7 +93,7 @@ internal fun DietHomeScreen(
                 if (tab == 0) {
                     DietStatisticsTab(uiState.records, uiState.goals)
                 } else {
-                    DietRecordsTab(uiState, onAdd, onEdit, onDelete)
+                    DietRecordsTab(uiState, onAdd, onOpen, onEdit, onDelete)
                 }
             }
             DetailTabBar(tabs, tabs[selectedTab].id) { item -> selectedTab = tabs.indexOf(item) }
@@ -104,6 +105,7 @@ internal fun DietHomeScreen(
 private fun DietRecordsTab(
     uiState: DietUiState,
     onAdd: () -> Unit,
+    onOpen: (DietRecord) -> Unit,
     onEdit: (DietRecord) -> Unit,
     onDelete: (String) -> Unit,
 ) {
@@ -148,6 +150,7 @@ private fun DietRecordsTab(
             items(filtered.sortedByDescending(DietRecord::mealStartAt), key = DietRecord::id) { record ->
                 DietCard(
                     record = record,
+                    onOpen = { onOpen(record) },
                     onEdit = { onEdit(record) },
                     onDelete = { deleting = record },
                 )
@@ -214,6 +217,7 @@ private val PeriodTagWidth = 96.dp
 @Composable
 private fun DietCard(
     record: DietRecord,
+    onOpen: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -221,7 +225,7 @@ private fun DietCard(
         entry.resolvedNutrients["ENERGY"]?.value ?: 0.0
     }
     Surface(
-        onClick = onEdit,
+        onClick = onOpen,
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
         modifier = Modifier.fillMaxWidth(),

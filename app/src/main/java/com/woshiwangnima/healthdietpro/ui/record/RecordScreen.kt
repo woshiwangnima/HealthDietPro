@@ -56,6 +56,7 @@ fun RecordScreen(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     var collapsedSections by remember { mutableStateOf(loadCollapsedSections(context)) }
+    var plannedExpanded by remember { mutableStateOf(loadPlannedExpanded(context)) }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -75,8 +76,7 @@ fun RecordScreen(
         }
         uiState.sections.forEach { section ->
             val items = section.items.filter { item ->
-                stringResource(item.titleRes).contains(uiState.submittedQuery, ignoreCase = true) ||
-                    item.searchAliasRes.any { stringResource(it).contains(uiState.submittedQuery, ignoreCase = true) }
+                item.enabled && item.matchesQuery(uiState.submittedQuery)
             }
             if (items.isEmpty()) return@forEach
             val sectionKey = section.key()
@@ -114,15 +114,58 @@ fun RecordScreen(
                 }
             }
         }
+        val plannedItems = uiState.sections.flatMap { section ->
+            section.items.filter { item -> !item.enabled && item.matchesQuery(uiState.submittedQuery) }
+        }
+        if (plannedItems.isNotEmpty()) {
+            val searching = uiState.submittedQuery.isNotBlank()
+            ActionSectionCard(
+                title = stringResource(com.woshiwangnima.healthdietpro.R.string.record_planned_features_count, plannedItems.size),
+                titleIconRes = com.woshiwangnima.healthdietpro.R.drawable.ic_time,
+                collapsed = !searching && !plannedExpanded,
+                onToggleCollapse = {
+                    plannedExpanded = !plannedExpanded
+                    savePlannedExpanded(context, plannedExpanded)
+                },
+            ) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    maxItemsInEachRow = 2,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    plannedItems.forEach { item ->
+                        ActionGridItem(
+                            title = stringResource(item.titleRes),
+                            iconRes = item.iconRes,
+                            enabled = false,
+                            summary = stringResource(com.woshiwangnima.healthdietpro.R.string.record_no_data),
+                            showSummary = false,
+                            onClick = {},
+                            onAddClick = null,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
 private const val RECORD_COLLAPSED_SECTIONS_KEY = "record_collapsed_sections_v1"
+private const val RECORD_PLANNED_EXPANDED_KEY = "record_planned_expanded_v1"
 
 private fun RecordSectionUiState.key(): String = titleRes.toString()
 
 private fun loadCollapsedSections(context: android.content.Context): Set<String> =
     UserPrefs.current(context).getStringSet(RECORD_COLLAPSED_SECTIONS_KEY)
+
+private fun savePlannedExpanded(context: android.content.Context, expanded: Boolean) {
+    UserPrefs.current(context).putBoolean(RECORD_PLANNED_EXPANDED_KEY, expanded)
+}
+
+private fun loadPlannedExpanded(context: android.content.Context): Boolean =
+    UserPrefs.current(context).getBoolean(RECORD_PLANNED_EXPANDED_KEY, false)
 
 private fun saveCollapsedSections(context: android.content.Context, collapsed: Set<String>) {
     UserPrefs.current(context).putStringSet(RECORD_COLLAPSED_SECTIONS_KEY, collapsed)
@@ -154,3 +197,8 @@ private fun relativeTime(timestamp: Long): String {
     }
     return stringResource(textRes, relativeTime.amount)
 }
+
+@Composable
+private fun RecordActionItemUiState.matchesQuery(query: String): Boolean =
+    stringResource(titleRes).contains(query, ignoreCase = true) ||
+        searchAliasRes.any { stringResource(it).contains(query, ignoreCase = true) }

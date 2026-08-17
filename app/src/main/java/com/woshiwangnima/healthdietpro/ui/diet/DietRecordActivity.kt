@@ -69,7 +69,7 @@ class DietRecordActivity : BaseActivity() {
     }
 }
 
-private enum class DietRoute { HOME, EDITOR, SETTINGS, DEFAULT_DURATION, GOALS, CONTAINERS }
+private enum class DietRoute { HOME, EDITOR, DETAIL, SETTINGS, DEFAULT_DURATION, GOALS, CONTAINERS }
 
 @Composable
 private fun DietRoute(
@@ -93,10 +93,12 @@ private fun DietRoute(
     }
     var route by rememberSaveable { mutableStateOf(if (openEditorInitially) DietRoute.EDITOR else DietRoute.HOME) }
     var editingRecord by remember { mutableStateOf<DietRecord?>(null) }
+    var viewingRecord by remember { mutableStateOf<DietRecord?>(null) }
 
     BackHandler(enabled = route != DietRoute.HOME) {
         when {
             openEditorInitially && route == DietRoute.EDITOR -> onFinish()
+            route == DietRoute.DETAIL -> route = DietRoute.HOME
             route == DietRoute.DEFAULT_DURATION -> route = DietRoute.SETTINGS
             route == DietRoute.GOALS -> route = DietRoute.SETTINGS
             route == DietRoute.CONTAINERS -> route = DietRoute.SETTINGS
@@ -109,12 +111,27 @@ private fun DietRoute(
         DietRoute.HOME -> DietHomeScreen(
             uiState = uiState,
             onAdd = { editingRecord = null; route = DietRoute.EDITOR },
+            onOpen = { viewingRecord = it; route = DietRoute.DETAIL },
             onEdit = { editingRecord = it; route = DietRoute.EDITOR },
             onDelete = viewModel::delete,
             onSettings = { route = DietRoute.SETTINGS },
             onBack = onFinish,
             modifier = Modifier,
         )
+        DietRoute.DETAIL -> {
+            val detailRecord = viewingRecord?.let { current ->
+                uiState.records.firstOrNull { it.id == current.id } ?: current
+            }
+            if (detailRecord != null) {
+                DietMealDetailScreen(
+                    record = detailRecord,
+                    goals = goals,
+                    onEdit = { editingRecord = detailRecord; route = DietRoute.EDITOR },
+                    onBack = { route = DietRoute.HOME },
+                    modifier = Modifier,
+                )
+            }
+        }
         DietRoute.EDITOR -> DietEditorScreen(
             existing = editingRecord,
             prefs = prefs,

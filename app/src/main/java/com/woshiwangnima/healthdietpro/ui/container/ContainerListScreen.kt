@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -92,6 +93,7 @@ internal fun ContainerListScreen(
                 tags = categoryTags,
                 selected = selectedCategories.map { it.name }.toSet(),
                 onToggle = { onToggleCategory(ContainerCategory.valueOf(it)) },
+                chipWidth = SystemCategoryChipWidth,
             )
             if (scenarioTags.isNotEmpty()) {
                 ContainerFilterChipRow(
@@ -140,28 +142,42 @@ private fun ContainerFilterChipRow(
     selected: Set<String>,
     onToggle: (String) -> Unit,
     modifier: Modifier = Modifier,
+    chipWidth: androidx.compose.ui.unit.Dp? = null,
 ) {
     Surface(modifier = modifier.fillMaxWidth().height(40.dp), shape = RoundedCornerShape(6.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight().padding(horizontal = 4.dp)) {
             Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Row(modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
                 tags.forEach { (id, label) ->
-                    ContainerFilterChip(selected = id in selected, onClick = { onToggle(id) }, label = { Text(label, style = MaterialTheme.typography.bodySmall) })
+                    ContainerFilterChip(
+                        selected = id in selected,
+                        onClick = { onToggle(id) },
+                        fixedWidth = chipWidth,
+                        label = { Text(label, style = MaterialTheme.typography.bodySmall) },
+                    )
                 }
             }
         }
     }
 }
 
+private val SystemCategoryChipWidth = 64.dp
+
 @Composable
-private fun ContainerFilterChip(selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier, label: @Composable () -> Unit) {
+private fun ContainerFilterChip(
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    fixedWidth: androidx.compose.ui.unit.Dp? = null,
+    label: @Composable () -> Unit,
+) {
     Surface(
-        modifier = modifier.height(28.dp).clickable(onClick = onClick),
+        modifier = modifier.then(if (fixedWidth != null) Modifier.width(fixedWidth) else Modifier).height(28.dp).clickable(onClick = onClick),
         shape = RoundedCornerShape(6.dp),
         color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
         border = androidx.compose.foundation.BorderStroke(1.dp, if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Box(modifier = Modifier.padding(horizontal = 2.dp), contentAlignment = Alignment.Center) { label() }
+        Box(modifier = Modifier.fillMaxSize().padding(horizontal = 2.dp), contentAlignment = Alignment.Center) { label() }
     }
 }
 

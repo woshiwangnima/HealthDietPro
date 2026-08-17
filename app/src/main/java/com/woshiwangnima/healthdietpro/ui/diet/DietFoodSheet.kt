@@ -37,7 +37,6 @@ import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.FoodCategoryFilterRows
 import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
-import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputRange
 import com.woshiwangnima.healthdietpro.model.diet.DietFoodEntry
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
@@ -60,7 +59,7 @@ internal fun DietFoodSheet(
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
     var source by rememberSaveable(existing?.foodName) { mutableStateOf(if (existing != null && existing.foodId == null) DietFoodSource.FREE_NAME else DietFoodSource.EXISTING) }
     var keyword by rememberSaveable { mutableStateOf("") }
-    var selectedKind by rememberSaveable { mutableStateOf(existing?.foodKind ?: FoodKind.INGREDIENT) }
+    var selectedKind by rememberSaveable { mutableStateOf(existing?.foodKind) }
     var customOnly by rememberSaveable { mutableStateOf(false) }
     var selectedRoot by remember { mutableStateOf<String?>(null) }
     var selectedChild by remember { mutableStateOf<String?>(null) }
@@ -116,9 +115,14 @@ internal fun DietFoodSheet(
                 style = MaterialTheme.typography.titleLarge,
             )
         },
-        confirmButton = {},
-        dismissButton = {
+        confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) }
+        },
+        dismissButton = {
+            TextButton(
+                enabled = saveEnabled,
+                onClick = { onConfirm(buildEntry()) },
+            ) { Text(stringResource(R.string.diet_entry_confirm)) }
         },
         text = {
             Column {
@@ -192,6 +196,11 @@ internal fun DietFoodSheet(
                     if (source == DietFoodSource.EXISTING) {
                         item {
                             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                FilterChip(
+                                    selected = selectedKind == null,
+                                    onClick = { selectedKind = null; selectedFoodId = null; selectedRoot = null; selectedChild = null },
+                                    label = { Text(stringResource(R.string.diet_food_source_all)) },
+                                )
                                 FoodKind.entries.forEach { kind ->
                                     FilterChip(
                                         selected = selectedKind == kind,
@@ -305,11 +314,6 @@ internal fun DietFoodSheet(
                         }
                     }
                 }
-                FormSaveBar(
-                    text = stringResource(R.string.diet_entry_confirm),
-                    enabled = saveEnabled,
-                    onSave = { onConfirm(buildEntry()) },
-                )
             }
         },
     )
@@ -362,7 +366,7 @@ private fun unitLabel(unitId: String): String = when (unitId) {
 private fun filteredFoods(
     foods: List<FoodItem>,
     keyword: String,
-    kind: FoodKind,
+    kind: FoodKind?,
     customOnly: Boolean,
     root: String?,
     child: String?,
@@ -370,7 +374,7 @@ private fun filteredFoods(
     language: String,
 ): List<FoodItem> {
     return foods.filter { food ->
-        if (food.kind != kind) return@filter false
+        if (kind != null && food.kind != kind) return@filter false
         if (customOnly && !UserCustomFoodRepository.isCustom(food.id)) return@filter false
         val searchable = food.searchableNames().joinToString(" ").lowercase()
         if (keyword.isNotBlank() && !searchable.contains(keyword.lowercase())) return@filter false
