@@ -25,36 +25,53 @@ class SleepRecordActivity : BaseActivity() {
     }
 }
 
-private enum class SleepRoute { LIST, EDITOR }
+private enum class SleepRoute { LIST, EDITOR, SETTINGS, DEFAULT_DURATION }
 
 @Composable
 private fun SleepRoute(onFinish: () -> Unit, openEditorInitially: Boolean) {
     val viewModel: SleepViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val prefs by viewModel.prefs.collectAsStateWithLifecycle()
     var route by rememberSaveable { mutableStateOf(if (openEditorInitially) SleepRoute.EDITOR else SleepRoute.LIST) }
     var editingRecord by remember { mutableStateOf<SleepRecord?>(null) }
 
     BackHandler(enabled = route != SleepRoute.LIST) {
-        if (openEditorInitially && route == SleepRoute.EDITOR) onFinish() else route = SleepRoute.LIST
+        when {
+            openEditorInitially && route == SleepRoute.EDITOR -> onFinish()
+            route == SleepRoute.SETTINGS -> route = SleepRoute.LIST
+            route == SleepRoute.DEFAULT_DURATION -> route = SleepRoute.SETTINGS
+            else -> route = SleepRoute.LIST
+        }
     }
 
     when (route) {
-        SleepRoute.LIST -> SleepListScreen(
+        SleepRoute.LIST -> SleepHomeScreen(
             uiState = uiState,
             onAdd = { editingRecord = null; route = SleepRoute.EDITOR },
             onEdit = { editingRecord = it; route = SleepRoute.EDITOR },
             onDelete = viewModel::delete,
             onWakeUp = viewModel::wakeUpNow,
             onDeleteTimer = viewModel::deleteTimer,
+            onSettings = { route = SleepRoute.SETTINGS },
             onBack = onFinish,
             modifier = Modifier,
         )
         SleepRoute.EDITOR -> SleepEditorScreen(
             existing = editingRecord,
+            prefs = prefs,
             onBack = { route = SleepRoute.LIST },
             onSave = { record -> viewModel.save(record); route = SleepRoute.LIST },
             onCreateTimer = viewModel::createTimerAndStart,
             modifier = Modifier,
+        )
+        SleepRoute.SETTINGS -> SleepSettingsScreen(
+            onBack = { route = SleepRoute.LIST },
+            onDefaultDuration = { route = SleepRoute.DEFAULT_DURATION },
+        )
+        SleepRoute.DEFAULT_DURATION -> SleepDefaultDurationScreen(
+            prefs = prefs,
+            onBack = { route = SleepRoute.SETTINGS },
+            onSave = { updated -> viewModel.savePrefs(updated); route = SleepRoute.SETTINGS },
         )
     }
 }

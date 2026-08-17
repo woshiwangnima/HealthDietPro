@@ -16,8 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,79 +29,123 @@ import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
+import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
+import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.timer.remainingNow
 import com.woshiwangnima.healthdietpro.model.sleep.SleepKind
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRecord
 import com.woshiwangnima.healthdietpro.model.sleep.durationMinutes
 
 @Composable
-internal fun SleepListScreen(
+internal fun SleepHomeScreen(
     uiState: SleepUiState,
     onAdd: () -> Unit,
     onEdit: (SleepRecord) -> Unit,
     onDelete: (String) -> Unit,
     onWakeUp: (String) -> Unit,
     onDeleteTimer: (String) -> Unit,
+    onSettings: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+) {
+    val tabs = remember {
+        listOf(
+            DetailTabItem("records", R.string.sleep_tab_records, R.drawable.ic_list),
+            DetailTabItem("statistics", R.string.sleep_tab_statistics, R.drawable.ic_chart),
+        )
+    }
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    BaseScreen(
+        title = stringResource(R.string.sleep_title),
+        onBack = onBack,
+        includeNavigationBarPadding = false,
+        actions = {
+            androidx.compose.material3.IconButton(onClick = onSettings) {
+                androidx.compose.material3.Icon(
+                    painter = androidx.compose.ui.res.painterResource(R.drawable.ic_settings),
+                    contentDescription = stringResource(R.string.sleep_settings_title),
+                )
+            }
+        },
+    ) { padding ->
+        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
+            AnimatedPageContent(selectedTab, Modifier.weight(1f), direction = { initial, target -> target - initial }) { tab ->
+                if (tab == 0) {
+                    SleepRecordsTab(uiState, onAdd, onEdit, onDelete, onWakeUp, onDeleteTimer)
+                } else {
+                    SleepStatisticsTab(uiState.records)
+                }
+            }
+            DetailTabBar(tabs, tabs[selectedTab].id) { item -> selectedTab = tabs.indexOf(item) }
+        }
+    }
+}
+
+@Composable
+private fun SleepRecordsTab(
+    uiState: SleepUiState,
+    onAdd: () -> Unit,
+    onEdit: (SleepRecord) -> Unit,
+    onDelete: (String) -> Unit,
+    onWakeUp: (String) -> Unit,
+    onDeleteTimer: (String) -> Unit,
 ) {
     var filterKind by remember { mutableStateOf<SleepKind?>(null) }
     var deleting by remember { mutableStateOf<SleepRecord?>(null) }
     val filtered = uiState.records.filter { filterKind == null || it.kind == filterKind }
     val ongoing = filtered.filter { it.wakeUpAt == null }
     val finished = filtered.filter { it.wakeUpAt != null }
-    BaseScreen(
-        title = stringResource(R.string.sleep_title),
-        onBack = onBack,
-    ) { padding ->
-        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            AppIconTextButton(stringResource(R.string.sleep_add), R.drawable.ic_add, onAdd, Modifier.fillMaxWidth())
-            LazyColumn(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
+    Column(
+        Modifier.fillMaxSize().padding(horizontal = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        AppIconTextButton(stringResource(R.string.sleep_add), R.drawable.ic_add, onAdd, Modifier.fillMaxWidth())
+        LazyColumn(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            contentPadding = PaddingValues(vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            item {
+                SleepKindFilter(filterKind, onFilterKindChange = { filterKind = it })
+            }
+            if (filtered.isEmpty()) {
                 item {
-                    SleepKindFilter(filterKind, onFilterKindChange = { filterKind = it })
+                    Text(
+                        stringResource(R.string.sleep_empty),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                    )
                 }
-                if (filtered.isEmpty()) {
-                    item {
-                        Text(
-                            stringResource(R.string.sleep_empty),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
-                        )
-                    }
+            }
+            if (ongoing.isNotEmpty()) {
+                item { Text(stringResource(R.string.sleep_ongoing), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary) }
+                items(ongoing, key = SleepRecord::id) { record ->
+                    SleepCard(
+                        record = record,
+                        timer = uiState.timerFor(record),
+                        onWakeUp = { onWakeUp(record.id) },
+                        onEdit = { onEdit(record) },
+                        onDelete = { deleting = record },
+                        onDeleteTimer = { record.timerId?.let(onDeleteTimer) },
+                        highlighted = true,
+                    )
                 }
-                if (ongoing.isNotEmpty()) {
-                    item { Text(stringResource(R.string.sleep_ongoing), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary) }
-                    items(ongoing, key = SleepRecord::id) { record ->
-                        SleepCard(
-                            record = record,
-                            timer = uiState.timerFor(record),
-                            onWakeUp = { onWakeUp(record.id) },
-                            onEdit = { onEdit(record) },
-                            onDelete = { deleting = record },
-                            onDeleteTimer = { record.timerId?.let(onDeleteTimer) },
-                            highlighted = true,
-                        )
-                    }
-                }
-                if (finished.isNotEmpty()) {
-                    item { Text(stringResource(R.string.sleep_history), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                    items(finished, key = SleepRecord::id) { record ->
-                        SleepCard(
-                            record = record,
-                            timer = uiState.timerFor(record),
-                            onWakeUp = null,
-                            onEdit = { onEdit(record) },
-                            onDelete = { deleting = record },
-                            onDeleteTimer = { record.timerId?.let(onDeleteTimer) },
-                            highlighted = false,
-                        )
-                    }
+            }
+            if (finished.isNotEmpty()) {
+                item { Text(stringResource(R.string.sleep_history), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                items(finished, key = SleepRecord::id) { record ->
+                    SleepCard(
+                        record = record,
+                        timer = uiState.timerFor(record),
+                        onWakeUp = null,
+                        onEdit = { onEdit(record) },
+                        onDelete = { deleting = record },
+                        onDeleteTimer = { record.timerId?.let(onDeleteTimer) },
+                        highlighted = false,
+                    )
                 }
             }
         }
@@ -186,6 +232,13 @@ private fun SleepCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            if (record.kind == SleepKind.NIGHT_SLEEP && record.nocturia.isNotEmpty()) {
+                Text(
+                    text = stringResource(R.string.sleep_nocturia_count_value, record.nocturia.size),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             timer?.let { instance ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(

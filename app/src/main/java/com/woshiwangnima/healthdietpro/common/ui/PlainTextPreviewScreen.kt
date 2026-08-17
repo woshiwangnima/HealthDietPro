@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -29,11 +30,23 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.archive.stableJsonString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+private const val MAX_DISPLAY_LINE_LENGTH = 200
+
+private fun displayLine(line: String): String = when {
+    line.isEmpty() -> " "
+    line.length <= MAX_DISPLAY_LINE_LENGTH -> line
+    else -> line.take(MAX_DISPLAY_LINE_LENGTH) + "..."
+}
 
 /** Reusable read-only preview for structured plaintext before an export action. */
 @Composable
 internal fun PlainTextPreviewScreen(title: String, content: String, onBack: () -> Unit) {
-    val formatted = remember(content) { stableJsonString(content, prettyPrint = true) }
+    val formatted by produceState(initialValue = "", content) {
+        value = withContext(Dispatchers.Default) { stableJsonString(content, prettyPrint = true) }
+    }
     val lines = remember(formatted) { formatted.lines() }
     val foldRanges = remember(lines) { findFoldRanges(lines) }
     var collapsedStarts by remember(lines) { mutableStateOf(emptySet<Int>()) }
@@ -55,7 +68,7 @@ internal fun PlainTextPreviewScreen(title: String, content: String, onBack: () -
                                 Text("", modifier = Modifier.width(20.dp))
                             }
                             Text((index + 1).toString(), modifier = Modifier.width(44.dp).background(MaterialTheme.colorScheme.surfaceVariant).padding(end = 8.dp), fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(line.ifEmpty { " " }, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
+                            Text(displayLine(line), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }

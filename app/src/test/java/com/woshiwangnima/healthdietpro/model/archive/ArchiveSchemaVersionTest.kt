@@ -1,36 +1,48 @@
 package com.woshiwangnima.healthdietpro.model.archive
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class ArchiveSchemaVersionTest {
     @Test
-    fun `unversioned archive migrates to current version`() {
-        assertEquals(
-            ArchiveSchemaVersion.Current,
-            migrateArchiveSchemaVersion(null),
-        )
+    fun `current version is the user archive envelope`() {
+        assertEquals(ArchiveSchemaVersion.UserArchiveEnvelope, ArchiveSchemaVersion.Current)
+        assertEquals(ArchiveSchemaVersion(1, 4, 0), ArchiveSchemaVersion.Current)
     }
 
     @Test
-    fun `legacy integer archive version migrates to current version`() {
-        assertEquals(
-            ArchiveSchemaVersion.Current,
-            migrateArchiveSchemaVersion(archiveSchemaVersionFromLegacy(3)),
-        )
+    fun `comparison is major then minor then patch`() {
+        assertEquals(0, ArchiveSchemaVersion(1, 2, 3).compareTo(ArchiveSchemaVersion(1, 2, 3)))
+        assertEquals(1, ArchiveSchemaVersion(2, 0, 0).compareTo(ArchiveSchemaVersion(1, 9, 9)))
+        assertEquals(1, ArchiveSchemaVersion(1, 3, 0).compareTo(ArchiveSchemaVersion(1, 2, 9)))
+        assertEquals(1, ArchiveSchemaVersion(1, 2, 4).compareTo(ArchiveSchemaVersion(1, 2, 3)))
+        assertEquals(-1, ArchiveSchemaVersion(1, 0, 0).compareTo(ArchiveSchemaVersion(1, 4, 0)))
     }
 
     @Test
-    fun `plain JSON archive without version field migrates to current version`() {
-        val archive = Json.decodeFromString<PlainUserArchive>(
-            """{"appVersion":"test","exportedAt":"2026-07-21T00:00:00Z","sourceUserId":"user","profile":{},"preferences":{}}""",
-        )
+    fun `negative components are rejected`() {
+        assertThrows(IllegalArgumentException::class.java) { ArchiveSchemaVersion(-1, 0, 0) }
+    }
 
-        assertEquals(
-            ArchiveSchemaVersion.Current,
-            migrateArchiveSchemaVersion(archive.formatVersion),
-        )
+    @Test
+    fun `version round-trips through json serializer`() {
+        val json = Json
+        val encoded = json.encodeToString<ArchiveSchemaVersion>(ArchiveSchemaVersion(1, 4, 0))
+        assertEquals("""{"major":1,"minor":4,"patch":0}""", encoded)
+        assertEquals(ArchiveSchemaVersion(1, 4, 0), json.decodeFromString<ArchiveSchemaVersion>(encoded))
+    }
+
+    @Test
+    fun `normalized app version parses partial and suffixed versions`() {
+        assertEquals("1.2.3", normalizedAppVersion("1.2.3"))
+        assertEquals("1.2.0", normalizedAppVersion("1.2"))
+        assertEquals("1.0.0", normalizedAppVersion("1"))
+        assertEquals("1.2.3-rc1", normalizedAppVersion("1.2.3-rc1"))
+        assertEquals("unknown", normalizedAppVersion(null))
+        assertEquals("unknown", normalizedAppVersion("alpha"))
     }
 }

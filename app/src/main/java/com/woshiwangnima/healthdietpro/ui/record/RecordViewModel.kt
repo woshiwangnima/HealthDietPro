@@ -92,7 +92,7 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
             .load().records.maxByOrNull { it.sleepStartAt }
         val latest = mapOf(
             RecordActionId.Height to profile.heightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} cm") },
-            RecordActionId.Weight to profile.weightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} kg") },
+            RecordActionId.Weight to profile.weightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, String.format(Locale.getDefault(), "%.2f kg", it.value)) },
             RecordActionId.BloodGlucose to glucose?.let {
                 RecordLatest(it.timestamp, "${formatGlucoseValue(it.valueMmolPerL, glucoseUnitId)} $glucoseUnit")
             },

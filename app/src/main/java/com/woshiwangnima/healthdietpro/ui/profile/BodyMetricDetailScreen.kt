@@ -144,9 +144,9 @@ private fun BodyMetricChart(
             chartStateKey = chartStateKey,
             canvasStyle = ChartCanvasStyle(
                 xAxisKind = ChartAxisKind.TimestampMs,
-                yValueFormatter = { "%.1f".format(it) },
+                yValueFormatter = { formatBodyMetricValue(it, category) },
                 xValueFormatter = ::formatBodyMetricChartTimeAxis,
-                crosshairValueFormatter = { value, label -> "%.1f %s".format(value, label) },
+                crosshairValueFormatter = { value, label -> "%s %s".format(formatBodyMetricValue(value, category), label) },
                 crosshairTimeFormatter = { timestamp -> formatBodyMetricChartTimeAxis(timestamp, 60_000L) },
             ),
             controlLabels = controlLabels,
@@ -229,7 +229,7 @@ private fun BodyMetricRecordTable(
             rowKey = { _, row -> row.record.id.orEmpty() },
             columns = listOf(
                 AppDataTableColumn("time", { AppDataTableHeaderText(stringResource(R.string.body_record_table_time)) }, ColumnWidth.Fixed(156.dp)) { AppDataTableText(it.record.date) },
-                AppDataTableColumn("value", { AppDataTableHeaderText(stringResource(R.string.body_record_value)) }, ColumnWidth.Fixed(120.dp)) { AppDataTableText("%.1f".format(UnitConverter.fromBase(category, it.record.value, unitId))) },
+                AppDataTableColumn("value", { AppDataTableHeaderText(stringResource(R.string.body_record_value)) }, ColumnWidth.Fixed(120.dp)) { AppDataTableText(formatBodyMetricValue(UnitConverter.fromBase(category, it.record.value, unitId), category)) },
                 AppDataTableColumn("unit", { AppDataTableHeaderText(stringResource(R.string.body_record_unit)) }, ColumnWidth.Fixed(96.dp)) { AppDataTableText(unitId) },
             ),
             actionsWidth = 104.dp,
@@ -239,6 +239,9 @@ private fun BodyMetricRecordTable(
         )
     }
 }
+
+private fun formatBodyMetricValue(value: Float, category: String): String =
+    if (category == "weight") "%.2f".format(value) else "%.1f".format(value)
 
 private fun formatBodyMetricChartTimeAxis(timestamp: Long, intervalMs: Long): String {
     val pattern = when {

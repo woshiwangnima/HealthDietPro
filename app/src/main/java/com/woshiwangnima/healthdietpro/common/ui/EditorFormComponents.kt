@@ -89,6 +89,7 @@ internal fun EditorTextField(
     singleLine: Boolean = true,
     suffix: @Composable (() -> Unit)? = null,
     supportingTextOverride: (@Composable () -> Unit)? = null,
+    modifier: Modifier = Modifier,
 ) {
     val valid = range?.accepts(value) ?: true
     val decoratedLabel = when {
@@ -114,7 +115,7 @@ internal fun EditorTextField(
         } else null,
         singleLine = singleLine,
         keyboardOptions = if (numeric) KeyboardOptions(keyboardType = KeyboardType.Decimal) else KeyboardOptions.Default,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     )
 }
 

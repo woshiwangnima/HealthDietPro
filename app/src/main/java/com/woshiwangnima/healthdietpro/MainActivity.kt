@@ -542,10 +542,13 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun previewArchive(onPreview: (String) -> Unit) {
+    private fun previewArchive(onPreview: (Result<String>) -> Unit) {
         lifecycleScope.launch {
             val archive = withContext(Dispatchers.IO) { plainUserArchiveRepository.exportCurrentUser() }
-            archive.onSuccess(onPreview).onFailure { Toast.makeText(this@MainActivity, R.string.profile_plain_json_operation_failed, Toast.LENGTH_SHORT).show() }
+            archive.onSuccess { onPreview(Result.success(it)) }.onFailure { error ->
+                Toast.makeText(this@MainActivity, R.string.profile_plain_json_operation_failed, Toast.LENGTH_SHORT).show()
+                onPreview(Result.failure(error))
+            }
         }
     }
 

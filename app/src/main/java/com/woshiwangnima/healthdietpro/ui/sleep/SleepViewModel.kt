@@ -7,8 +7,11 @@ import com.woshiwangnima.healthdietpro.common.timer.AppTimerController
 import com.woshiwangnima.healthdietpro.common.timer.TimerController
 import com.woshiwangnima.healthdietpro.common.timer.TimerInstance
 import com.woshiwangnima.healthdietpro.common.timer.TimerState
+import com.woshiwangnima.healthdietpro.model.sleep.SleepPrefs
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRecord
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRepository
+import com.woshiwangnima.healthdietpro.model.sleep.loadSleepPrefs
+import com.woshiwangnima.healthdietpro.model.sleep.saveSleepPrefs
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +24,15 @@ class SleepViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(SleepUiState())
     internal val uiState: StateFlow<SleepUiState> = _uiState.asStateFlow()
 
+    private val _prefs = MutableStateFlow(loadSleepPrefs(application))
+    internal val prefs: StateFlow<SleepPrefs> = _prefs.asStateFlow()
+
     init { refresh() }
+
+    internal fun savePrefs(prefs: SleepPrefs) {
+        saveSleepPrefs(getApplication(), prefs)
+        _prefs.value = prefs
+    }
 
     fun refresh() {
         val records = repository.load().records.sortedByDescending(SleepRecord::sleepStartAt)

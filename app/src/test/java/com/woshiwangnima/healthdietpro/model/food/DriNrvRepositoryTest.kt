@@ -26,7 +26,7 @@ class DriNrvRepositoryTest {
         val reference = repository.referenceFor(profile)
 
         assertEquals("children_7_8y_male", reference.id)
-        assertEquals(25.0, reference.percent("PROTEIN", FoodAmount(10.0, "weight", "g"), 1.0), 0.0001)
+        assertEquals(25.0, reference.percent("PROTEIN", FoodAmount(10.0, "weight", "g"), 1.0)!!, 0.0001)
     }
 
     @Test
@@ -36,7 +36,7 @@ class DriNrvRepositoryTest {
         val reference = repository.referenceFor(UserProfile(gender = Gender.FEMALE))
 
         assertEquals(DriNrvRepository.ADULT_REFERENCE_ID, reference.id)
-        assertEquals(20.0, reference.percent("PROTEIN", FoodAmount(12.0, "weight", "g"), 1.0), 0.0001)
+        assertEquals(20.0, reference.percent("PROTEIN", FoodAmount(12.0, "weight", "g"), 1.0)!!, 0.0001)
         assertNull(reference.percent("WATER", FoodAmount(100.0, "volume", "mL"), 1.0))
     }
 }

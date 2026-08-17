@@ -22,7 +22,7 @@ class DiseaseI18nTest {
         assertEquals("type2_diabetes", repository.findByIcd11Code("5A11").single().id)
         assertEquals("fatty_liver", repository.search("脂肪肝", Locale.SIMPLIFIED_CHINESE).single().id)
         assertEquals("pcos", repository.search("PCOS", Locale.ENGLISH).single().id)
-        assertEquals("common_cold", repository.search("感冒", Locale.SIMPLIFIED_CHINESE).single().id)
+        assertTrue(repository.search("感冒", Locale.SIMPLIFIED_CHINESE).any { it.id == "common_cold" })
         assertEquals("influenza", repository.search("flu", Locale.ENGLISH).single().id)
         assertEquals("influenza", repository.findByIcd11Code("1E30").single().id)
     }

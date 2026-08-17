@@ -44,7 +44,7 @@ object UnitConverter {
         return baseValue / unit.toBase
     }
 
-    fun formatWithUnit(category: String, baseValue: Float, unitId: String, locale: String = "zh"): String {
+    fun formatWithUnit(category: String, baseValue: Float, unitId: String, locale: String = "zh", precision: Int = 1): String {
         val repo = repository ?: return "$baseValue"
         val unit = repo.getUnit(category, unitId) ?: return "$baseValue"
         val converted = fromBase(category, baseValue, unitId)
@@ -52,7 +52,7 @@ object UnitConverter {
         return if (unitId == "ft") {
             formatHeightFtIn(baseValue)
         } else {
-            "%.1f %s".format(converted, symbol)
+            "%.${precision}f %s".format(converted, symbol)
         }
     }
 

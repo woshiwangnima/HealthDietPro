@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import com.woshiwangnima.healthdietpro.common.ui.SearchActivityPanel
 import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
 import com.woshiwangnima.healthdietpro.common.time.RelativeTimeUnit
 import com.woshiwangnima.healthdietpro.common.time.relativeTimeSince
+import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 
 @Composable
 fun RecordScreen(
@@ -52,6 +54,8 @@ fun RecordScreen(
 ) {
     var searchFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+    var collapsedSections by remember { mutableStateOf(loadCollapsedSections(context)) }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -75,9 +79,19 @@ fun RecordScreen(
                     item.searchAliasRes.any { stringResource(it).contains(uiState.submittedQuery, ignoreCase = true) }
             }
             if (items.isEmpty()) return@forEach
+            val sectionKey = section.key()
             ActionSectionCard(
                 title = stringResource(section.titleRes),
                 titleIconRes = section.titleIconRes,
+                collapsed = sectionKey in collapsedSections,
+                onToggleCollapse = {
+                    collapsedSections = if (sectionKey in collapsedSections) {
+                        collapsedSections - sectionKey
+                    } else {
+                        collapsedSections + sectionKey
+                    }
+                    saveCollapsedSections(context, collapsedSections)
+                },
             ) {
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -101,6 +115,17 @@ fun RecordScreen(
             }
         }
     }
+}
+
+private const val RECORD_COLLAPSED_SECTIONS_KEY = "record_collapsed_sections_v1"
+
+private fun RecordSectionUiState.key(): String = titleRes.toString()
+
+private fun loadCollapsedSections(context: android.content.Context): Set<String> =
+    UserPrefs.current(context).getStringSet(RECORD_COLLAPSED_SECTIONS_KEY)
+
+private fun saveCollapsedSections(context: android.content.Context, collapsed: Set<String>) {
+    UserPrefs.current(context).putStringSet(RECORD_COLLAPSED_SECTIONS_KEY, collapsed)
 }
 
 private val quickAddActionIds = setOf(

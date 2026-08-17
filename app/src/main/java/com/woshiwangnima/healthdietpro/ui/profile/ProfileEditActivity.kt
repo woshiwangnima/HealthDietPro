@@ -235,7 +235,7 @@ class ProfileEditActivity : DirtyFormActivity() {
             },
             regionText = selectedRegion.takeIf { !it.isEmpty() }?.display() ?: getString(R.string.profile_edit_choose),
             heightText = latestHeight?.let { "%.1f cm".format(it.value) } ?: getString(R.string.profile_edit_no_record),
-            weightText = latestWeight?.let { "%.1f kg".format(it.value) } ?: getString(R.string.profile_edit_no_record),
+            weightText = latestWeight?.let { "%.2f kg".format(it.value) } ?: getString(R.string.profile_edit_no_record),
             bmiText = if (bmi > 0f) "%.1f %s".format(bmi, BmiUtil.getBmiLabel(bmi)) else getString(R.string.profile_edit_no_record),
             bmiColor = if (bmi > 0f) androidx.compose.ui.graphics.Color(BmiUtil.getBmiColor(bmi)).copy(alpha = 1f) else null,
             avatarFilePath = avatarFilePath(),

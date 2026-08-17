@@ -70,6 +70,10 @@ class UserPrefsScope private constructor(
     fun getString(key: String, default: String): String = values[key] as? String ?: default
     fun putString(key: String, v: String) { put(key, v) }
 
+    fun getStringSet(key: String, default: Set<String> = emptySet()): Set<String> =
+        (values[key] as? Set<*>)?.filterIsInstance<String>()?.toSet() ?: default
+    fun putStringSet(key: String, v: Set<String>) { put(key, v) }
+
     fun remove(key: String) { update { it - key } }
 
     fun getInt(key: String, default: Int): Int = values[key] as? Int ?: default

@@ -11,7 +11,11 @@ internal fun serializeSearchHistory(entries: List<String>): String =
 internal fun deserializeSearchHistory(value: String): List<String> = runCatching {
     searchHistoryJson.decodeFromString<List<String>>(value)
 }.getOrElse {
-    value.split(LEGACY_HISTORY_SEPARATOR).filter { it.isNotBlank() }
+    if (LEGACY_HISTORY_SEPARATOR in value) {
+        value.split(LEGACY_HISTORY_SEPARATOR).filter { it.isNotBlank() }
+    } else {
+        emptyList()
+    }
 }
 
 private const val LEGACY_HISTORY_SEPARATOR = "\u001F"

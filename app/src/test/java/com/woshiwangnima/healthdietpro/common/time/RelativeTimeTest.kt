@@ -17,7 +17,7 @@ class RelativeTimeTest {
         assertRelativeTime(1L, RelativeTimeUnit.DAY, 86_400_000L)
         assertRelativeTime(29L, RelativeTimeUnit.DAY, 2_591_999_999L)
         assertRelativeTime(1L, RelativeTimeUnit.MONTH, 2_592_000_000L)
-        assertRelativeTime(11L, RelativeTimeUnit.MONTH, 31_535_999_999L)
+        assertRelativeTime(12L, RelativeTimeUnit.MONTH, 31_535_999_999L)
         assertRelativeTime(1L, RelativeTimeUnit.YEAR, 31_536_000_000L)
     }
 

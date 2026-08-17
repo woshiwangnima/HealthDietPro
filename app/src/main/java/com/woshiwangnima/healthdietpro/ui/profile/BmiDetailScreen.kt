@@ -476,6 +476,7 @@ private fun formatMetric(baseValue: Float, unitId: String, locale: String): Stri
         baseValue = baseValue,
         unitId = unitId,
         locale = locale,
+        precision = if (unitId in LENGTH_UNIT_IDS) 1 else 2,
     )
 
 private val LENGTH_UNIT_IDS = setOf("cm", "m", "ft", "in")

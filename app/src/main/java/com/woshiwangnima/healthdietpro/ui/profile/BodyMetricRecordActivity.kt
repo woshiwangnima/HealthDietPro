@@ -90,7 +90,7 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
         return BodyMetricRecordForm(
             date = editing?.date ?: formatBodyRecordDateTime(LocalDateTime.now()),
             unitId = selectedUnit,
-            value = editing?.let { "%.1f".format(UnitConverter.fromBase(category, it.value, selectedUnit)) }.orEmpty(),
+            value = editing?.let { formatBodyMetricValue(UnitConverter.fromBase(category, it.value, selectedUnit), category) }.orEmpty(),
         )
     }
 
@@ -135,6 +135,9 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
         const val EXTRA_CUSTOM_METRIC_TITLE = "custom_metric_title"
     }
 }
+
+private fun formatBodyMetricValue(value: Float, category: String): String =
+    if (category == "weight") "%.2f".format(value) else "%.1f".format(value)
 
 private data class BodyMetricRecordForm(
     val date: String = "",

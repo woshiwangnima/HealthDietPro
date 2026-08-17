@@ -78,7 +78,7 @@ internal fun ContainerEditorScreen(
     var capacityMode by rememberSaveable(existing?.id) { mutableStateOf(existing?.capacityMode ?: ContainerCapacityMode.MANUAL) }
     var capacityText by rememberSaveable(existing?.id) { mutableStateOf(existing?.let { "%.1f".format(fromMl(it.capacityMl, defaultVolumeUnit)) }.orEmpty()) }
     var volumeUnitId by rememberSaveable(existing?.id) { mutableStateOf(defaultVolumeUnit) }
-    var emptyMassText by rememberSaveable(existing?.id) { mutableStateOf(existing?.emptyMassGrams?.let { "%.1f".format(fromGrams(it, defaultWeightUnit)) }.orEmpty()) }
+    var emptyMassText by rememberSaveable(existing?.id) { mutableStateOf(existing?.emptyMassGrams?.let { "%.2f".format(fromGrams(it, defaultWeightUnit)) }.orEmpty()) }
     var weightUnitId by rememberSaveable(existing?.id) { mutableStateOf(defaultWeightUnit) }
     var note by rememberSaveable(existing?.id) { mutableStateOf(existing?.note.orEmpty()) }
     var imagePaths by remember(existing?.id) { mutableStateOf(existing?.imagePaths.orEmpty()) }
