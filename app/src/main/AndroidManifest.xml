@@ -95,6 +95,10 @@
         <activity
             android:name=".ui.sleep.SleepRecordActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.diet.DietRecordActivity"
+            android:exported="false" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -28,6 +28,37 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun ComposeClockPickerDialog(
+    initialMinuteOfDay: Int,
+    onDismiss: () -> Unit,
+    onTimePicked: (Int) -> Unit,
+) {
+    val state = rememberTimePickerState(
+        initialHour = (initialMinuteOfDay / 60).coerceIn(0, 23),
+        initialMinute = (initialMinuteOfDay % 60).coerceIn(0, 59),
+        is24Hour = true,
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.diet_settings_period_range)) },
+        text = { TimePicker(state = state) },
+        confirmButton = {
+            TextButton(onClick = {
+                onTimePicked(state.hour * 60 + state.minute)
+            }) {
+                Text(stringResource(R.string.compose_confirm_dialog_ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.compose_confirm_dialog_cancel))
+            }
+        },
+    )
+}
+
 internal fun formatDateTime(millis: Long): String =
     formatRecordTimestamp(millis, RecordTimePrecision.MINUTE)
 

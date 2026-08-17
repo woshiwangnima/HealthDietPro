@@ -3824,14 +3824,17 @@
       "kind": "ingredient"
     },
     {
-      "id": "food:taxon:zingiber_mioga:raw",
+      "id": "food:taxon:zizania_latifolia:raw",
       "botanicalTaxonomy": { "family": "Poaceae", "genus": "Zizania", "species": "Zizania latifolia" },
       "names": {
         "zh": [
-          "茭白"
+          "茭白",
+          "篙瓜",
+          "茭笋"
         ],
         "en": [
-          "Water bamboo shoot"
+          "Water bamboo shoot",
+          "Wild rice stem"
         ]
       },
       "categoryTags": [
@@ -7880,6 +7883,490 @@
     {"id":"food:snack:fava_bean:plain","kind":"food","names":{"zh":["兰花豆（原味）","炒蚕豆"],"en":["Plain roasted fava beans"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:vicia_faba:dry","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried fava beans; nutrient calculation uses baked derivation"}],"commonness":3},
     {"id":"food:snack:black_soybean:plain","kind":"food","names":{"zh":["炒黑豆（原味）"],"en":["Plain roasted black soybeans"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:glycine_max:black:dry","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried black soybeans; nutrient calculation uses baked derivation"}],"commonness":3},
     {"id":"food:snack:soybean:plain","kind":"food","names":{"zh":["炒黄豆（原味）"],"en":["Plain roasted soybeans"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:glycine_max:soybean:dried","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried soybeans; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:green_pea:plain","kind":"food","names":{"zh":["炒青豆（原味）"],"en":["Plain roasted green peas"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:pisum_sativum:dry","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried green peas; nutrient calculation uses baked derivation"}],"commonness":3}
+    {"id":"food:snack:green_pea:plain","kind":"food","names":{"zh":["炒青豆（原味）"],"en":["Plain roasted green peas"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:pisum_sativum:dry","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried green peas; nutrient calculation uses baked derivation"}],"commonness":3},
+    {
+      "id": "food:taxon:benincasa_hispida:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": { "family": "Cucurbitaceae", "genus": "Benincasa", "species": "Benincasa hispida" },
+      "names": {
+        "zh": [
+          "冬瓜"
+        ],
+        "en": [
+          "Winter melon",
+          "Wax gourd"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable"
+      ],
+      "edibleRatio": 0.8,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "wax gourd, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 11,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "冬瓜含水量高、能量密度低，适合作为低热量蔬菜搭配；可食部约占购买量的 80%。",
+        "en": "Winter melon is a high-water, low-energy vegetable; edible portion is about 80% of purchased weight."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:ctenopharyngodon_idella:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "草鱼",
+          "白鲩"
+        ],
+        "en": [
+          "Grass carp",
+          "White amur"
+        ]
+      },
+      "categoryTags": [
+        "food.aquatic.fish"
+      ],
+      "edibleRatio": 0.6,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "grass carp, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 113,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 16.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 5.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "草鱼是常见的淡水养殖鱼类，蛋白质含量较高，脂肪适中；可食部约占购买量的 60%。",
+        "en": "Grass carp is a common freshwater farmed fish with high protein and moderate fat; edible portion is about 60% of purchased weight."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:carassius_auratus:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "鲫鱼"
+        ],
+        "en": [
+          "Crucian carp",
+          "Goldfish carp"
+        ]
+      },
+      "categoryTags": [
+        "food.aquatic.fish"
+      ],
+      "edibleRatio": 0.54,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "crucian carp, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 108,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 17.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 2.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "鲫鱼是常见淡水鱼，蛋白质丰富、脂肪较低，适合清蒸或炖汤；可食部约占购买量的 54%。",
+        "en": "Crucian carp is a common freshwater fish rich in protein with low fat; edible portion is about 54% of purchased weight."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:culter_alburnus:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "翘嘴白",
+          "翘嘴鲌",
+          "白条鱼"
+        ],
+        "en": [
+          "Topmouth culter",
+          "Sharp-belly fish"
+        ]
+      },
+      "categoryTags": [
+        "food.aquatic.fish"
+      ],
+      "edibleRatio": 0.55,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "topmouth culter, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 113,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 18.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 4.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "翘嘴白是肉质细嫩的淡水鱼，蛋白质含量较高；可食部约占购买量的 55%。",
+        "en": "Topmouth culter is a freshwater fish with fine flesh and high protein; edible portion is about 55% of purchased weight."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:hypophthalmichthys_nobilis:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "胖头鱼",
+          "鳙鱼",
+          "花鲢"
+        ],
+        "en": [
+          "Bighead carp"
+        ]
+      },
+      "categoryTags": [
+        "food.aquatic.fish"
+      ],
+      "edibleRatio": 0.61,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "bighead carp, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 100,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 15.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 2.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "胖头鱼（鳙鱼）是淡水养殖鱼类，头大肉多，适合剁椒鱼头等做法；可食部约占购买量的 61%。",
+        "en": "Bighead carp is a freshwater farmed fish with a large head and plenty of meat; edible portion is about 61% of purchased weight."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:plant_oil:corn",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "玉米油"
+        ],
+        "en": [
+          "Corn oil"
+        ]
+      },
+      "categoryTags": [
+        "food.oil",
+        "food.oil.plant"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 899,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 99.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "corn oil; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "玉米油是常见植物食用油，以不饱和脂肪酸为主。",
+        "en": "Corn oil is a common plant cooking oil rich in unsaturated fatty acids."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:plant_oil:rapeseed",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "菜籽油",
+          "菜油"
+        ],
+        "en": [
+          "Rapeseed oil",
+          "Canola oil"
+        ]
+      },
+      "categoryTags": [
+        "food.oil",
+        "food.oil.plant"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 899,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 99.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "rapeseed oil; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "菜籽油是中式烹调常用食用油，营养值按精炼菜籽油整理。",
+        "en": "Rapeseed oil is a common cooking oil in Chinese cuisine; values are for refined rapeseed oil."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:plant_oil:peanut",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "花生油"
+        ],
+        "en": [
+          "Peanut oil"
+        ]
+      },
+      "categoryTags": [
+        "food.oil",
+        "food.oil.plant"
+      ],
+      "edibleRatio": 1,
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 899,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 99.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "peanut oil; per 100 g edible portion"
+        }
+      ],
+      "description": {
+        "zh": "花生油是中式烹调常用食用油，具有较高的烟点，适合炒菜。",
+        "en": "Peanut oil is a common cooking oil in Chinese cuisine with a high smoke point, suitable for stir-frying."
+      },
+      "commonness": 4
+    }
   ]
 }

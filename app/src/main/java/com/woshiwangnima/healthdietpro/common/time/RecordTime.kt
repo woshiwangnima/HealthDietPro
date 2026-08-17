@@ -56,3 +56,5 @@ private val CLOCK_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("HH
 
 internal fun formatRecordClock(epochMillis: Long, zoneId: ZoneId = ZoneId.systemDefault()): String =
     Instant.ofEpochMilli(epochMillis).atZone(zoneId).format(CLOCK_FORMATTER)
+
+internal fun formatMinuteOfDay(minuteOfDay: Int): String = "%02d:%02d".format(minuteOfDay / 60, minuteOfDay % 60)

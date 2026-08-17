@@ -67,7 +67,7 @@ class RecordViewModelTest {
         assertTrue(sections[3].items.first { it.id == RecordActionId.Medication }.enabled)
         assertTrue(sections[4].items.first { it.id == RecordActionId.Container }.enabled)
         assertTrue(sections[3].items.first { it.id == RecordActionId.Sleep }.enabled)
-        assertFalse(sections[3].items.first { it.id == RecordActionId.Diet }.enabled)
+        assertTrue(sections[3].items.first { it.id == RecordActionId.Diet }.enabled)
         assertFalse(sections[4].items.first { it.id == RecordActionId.Container }.showSummary)
     }
 }

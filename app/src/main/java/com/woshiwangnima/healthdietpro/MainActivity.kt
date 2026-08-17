@@ -49,6 +49,8 @@ import com.woshiwangnima.healthdietpro.model.profile.BodyMetricsRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.formatBodyRecordDateTime
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
+import com.woshiwangnima.healthdietpro.model.food.FoodKind
+import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodRepository
 import com.woshiwangnima.healthdietpro.model.food.DishComponentDto
 import com.woshiwangnima.healthdietpro.model.food.FoodAmountDto
 import com.woshiwangnima.healthdietpro.model.food.FoodDerivationDto
@@ -83,6 +85,7 @@ import com.woshiwangnima.healthdietpro.ui.record.DiseaseRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.WaterRecordActivity
 import com.woshiwangnima.healthdietpro.ui.container.ContainerRecordActivity
 import com.woshiwangnima.healthdietpro.ui.sleep.SleepRecordActivity
+import com.woshiwangnima.healthdietpro.ui.diet.DietRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.RecordActionId
 import com.woshiwangnima.healthdietpro.ui.record.RecordScreen
 import com.woshiwangnima.healthdietpro.ui.record.RecordViewModel
@@ -101,6 +104,9 @@ import com.woshiwangnima.healthdietpro.util.UnitConverter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class MainActivity : BaseActivity() {
 
@@ -319,8 +325,31 @@ class MainActivity : BaseActivity() {
 
         checkFirstLaunch()
         ProfilePrefs.noteApplicationOpened(this)
+        handleCustomFoodEditorIntent()
     }
 
+
+    private fun handleCustomFoodEditorIntent() {
+        val kindName = intent.getStringExtra(EXTRA_OPEN_NUTRITION_EDITOR_KIND) ?: return
+        val kind = FoodKind.entries.firstOrNull { it.name == kindName } ?: return
+        selectedRoute = ROUTE_NUTRITION
+        val userId = ProfilePrefs.getCurrentUserId(this)
+        val customRepository = UserCustomFoodRepository.fromContext(this)
+        val idsBefore = customRepository.loadDtos().map { it.id }.toSet()
+        nutritionViewModel.openEditor(kind)
+        lifecycleScope.launch {
+            nutritionViewModel.state.map { it.editor }
+                .distinctUntilChanged()
+                .first { it == null }
+            val createdId = customRepository.loadDtos().map { it.id }.toSet()
+                .filterNot { idsBefore.contains(it) }
+                .firstOrNull()
+            if (createdId != null && ProfilePrefs.getCurrentUserId(this@MainActivity) == userId) {
+                setResult(RESULT_OK, Intent().putExtra(EXTRA_CREATED_CUSTOM_FOOD_ID, createdId))
+            }
+            finish()
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -736,8 +765,8 @@ class MainActivity : BaseActivity() {
             RecordActionId.Container -> startActivity(Intent(this, ContainerRecordActivity::class.java))
             RecordActionId.Waist -> openCircumferenceDetail()
             RecordActionId.Sleep -> startActivity(Intent(this, SleepRecordActivity::class.java))
+            RecordActionId.Diet -> startActivity(Intent(this, DietRecordActivity::class.java))
             RecordActionId.Period,
-            RecordActionId.Diet,
             RecordActionId.Exercise,
             RecordActionId.Bowel,
             RecordActionId.Habit,
@@ -766,6 +795,7 @@ class MainActivity : BaseActivity() {
             RecordActionId.Water -> startActivity(Intent(this, WaterRecordActivity::class.java).putExtra(WaterRecordActivity.EXTRA_OPEN_EDITOR, true))
             RecordActionId.Container -> startActivity(Intent(this, ContainerRecordActivity::class.java).putExtra(ContainerRecordActivity.EXTRA_OPEN_EDITOR, true))
             RecordActionId.Sleep -> startActivity(Intent(this, SleepRecordActivity::class.java).putExtra(SleepRecordActivity.EXTRA_OPEN_EDITOR, true))
+            RecordActionId.Diet -> startActivity(Intent(this, DietRecordActivity::class.java).putExtra(DietRecordActivity.EXTRA_OPEN_EDITOR, true))
             else -> Unit
         }
     }
@@ -847,7 +877,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private companion object {
+    companion object {
         const val MAIN_NAV_KEY = "main_nav"
         const val BACK_EXIT_WINDOW_MS = 2_000L
         const val TEST_DATA_RANGE_MILLIS = 90L * 24 * 60 * 60 * 1_000
@@ -855,6 +885,8 @@ class MainActivity : BaseActivity() {
         const val ROUTE_RECORD = "record"
         const val ROUTE_PROFILE = "profile"
         const val ROUTE_TEST = "test"
+        const val EXTRA_OPEN_NUTRITION_EDITOR_KIND = "open_nutrition_editor_kind"
+        const val EXTRA_CREATED_CUSTOM_FOOD_ID = "created_custom_food_id"
     }
 
     private enum class TestPage { Landing, Commands, Features, CommonUi, CrossSection }

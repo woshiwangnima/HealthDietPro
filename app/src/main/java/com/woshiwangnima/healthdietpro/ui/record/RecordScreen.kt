@@ -138,6 +138,7 @@ private val quickAddActionIds = setOf(
     RecordActionId.Water,
     RecordActionId.Container,
     RecordActionId.Sleep,
+    RecordActionId.Diet,
 )
 
 @Composable

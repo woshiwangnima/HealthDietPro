@@ -92,6 +92,9 @@ import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
+import com.woshiwangnima.healthdietpro.common.ui.NutrientCarbsColor
+import com.woshiwangnima.healthdietpro.common.ui.NutrientFatColor
+import com.woshiwangnima.healthdietpro.common.ui.NutrientProteinColor
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
@@ -1025,9 +1028,9 @@ private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?, modifier: Mod
     val energy = resolved.macronutrientEnergy() ?: return
     val totalKcal = resolved.energyKilocalories() ?: return
     val legendItems = listOf(
-        MacronutrientLegendItem("carbohydrate", stringResource(R.string.nutrition_energy_carbohydrate, energy.carbohydrateKcal / energy.totalKcal * 100.0), energy.carbohydrateKcal, androidx.compose.ui.graphics.Color(0xFFF9A825)),
-        MacronutrientLegendItem("protein", stringResource(R.string.nutrition_energy_protein, energy.proteinKcal / energy.totalKcal * 100.0), energy.proteinKcal, androidx.compose.ui.graphics.Color(0xFF43A047)),
-        MacronutrientLegendItem("fat", stringResource(R.string.nutrition_energy_fat, energy.fatKcal / energy.totalKcal * 100.0), energy.fatKcal, androidx.compose.ui.graphics.Color(0xFFE53935)),
+        MacronutrientLegendItem("carbohydrate", stringResource(R.string.nutrition_energy_carbohydrate, energy.carbohydrateKcal / energy.totalKcal * 100.0), energy.carbohydrateKcal, NutrientCarbsColor),
+        MacronutrientLegendItem("protein", stringResource(R.string.nutrition_energy_protein, energy.proteinKcal / energy.totalKcal * 100.0), energy.proteinKcal, NutrientProteinColor),
+        MacronutrientLegendItem("fat", stringResource(R.string.nutrition_energy_fat, energy.fatKcal / energy.totalKcal * 100.0), energy.fatKcal, NutrientFatColor),
     )
     DetailSectionTitle(R.drawable.ic_energy_distribution, stringResource(R.string.nutrition_macronutrient_energy), modifier)
     AnimatedDonutChart(

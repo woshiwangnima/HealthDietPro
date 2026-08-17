@@ -10,6 +10,7 @@ import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.disease.curatedId
 import com.woshiwangnima.healthdietpro.model.disease.customId
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
+import com.woshiwangnima.healthdietpro.model.diet.DietRepository
 import com.woshiwangnima.healthdietpro.model.water.WaterRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
@@ -19,6 +20,8 @@ import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.model.unit.formatGlucoseValue
 import com.woshiwangnima.healthdietpro.model.sleep.durationMinutes
+import com.woshiwangnima.healthdietpro.ui.diet.displayRes
+import com.woshiwangnima.healthdietpro.ui.diet.formatCalories
 import com.woshiwangnima.healthdietpro.ui.profile.CircumferenceMetric
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import java.util.Locale
@@ -90,6 +93,7 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
             .maxByOrNull { (_, record) -> record.recordedAtMillis }
         val sleep = com.woshiwangnima.healthdietpro.model.sleep.SleepRepository.fromContext(context)
             .load().records.maxByOrNull { it.sleepStartAt }
+        val diet = DietRepository.fromContext(context).load().records.maxByOrNull { it.mealStartAt }
         val latest = mapOf(
             RecordActionId.Height to profile.heightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} cm") },
             RecordActionId.Weight to profile.weightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, String.format(Locale.getDefault(), "%.2f kg", it.value)) },
@@ -124,6 +128,11 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
                     if (hours > 0) "${hours}h ${rest}m" else "${rest}m"
                 } ?: ""
                 RecordLatest(record.sleepStartAt, duration)
+            },
+            RecordActionId.Diet to diet?.let { record ->
+                val totalKcal = record.entries.sumOf { it.resolvedNutrients["ENERGY"]?.value ?: 0.0 }
+                val period = context.getString(record.mealPeriod.displayRes())
+                RecordLatest(record.mealStartAt, "$period ${formatCalories(totalKcal)} kcal")
             },
         )
         val prefs = UserPrefs.current(context)

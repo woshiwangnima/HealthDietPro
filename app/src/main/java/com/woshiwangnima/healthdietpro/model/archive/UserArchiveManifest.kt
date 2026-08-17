@@ -138,6 +138,7 @@ private val DOMAIN_FILE_NAMES = linkedMapOf(
     "disease_records" to "disease_records.json",
     "custom_foods" to "custom_foods.json",
     "sleep" to "sleep.json",
+    "diet_records" to "diet.json",
     "user_preferences" to "user_preferences.json",
 )
 
