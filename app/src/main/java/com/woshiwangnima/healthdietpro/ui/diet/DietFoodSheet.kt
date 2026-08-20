@@ -1,17 +1,26 @@
 package com.woshiwangnima.healthdietpro.ui.diet
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,19 +34,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
+import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.FoodCategoryFilterRows
 import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputRange
+import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.model.diet.DietFoodEntry
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
@@ -69,6 +83,7 @@ internal fun DietFoodSheet(
     var unitId by rememberSaveable(existing?.weightUnitId) { mutableStateOf(existing?.weightUnitId ?: state.defaultWeightUnitId) }
     var containerId by rememberSaveable(existing?.containerId) { mutableStateOf(existing?.containerId) }
     var showContainerPicker by remember { mutableStateOf(false) }
+    var showNutritionPreview by rememberSaveable { mutableStateOf(false) }
 
     val selectedFood = state.foods.firstOrNull { it.id == selectedFoodId }
     val previewFood = if (source == DietFoodSource.EXISTING) selectedFood else null
@@ -87,6 +102,7 @@ internal fun DietFoodSheet(
     val hasChanges = existing == null || !existingEntryUnchanged ||
         (source == DietFoodSource.FREE_NAME && freeName.trim() != (existing?.foodName.orEmpty()))
     val saveEnabled = valid && hasChanges
+    val previewEnabled = source == DietFoodSource.EXISTING && previewFood != null && netGrams > 0.0
 
     fun buildEntry(): DietFoodEntry {
         val name = if (source == DietFoodSource.EXISTING) previewFood?.displayName(language).orEmpty() else freeName.trim()
@@ -108,6 +124,8 @@ internal fun DietFoodSheet(
     }
 
     AlertDialog(
+        modifier = Modifier.width((LocalConfiguration.current.screenWidthDp - 16).dp),
+        properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = onDismiss,
         title = {
             Text(
@@ -116,18 +134,31 @@ internal fun DietFoodSheet(
             )
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) }
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(
+                    enabled = previewEnabled,
+                    onClick = { showNutritionPreview = true },
+                ) {
+                    Text(stringResource(R.string.diet_nutrition_preview))
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextButton(
+                        enabled = saveEnabled,
+                        onClick = { onConfirm(buildEntry()) },
+                    ) { Text(stringResource(R.string.diet_entry_confirm)) }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) }
+                }
+            }
         },
-        dismissButton = {
-            TextButton(
-                enabled = saveEnabled,
-                onClick = { onConfirm(buildEntry()) },
-            ) { Text(stringResource(R.string.diet_entry_confirm)) }
-        },
+        dismissButton = { },
         text = {
             Column {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().height(560.dp),
+                    modifier = Modifier.fillMaxWidth().height(if (source == DietFoodSource.EXISTING) 500.dp else 540.dp),
                     contentPadding = PaddingValues(vertical = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
@@ -142,81 +173,110 @@ internal fun DietFoodSheet(
                         )
                     }
                     item {
-                        Text(stringResource(R.string.diet_entry_weight), style = MaterialTheme.typography.titleSmall)
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
-                            EditorTextField(
-                                label = stringResource(R.string.diet_entry_weight_value),
-                                value = weightText,
-                                onValueChange = { weightText = it },
-                                required = true,
-                                numeric = true,
-                                range = NumericInputRange(minimum = 0.001),
-                                modifier = Modifier.weight(1f),
-                            )
-                            AppDropdownField(
-                                label = stringResource(R.string.diet_entry_unit),
-                                value = unitLabel(unitId),
-                                options = state.weightUnitIds.map { AppDropdownOption(it, unitLabel(it)) },
-                                onSelect = { unitId = it.id },
-                                modifier = Modifier.weight(0.9f),
-                            )
-                        }
-                    }
-                    item {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            TextButton(onClick = { showContainerPicker = true }) {
-                                Text(if (container != null) stringResource(R.string.diet_change_container) else stringResource(R.string.diet_select_container))
-                            }
-                            if (container != null) {
-                                TextButton(onClick = { containerId = null }) { Text(stringResource(R.string.diet_remove_container)) }
-                            }
-                        }
-                        if (container != null && weightValue != null && weightValue > 0.0) {
-                            val grossGrams = viewModel.netGrams(weightValue, unitId, null)
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.diet_tare_preview, formatGrams(grossGrams), formatGrams(container.emptyMassGrams ?: 0.0), formatGrams(netGrams)),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .padding(10.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
+                                EditorTextField(
+                                    label = stringResource(R.string.diet_entry_weight_value),
+                                    value = weightText,
+                                    onValueChange = { weightText = it },
+                                    required = true,
+                                    numeric = true,
+                                    range = NumericInputRange(minimum = 0.001),
                                     modifier = Modifier.weight(1f),
                                 )
-                                TextButton(
-                                    onClick = {
-                                        weightText = formatWeightValue(viewModel.gramsToUnitValue(netGrams, unitId))
-                                        containerId = null
-                                    },
-                                ) { Text(stringResource(R.string.diet_tare_apply_net)) }
+                                AppDropdownField(
+                                    label = stringResource(R.string.diet_entry_unit),
+                                    value = unitLabel(unitId),
+                                    options = state.weightUnitIds.map { AppDropdownOption(it, unitLabel(it)) },
+                                    onSelect = { unitId = it.id },
+                                    modifier = Modifier.weight(0.45f),
+                                )
+                            }
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                AppOutlinedIconTextButton(
+                                    text = stringResource(if (container != null) R.string.diet_change_container else R.string.diet_select_container),
+                                    iconRes = R.drawable.ic_container,
+                                    onClick = { showContainerPicker = true },
+                                )
+                                if (container != null) {
+                                    OutlinedButton(
+                                        onClick = { containerId = null },
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                                    ) {
+                                        Icon(painterResource(R.drawable.ic_cancel), contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(stringResource(R.string.diet_remove_container))
+                                    }
+                                }
+                            }
+                            if (container != null) {
+                                val hasWeight = weightValue != null && weightValue > 0.0
+                                val emptyMass = container.emptyMassGrams
+                                Row(
+                                    Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = stringResource(
+                                            R.string.diet_tare_preview,
+                                            if (hasWeight) formatGrams(viewModel.netGrams(requireNotNull(weightValue), unitId, null)) else "?",
+                                            emptyMass?.let(::formatGrams) ?: "?",
+                                            if (hasWeight) formatGrams(netGrams) else "?",
+                                        ),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    AppIconTextButton(
+                                        text = stringResource(R.string.diet_tare_apply_net),
+                                        iconRes = R.drawable.ic_check,
+                                        enabled = hasWeight,
+                                        onClick = {
+                                            weightText = formatWeightValue(viewModel.gramsToUnitValue(netGrams, unitId))
+                                            containerId = null
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
                     if (source == DietFoodSource.EXISTING) {
                         item {
-                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
                                 FilterChip(
                                     selected = selectedKind == null,
                                     onClick = { selectedKind = null; selectedFoodId = null; selectedRoot = null; selectedChild = null },
-                                    label = { Text(stringResource(R.string.diet_food_source_all)) },
+                                    label = { TextOverflowText(stringResource(R.string.diet_food_source_all), style = MaterialTheme.typography.labelLarge) },
+                                    modifier = Modifier.weight(1f),
                                 )
                                 FoodKind.entries.forEach { kind ->
                                     FilterChip(
                                         selected = selectedKind == kind,
                                         onClick = { selectedKind = kind; selectedFoodId = null; selectedRoot = null; selectedChild = null },
-                                        label = { Text(stringResource(kind.displayRes())) },
+                                        label = { TextOverflowText(stringResource(kind.displayRes()), style = MaterialTheme.typography.labelLarge) },
+                                        modifier = Modifier.weight(1f),
                                     )
                                 }
                                 FilterChip(
                                     selected = customOnly,
                                     onClick = { customOnly = !customOnly; selectedFoodId = null },
-                                    label = { Text(stringResource(R.string.diet_food_source_custom)) },
+                                    label = { TextOverflowText(stringResource(R.string.diet_food_source_custom), style = MaterialTheme.typography.labelLarge) },
+                                    modifier = Modifier.weight(1f),
                                 )
                             }
                         }
                         item {
-                            FoodSearchField(keyword, { keyword = it }, stringResource(R.string.diet_food_search_hint))
+                            FoodSearchField(keyword, { keyword = it }, stringResource(R.string.diet_food_search_hint), onSearch = { })
                         }
                         if (selectedKind != FoodKind.DISH) {
                             item {
@@ -237,7 +297,7 @@ internal fun DietFoodSheet(
                             items(matched, key = FoodItem::id) { food ->
                                 val selected = food.id == selectedFoodId
                                 Surface(
-                                    onClick = { selectedFoodId = food.id },
+                                    onClick = { selectedFoodId = if (selected) null else food.id },
                                     color = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                                     shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
                                     modifier = Modifier.fillMaxWidth(),
@@ -292,25 +352,58 @@ internal fun DietFoodSheet(
                             }
                         }
                     }
-                    item {
-                        Text(stringResource(R.string.diet_nutrition_preview), style = MaterialTheme.typography.titleSmall)
-                        if (source == DietFoodSource.FREE_NAME) {
-                            Text(stringResource(R.string.diet_no_nutrition), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        } else if (netGrams > 0.0) {
-                            if (previewNutrients.isEmpty()) {
-                                Text(stringResource(R.string.diet_no_nutrition), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            } else {
-                                Text(
-                                    text = stringResource(
-                                        R.string.diet_preview_summary,
-                                        formatCalories(previewNutrients["ENERGY"]?.value ?: 0.0),
-                                        formatGrams(previewNutrients["PROTEIN"]?.value ?: 0.0),
-                                        formatGrams(previewNutrients["FAT"]?.value ?: 0.0),
-                                        formatGrams(previewNutrients["CHO"]?.value ?: 0.0),
-                                    ),
-                                    style = MaterialTheme.typography.bodyMedium,
+                }
+                if (source == DietFoodSource.EXISTING) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.diet_selected_food),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (previewFood != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        if (previewFood != null) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Row(
+                                    Modifier.padding(8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    FoodKindBadge(previewFood.kind, language)
+                                    Column(Modifier.weight(1f)) {
+                                        Text(previewFood.displayName(language), style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        if (previewFood.allNames(language).size > 1) {
+                                            Text(
+                                                text = previewFood.allNames(language).drop(1).joinToString(" / "),
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            IconButton(onClick = { selectedFoodId = null }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_cancel),
+                                    contentDescription = stringResource(R.string.diet_selected_food),
+                                    tint = MaterialTheme.colorScheme.error,
                                 )
                             }
+                        } else {
+                            Text(
+                                text = stringResource(R.string.diet_selected_food_none),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.weight(1f),
+                            )
                         }
                     }
                 }
@@ -323,6 +416,43 @@ internal fun DietFoodSheet(
             selectedId = containerId,
             onSelect = { containerId = it },
             onDismiss = { showContainerPicker = false },
+        )
+    }
+    if (showNutritionPreview) {
+        AlertDialog(
+            onDismissRequest = { showNutritionPreview = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.diet_nutrition_preview),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (source == DietFoodSource.FREE_NAME || netGrams <= 0.0 || previewNutrients.isEmpty()) {
+                        Text(stringResource(R.string.diet_no_nutrition), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        previewFood?.let {
+                            Text(it.displayName(language), style = MaterialTheme.typography.bodyLarge)
+                        }
+                        Text(
+                            text = stringResource(
+                                R.string.diet_preview_summary,
+                                formatCalories(previewNutrients["ENERGY"]?.value ?: 0.0),
+                                formatGrams(previewNutrients["PROTEIN"]?.value ?: 0.0),
+                                formatGrams(previewNutrients["FAT"]?.value ?: 0.0),
+                                formatGrams(previewNutrients["CHO"]?.value ?: 0.0),
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showNutritionPreview = false }) {
+                    Text(stringResource(R.string.compose_confirm_dialog_ok))
+                }
+            },
         )
     }
 }

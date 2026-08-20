@@ -1350,6 +1350,8 @@
     <string name="diet_note_hint">本条用餐的可选备注。</string>
     <string name="diet_save">保存用餐</string>
     <string name="diet_entry_delete">删除条目</string>
+    <string name="diet_entry_delete_title">确认删除</string>
+    <string name="diet_entry_delete_message">确定删除「%1$s」吗？</string>
     <string name="diet_entry_nutrition_summary">%1$s 千卡</string>
     <string name="diet_no_nutrition">无营养数据</string>
     <string name="diet_filter_all">全部时段</string>
@@ -1378,6 +1380,8 @@
     <string name="diet_nutrition_preview">营养实时预览</string>
     <string name="diet_preview_summary">≈ %1$s 千卡 · 蛋白 %2$s 脂肪 %3$s 碳水 %4$s</string>
     <string name="diet_entry_confirm">确认条目</string>
+    <string name="diet_selected_food">已选择食物</string>
+    <string name="diet_selected_food_none">未选择</string>
     <string name="diet_containers_empty">还没有记录空重的容器，请先在「记容器」中记录。</string>
     <string name="diet_container_empty_mass">空重 %1$s</string>
     <string name="diet_settings_meal_periods">时段默认区间</string>

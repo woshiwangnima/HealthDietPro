@@ -1,14 +1,19 @@
 package com.woshiwangnima.healthdietpro.ui.diet
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,9 +25,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
@@ -35,6 +46,7 @@ import com.woshiwangnima.healthdietpro.common.ui.DiscardChangesDialog
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
+import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.model.diet.DietFoodEntry
 import com.woshiwangnima.healthdietpro.model.diet.DietPrefs
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
@@ -64,6 +76,7 @@ internal fun DietEditorScreen(
     var entries by rememberSaveable(existing?.id) { mutableStateOf(existing?.entries ?: emptyList()) }
     var pickField by remember { mutableStateOf<DietTimeField?>(null) }
     var editingEntry by remember { mutableStateOf<DietFoodEntry?>(null) }
+    var deletingEntry by remember { mutableStateOf<DietFoodEntry?>(null) }
     var showEntryEditor by remember { mutableStateOf(false) }
     var showDiscardDialog by rememberSaveable(existing?.id) { mutableStateOf(false) }
     var endAtDefault by rememberSaveable(existing?.id) { mutableStateOf(existing == null) }
@@ -133,17 +146,28 @@ internal fun DietEditorScreen(
                         })
                     }
                 }
-                if (entries.isEmpty()) {
-                    item {
-                        Text(stringResource(R.string.diet_entries_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                } else {
-                    items(entries, key = { it.foodName + it.netWeightGrams }) { entry ->
-                        DietEntryCard(
-                            entry = entry,
-                            onEdit = { editingEntry = entry; showEntryEditor = true },
-                            onDelete = { entries = entries.filterNot { it == entry } },
-                        )
+                item {
+                    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (entries.isEmpty()) {
+                            Text(
+                                stringResource(R.string.diet_entries_empty),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 8.dp),
+                            )
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth().height(EntryListHeight).nestedScroll(IsolatedNestedScroll),
+                                verticalArrangement = Arrangement.spacedBy(EntryCardSpacing),
+                            ) {
+                                itemsIndexed(entries, key = { index, entry -> entry.foodName + entry.netWeightGrams + index }) { _, entry ->
+                                    DietEntryCard(
+                                        entry = entry,
+                                        onEdit = { editingEntry = entry; showEntryEditor = true },
+                                        onDelete = { deletingEntry = entry },
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
                 item { EditorTextField(stringResource(R.string.diet_note), note, { note = it }, required = false, supportingTextOverride = { Text(stringResource(R.string.diet_note_hint), color = MaterialTheme.colorScheme.onSurfaceVariant) }) }
@@ -193,6 +217,26 @@ internal fun DietEditorScreen(
             },
         )
     }
+    deletingEntry?.let { target ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { deletingEntry = null },
+            title = { Text(stringResource(R.string.diet_entry_delete_title)) },
+            text = { Text(stringResource(R.string.diet_entry_delete_message, target.foodName)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    entries = entries.filterNot { it == target }
+                    deletingEntry = null
+                }) {
+                    Text(stringResource(R.string.body_record_delete), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { deletingEntry = null }) {
+                    Text(stringResource(R.string.compose_confirm_dialog_cancel))
+                }
+            },
+        )
+    }
 }
 
 @Composable
@@ -201,40 +245,106 @@ private fun DietEntryCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    val (container, onContainer) = foodKindColors(entry.foodKind)
+    val dimText = onContainer.copy(alpha = 0.78f)
     Surface(
         onClick = onEdit,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
-        modifier = Modifier.fillMaxWidth(),
+        color = container,
+        contentColor = onContainer,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth().height(EntryCardHeight),
     ) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(entry.foodName, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(formatGrams(entry.netWeightGrams), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                androidx.compose.material3.IconButton(onClick = onDelete) {
-                    androidx.compose.material3.Icon(
-                        painter = painterResource(R.drawable.ic_delete),
-                        contentDescription = stringResource(R.string.diet_entry_delete),
-                        tint = MaterialTheme.colorScheme.error,
-                    )
-                }
-            }
-            val energy = entry.resolvedNutrients["ENERGY"]?.value
-            if (energy != null) {
-                Text(
-                    text = stringResource(R.string.diet_entry_nutrition_summary, formatCalories(energy)),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+        Row(
+            Modifier.padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TextOverflowText(
+                text = entry.foodName,
+                style = MaterialTheme.typography.bodyMedium,
+                color = onContainer,
+                maxLines = 1,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            )
+            NutrientCell(
+                label = stringResource(R.string.diet_entry_weight),
+                value = formatGrams(entry.netWeightGrams),
+                fg = onContainer,
+                dimText = dimText,
+                labelStyle = MaterialTheme.typography.bodySmall,
+                valueStyle = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f),
+            )
+            NutrientMetric.entries.forEach { metric ->
+                NutrientCell(
+                    label = stringResource(metric.labelRes),
+                    value = entryMetricValue(entry, metric),
+                    fg = onContainer,
+                    dimText = dimText,
+                    modifier = Modifier.weight(1f),
                 )
-            } else {
-                Text(
-                    text = stringResource(R.string.diet_no_nutrition),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+            }
+            Box(
+                modifier = Modifier.weight(1f).fillMaxHeight().clickable(onClick = onDelete),
+                contentAlignment = Alignment.CenterEnd,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_delete),
+                    contentDescription = stringResource(R.string.diet_entry_delete),
+                    tint = onContainer.copy(alpha = 0.9f),
                 )
             }
         }
     }
+}
+
+@Composable
+private fun NutrientCell(
+    label: String,
+    value: String,
+    fg: Color,
+    dimText: Color,
+    modifier: Modifier = Modifier,
+    labelStyle: TextStyle = MaterialTheme.typography.labelSmall,
+    valueStyle: TextStyle = MaterialTheme.typography.bodySmall,
+) {
+    Column(
+        modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        TextOverflowText(
+            text = label,
+            style = labelStyle,
+            color = dimText,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        TextOverflowText(
+            text = value,
+            style = valueStyle,
+            color = fg,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+private fun entryMetricValue(entry: DietFoodEntry, metric: NutrientMetric): String =
+    if (metric == NutrientMetric.ENERGY) {
+        "${formatCalories(entry.resolvedNutrients[metric.id]?.value ?: 0.0)} ${metric.unit}"
+    } else {
+        formatGrams(entry.resolvedNutrients[metric.id]?.value ?: 0.0)
+    }
+
+private val EntryCardHeight = 56.dp
+private val EntryCardSpacing = 8.dp
+private val EntryListHeight = EntryCardHeight * 4.5f + EntryCardSpacing * 4f
+
+private val IsolatedNestedScroll = object : NestedScrollConnection {
+    override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset = available
 }
 
 private sealed interface DietTimeField {

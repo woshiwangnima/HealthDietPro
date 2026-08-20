@@ -1349,6 +1349,8 @@
     <string name="diet_note_hint">Optional note for this meal.</string>
     <string name="diet_save">Save meal</string>
     <string name="diet_entry_delete">Delete entry</string>
+    <string name="diet_entry_delete_title">Remove food?</string>
+    <string name="diet_entry_delete_message">Remove %1$s from this meal?</string>
     <string name="diet_entry_nutrition_summary">%1$s kcal</string>
     <string name="diet_no_nutrition">No nutrition data</string>
     <string name="diet_filter_all">All periods</string>
@@ -1377,6 +1379,8 @@
     <string name="diet_nutrition_preview">Nutrition preview</string>
     <string name="diet_preview_summary">≈ %1$s kcal · P %2$s F %3$s C %4$s</string>
     <string name="diet_entry_confirm">Confirm entry</string>
+    <string name="diet_selected_food">Selected food</string>
+    <string name="diet_selected_food_none">None selected</string>
     <string name="diet_containers_empty">No containers with a recorded empty mass yet. Record one in the container app first.</string>
     <string name="diet_container_empty_mass">Empty mass %1$s</string>
     <string name="diet_settings_meal_periods">Meal period defaults</string>

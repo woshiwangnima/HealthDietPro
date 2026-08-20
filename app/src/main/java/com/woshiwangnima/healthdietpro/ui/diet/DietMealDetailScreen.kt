@@ -244,7 +244,7 @@ private fun FoodNutrientBarRow(metric: NutrientMetric, value: Double, mealTotal:
     }
 }
 
-private fun foodKindColors(kind: FoodKind?): Pair<Color, Color> = when (kind) {
+internal fun foodKindColors(kind: FoodKind?): Pair<Color, Color> = when (kind) {
     FoodKind.INGREDIENT -> Color(0xFF43A047) to Color(0xFFFFFFFF)
     FoodKind.FOOD -> Color(0xFFF57C00) to Color(0xFFFFFFFF)
     FoodKind.DISH -> Color(0xFFE53935) to Color(0xFFFFFFFF)

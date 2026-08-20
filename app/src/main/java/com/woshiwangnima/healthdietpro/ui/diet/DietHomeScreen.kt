@@ -45,6 +45,9 @@ import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlinx.coroutines.delay
 
 @Composable
@@ -122,6 +125,11 @@ private fun DietRecordsTab(
     val filtered = uiState.records.filter { record ->
         range.contains(record.mealStartAt) && (filterPeriod == null || record.mealPeriod == filterPeriod)
     }
+    val grouped = remember(filtered) {
+        filtered.sortedByDescending(DietRecord::mealStartAt).groupBy { record ->
+            Instant.ofEpochMilli(record.mealStartAt).atZone(ZoneId.systemDefault()).toLocalDate()
+        }
+    }
     Column(
         Modifier.fillMaxSize().padding(horizontal = 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -147,14 +155,18 @@ private fun DietRecordsTab(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                     )
                 }
-            }
-            items(filtered.sortedByDescending(DietRecord::mealStartAt), key = DietRecord::id) { record ->
-                DietCard(
-                    record = record,
-                    onOpen = { onOpen(record) },
-                    onEdit = { onEdit(record) },
-                    onDelete = { deleting = record },
-                )
+            } else {
+                grouped.forEach { (date, records) ->
+                    item(key = "date_$date") { DietDateHeader(date) }
+                    items(records, key = DietRecord::id) { record ->
+                        DietCard(
+                            record = record,
+                            onOpen = { onOpen(record) },
+                            onEdit = { onEdit(record) },
+                            onDelete = { deleting = record },
+                        )
+                    }
+                }
             }
         }
     }
@@ -164,13 +176,25 @@ private fun DietRecordsTab(
             title = { Text(stringResource(R.string.body_record_delete_confirm_title)) },
             text = { Text(stringResource(R.string.diet_delete_message, formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE))) },
             confirmButton = {
-                TextButton(onClick = { onDelete(record.id); deleting = null }) { Text(stringResource(R.string.body_record_delete)) }
+                TextButton(onClick = { onDelete(record.id); deleting = null }) {
+                    Text(stringResource(R.string.body_record_delete), color = MaterialTheme.colorScheme.error)
+                }
             },
             dismissButton = {
                 TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) }
             },
         )
     }
+}
+
+@Composable
+private fun DietDateHeader(date: LocalDate) {
+    Text(
+        text = date.toString(),
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+    )
 }
 
 @Composable
