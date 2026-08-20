@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 
@@ -56,6 +57,7 @@ internal fun AnimatedDonutChart(
     centerLabel: String,
     modifier: Modifier = Modifier,
     showLegend: Boolean = true,
+    labelMaxLines: Int = 1,
 ) {
     val scheme = MaterialTheme.colorScheme
     val palette = remember(scheme) {
@@ -122,6 +124,7 @@ internal fun AnimatedDonutChart(
             DynamicDonutLabels(
                 segments = normalized,
                 onLayoutsChanged = { labelLayouts = it },
+                maxLines = labelMaxLines,
             )
         }
         if (showLegend) {
@@ -153,18 +156,25 @@ private fun Rect.closestPointTo(point: Offset): Offset = Offset(
 private fun DynamicDonutLabels(
     segments: List<DonutChartSegment>,
     onLayoutsChanged: (List<DonutLabelLayout>) -> Unit,
+    maxLines: Int = 1,
 ) {
     val density = LocalDensity.current
     val textStyle = MaterialTheme.typography.labelSmall
     val textMeasurer = rememberTextMeasurer()
     var size by remember { androidx.compose.runtime.mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
-    val layouts = remember(segments, size, textStyle, density) {
+    val layouts = remember(segments, size, textStyle, density, maxLines) {
         donutLabelLayouts(
             segments = segments,
             width = size.width.toFloat(),
             height = size.height.toFloat(),
             radius = donutOuterRadius(size.width.toFloat(), size.height.toFloat(), with(density) { 28.dp.toPx() }),
-            textMeasure = { text -> textMeasurer.measure(AnnotatedString(text), textStyle).size },
+            textMeasure = { text, maxWidth ->
+                textMeasurer.measure(
+                    AnnotatedString(text),
+                    textStyle,
+                    constraints = if (maxLines > 1) Constraints(maxWidth = maxWidth) else Constraints(),
+                ).size
+            },
         )
     }
     androidx.compose.runtime.LaunchedEffect(layouts) { onLayoutsChanged(layouts) }
@@ -172,17 +182,31 @@ private fun DynamicDonutLabels(
         layouts.forEach { layout ->
             val width = layout.bounds.width.toInt().coerceAtLeast(1)
             val height = layout.bounds.height.toInt().coerceAtLeast(1)
-            TextOverflowText(
-                text = segments.first { it.id == layout.id }.label,
-                modifier = Modifier
-                    .offset { IntOffset(layout.bounds.left.toInt(), layout.bounds.top.toInt()) }
-                    .widthIn(min = with(density) { width.toDp() }, max = with(density) { width.toDp() })
-                    .height(with(density) { height.toDp() }),
-                style = textStyle,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = if (layout.bounds.center.x < size.width / 2f) TextAlign.End else TextAlign.Start,
-                maxLines = 1,
-            )
+            val labelModifier = Modifier
+                .offset { IntOffset(layout.bounds.left.toInt(), layout.bounds.top.toInt()) }
+                .widthIn(min = with(density) { width.toDp() }, max = with(density) { width.toDp() })
+                .height(with(density) { height.toDp() })
+            val labelAlign = if (layout.bounds.center.x < size.width / 2f) TextAlign.End else TextAlign.Start
+            if (maxLines > 1) {
+                Text(
+                    text = segments.first { it.id == layout.id }.label,
+                    modifier = labelModifier,
+                    style = textStyle,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = labelAlign,
+                    maxLines = maxLines,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            } else {
+                TextOverflowText(
+                    text = segments.first { it.id == layout.id }.label,
+                    modifier = labelModifier,
+                    style = textStyle,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = labelAlign,
+                    maxLines = 1,
+                )
+            }
         }
     }
 }
@@ -199,12 +223,12 @@ private fun donutLabelLayouts(
     width: Float,
     height: Float,
     radius: Float,
-    textMeasure: (String) -> androidx.compose.ui.unit.IntSize,
+    textMeasure: (String, Int) -> androidx.compose.ui.unit.IntSize,
 ): List<DonutLabelLayout> {
     if (width <= 0f || height <= 0f || segments.isEmpty()) return emptyList()
     val minLabelWidth = 52f
-    val maxLabelWidth = width * .38f
     val gap = 10f
+    val maxLabelWidth = (width / 2f - radius - gap).coerceAtLeast(minLabelWidth)
     val center = Offset(width / 2f, height / 2f)
     val total = segments.sumOf { it.value.toDouble() }.toFloat().coerceAtLeast(1f)
     var angle = -90f
@@ -215,7 +239,7 @@ private fun donutLabelLayouts(
         val direction = Offset(kotlin.math.cos(middle).toFloat(), kotlin.math.sin(middle).toFloat())
         val anchor = Offset(center.x + direction.x * radius, center.y + direction.y * radius)
         val leftSide = direction.x < 0f
-        val measured = textMeasure(segment.label)
+        val measured = textMeasure(segment.label, maxLabelWidth.toInt())
         val labelWidth = measured.width.toFloat().coerceIn(minLabelWidth, maxLabelWidth)
         val labelHeight = measured.height.toFloat().coerceAtLeast(20f)
         val x = if (leftSide) {

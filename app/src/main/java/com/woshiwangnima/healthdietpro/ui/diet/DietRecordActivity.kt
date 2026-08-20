@@ -123,9 +123,21 @@ private fun DietRoute(
                 uiState.records.firstOrNull { it.id == current.id } ?: current
             }
             if (detailRecord != null) {
+                val zone = remember { java.time.ZoneId.systemDefault() }
+                val detailDayStart = remember(detailRecord, zone) {
+                    com.woshiwangnima.healthdietpro.common.time.recordDateStartMillis(
+                        java.time.Instant.ofEpochMilli(detailRecord.mealStartAt).atZone(zone).toLocalDate(),
+                        zone,
+                    )
+                }
+                val detailDayEnd = remember(detailRecord, zone) { detailDayStart + java.time.Duration.ofDays(1).toMillis() }
+                val detailDayTotals = remember(uiState.records, detailDayStart, detailDayEnd) {
+                    sumNutrients(uiState.records.filter { it.mealStartAt in detailDayStart until detailDayEnd })
+                }
                 DietMealDetailScreen(
                     record = detailRecord,
                     goals = goals,
+                    dayTotals = detailDayTotals,
                     onEdit = { editingRecord = detailRecord; route = DietRoute.EDITOR },
                     onBack = { route = DietRoute.HOME },
                     modifier = Modifier,

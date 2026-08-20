@@ -1,7 +1,6 @@
 package com.woshiwangnima.healthdietpro.ui.diet
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,10 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,7 +40,6 @@ import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter
-import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.model.diet.DietFoodEntry
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
@@ -137,7 +133,12 @@ private fun DietRecordsTab(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item { RecordTimeRangeFilter(timeSelection, { timeSelection = it }) }
-            item { DietPeriodFilter(filterPeriod, onFilterPeriodChange = { filterPeriod = it }) }
+            item {
+                MealPeriodSelectorBar(
+                    selected = filterPeriod,
+                    onPeriodSelected = { filterPeriod = it },
+                )
+            }
             if (filtered.isEmpty()) {
                 item {
                     Text(
@@ -171,48 +172,6 @@ private fun DietRecordsTab(
         )
     }
 }
-
-@Composable
-private fun DietPeriodFilter(selected: MealPeriod?, onFilterPeriodChange: (MealPeriod?) -> Unit) {
-    val scrollState = rememberScrollState()
-    Row(
-        modifier = Modifier.fillMaxWidth().horizontalScroll(scrollState),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        DietPeriodTag(
-            text = stringResource(R.string.diet_filter_all),
-            selected = selected == null,
-            onClick = { onFilterPeriodChange(null) },
-        )
-        MealPeriod.entries.forEach { period ->
-            DietPeriodTag(
-                text = stringResource(period.displayRes()),
-                selected = selected == period,
-                onClick = { onFilterPeriodChange(if (selected == period) null else period) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun DietPeriodTag(text: String, selected: Boolean, onClick: () -> Unit) {
-    androidx.compose.material3.Surface(
-        onClick = onClick,
-        color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-        modifier = Modifier.width(PeriodTagWidth),
-    ) {
-        TextOverflowText(
-            text = text,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-            style = MaterialTheme.typography.labelMedium,
-            color = if (selected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-        )
-    }
-}
-
-private val PeriodTagWidth = 96.dp
 
 @Composable
 private fun DietCard(

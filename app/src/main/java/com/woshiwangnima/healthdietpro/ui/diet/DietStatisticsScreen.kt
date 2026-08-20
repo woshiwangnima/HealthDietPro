@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -36,10 +39,12 @@ import com.woshiwangnima.healthdietpro.common.time.recordDateStartMillis
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
+import com.woshiwangnima.healthdietpro.common.ui.LinearProgressWithPercent
 import com.woshiwangnima.healthdietpro.common.ui.NutrientCarbsColor
 import com.woshiwangnima.healthdietpro.common.ui.NutrientEnergyColor
 import com.woshiwangnima.healthdietpro.common.ui.NutrientFatColor
 import com.woshiwangnima.healthdietpro.common.ui.NutrientProteinColor
+import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.common.ui.nutrientColor
 import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarChart
 import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarEntry
@@ -51,21 +56,22 @@ import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlin.math.roundToInt
 
-private data class DayNutrients(val energy: Double = 0.0, val protein: Double = 0.0, val fat: Double = 0.0, val carbs: Double = 0.0)
+internal data class DayNutrients(val energy: Double = 0.0, val protein: Double = 0.0, val fat: Double = 0.0, val carbs: Double = 0.0)
 
-private enum class NutrientMetric(val id: String, val labelRes: Int, val unit: String) {
+internal enum class NutrientMetric(val id: String, val labelRes: Int, val unit: String) {
     ENERGY("ENERGY", R.string.diet_summary_energy, "kcal"),
+    CARBS("CHO", R.string.diet_summary_carbs, "g"),
     PROTEIN("PROTEIN", R.string.diet_summary_protein, "g"),
     FAT("FAT", R.string.diet_summary_fat, "g"),
-    CARBS("CHO", R.string.diet_summary_carbs, "g"),
 }
 
-private fun DayNutrients.value(metric: NutrientMetric): Double = when (metric) {
+internal fun DayNutrients.value(metric: NutrientMetric): Double = when (metric) {
     NutrientMetric.ENERGY -> energy
+    NutrientMetric.CARBS -> carbs
     NutrientMetric.PROTEIN -> protein
     NutrientMetric.FAT -> fat
-    NutrientMetric.CARBS -> carbs
 }
 
 @Composable
@@ -103,12 +109,7 @@ internal fun DietStatisticsTab(
             .mapValues { (_, dayRecords) -> sumNutrients(dayRecords) }
     }
     val periodColors = remember {
-        MealPeriod.entries.mapIndexed { index, period ->
-            period to listOf(
-                NutrientProteinColor, NutrientCarbsColor, Color(0xFF8E24AA),
-                Color(0xFF00897B), Color(0xFF039BE5), NutrientEnergyColor, NutrientFatColor,
-            )[index % 7]
-        }.toMap()
+        MealPeriod.entries.associateWith(::periodColor)
     }
     val primaryColor = MaterialTheme.colorScheme.primary
     val entries = remember(dates, dayTrendTotals, trendMetric, primaryColor) {
@@ -127,11 +128,30 @@ internal fun DietStatisticsTab(
     var selectedTrendDate by rememberSaveable(trendDays) { mutableStateOf(dates.firstOrNull()) }
     val selectedEntry = entries.firstOrNull { it.date == selectedTrendDate }
     val periodLabels = MealPeriod.entries.associateWith { period -> stringResource(period.displayRes()) }
-    val donutSegments = remember(perMealTotals, periodColors, donutMetric, periodLabels) {
+    val donutTotal = remember(perMealTotals, donutMetric) { perMealTotals.values.sumOf { it.value(donutMetric) } }
+    val donutSegmentLabels = MealPeriod.entries.associateWith { period ->
+        val value = perMealTotals.getValue(period).value(donutMetric)
+        if (value <= 0.0) ""
+        else {
+            val percent = if (donutTotal > 0.0) (value / donutTotal * 100.0).roundToInt() else 0
+            stringResource(
+                R.string.diet_donut_segment_label,
+                periodLabels.getValue(period),
+                formatMetricValue(value, donutMetric.unit),
+                percent,
+            )
+        }
+    }
+    val donutSegments = remember(perMealTotals, periodColors, donutMetric, donutSegmentLabels) {
         MealPeriod.entries.mapNotNull { period ->
             val value = perMealTotals.getValue(period).value(donutMetric)
             if (value <= 0.0) null
-            else DonutChartSegment(period.name, periodLabels.getValue(period), value.toFloat(), periodColors.getValue(period))
+            else DonutChartSegment(
+                id = period.name,
+                label = donutSegmentLabels.getValue(period),
+                value = value.toFloat(),
+                color = periodColors.getValue(period),
+            )
         }
     }
 
@@ -145,12 +165,19 @@ internal fun DietStatisticsTab(
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.diet_today_summary), style = MaterialTheme.typography.titleMedium)
-                StatRow {
-                    DietStatAmount(stringResource(R.string.diet_summary_energy), formatCalories(dayTotals.energy) + " kcal")
-                    DietStatAmount(stringResource(R.string.diet_summary_protein), formatGrams(dayTotals.protein))
-                    DietStatAmount(stringResource(R.string.diet_summary_fat), formatGrams(dayTotals.fat))
-                    DietStatAmount(stringResource(R.string.diet_summary_carbs), formatGrams(dayTotals.carbs))
+                SectionTitle(R.drawable.ic_diet, stringResource(R.string.diet_today_summary))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    NutrientMetric.entries.forEach { metric ->
+                        DietStatCard(
+                            label = stringResource(metric.labelRes),
+                            unit = metric.unit,
+                            value = formatCalories(dayTotals.value(metric)),
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
                 listOf(
                     NutrientMetric.ENERGY to goals.energyKcal.toDouble(),
@@ -170,47 +197,32 @@ internal fun DietStatisticsTab(
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.diet_meal_distribution), style = MaterialTheme.typography.titleMedium)
+                SectionTitle(R.drawable.ic_energy_distribution, stringResource(R.string.diet_meal_distribution))
                 NutrientToggleRow(donutMetric) { donutMetric = it }
                 AnimatedDonutChart(
                     segments = donutSegments,
                     centerValue = formatMetricValue(dayTotals.value(donutMetric), donutMetric.unit),
                     centerLabel = stringResource(R.string.diet_meal_distribution_center, stringResource(donutMetric.labelRes)),
+                    showLegend = false,
+                    labelMaxLines = 2,
                 )
                 if (perMealTotals.all { it.value.energy == 0.0 }) {
                     Text(stringResource(R.string.diet_statistics_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
-                    MealPeriod.entries.forEach { period ->
-                        val totals = perMealTotals.getValue(period)
-                        if (totals.value(donutMetric) > 0.0) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                androidx.compose.foundation.Canvas(Modifier.size(10.dp).padding(end = 6.dp)) { drawCircle(periodColors.getValue(period)) }
-                                Text(stringResource(period.displayRes()), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                                Text(
-                                    text = stringResource(
-                                        R.string.diet_meal_subtotal_metric,
-                                        stringResource(donutMetric.labelRes),
-                                        formatMetricValue(totals.value(donutMetric), donutMetric.unit),
-                                    ),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                    }
+                    MealNutrientTable(perMealTotals, dayTotals, periodColors)
                 }
             }
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.diet_trend), style = MaterialTheme.typography.titleMedium)
+                SectionTitle(R.drawable.ic_nutrients, stringResource(R.string.diet_trend))
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                    listOf(7, 30).forEachIndexed { index, optionDays ->
+                    listOf(7, 30, 90).forEachIndexed { index, optionDays ->
                         SegmentedButton(
                             selected = trendDays == optionDays,
                             onClick = { trendDays = optionDays },
-                            shape = SegmentedButtonDefaults.itemShape(index, 2),
-                            label = { Text(stringResource(if (optionDays == 7) R.string.diet_statistics_7_days else R.string.diet_statistics_30_days)) },
+                            shape = SegmentedButtonDefaults.itemShape(index, 3),
+                            label = { Text(stringResource(dayRangeLabelRes(optionDays))) },
                         )
                     }
                 }
@@ -240,10 +252,10 @@ internal fun DietStatisticsTab(
                     val trendDayTotals = remember(rangeRecords, trendDateStart, trendDateEnd) {
                         sumNutrients(rangeRecords.filter { it.mealStartAt in trendDateStart until trendDateEnd })
                     }
-                    if (trendDayTotals.value(trendMetric) > 0.0) {
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                    if (NutrientMetric.entries.any { trendDayTotals.value(it) > 0.0 }) {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                stringResource(R.string.diet_statistics_selected_day_breakdown, trendDate.toString(), stringResource(trendMetric.labelRes)),
+                                stringResource(R.string.diet_statistics_selected_day_breakdown_title, trendDate.toString()),
                                 style = MaterialTheme.typography.titleSmall,
                             )
                             val breakdown = remember(rangeRecords, trendDateStart, trendDateEnd) {
@@ -251,20 +263,7 @@ internal fun DietStatisticsTab(
                                     sumNutrients(rangeRecords.filter { it.mealPeriod == period && it.mealStartAt in trendDateStart until trendDateEnd })
                                 }
                             }
-                            MealPeriod.entries.forEach { period ->
-                                val periodTotals = breakdown.getValue(period)
-                                if (periodTotals.value(trendMetric) > 0.0) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        androidx.compose.foundation.Canvas(Modifier.size(10.dp).padding(end = 6.dp)) { drawCircle(periodColors.getValue(period)) }
-                                        Text(stringResource(period.displayRes()), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                                        Text(
-                                            formatMetricValue(periodTotals.value(trendMetric), trendMetric.unit),
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
-                                }
-                            }
+                            MealNutrientTable(breakdown, trendDayTotals, periodColors)
                         }
                     }
                 }
@@ -310,6 +309,69 @@ private fun DayDatePicker(selectedDay: LocalDate, onPick: () -> Unit) {
 }
 
 @Composable
+internal fun SectionTitle(iconRes: Int, text: String) {
+    val iconSize = with(LocalDensity.current) { MaterialTheme.typography.titleMedium.fontSize.toDp() }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        androidx.compose.material3.Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(iconSize),
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(text, style = MaterialTheme.typography.titleMedium)    }
+}
+
+private fun dayRangeLabelRes(days: Int): Int = when (days) {
+    7 -> R.string.diet_statistics_7_days
+    30 -> R.string.diet_statistics_30_days
+    else -> R.string.diet_statistics_90_days
+}
+
+internal fun periodColor(period: MealPeriod): Color {
+    val palette = listOf(
+        NutrientProteinColor, NutrientCarbsColor, Color(0xFF8E24AA),
+        Color(0xFF00897B), Color(0xFF039BE5), NutrientEnergyColor, NutrientFatColor,
+    )
+    return palette[MealPeriod.entries.indexOf(period) % palette.size]
+}
+
+@Composable
+internal fun DietStatCard(label: String, unit: String, value: String, modifier: Modifier = Modifier) {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
+        modifier = modifier,
+    ) {
+        Column(Modifier.padding(horizontal = 10.dp, vertical = 10.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                TextOverflowText(
+                    text = label,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                )
+                TextOverflowText(
+                    text = unit,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                )
+            }
+            TextOverflowText(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+@Composable
 private fun GoalProgressRow(label: String, value: Double, goal: Double, unit: String, color: Color) {
     val fraction = if (goal > 0.0) (value / goal).toFloat().coerceIn(0f, 1f) else 0f
     val overflow = goal > 0.0 && value > goal
@@ -337,6 +399,87 @@ private fun GoalProgressRow(label: String, value: Double, goal: Double, unit: St
 }
 
 @Composable
+internal fun MealNutrientTable(
+    perMealTotals: Map<MealPeriod, DayNutrients>,
+    dayTotals: DayNutrients,
+    periodColors: Map<MealPeriod, Color>,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+        MealPeriod.entries.forEach { period ->
+            val totals = perMealTotals[period] ?: DayNutrients()
+            if (NutrientMetric.entries.any { totals.value(it) > 0.0 }) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.width(MealLabelWidth),
+                    ) {
+                        androidx.compose.foundation.Canvas(Modifier.size(10.dp).padding(end = 6.dp)) { drawCircle(periodColors.getValue(period)) }
+                        TextOverflowText(
+                            text = stringResource(period.displayRes()),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 2,
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        NutrientMetric.entries.forEach { metric ->
+                            NutrientProgressRow(
+                                metric = metric,
+                                value = totals.value(metric),
+                                total = dayTotals.value(metric),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun NutrientProgressRow(metric: NutrientMetric, value: Double, total: Double) {
+    val fraction = if (total > 0.0) (value / total).toFloat().coerceIn(0f, 1f) else 0f
+    val percent = if (total > 0.0) (value / total * 100.0).roundToInt() else 0
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        TextOverflowText(
+            text = stringResource(metric.labelRes),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            modifier = Modifier.width(NutrientNameWidth),
+        )
+        LinearProgressWithPercent(
+            progress = { fraction },
+            color = MetricColor(metric),
+            trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            percentText = "$percent%",
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(Modifier.width(6.dp))
+        TextOverflowText(
+            text = if (total > 0.0) {
+                stringResource(
+                    R.string.diet_meal_nutrient_values,
+                    formatCalories(value),
+                    formatCalories(total),
+                    metric.unit,
+                )
+            } else {
+                stringResource(R.string.diet_meal_nutrient_values_no_total, formatCalories(value), metric.unit)
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            modifier = Modifier.width(NutrientValueWidth),
+        )
+    }
+}
+
+@Composable
 private fun NutrientToggleRow(selected: NutrientMetric, onMetricChanged: (NutrientMetric) -> Unit) {
     val metrics = NutrientMetric.entries
     SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
@@ -354,9 +497,9 @@ private fun NutrientToggleRow(selected: NutrientMetric, onMetricChanged: (Nutrie
 private fun formatMetricValue(value: Double, unit: String): String =
     "${formatCalories(value)} $unit"
 
-private fun MetricColor(metric: NutrientMetric): Color = nutrientColor(metric.id)
+internal fun MetricColor(metric: NutrientMetric): Color = nutrientColor(metric.id)
 
-private fun sumNutrients(records: List<DietRecord>): DayNutrients = records.fold(DayNutrients()) { totals, record ->
+internal fun sumNutrients(records: List<DietRecord>): DayNutrients = records.fold(DayNutrients()) { totals, record ->
     record.entries.fold(totals) { acc, entry ->
         val nutrients = entry.resolvedNutrients
         acc.copy(
@@ -368,21 +511,6 @@ private fun sumNutrients(records: List<DietRecord>): DayNutrients = records.fold
     }
 }
 
-@Composable
-private fun StatRow(content: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom,
-    ) {
-        content()
-    }
-}
-
-@Composable
-private fun androidx.compose.foundation.layout.RowScope.DietStatAmount(label: String, value: String) {
-    Column(modifier = Modifier.weight(1f)) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, style = MaterialTheme.typography.titleMedium)
-    }
-}
+private val MealLabelWidth = 62.dp
+private val NutrientNameWidth = 52.dp
+private val NutrientValueWidth = 104.dp
