@@ -769,7 +769,8 @@
       },
       "categoryTags": [
         "food.staple.tuber",
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.root"
       ],
       "healthMetrics": {
         "glycemicIndex": {
@@ -825,7 +826,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
       ],
       "healthMetrics": {
         "glycemicIndex": {
@@ -912,7 +914,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
       ],
       "healthMetrics": {
         "glycemicIndex": {
@@ -999,6 +1002,7 @@
       },
       "categoryTags": [
         "food.vegetable",
+        "food.vegetable.gourd_solanaceous",
         "food.fruit"
       ],
       "healthMetrics": {
@@ -1086,7 +1090,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.flower"
       ],
       "healthMetrics": {
         "glycemicIndex": {
@@ -1649,7 +1654,9 @@
         ]
       },
       "categoryTags": [
-        "food.dairy"
+        "food.dairy",
+        "food.beverage",
+        "food.beverage.dairy"
       ],
       "healthMetrics": {
         "glycemicIndex": {
@@ -3326,7 +3333,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
       ],
       "commonness": 5,
       "healthMetrics": {
@@ -3398,7 +3406,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.leafy"
       ],
       "commonness": 5,
       "healthMetrics": {
@@ -3470,7 +3479,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.root"
       ],
       "commonness": 5,
       "healthMetrics": {
@@ -3544,7 +3554,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
       ],
       "commonness": 3,
       "healthMetrics": {
@@ -3617,7 +3628,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.fresh_legume"
       ],
       "commonness": 5,
       "healthMetrics": {
@@ -3690,7 +3702,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.fresh_legume"
       ],
       "commonness": 4,
       "healthMetrics": {
@@ -3763,7 +3776,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.root"
       ],
       "commonness": 4,
       "healthMetrics": {
@@ -3838,7 +3852,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.aquatic"
       ],
       "commonness": 3,
       "healthMetrics": {
@@ -3910,7 +3925,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.root"
       ],
       "commonness": 4,
       "healthMetrics": {
@@ -3982,7 +3998,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.leafy"
       ],
       "commonness": 5,
       "healthMetrics": {
@@ -4353,7 +4370,8 @@
       },
       "categoryTags": [
         "food.fruit",
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
       ],
       "commonness": 4,
       "healthMetrics": {
@@ -4982,7 +5000,8 @@
       },
       "categoryTags": [
         "food.staple.tuber",
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.root"
       ],
       "systemTags": [
         "common"
@@ -5286,6 +5305,8 @@
         ]
       },
       "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.root",
         "food.staple",
         "food.staple.tuber"
       ],
@@ -5360,6 +5381,8 @@
         ]
       },
       "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.root",
         "food.staple",
         "food.staple.tuber"
       ],
@@ -6832,7 +6855,8 @@
         "food.beverage.tea"
       ],
       "systemTags": [
-        "common"
+        "common",
+        "beverage_brew_base"
       ],
       "edibleRatio": 1,
       "nutritionTables": {
@@ -6900,7 +6924,8 @@
         "food.beverage.coffee"
       ],
       "systemTags": [
-        "common"
+        "common",
+        "beverage_brew_base"
       ],
       "edibleRatio": 1,
       "nutritionTables": {
@@ -7898,7 +7923,8 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable"
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
       ],
       "edibleRatio": 0.8,
       "sources": [
@@ -8367,6 +8393,3650 @@
         "en": "Peanut oil is a common cooking oil in Chinese cuisine with a high smoke point, suitable for stir-frying."
       },
       "commonness": 4
+    },
+    {
+      "id": "food:taxon:spinacia_oleracea:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Amaranthaceae",
+        "genus": "Spinacia",
+        "species": "Spinacia oleracea"
+      },
+      "names": {
+        "zh": [
+          "菠菜"
+        ],
+        "en": [
+          "Spinach"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.89,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "spinach, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 24,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "菠菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Spinach is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:brassica_rapa:pekinensis:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica rapa subsp. pekinensis"
+      },
+      "names": {
+        "zh": [
+          "大白菜",
+          "白菜",
+          "黄芽白"
+        ],
+        "en": [
+          "Chinese cabbage",
+          "Napa cabbage"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.87,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Chinese cabbage, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 17,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "大白菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Chinese cabbage is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:brassica_rapa:chinensis:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica rapa subsp. chinensis"
+      },
+      "names": {
+        "zh": [
+          "小白菜",
+          "青菜",
+          "上海青"
+        ],
+        "en": [
+          "Bok choy",
+          "Pak choi"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.87,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "bok choy, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 15,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "小白菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Bok choy is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:brassica_oleracea:capitata:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica oleracea var. capitata"
+      },
+      "names": {
+        "zh": [
+          "圆白菜",
+          "卷心菜",
+          "包菜",
+          "洋白菜"
+        ],
+        "en": [
+          "Cabbage"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.86,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "cabbage, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 24,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "圆白菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Cabbage is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:brassica_rapa:oleifera:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica rapa subsp. oleifera"
+      },
+      "names": {
+        "zh": [
+          "油菜",
+          "青菜"
+        ],
+        "en": [
+          "Rapeseed greens"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.87,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "rapeseed greens, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 23,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "油菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Rapeseed greens is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:allium_tuberosum:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Amaryllidaceae",
+        "genus": "Allium",
+        "species": "Allium tuberosum"
+      },
+      "names": {
+        "zh": [
+          "韭菜"
+        ],
+        "en": [
+          "Chinese chives",
+          "Garlic chives"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.9,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Chinese chives, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 26,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "韭菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Chinese chives is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:ipomoea_aquatica:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Convolvulaceae",
+        "genus": "Ipomoea",
+        "species": "Ipomoea aquatica"
+      },
+      "names": {
+        "zh": [
+          "空心菜",
+          "蕹菜",
+          "通菜"
+        ],
+        "en": [
+          "Water spinach",
+          "Water morning glory"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.76,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "water spinach, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 20,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "空心菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Water spinach is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:lactuca_sativa:longifolia:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Asteraceae",
+        "genus": "Lactuca",
+        "species": "Lactuca sativa var. longifolia"
+      },
+      "names": {
+        "zh": [
+          "油麦菜"
+        ],
+        "en": [
+          "Long-leaf lettuce"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.9,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "long-leaf lettuce, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 15,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "油麦菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Long-leaf lettuce is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:amaranthus_tricolor:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Amaranthaceae",
+        "genus": "Amaranthus",
+        "species": "Amaranthus tricolor"
+      },
+      "names": {
+        "zh": [
+          "苋菜",
+          "红苋菜"
+        ],
+        "en": [
+          "Amaranth greens",
+          "Red amaranth"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.74,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "amaranth greens, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 25,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "苋菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Amaranth greens is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:glebionis_coronaria:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Asteraceae",
+        "genus": "Glebionis",
+        "species": "Glebionis coronaria"
+      },
+      "names": {
+        "zh": [
+          "茼蒿",
+          "蒿子秆"
+        ],
+        "en": [
+          "Garland chrysanthemum"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.82,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "garland chrysanthemum, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 24,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "茼蒿是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Garland chrysanthemum is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:brassica_rapa:chinensis:baby:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica rapa subsp. chinensis"
+      },
+      "names": {
+        "zh": [
+          "娃娃菜"
+        ],
+        "en": [
+          "Baby bok choy"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.9,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "baby bok choy, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 12,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "娃娃菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Baby bok choy is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:brassica_oleracea:alboglabra:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica oleracea var. alboglabra"
+      },
+      "names": {
+        "zh": [
+          "芥蓝",
+          "芥兰"
+        ],
+        "en": [
+          "Chinese kale",
+          "Chinese broccoli"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.leafy"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.78,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Chinese kale, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 24,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "芥蓝是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Chinese kale is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:raphanus_sativus:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Raphanus",
+        "species": "Raphanus sativus"
+      },
+      "names": {
+        "zh": [
+          "白萝卜"
+        ],
+        "en": [
+          "White radish",
+          "Daikon"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.root"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.95,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "white radish, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 21,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "白萝卜是常见的根茎类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "White radish is a common root and tuber vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:raphanus_sativus:green:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Raphanus",
+        "species": "Raphanus sativus"
+      },
+      "names": {
+        "zh": [
+          "青萝卜"
+        ],
+        "en": [
+          "Green radish"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.root"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.93,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "green radish, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 26,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 5.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "青萝卜是常见的根茎类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Green radish is a common root and tuber vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:allium_cepa:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Amaryllidaceae",
+        "genus": "Allium",
+        "species": "Allium cepa"
+      },
+      "names": {
+        "zh": [
+          "洋葱",
+          "圆葱"
+        ],
+        "en": [
+          "Onion"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.root"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.9,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "onion, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 40,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 9.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "洋葱是常见的根茎类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Onion is a common root and tuber vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:phyllostachys_edulis:shoot:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Poaceae",
+        "genus": "Phyllostachys",
+        "species": "Phyllostachys edulis"
+      },
+      "names": {
+        "zh": [
+          "竹笋",
+          "冬笋",
+          "春笋"
+        ],
+        "en": [
+          "Bamboo shoot"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.root"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.63,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "bamboo shoot, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 23,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "竹笋是常见的根茎类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Bamboo shoot is a common root and tuber vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:luffa_aegyptiaca:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Luffa",
+        "species": "Luffa aegyptiaca"
+      },
+      "names": {
+        "zh": [
+          "丝瓜",
+          "水瓜"
+        ],
+        "en": [
+          "Luffa",
+          "Loofah",
+          "Sponge gourd"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.83,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "luffa, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 20,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "丝瓜是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Luffa is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:momordica_charantia:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Momordica",
+        "species": "Momordica charantia"
+      },
+      "names": {
+        "zh": [
+          "苦瓜",
+          "凉瓜"
+        ],
+        "en": [
+          "Bitter gourd",
+          "Bitter melon"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.81,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "bitter gourd, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 19,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "苦瓜是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Bitter gourd is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:cucurbita_moschata:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Cucurbita",
+        "species": "Cucurbita moschata"
+      },
+      "names": {
+        "zh": [
+          "南瓜",
+          "倭瓜"
+        ],
+        "en": [
+          "Pumpkin",
+          "Winter squash"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.85,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "pumpkin, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 22,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 5.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "南瓜是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Pumpkin is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:cucurbita_pepo:zucchini:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Cucurbita",
+        "species": "Cucurbita pepo"
+      },
+      "names": {
+        "zh": [
+          "西葫芦",
+          "角瓜"
+        ],
+        "en": [
+          "Zucchini",
+          "Courgette"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.95,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "zucchini, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 18,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "西葫芦是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Zucchini is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:capsicum_annuum:bell_green:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Capsicum",
+        "species": "Capsicum annuum"
+      },
+      "names": {
+        "zh": [
+          "青椒",
+          "柿子椒",
+          "甜椒"
+        ],
+        "en": [
+          "Green bell pepper"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.82,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "green bell pepper, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 22,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "青椒是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Green bell pepper is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:lagenaria_siceraria:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Lagenaria",
+        "species": "Lagenaria siceraria"
+      },
+      "names": {
+        "zh": [
+          "瓠瓜",
+          "葫芦瓜",
+          "瓠子"
+        ],
+        "en": [
+          "Bottle gourd",
+          "Calabash"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.85,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "bottle gourd, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 15,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "瓠瓜是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Bottle gourd is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:sechium_edule:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Sechium",
+        "species": "Sechium edule"
+      },
+      "names": {
+        "zh": [
+          "佛手瓜",
+          "合手瓜"
+        ],
+        "en": [
+          "Chayote"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.87,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "chayote, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 19,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "佛手瓜是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Chayote is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:benincasa_hispida:chieh_qua:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Benincasa",
+        "species": "Benincasa hispida var. chieh-qua"
+      },
+      "names": {
+        "zh": [
+          "节瓜",
+          "毛瓜"
+        ],
+        "en": [
+          "Hairy melon",
+          "Pichay"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.gourd_solanaceous"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.85,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "hairy melon, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 12,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "节瓜是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Hairy melon is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:pisum_sativum:snap_pea:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Fabaceae",
+        "genus": "Pisum",
+        "species": "Pisum sativum"
+      },
+      "names": {
+        "zh": [
+          "荷兰豆",
+          "豌豆荚"
+        ],
+        "en": [
+          "Snap pea",
+          "Snow pea"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fresh_legume"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.98,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "snow pea pods, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 30,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "荷兰豆是常见的鲜豆类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Snap pea is a common fresh legume. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:glycine_max:edamame:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Fabaceae",
+        "genus": "Glycine",
+        "species": "Glycine max"
+      },
+      "names": {
+        "zh": [
+          "毛豆",
+          "青豆"
+        ],
+        "en": [
+          "Edamame",
+          "Fresh green soybeans"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fresh_legume"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.53,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "edamame, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 123,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 13.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 5.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 10.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 4.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "毛豆是常见的鲜豆类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Edamame is a common fresh legume. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:vicia_faba:fresh:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Fabaceae",
+        "genus": "Vicia",
+        "species": "Vicia faba"
+      },
+      "names": {
+        "zh": [
+          "蚕豆",
+          "胡豆"
+        ],
+        "en": [
+          "Fava beans, fresh",
+          "Broad beans"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fresh_legume"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.32,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "fresh fava beans, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 104,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 8.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 16.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 3.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "蚕豆是常见的鲜豆类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Fava beans, fresh is a common fresh legume. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:lablab_purpureus:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Fabaceae",
+        "genus": "Lablab",
+        "species": "Lablab purpureus"
+      },
+      "names": {
+        "zh": [
+          "扁豆",
+          "眉豆"
+        ],
+        "en": [
+          "Hyacinth bean"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fresh_legume"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.91,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "hyacinth bean, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 24,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 5.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "扁豆是常见的鲜豆类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Hyacinth bean is a common fresh legume. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:pisum_sativum:fresh_peas:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Fabaceae",
+        "genus": "Pisum",
+        "species": "Pisum sativum"
+      },
+      "names": {
+        "zh": [
+          "豌豆",
+          "青豌豆"
+        ],
+        "en": [
+          "Green peas, fresh"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fresh_legume"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.42,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "green peas, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 105,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 7.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 21.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 3.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "豌豆是常见的鲜豆类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Green peas, fresh is a common fresh legume. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:brassica_oleracea:cauliflower:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica oleracea var. botrytis"
+      },
+      "names": {
+        "zh": [
+          "菜花",
+          "花椰菜",
+          "花菜"
+        ],
+        "en": [
+          "Cauliflower"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.flower"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.82,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "cauliflower, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 22,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "菜花是常见的花菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Cauliflower is a common flower vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:hemerocallis:fresh:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Asphodelaceae",
+        "genus": "Hemerocallis",
+        "species": "Hemerocallis fulva"
+      },
+      "names": {
+        "zh": [
+          "黄花菜",
+          "金针菜"
+        ],
+        "en": [
+          "Day lily flower buds, fresh"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.flower"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.98,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "fresh day lily buds, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 27,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 12.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 4.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "黄花菜是常见的花菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Day lily flower buds, fresh is a common flower vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:brassica_rapa:choy_sum:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica rapa subsp. parachinensis"
+      },
+      "names": {
+        "zh": [
+          "菜薹",
+          "菜心",
+          "广东菜心"
+        ],
+        "en": [
+          "Choy sum",
+          "Flowering Chinese cabbage"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.flower"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.82,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "choy sum, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 25,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "菜薹是常见的花菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Choy sum is a common flower vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:lentinula_edodes:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Marasmiaceae",
+        "genus": "Lentinula",
+        "species": "Lentinula edodes"
+      },
+      "names": {
+        "zh": [
+          "香菇",
+          "冬菇"
+        ],
+        "en": [
+          "Shiitake mushroom"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "shiitake mushroom, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 26,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 5.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 3.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "香菇是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Shiitake mushroom is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:pleurotus_ostreatus:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Pleurotaceae",
+        "genus": "Pleurotus",
+        "species": "Pleurotus ostreatus"
+      },
+      "names": {
+        "zh": [
+          "平菇",
+          "侧耳"
+        ],
+        "en": [
+          "Oyster mushroom"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "oyster mushroom, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 24,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "平菇是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Oyster mushroom is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:flammulina_velutipes:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Physalacriaceae",
+        "genus": "Flammulina",
+        "species": "Flammulina velutipes"
+      },
+      "names": {
+        "zh": [
+          "金针菇",
+          "金菇"
+        ],
+        "en": [
+          "Enoki mushroom",
+          "Golden needle mushroom"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "enoki mushroom, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 32,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 6.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "金针菇是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Enoki mushroom is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:pleurotus_eryngii:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Pleurotaceae",
+        "genus": "Pleurotus",
+        "species": "Pleurotus eryngii"
+      },
+      "names": {
+        "zh": [
+          "杏鲍菇",
+          "刺芹侧耳"
+        ],
+        "en": [
+          "King oyster mushroom"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "king oyster mushroom, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 31,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 8.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "杏鲍菇是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "King oyster mushroom is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:auricularia_auricula:fresh:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Auriculariaceae",
+        "genus": "Auricularia",
+        "species": "Auricularia auricula-judae"
+      },
+      "names": {
+        "zh": [
+          "黑木耳",
+          "木耳"
+        ],
+        "en": [
+          "Wood ear mushroom, fresh"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "fresh wood ear fungus, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 27,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 6.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "黑木耳是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Wood ear mushroom, fresh is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 5
+    },
+    {
+      "id": "food:taxon:agaricus_bisporus:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Agaricaceae",
+        "genus": "Agaricus",
+        "species": "Agaricus bisporus"
+      },
+      "names": {
+        "zh": [
+          "白蘑菇",
+          "口蘑",
+          "洋蘑菇"
+        ],
+        "en": [
+          "White button mushroom"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "white button mushroom, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 24,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 4.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "白蘑菇是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "White button mushroom is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:volvariella_volvacea:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Pluteaceae",
+        "genus": "Volvariella",
+        "species": "Volvariella volvacea"
+      },
+      "names": {
+        "zh": [
+          "草菇"
+        ],
+        "en": [
+          "Straw mushroom"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "straw mushroom, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 23,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 3.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "草菇是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Straw mushroom is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:saccharina_japonica:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Laminariaceae",
+        "genus": "Saccharina",
+        "species": "Saccharina japonica"
+      },
+      "names": {
+        "zh": [
+          "海带"
+        ],
+        "en": [
+          "Kelp"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "kelp, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 13,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "海带是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Kelp is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:porphyra:dried:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Bangiaceae",
+        "genus": "Porphyra",
+        "species": "Porphyra spp."
+      },
+      "names": {
+        "zh": [
+          "紫菜",
+          "干紫菜"
+        ],
+        "en": [
+          "Dried laver"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.fungi_algae"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "dried laver, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 250,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 26.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 44.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 21.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "紫菜是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Dried laver is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:nelumbo_nucifera:rhizome:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Nelumbonaceae",
+        "genus": "Nelumbo",
+        "species": "Nelumbo nucifera"
+      },
+      "names": {
+        "zh": [
+          "莲藕",
+          "藕"
+        ],
+        "en": [
+          "Lotus root"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.aquatic"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.88,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "lotus root, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 73,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 16.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "莲藕是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Lotus root is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:eleocharis_dulcis:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Cyperaceae",
+        "genus": "Eleocharis",
+        "species": "Eleocharis dulcis"
+      },
+      "names": {
+        "zh": [
+          "荸荠",
+          "马蹄"
+        ],
+        "en": [
+          "Water chestnut"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.aquatic"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.78,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "water chestnut, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 61,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 13.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "荸荠是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Water chestnut is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:nasturtium_officinale:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Nasturtium",
+        "species": "Nasturtium officinale"
+      },
+      "names": {
+        "zh": [
+          "西洋菜",
+          "豆瓣菜"
+        ],
+        "en": [
+          "Watercress"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.aquatic"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.85,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "watercress, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 19,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 1.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "西洋菜是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Watercress is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:oenanthe_javanica:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Apiaceae",
+        "genus": "Oenanthe",
+        "species": "Oenanthe javanica"
+      },
+      "names": {
+        "zh": [
+          "水芹"
+        ],
+        "en": [
+          "Water celery"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.aquatic"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.8,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "water celery, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 20,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 2.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 0.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "水芹是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Water celery is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:sagittaria_sagittifolia:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Alismataceae",
+        "genus": "Sagittaria",
+        "species": "Sagittaria sagittifolia"
+      },
+      "names": {
+        "zh": [
+          "慈姑",
+          "茨菇"
+        ],
+        "en": [
+          "Arrowhead",
+          "Chinese arrowhead"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.aquatic"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.82,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "arrowhead corm, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 94,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 4.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 19.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 1.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "慈姑是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Arrowhead is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:trapa:raw",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Trapaceae",
+        "genus": "Trapa",
+        "species": "Trapa spp."
+      },
+      "names": {
+        "zh": [
+          "菱角"
+        ],
+        "en": [
+          "Water caltrop"
+        ]
+      },
+      "categoryTags": [
+        "food.vegetable",
+        "food.vegetable.aquatic"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 0.64,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "water caltrop, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 98,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 2.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 21.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 2.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "菱角是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+        "en": "Water caltrop is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:fagopyrum_esculentum:flour",
+      "kind": "ingredient",
+      "botanicalTaxonomy": {
+        "family": "Polygonaceae",
+        "genus": "Fagopyrum",
+        "species": "Fagopyrum esculentum"
+      },
+      "names": {
+        "zh": [
+          "荞麦粉",
+          "荞面"
+        ],
+        "en": [
+          "Buckwheat flour"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.grain",
+        "food.staple.whole_grain"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1.0,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Buckwheat flour, whole-groat, per 100 g edible portion"
+        }
+      ],
+      "nutritionTables": {
+        "standard.100g": {
+          "basis": {
+            "value": 100.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 335,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 12.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 3.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 70.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 10.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "description": {
+        "zh": "荞麦粉由荞麦磨制而成，含完整麸皮，是全谷物主食原料。",
+        "en": "Buckwheat flour is milled from whole buckwheat groats and keeps the full bran as a whole-grain staple."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:fagopyrum_esculentum:steamed_cake",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "荞篙发粑",
+          "荞麦粑"
+        ],
+        "en": [
+          "Steamed buckwheat cake"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:fagopyrum_esculentum:flour",
+          "quantity": {
+            "value": 50.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 50.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "Buckwheat flour + water, fermented and steamed"
+        }
+      ],
+      "description": {
+        "zh": "荞篙发粑以荞麦粉发酵蒸制，口感松软带荞麦清香，为南方常见杂粮主食。",
+        "en": "A fermented steamed buckwheat cake with a soft, fragrant texture, a common whole-grain staple in southern China."
+      },
+      "recipeSteps": [
+        {
+          "text": "荞麦粉加水调成糊状，静置发酵。"
+        },
+        {
+          "text": "倒入蒸笼大火蒸熟，脱模即食。"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:oryza_sativa:glutinous_herb_cake",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "糯米水萩粑",
+          "水萩粑"
+        ],
+        "en": [
+          "Glutinous rice herb cake"
+        ]
+      },
+      "categoryTags": [
+        "food.staple",
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:glutinous:raw",
+          "quantity": {
+            "value": 56.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 44.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "Glutinous rice + water + cudweed herb, steamed"
+        }
+      ],
+      "description": {
+        "zh": "糯米水萩粑将浸泡磨浆的糯米拌入剁碎的水萩（鼠曲草）蒸制而成，色泽青绿、软糯清香，多作春季时令主食。",
+        "en": "A springtime steamed cake made from soaked glutinous rice mixed with chopped cudweed herb, soft, green-tinted and aromatic."
+      },
+      "recipeSteps": [
+        {
+          "text": "糯米浸泡后磨浆，拌入洗净剁碎的水萩（鼠曲草）。"
+        },
+        {
+          "text": "蒸熟后整形压制成粑。"
+        }
+      ],
+      "commonness": 2
     }
   ]
 }

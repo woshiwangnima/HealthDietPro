@@ -57,10 +57,14 @@
     <string name="nutrition_sources">Sources</string>
     <string name="nutrition_sources_empty">No source is available for this item.</string>
     <string name="nutrition_macronutrient_energy">Nutrient energy</string>
-    <string name="nutrition_macronutrient_energy_center">Carbohydrate, protein and fat</string>
+    <string name="nutrition_macronutrient_energy_center">Energy contribution</string>
     <string name="nutrition_energy_carbohydrate">Carbohydrate %.1f%%</string>
     <string name="nutrition_energy_protein">Protein %.1f%%</string>
     <string name="nutrition_energy_fat">Fat %.1f%%</string>
+    <string name="nutrition_energy_fiber">Dietary fiber %.1f%%</string>
+    <string name="nutrition_energy_alcohol">Alcohol %.1f%%</string>
+    <string name="nutrition_energy_organic_acid">Organic acid %.1f%%</string>
+    <string name="nutrition_energy_other">Other %.1f%%</string>
     <string name="nutrition_energy_kcal_value">%.0f kcal</string>
     <string name="nutrition_profile_item">Item</string>
     <string name="nutrition_profile_amount">Amount</string>
@@ -109,6 +113,13 @@
     <string name="food_category_beverage">Beverages</string>
     <string name="food_category_seasoning">Seasonings</string>
     <string name="food_category_grain">Grains</string>
+    <string name="food_category_vegetable_leafy">Leafy vegetables</string>
+    <string name="food_category_vegetable_root">Root &amp; tuber vegetables</string>
+    <string name="food_category_vegetable_gourd_solanaceous">Gourds &amp; solanaceous</string>
+    <string name="food_category_vegetable_fresh_legume">Fresh legumes</string>
+    <string name="food_category_vegetable_flower">Flower vegetables</string>
+    <string name="food_category_vegetable_fungi_algae">Fungi &amp; algae</string>
+    <string name="food_category_vegetable_aquatic">Aquatic vegetables</string>
     <string name="food_category_whole_grain">Whole grains</string>
     <string name="food_category_mixed_bean">Mixed beans</string>
     <string name="food_category_tuber">Tubers</string>
@@ -134,6 +145,7 @@
     <string name="food_category_juice">Juice drinks</string>
     <string name="food_category_soy_beverage">Soy drinks</string>
     <string name="food_category_mixed_beverage">Mixed drinks</string>
+    <string name="food_category_dairy_beverage">Dairy drinks</string>
     <string name="food_category_fermented_dairy">Fermented dairy</string>
     <string name="food_category_fresh_aromatic">Fresh aromatics</string>
     <string name="food_category_dry_spice">Dry spices</string>

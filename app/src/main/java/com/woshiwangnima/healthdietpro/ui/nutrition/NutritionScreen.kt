@@ -92,10 +92,9 @@ import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
-import com.woshiwangnima.healthdietpro.common.ui.NutrientCarbsColor
-import com.woshiwangnima.healthdietpro.common.ui.NutrientFatColor
-import com.woshiwangnima.healthdietpro.common.ui.NutrientProteinColor
+import com.woshiwangnima.healthdietpro.common.ui.NutrientOtherColor
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
+import com.woshiwangnima.healthdietpro.common.ui.nutrientColor
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.Dish
@@ -176,11 +175,11 @@ private fun FoodKind.nameColors(): Pair<androidx.compose.ui.graphics.Color, andr
 }
 
 @Composable
-private fun systemTagPresentation(tag: String): Pair<String, androidx.compose.ui.graphics.Color> = when (tag) {
+private fun systemTagPresentation(tag: String): Pair<String, androidx.compose.ui.graphics.Color>? = when (tag) {
     "common" -> stringResource(R.string.nutrition_tag_common) to androidx.compose.ui.graphics.Color(0xFF2E7D32)
     "favorite" -> stringResource(R.string.nutrition_tag_favorite) to androidx.compose.ui.graphics.Color(0xFFC62828)
     "recent" -> stringResource(R.string.nutrition_tag_recent) to androidx.compose.ui.graphics.Color(0xFF1565C0)
-    else -> tag to androidx.compose.ui.graphics.Color(0xFF6A1B9A)
+    else -> null
 }
 
 @Composable
@@ -195,7 +194,7 @@ private fun FoodImageWithSystemTags(
         addAll(food.systemTags)
         if (isFavorite) add("favorite")
         if (isRecent) add("recent")
-    }.distinct()
+    }.distinct().mapNotNull { systemTagPresentation(it) }
     Box(modifier = modifier) {
         FoodImage(image, Modifier.fillMaxSize())
         if (tags.isNotEmpty()) {
@@ -203,8 +202,7 @@ private fun FoodImageWithSystemTags(
                 modifier = Modifier.align(Alignment.TopStart).fillMaxWidth().padding(horizontal = 1.dp, vertical = 2.dp),
                 horizontalArrangement = Arrangement.spacedBy(1.dp),
             ) {
-                tags.forEach { tag ->
-                    val (label, color) = systemTagPresentation(tag)
+                tags.forEach { (label, color) ->
                     Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(4.dp), color = color) {
                         TextOverflowText(text = label, modifier = Modifier.fillMaxWidth().padding(horizontal = 1.dp), style = TextStyle(fontSize = 9.sp), color = androidx.compose.ui.graphics.Color.White, maxLines = 1, textAlign = TextAlign.Center)
                     }
@@ -997,21 +995,31 @@ private fun FoodSourcesSection(food: FoodItem, textStyle: androidx.compose.ui.te
     }
 }
 
-private data class MacronutrientEnergy(
-    val carbohydrateKcal: Double,
-    val proteinKcal: Double,
-    val fatKcal: Double,
-) {
-    val totalKcal: Double get() = carbohydrateKcal + proteinKcal + fatKcal
-}
+private data class NutrientEnergyItem(
+    val nutrientId: String,
+    val kcal: Double,
+)
 
-private fun ResolvedNutrition?.macronutrientEnergy(): MacronutrientEnergy? {
+private val energyKcalPerGram: Map<String, Double> = mapOf(
+    "PROTEIN" to 4.0,
+    "CHO" to 4.0,
+    "FAT" to 9.0,
+    "FIBER" to 2.0,
+    "ALCOHOL" to 7.0,
+    "ORGANIC_ACID" to 3.0,
+)
+
+private fun ResolvedNutrition?.nutrientEnergyItems(): List<NutrientEnergyItem>? {
     val nutrients = this?.nutrients ?: return null
-    return MacronutrientEnergy(
-        carbohydrateKcal = (nutrients["CHO"]?.value ?: 0.0) * 4.0,
-        proteinKcal = (nutrients["PROTEIN"]?.value ?: 0.0) * 4.0,
-        fatKcal = (nutrients["FAT"]?.value ?: 0.0) * 9.0,
-    ).takeIf { it.totalKcal > 0.0 }
+    val items = nutrients.mapNotNull { (id, amount) ->
+        val factor = energyKcalPerGram[id] ?: return@mapNotNull null
+        if (amount.unitId.equals("g", ignoreCase = true)) {
+            (amount.value * factor).takeIf { it > 0.0 }?.let { NutrientEnergyItem(id, it) }
+        } else {
+            null
+        }
+    }.sortedByDescending { it.kcal }
+    return items.takeIf { it.isNotEmpty() }
 }
 
 private fun ResolvedNutrition?.energyKilocalories(multiplier: Double = 1.0): Double? {
@@ -1024,14 +1032,46 @@ private fun ResolvedNutrition?.energyKilocalories(multiplier: Double = 1.0): Dou
 }
 
 @Composable
+private fun nutrientEnergyLabel(nutrientId: String, percent: Double): String = when (nutrientId.uppercase()) {
+    "CHO" -> stringResource(R.string.nutrition_energy_carbohydrate, percent)
+    "PROTEIN" -> stringResource(R.string.nutrition_energy_protein, percent)
+    "FAT" -> stringResource(R.string.nutrition_energy_fat, percent)
+    "FIBER" -> stringResource(R.string.nutrition_energy_fiber, percent)
+    "ALCOHOL" -> stringResource(R.string.nutrition_energy_alcohol, percent)
+    "ORGANIC_ACID" -> stringResource(R.string.nutrition_energy_organic_acid, percent)
+    else -> stringResource(R.string.nutrition_energy_other, percent)
+}
+
+@Composable
 private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?, modifier: Modifier = Modifier) {
-    val energy = resolved.macronutrientEnergy() ?: return
+    val items = resolved.nutrientEnergyItems() ?: return
     val totalKcal = resolved.energyKilocalories() ?: return
-    val legendItems = listOf(
-        MacronutrientLegendItem("carbohydrate", stringResource(R.string.nutrition_energy_carbohydrate, energy.carbohydrateKcal / energy.totalKcal * 100.0), energy.carbohydrateKcal, NutrientCarbsColor),
-        MacronutrientLegendItem("protein", stringResource(R.string.nutrition_energy_protein, energy.proteinKcal / energy.totalKcal * 100.0), energy.proteinKcal, NutrientProteinColor),
-        MacronutrientLegendItem("fat", stringResource(R.string.nutrition_energy_fat, energy.fatKcal / energy.totalKcal * 100.0), energy.fatKcal, NutrientFatColor),
-    )
+    val totalItemsKcal = items.sumOf { it.kcal }
+    if (totalItemsKcal <= 0.0) return
+    val top = items.take(3)
+    val otherKcal = items.drop(3).sumOf { it.kcal }
+    val legendItems = buildList {
+        top.forEach { item ->
+            add(
+                MacronutrientLegendItem(
+                    id = item.nutrientId,
+                    label = nutrientEnergyLabel(item.nutrientId, item.kcal / totalItemsKcal * 100.0),
+                    value = item.kcal,
+                    color = nutrientColor(item.nutrientId),
+                ),
+            )
+        }
+        if (otherKcal > 0.0) {
+            add(
+                MacronutrientLegendItem(
+                    id = "other",
+                    label = stringResource(R.string.nutrition_energy_other, otherKcal / totalItemsKcal * 100.0),
+                    value = otherKcal,
+                    color = NutrientOtherColor,
+                ),
+            )
+        }
+    }
     DetailSectionTitle(R.drawable.ic_energy_distribution, stringResource(R.string.nutrition_macronutrient_energy), modifier)
     AnimatedDonutChart(
         segments = legendItems.map { DonutChartSegment(it.id, it.label, it.value.toFloat(), it.color) },

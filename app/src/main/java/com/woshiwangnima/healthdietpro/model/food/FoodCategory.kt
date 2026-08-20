@@ -3,6 +3,9 @@ package com.woshiwangnima.healthdietpro.model.food
 import androidx.annotation.StringRes
 import com.woshiwangnima.healthdietpro.R
 
+/** systemTags 轴：干态冲泡基底（如茶叶、咖啡粉），不可直接作为饮品记录。 */
+internal const val SYSTEM_TAG_BEVERAGE_BREW_BASE = "beverage_brew_base"
+
 internal data class FoodCategory(
     val tag: String,
     @param:StringRes val labelRes: Int,
@@ -29,6 +32,13 @@ internal object FoodCategories {
         FoodCategory("food.staple.mixed_bean", R.string.food_category_mixed_bean, "food.staple"),
         FoodCategory("food.staple.tuber", R.string.food_category_tuber, "food.staple"),
         FoodCategory("food.staple.processed", R.string.food_category_staple_processed, "food.staple"),
+        FoodCategory("food.vegetable.leafy", R.string.food_category_vegetable_leafy, "food.vegetable"),
+        FoodCategory("food.vegetable.root", R.string.food_category_vegetable_root, "food.vegetable"),
+        FoodCategory("food.vegetable.gourd_solanaceous", R.string.food_category_vegetable_gourd_solanaceous, "food.vegetable"),
+        FoodCategory("food.vegetable.fresh_legume", R.string.food_category_vegetable_fresh_legume, "food.vegetable"),
+        FoodCategory("food.vegetable.flower", R.string.food_category_vegetable_flower, "food.vegetable"),
+        FoodCategory("food.vegetable.fungi_algae", R.string.food_category_vegetable_fungi_algae, "food.vegetable"),
+        FoodCategory("food.vegetable.aquatic", R.string.food_category_vegetable_aquatic, "food.vegetable"),
         FoodCategory("food.meat_egg.livestock", R.string.food_category_livestock, "food.meat_egg"),
         FoodCategory("food.meat_egg.poultry", R.string.food_category_poultry, "food.meat_egg"),
         FoodCategory("food.meat_egg.egg", R.string.food_category_egg, "food.meat_egg"),
@@ -50,6 +60,7 @@ internal object FoodCategories {
         FoodCategory("food.beverage.juice", R.string.food_category_juice, "food.beverage"),
         FoodCategory("food.beverage.soy", R.string.food_category_soy_beverage, "food.beverage"),
         FoodCategory("food.beverage.mixed", R.string.food_category_mixed_beverage, "food.beverage"),
+        FoodCategory("food.beverage.dairy", R.string.food_category_dairy_beverage, "food.beverage"),
         FoodCategory("food.dairy.fermented", R.string.food_category_fermented_dairy, "food.dairy"),
         FoodCategory("food.seasoning.fresh_aromatic", R.string.food_category_fresh_aromatic, "food.seasoning"),
         FoodCategory("food.seasoning.dry_spice", R.string.food_category_dry_spice, "food.seasoning"),

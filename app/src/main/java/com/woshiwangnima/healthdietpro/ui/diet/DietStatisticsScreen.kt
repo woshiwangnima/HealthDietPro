@@ -1,8 +1,14 @@
 package com.woshiwangnima.healthdietpro.ui.diet
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -375,6 +382,28 @@ internal fun DietStatCard(label: String, unit: String, value: String, modifier: 
 private fun GoalProgressRow(label: String, value: Double, goal: Double, unit: String, color: Color) {
     val fraction = if (goal > 0.0) (value / goal).toFloat().coerceIn(0f, 1f) else 0f
     val overflow = goal > 0.0 && value > goal
+    val density = LocalDensity.current
+    val shakeTransition = rememberInfiniteTransition(label = "goalProgressShake")
+    val shakeDp by shakeTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 1400
+                0f at 0
+                -5f at 50
+                4f at 100
+                -3f at 150
+                2.2f at 195
+                -1.4f at 240
+                0.8f at 275
+                0f at 300
+            },
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "goalProgressShakeOffset",
+    )
+    val shakePx = with(density) { shakeDp.dp.toPx() }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(label, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
@@ -391,9 +420,9 @@ private fun GoalProgressRow(label: String, value: Double, goal: Double, unit: St
         }
         LinearProgressIndicator(
             progress = { fraction },
-            color = if (overflow) MaterialTheme.colorScheme.error else color,
+            color = color,
             trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().offset { IntOffset(0, if (overflow) shakePx.toInt() else 0) },
         )
     }
 }

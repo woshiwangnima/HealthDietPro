@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -241,6 +242,14 @@ private fun FoodNutrientBarRow(metric: NutrientMetric, value: Double, mealTotal:
             percentText = "$percent%",
             modifier = Modifier.weight(1f),
         )
+        Spacer(Modifier.width(6.dp))
+        TextOverflowText(
+            text = formatCalories(value) + " " + metric.unit,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            modifier = Modifier.width(FoodNutrientValueWidth),
+        )
     }
 }
 
@@ -253,6 +262,7 @@ internal fun foodKindColors(kind: FoodKind?): Pair<Color, Color> = when (kind) {
 
 private val MealFoodLabelWidth = 90.dp
 private val FoodNutrientNameWidth = 40.dp
+private val FoodNutrientValueWidth = 52.dp
 
 private fun applyEntrySort(entries: List<DietFoodEntry>, active: List<Pair<String, SortOrder>>): List<DietFoodEntry> {
     if (active.isEmpty()) return entries

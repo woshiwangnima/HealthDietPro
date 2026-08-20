@@ -77,6 +77,7 @@ import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
 import com.woshiwangnima.healthdietpro.common.time.formatRecordClock
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
+import com.woshiwangnima.healthdietpro.model.food.SYSTEM_TAG_BEVERAGE_BREW_BASE
 import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.water.ActivityLevel
@@ -612,7 +613,7 @@ private fun loadBeverages(context: android.content.Context): List<Beverage> {
     val foods = repository.foodsWithin("food.beverage") + UserCustomFoodRepository.fromContext(context).load()
     val language = context.resources.configuration.locales[0].language
     return foods.filterIsInstance<CategorizedFood>()
-        .filter { it.kind != FoodKind.DISH && repository.hasCategory(it.categoryTags, "food.beverage") }
+        .filter { it.kind != FoodKind.DISH && repository.hasCategory(it.categoryTags, "food.beverage") && SYSTEM_TAG_BEVERAGE_BREW_BASE !in it.systemTags }
         .map { Beverage(it.id, it.displayName(language), it.kind, it.hydrationMlPer100g, when (it) {
             is com.woshiwangnima.healthdietpro.model.food.Ingredient -> it.densityGramsPerMl
             is com.woshiwangnima.healthdietpro.model.food.PreparedFood -> it.densityGramsPerMl

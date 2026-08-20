@@ -57,10 +57,14 @@
     <string name="nutrition_sources">数据来源</string>
     <string name="nutrition_sources_empty">该条目暂无数据来源。</string>
     <string name="nutrition_macronutrient_energy">营养素供能</string>
-    <string name="nutrition_macronutrient_energy_center">碳水、蛋白质、脂肪</string>
+    <string name="nutrition_macronutrient_energy_center">供能构成</string>
     <string name="nutrition_energy_carbohydrate">碳水供能 %.1f%%</string>
     <string name="nutrition_energy_protein">蛋白供能 %.1f%%</string>
     <string name="nutrition_energy_fat">脂肪供能 %.1f%%</string>
+    <string name="nutrition_energy_fiber">膳食纤维供能 %.1f%%</string>
+    <string name="nutrition_energy_alcohol">酒精供能 %.1f%%</string>
+    <string name="nutrition_energy_organic_acid">有机酸供能 %.1f%%</string>
+    <string name="nutrition_energy_other">其他供能 %.1f%%</string>
     <string name="nutrition_energy_kcal_value">%.0f 千卡</string>
     <string name="nutrition_profile_item">项目</string>
     <string name="nutrition_profile_amount">含量</string>
@@ -133,6 +137,13 @@
     <string name="food_category_beverage">饮料</string>
     <string name="food_category_seasoning">调味品</string>
     <string name="food_category_grain">谷物</string>
+    <string name="food_category_vegetable_leafy">叶菜类</string>
+    <string name="food_category_vegetable_root">根茎类</string>
+    <string name="food_category_vegetable_gourd_solanaceous">瓜茄类</string>
+    <string name="food_category_vegetable_fresh_legume">鲜豆类</string>
+    <string name="food_category_vegetable_flower">花菜类</string>
+    <string name="food_category_vegetable_fungi_algae">菌藻菇类</string>
+    <string name="food_category_vegetable_aquatic">水生蔬菜</string>
     <string name="food_category_whole_grain">全谷物</string>
     <string name="food_category_mixed_bean">杂豆</string>
     <string name="food_category_tuber">薯芋</string>
@@ -158,6 +169,7 @@
     <string name="food_category_juice">果汁饮品</string>
     <string name="food_category_soy_beverage">豆类植物饮品</string>
     <string name="food_category_mixed_beverage">混合饮品</string>
+    <string name="food_category_dairy_beverage">奶类饮品</string>
     <string name="food_category_fermented_dairy">发酵乳制品</string>
     <string name="food_category_fresh_aromatic">鲜香辛料</string>
     <string name="food_category_dry_spice">干香辛料</string>
