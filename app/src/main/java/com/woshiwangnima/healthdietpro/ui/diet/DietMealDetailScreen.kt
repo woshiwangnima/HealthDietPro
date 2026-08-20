@@ -48,6 +48,7 @@ internal fun DietMealDetailScreen(
     goals: DietGoalsPrefs,
     dayTotals: DayNutrients,
     onEdit: () -> Unit,
+    onOpenFood: (DietFoodEntry) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -130,7 +131,7 @@ internal fun DietMealDetailScreen(
                 )
             }
             itemsIndexed(sortedEntries, key = { index, entry -> entry.foodName + entry.netWeightGrams + index }) { _, entry ->
-                MealEntryRow(entry, mealTotals)
+                MealEntryRow(entry, mealTotals, onOpenFood)
             }
             if (record.note.isNotBlank()) {
                 item {
@@ -170,7 +171,7 @@ private fun MealTimeCard(record: DietRecord) {
 }
 
 @Composable
-private fun MealEntryRow(entry: DietFoodEntry, mealTotals: DayNutrients) {
+private fun MealEntryRow(entry: DietFoodEntry, mealTotals: DayNutrients, onOpenFood: (DietFoodEntry) -> Unit) {
     val (container, onContainer) = foodKindColors(entry.foodKind)
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
@@ -183,6 +184,8 @@ private fun MealEntryRow(entry: DietFoodEntry, mealTotals: DayNutrients) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Surface(
+                onClick = { onOpenFood(entry) },
+                enabled = entry.foodId != null,
                 color = container,
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                 modifier = Modifier.width(MealFoodLabelWidth),

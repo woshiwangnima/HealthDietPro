@@ -141,6 +141,7 @@ class MainActivity : BaseActivity() {
     private var isMainPageTransitionRunning by mutableStateOf(false)
     private var routeBeforeTest = ROUTE_NUTRITION
     private var showOnboarding by mutableStateOf(false)
+    private var foodDetailMode by mutableStateOf(false)
     private var lastBackPressedAt = 0L
     private var previousSoftInputMode: Int? = null
     private var testPage by mutableStateOf(TestPage.Landing)
@@ -326,6 +327,7 @@ class MainActivity : BaseActivity() {
         checkFirstLaunch()
         ProfilePrefs.noteApplicationOpened(this)
         handleCustomFoodEditorIntent()
+        handleFoodDetailIntent()
     }
 
 
@@ -351,6 +353,26 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private fun handleFoodDetailIntent() {
+        val foodId = intent.getStringExtra(EXTRA_OPEN_NUTRITION_DETAIL_ID) ?: return
+        foodDetailMode = true
+        selectedRoute = ROUTE_NUTRITION
+        val userId = ProfilePrefs.getCurrentUserId(this)
+        lifecycleScope.launch {
+            val foods = nutritionViewModel.state.map { it.foods }.distinctUntilChanged().first { it.isNotEmpty() }
+            val food = foods.firstOrNull { it.id == foodId }
+            if (food == null) {
+                finish()
+                return@launch
+            }
+            nutritionViewModel.openFood(food)
+            nutritionViewModel.state.map { it.selectedFood }.distinctUntilChanged().first { it == null }
+            if (ProfilePrefs.getCurrentUserId(this@MainActivity) == userId) {
+                finish()
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         ProfilePrefs.noteCurrentUserActivity(this)
@@ -371,7 +393,7 @@ class MainActivity : BaseActivity() {
     private fun MainShell() {
         val nutritionState by nutritionViewModel.state.collectAsState()
         val showBottomNavigation = selectedRoute != ROUTE_NUTRITION ||
-            (nutritionState.selectedFood == null && nutritionState.comparisonReturnTarget == null && nutritionState.editor == null)
+            (!foodDetailMode && nutritionState.selectedFood == null && nutritionState.comparisonReturnTarget == null && nutritionState.editor == null)
         if (showOnboarding) {
             AlertDialog(
                 onDismissRequest = {},
@@ -421,7 +443,14 @@ class MainActivity : BaseActivity() {
             },
         ) { route ->
             when (route) {
-                ROUTE_NUTRITION -> NutritionScreen(viewModel = nutritionViewModel, modifier = Modifier.fillMaxSize())
+                ROUTE_NUTRITION -> {
+                    val nutritionState by nutritionViewModel.state.collectAsState()
+                    if (foodDetailMode && nutritionState.selectedFood == null) {
+                        Box(Modifier.fillMaxSize())
+                    } else {
+                        NutritionScreen(viewModel = nutritionViewModel, modifier = Modifier.fillMaxSize())
+                    }
+                }
                 ROUTE_RECORD -> {
                     val uiState by recordViewModel.uiState.collectAsState()
                     RecordScreen(
@@ -886,6 +915,7 @@ class MainActivity : BaseActivity() {
         const val ROUTE_PROFILE = "profile"
         const val ROUTE_TEST = "test"
         const val EXTRA_OPEN_NUTRITION_EDITOR_KIND = "open_nutrition_editor_kind"
+        const val EXTRA_OPEN_NUTRITION_DETAIL_ID = "open_nutrition_detail_id"
         const val EXTRA_CREATED_CUSTOM_FOOD_ID = "created_custom_food_id"
     }
 

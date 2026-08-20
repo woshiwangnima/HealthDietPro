@@ -55,6 +55,7 @@ class DietRecordActivity : BaseActivity() {
                     viewModel = dietViewModel,
                     onFinish = ::finish,
                     onCreateCustomFood = ::launchCustomFoodEditor,
+                    onOpenFoodDetail = ::openFoodDetail,
                     openEditorInitially = intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false),
                 )
             }
@@ -67,6 +68,13 @@ class DietRecordActivity : BaseActivity() {
                 .putExtra(MainActivity.EXTRA_OPEN_NUTRITION_EDITOR_KIND, kind.name),
         )
     }
+
+    private fun openFoodDetail(foodId: String) {
+        startActivity(
+            Intent(this, MainActivity::class.java)
+                .putExtra(MainActivity.EXTRA_OPEN_NUTRITION_DETAIL_ID, foodId),
+        )
+    }
 }
 
 private enum class DietRoute { HOME, EDITOR, DETAIL, SETTINGS, DEFAULT_DURATION, GOALS, CONTAINERS }
@@ -76,6 +84,7 @@ private fun DietRoute(
     viewModel: DietViewModel,
     onFinish: () -> Unit,
     onCreateCustomFood: (FoodKind) -> Unit,
+    onOpenFoodDetail: (String) -> Unit,
     openEditorInitially: Boolean,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -139,6 +148,7 @@ private fun DietRoute(
                     goals = goals,
                     dayTotals = detailDayTotals,
                     onEdit = { editingRecord = detailRecord; route = DietRoute.EDITOR },
+                    onOpenFood = { entry -> entry.foodId?.let(onOpenFoodDetail) },
                     onBack = { route = DietRoute.HOME },
                     modifier = Modifier,
                 )
