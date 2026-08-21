@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartViewModel
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodHbA1cRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseSource
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRepository
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseDiabetesType
@@ -30,6 +31,8 @@ internal class BloodGlucoseViewModel(application: Application) : BaseChartViewMo
     private val alertNotifier = BloodGlucoseAlertNotifier(application)
     private val _records = MutableStateFlow<List<BloodGlucoseRecord>>(emptyList())
     val records: StateFlow<List<BloodGlucoseRecord>> = _records.asStateFlow()
+    private val _hbA1cRecords = MutableStateFlow<List<BloodHbA1cRecord>>(emptyList())
+    val hbA1cRecords: StateFlow<List<BloodHbA1cRecord>> = _hbA1cRecords.asStateFlow()
     private val _sources = MutableStateFlow<List<BloodGlucoseSource>>(emptyList())
     val sources: StateFlow<List<BloodGlucoseSource>> = _sources.asStateFlow()
     private val _diabetesType = MutableStateFlow(BloodGlucoseDiabetesType.Normal)
@@ -51,6 +54,7 @@ internal class BloodGlucoseViewModel(application: Application) : BaseChartViewMo
         viewModelScope.launch {
             val archive = withContext(Dispatchers.IO) { repository.loadArchive() }
             _records.value = archive.records
+            _hbA1cRecords.value = archive.hbA1cRecords
             _sources.value = archive.sources
         }
     }
@@ -76,10 +80,24 @@ internal class BloodGlucoseViewModel(application: Application) : BaseChartViewMo
         }
     }
 
-    fun delete(id: String) {
+    fun upsertHbA1c(record: BloodHbA1cRecord) {
+        val updated = (_hbA1cRecords.value.filterNot { it.id == record.id } + record).sortedByDescending { it.timestamp }
+        _hbA1cRecords.value = updated
+        viewModelScope.launch(Dispatchers.IO) { repository.saveHbA1cRecords(updated) }
+    }
+
+    fun deleteGlucose(id: String) {
         val updated = _records.value.filterNot { it.id == id }
         _records.value = updated
         viewModelScope.launch(Dispatchers.IO) { repository.save(updated) }
+    }
+
+    fun delete(id: String) = deleteGlucose(id)
+
+    fun deleteHbA1c(id: String) {
+        val updated = _hbA1cRecords.value.filterNot { it.id == id }
+        _hbA1cRecords.value = updated
+        viewModelScope.launch(Dispatchers.IO) { repository.saveHbA1cRecords(updated) }
     }
 
     fun saveSources(sources: List<BloodGlucoseSource>) {

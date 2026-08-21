@@ -6,21 +6,23 @@ import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 
 enum class BloodGlucoseDiabetesType(
-    val minMmolPerL: Float,
-    val maxMmolPerL: Float,
+    val glucoseReferenceRangeMmolPerL: UnitRange<Float>,
+    val hbA1cReferenceRange: UnitRange<Double>,
     val available: Boolean,
 ) {
-    Normal(3.9f, 7.8f, true),
-    Type1(3.9f, 10.0f, true),
-    Type2(3.9f, 10.0f, true),
-    Gestational(3.5f, 7.8f, true),
-    Other(3.9f, 10.0f, true),
+    Normal(UnitRange(3.9f, true, 7.8f, true, UnitCategoryType.Glucose.id, "mmol_l"), UnitRange(4.0, true, 6.0, true, "hbA1c", "%"), true),
+    Type1(UnitRange(3.9f, true, 10.0f, true, UnitCategoryType.Glucose.id, "mmol_l"), UnitRange(6.5, true, 7.0, false, "hbA1c", "%"), true),
+    Type2(UnitRange(3.9f, true, 10.0f, true, UnitCategoryType.Glucose.id, "mmol_l"), UnitRange(6.5, true, 7.0, false, "hbA1c", "%"), true),
+    Gestational(UnitRange(3.5f, true, 7.8f, true, UnitCategoryType.Glucose.id, "mmol_l"), UnitRange(null, false, 5.5, false, "hbA1c", "%"), true),
+    Other(UnitRange(3.9f, true, 10.0f, true, UnitCategoryType.Glucose.id, "mmol_l"), UnitRange(4.0, true, 6.0, true, "hbA1c", "%"), true),
     ;
 
     /** Returns this target in the requested blood glucose unit. */
     fun targetRange(unitId: String = UnitCategoryType.Glucose.defaultUnitId): UnitRange<Float> = UnitRange(
-        min = UnitConverter.fromBase(UnitCategoryType.Glucose.id, minMmolPerL, unitId),
-        max = UnitConverter.fromBase(UnitCategoryType.Glucose.id, maxMmolPerL, unitId),
+        min = glucoseReferenceRangeMmolPerL.min?.let { UnitConverter.fromBase(UnitCategoryType.Glucose.id, it, unitId) },
+        minInclusive = glucoseReferenceRangeMmolPerL.minInclusive,
+        max = glucoseReferenceRangeMmolPerL.max?.let { UnitConverter.fromBase(UnitCategoryType.Glucose.id, it, unitId) },
+        maxInclusive = glucoseReferenceRangeMmolPerL.maxInclusive,
         unitCategory = UnitCategoryType.Glucose.id,
         unitId = unitId,
     )

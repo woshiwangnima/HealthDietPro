@@ -61,8 +61,15 @@ internal class BloodGlucoseArchiveStore private constructor(
         require(ids.distinct().size == ids.size) { "Duplicate blood glucose record id" }
     }
 
+    private fun validateHbA1cRecordIds(records: List<BloodHbA1cRecord>) {
+        val ids = records.map(BloodHbA1cRecord::id)
+        require(ids.all { it.isNotBlank() }) { "HbA1c record id is blank" }
+        require(ids.distinct().size == ids.size) { "Duplicate HbA1c record id" }
+    }
+
     private fun validate(archive: BloodGlucoseArchive) {
         validateRecordIds(archive.records)
+        validateHbA1cRecordIds(archive.hbA1cRecords)
         val sourceIds = archive.sources.map(BloodGlucoseSource::id)
         require(sourceIds.all { it.isNotBlank() }) { "Blood glucose source id is blank" }
         require(sourceIds.distinct().size == sourceIds.size) { "Duplicate blood glucose source id" }
@@ -89,6 +96,7 @@ internal class BloodGlucoseArchiveStore private constructor(
 internal data class BloodGlucoseArchive(
     val schemaVersion: Int = 2,
     val records: List<BloodGlucoseRecord> = emptyList(),
+    val hbA1cRecords: List<BloodHbA1cRecord> = emptyList(),
     val sources: List<BloodGlucoseSource> = emptyList(),
     val diabetesType: BloodGlucoseDiabetesType = BloodGlucoseDiabetesType.Normal,
     val reminder: BloodGlucoseReminderSettings = BloodGlucoseReminderSettings(),

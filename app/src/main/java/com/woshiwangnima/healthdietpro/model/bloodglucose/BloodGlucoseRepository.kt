@@ -13,6 +13,10 @@ internal class BloodGlucoseRepository private constructor(private val context: C
         archive.update { it.copy(records = records.sortedByDescending(BloodGlucoseRecord::timestamp)) }
     }
 
+    fun saveHbA1cRecords(records: List<BloodHbA1cRecord>) {
+        archive.update { it.copy(hbA1cRecords = records.sortedByDescending(BloodHbA1cRecord::timestamp)) }
+    }
+
     fun saveSources(sources: List<BloodGlucoseSource>) {
         archive.update { it.copy(sources = sources) }
     }
