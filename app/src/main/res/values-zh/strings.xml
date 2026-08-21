@@ -1170,7 +1170,6 @@
     <string name="water_hydration_tooltip">饮品含水量是每 100 克可食饮品中所含水分的毫升数，来自食物数据，仅作参考，不构成治疗建议。</string>
     <string name="water_hydration">含水量</string>
     <string name="water_hydration_value">%1$.1f ml / 100 g</string>
-    <string name="water_hydration_option">%1$.1f ml / 100 g</string>
     <string name="water_food_kind">类型</string>
     <string name="water_kind_ingredient">食材</string>
     <string name="water_kind_food">食物</string>

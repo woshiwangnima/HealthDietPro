@@ -237,7 +237,7 @@ private fun BloodPressureChart(
         lineStyle = stringResource(R.string.view_chart_line_style),
         xAxisRange = stringResource(R.string.view_chart_time_range),
         xAxisInterval = stringResource(R.string.view_chart_time_interval),
-        yAxisBounds = stringResource(R.string.view_chart_bmi_bounds),
+        yAxisBounds = stringResource(R.string.view_chart_y_axis_bounds),
         fullscreen = stringResource(R.string.view_chart_fullscreen),
     )
     val series = remember(systolicData, diastolicData, systolicLabel, diastolicLabel) {

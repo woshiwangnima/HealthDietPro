@@ -215,7 +215,7 @@
     <string name="nutrition_editor_section_optional">Optional</string>
     <string name="nutrition_editor_gi">Glycemic index (GI)</string>
     <string name="nutrition_editor_gl">Glycemic load (GL) / 100 g</string>
-    <string name="nutrition_editor_description">Description</string>
+    <string name="nutrition_editor_description">Description (optional)</string>
     <string name="nutrition_editor_description_hint">Scientific notes, e.g. botanical family / genus</string>
     <string name="nutrition_editor_computed_nutrients">Computed nutrients (per 100 g)</string>
     <string name="nutrition_editor_ratio_note">Nutrition is derived from the source ingredient and cooking method.</string>
@@ -1170,7 +1170,6 @@
     <string name="water_hydration_tooltip">Beverage hydration is the amount of water in each 100 g of edible beverage. It is a food-data reference, not a treatment recommendation.</string>
     <string name="water_hydration">Hydration</string>
     <string name="water_hydration_value">%1$.1f ml / 100 g</string>
-    <string name="water_hydration_option">%1$.1f ml / 100 g</string>
     <string name="water_food_kind">Type</string>
     <string name="water_kind_ingredient">Ingredient</string>
     <string name="water_kind_food">Food</string>

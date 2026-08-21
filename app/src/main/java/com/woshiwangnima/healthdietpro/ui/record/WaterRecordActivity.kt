@@ -472,7 +472,7 @@ private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, q
                         )
                     }
                 }
-                item { AppDropdownField(stringResource(R.string.water_beverage), beverage?.name.orEmpty(), beverages.map { AppDropdownOption(it.id, it.name, it.hydrationMlPer100g?.let { value -> stringResource(R.string.water_hydration_option, value) }) }, { beverageId = it.id; selectedQuickRecordId = null }) }
+                item { AppDropdownField(stringResource(R.string.water_beverage), beverage?.name.orEmpty(), beverages.map { AppDropdownOption(it.id, it.name, it.hydrationMlPer100g?.let { value -> stringResource(R.string.water_hydration_value, value) }) }, { beverageId = it.id; selectedQuickRecordId = null }) }
                 item { EditorTextField(label = stringResource(R.string.water_volume), value = volume, onValueChange = { volume = it }, required = true, numeric = true, range = NumericInputRange(minimum = 0.001)) }
                 item { AppDropdownField(stringResource(R.string.water_unit), unit.name.lowercase(), WaterVolumeUnit.entries.map { AppDropdownOption(it.name, it.name.lowercase()) }, { unit = WaterVolumeUnit.valueOf(it.id) }) }
             }
