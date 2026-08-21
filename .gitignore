@@ -84,3 +84,4 @@ docs/*
 # Hidden directories
 .*/
 !.gitignore
+agp_report.pdf
