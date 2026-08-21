@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.Icon
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 data class EqualWidthTab(
@@ -65,8 +64,6 @@ fun EqualWidthSegmentedTabs(
                     tab.iconRes?.let { Icon(painterResource(it), null, modifier = Modifier.size(16.dp), tint = contentColor) }
                     TextOverflowText(
                         text = tab.title ?: stringResource(tab.titleRes),
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.labelLarge,
                         color = contentColor,
                     )
