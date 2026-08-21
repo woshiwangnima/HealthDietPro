@@ -8,6 +8,7 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - 依赖注入：手动构造（后续可接入 Hilt）
 
 **禁用清单（新代码与迁移代码一律遵守）：**
+
 - 不引入 Gson（迁移既有 Repository 时改 `kotlinx.serialization`）
 - 不新增 Fragment / XML 布局用于新屏（新屏必须 Compose）
 - 不引入第三方图表库（图表走自研 Canvas）
@@ -17,13 +18,13 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 
 9 模块定义见 DESIGN §3。允许的依赖方向：
 
-| 模块 | 可依赖 |
-|------|--------|
-| 静态数据只读 | 无（纯只读，不持写入口） |
-| 存档（app / user） | 静态数据 schema |
-| 基础设施（UI 公用 / 多层 Tag / 图表渲染） | 静态数据（图表轴格式）、存档（`TabPersistence` / `AppPrefs` 持久化） |
-| 功能模块（单位切换 / GPS / 疾病 / 个人信息 / 营养表） | 静态数据 + 存档 + 基础设施 |
-| 界面模块 | 功能模块 + 基础设施 + 存档 |
+| 模块                                 | 可依赖                                               |
+| ---------------------------------- | ------------------------------------------------- |
+| 静态数据只读                             | 无（纯只读，不持写入口）                                      |
+| 存档（app / user）                     | 静态数据 schema                                       |
+| 基础设施（UI 公用 / 多层 Tag / 图表渲染）        | 静态数据（图表轴格式）、存档（`TabPersistence` / `AppPrefs` 持久化） |
+| 功能模块（单位切换 / GPS / 疾病 / 个人信息 / 营养表） | 静态数据 + 存档 + 基础设施                                  |
+| 界面模块                               | 功能模块 + 基础设施 + 存档                                  |
 
 **禁止：** 循环依赖；UI 直接读 `assets/*.json`（须经静态数据 Repository）；功能模块反向依赖界面模块；静态数据模块依赖任何其他模块。
 
@@ -136,6 +137,17 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - 不改 `assets/*.json` 与 `res/raw/*` 除非明确要求。
 - 现状：XML + DataBinding 单 Activity 多 Fragment，Compose 未启用；本规范描述目标态，迁移按 DESIGN §10 推进。
 
+### AGP PDF 血糖导入
+
+- AGP PDF 的固定工作目录为 `tools/agp_pdf/`：用户提供的报告仅放入 `input/`，解析 JSON 与图像仅写入 `output/`，脚本与说明不得散落在项目根目录或临时目录。
+- 第一步运行 `tools/agp_pdf/01-GeneratePreview.ps1`。它要求 `input/` 恰有一个 PDF，调用 `uv run python` 的矢量路径解析器生成 `output/agp_preview.json`，再自动生成并打开 `output/agp_preview.png`。预览步骤**绝不**连接或写入 Android 设备。
+- 解析规则仅适用于含 `每日血糖曲线` 矢量路径的 AGP PDF：横轴按报告本地时间 `Asia/Shanghai`，纵轴为 `mmol/L`，每 5 分钟一个实际曲线点。首尾不完整日允许存在，必须保留实际点数，禁止插值、补点或按 24 小时填满。
+- 导入前人工核对 PNG 与 PDF：每日曲线形状、日期、有效点数和 MBG 必须一致；每日反算 MBG 相对 PDF 摘要的误差不得超过 `0.02 mmol/L`。任何日期不通过时停止导入并修复解析器，禁止手工修改 JSON 使其通过。
+- 人工确认后，确保测试机已经安装含 AGP 导入器的当前 debug APK，并在 App 内切换到目标当前用户；再运行 `tools/agp_pdf/02-ImportConfirmedPreview.ps1`。脚本会显示准备要求并等待 Enter，且只接受一个 `device` 状态的 ADB 设备；它将 JSON 暂存进 App 私有待导入目录、显式启动导入入口，并在终端轮询显示成功新增记录数或 App 返回的失败原因。
+- App 导入器必须在操作开始时通过 `ProfilePrefs.getCurrentUserId` 绑定当前用户，拒绝无当前用户情形。它只接受 `agp-vector-preview-v1`、`Asia/Shanghai`、5 分钟间隔与合法 `1.1..33.3 mmol/L` 值，并在一次 `BloodGlucoseArchiveStore.update` 事务中追加记录、保留既有记录和来源。
+- AGP 记录基础单位恒为 `valueMmolPerL`；导入前必须由用户在 App 内从当前用户已保存的血糖值来源设置中选择一个，记录只保存该既有 `sourceId`，不得自动新建或覆盖来源设置。用 `timestamp + valueMmolPerL` 精确去重，重复导入不得产生新记录。导入不回放历史高/低血糖提醒。成功后删除待导入 JSON；失败时保留该文件、不得出现半批记录。
+- 设备端存档必须由 App 的 `BloodGlucoseRepository` / `BloodGlucoseArchiveStore` 写入以生成 archive 信封、清单和版本字段。PowerShell/Python 脚本不得直接构造、覆盖或编辑 `blood_glucose.json`。
+
 ## Android Debug / Logcat commands
 
 Use absolute paths in PowerShell so another agent can reproduce device debugging without relying on PATH.
@@ -178,3 +190,24 @@ $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
 # IME / system navigation investigation on MIUI or real devices.
 & $Adb -s adb-d794c3f-uZefzR._adb-tls-connect._tcp logcat -d -v time | Select-String -Pattern "ImeTracker|Insets|BarFollowAnimation|NavigationBar|healthdietpro|MainActivity|TestFragment" -Context 4,16
 ```
+
+# MinerU 文档解析指令
+
+## 环境与执行
+
+- 本项目使用 `uv` 管理依赖，虚拟环境位于 `.venv`。
+- **严禁**直接使用系统 `pip` 或系统 Python 运行解析任务。
+- 所有解析命令必须通过 `uv run` 前缀执行，以确保依赖正确加载。
+  
+  ## 解析命令模板
+  
+  当用户要求解析 PDF、图片、DOCX、PPTX 或 XLSX 时，使用以下格式：
+  ```bash
+  
+  # 解析单个文件或文件夹（自动判断）
+  
+  uv run mineru -p <输入文件或文件夹路径> -o <输出文件夹路径>
+  
+  # 如果是纯 CPU 环境或速度优先，可指定 pipeline 后端
+  
+  uv run mineru -p <输入路径> -o <输出路径> -b pipeline

@@ -84,4 +84,8 @@ docs/*
 # Hidden directories
 .*/
 !.gitignore
-agp_report.pdf
+
+# AGP PDF import workflow: user health reports and derived preview artifacts
+tools/agp_pdf/input/*
+!tools/agp_pdf/input/.gitkeep
+tools/agp_pdf/output/

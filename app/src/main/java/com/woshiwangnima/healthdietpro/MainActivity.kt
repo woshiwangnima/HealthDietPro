@@ -1,6 +1,7 @@
 package com.woshiwangnima.healthdietpro
 
 import android.content.Intent
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.WindowInsets as AndroidWindowInsets
 import android.view.WindowManager
@@ -62,6 +63,7 @@ import com.woshiwangnima.healthdietpro.model.food.FoodQuantityDto
 import com.woshiwangnima.healthdietpro.model.food.RecipeStepDto
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRepository
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseSource
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingAnchor
 import com.woshiwangnima.healthdietpro.model.water.WaterRecord
 import com.woshiwangnima.healthdietpro.model.water.WaterRepository
@@ -101,6 +103,7 @@ import com.woshiwangnima.healthdietpro.ui.test.CrossSectionUiTestScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComponentsPreviewScreen
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabPersistence
 import com.woshiwangnima.healthdietpro.util.UnitConverter
+import com.woshiwangnima.healthdietpro.model.bloodglucose.AgpPreviewImporter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -328,6 +331,47 @@ class MainActivity : BaseActivity() {
         ProfilePrefs.noteApplicationOpened(this)
         handleCustomFoodEditorIntent()
         handleFoodDetailIntent()
+        handleAgpPreviewImportIntent()
+    }
+
+    private fun handleAgpPreviewImportIntent() {
+        if (!intent.getBooleanExtra(EXTRA_IMPORT_AGP_PREVIEW, false)) return
+        lifecycleScope.launch {
+            val importer = AgpPreviewImporter(this@MainActivity)
+            val sources = withContext(Dispatchers.IO) { importer.loadSources() }
+            if (sources.isEmpty()) {
+                finishAgpPreviewImport(importer, Result.failure(IllegalStateException("No blood glucose sources configured")))
+                return@launch
+            }
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("选择血糖值来源")
+                .setItems(sources.map(BloodGlucoseSource::note).toTypedArray()) { _, which ->
+                    lifecycleScope.launch {
+                        val result = runCatching { withContext(Dispatchers.IO) { importer.importPending(sources[which].id) } }
+                        finishAgpPreviewImport(importer, result)
+                    }
+                }
+                .setOnCancelListener {
+                    lifecycleScope.launch { finishAgpPreviewImport(importer, Result.failure(IllegalStateException("Blood glucose source selection cancelled"))) }
+                }
+                .show()
+        }
+    }
+
+    private suspend fun finishAgpPreviewImport(importer: AgpPreviewImporter, result: Result<Int>) {
+        withContext(Dispatchers.IO) {
+            importer.writeResult(
+                result.fold(
+                    onSuccess = { "SUCCESS:$it" },
+                    onFailure = { "FAILED:${it.message ?: it.javaClass.simpleName}" },
+                ),
+            )
+        }
+        Toast.makeText(
+            this,
+            result.fold({ "AGP 导入完成：新增 $it 条血糖记录" }, { "AGP 导入失败：${it.message}" }),
+            Toast.LENGTH_LONG,
+        ).show()
     }
 
 
@@ -917,6 +961,7 @@ class MainActivity : BaseActivity() {
         const val EXTRA_OPEN_NUTRITION_EDITOR_KIND = "open_nutrition_editor_kind"
         const val EXTRA_OPEN_NUTRITION_DETAIL_ID = "open_nutrition_detail_id"
         const val EXTRA_CREATED_CUSTOM_FOOD_ID = "created_custom_food_id"
+        const val EXTRA_IMPORT_AGP_PREVIEW = "import_agp_preview"
     }
 
     private enum class TestPage { Landing, Commands, Features, CommonUi, CrossSection }
