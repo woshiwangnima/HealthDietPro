@@ -29,6 +29,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -109,20 +112,10 @@ import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.model.unit.UnitStepMode
 import com.woshiwangnima.healthdietpro.model.unit.stepSpec
 import com.woshiwangnima.healthdietpro.util.UnitConverter
-import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartAxisKind
-import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartCanvasStyle
-import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartControlLabels
-import com.woshiwangnima.healthdietpro.ui.profile.chart.ChartSeries
-import com.woshiwangnima.healthdietpro.ui.profile.chart.ComposeChart
-import com.woshiwangnima.healthdietpro.ui.profile.chart.ComposeChartSpec
-import com.woshiwangnima.healthdietpro.ui.profile.chart.LineStyle
-import com.woshiwangnima.healthdietpro.ui.profile.chart.LineType
-import com.woshiwangnima.healthdietpro.ui.profile.chart.PointFill
-import com.woshiwangnima.healthdietpro.ui.profile.chart.PointShape
 import com.woshiwangnima.healthdietpro.ui.event.EventScreen
 import com.woshiwangnima.healthdietpro.ui.event.EventViewModel
 import com.woshiwangnima.healthdietpro.ui.event.EventInfoScreen
-import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartEvent
+import com.woshiwangnima.healthdietpro.common.time.resolve
 import com.woshiwangnima.healthdietpro.model.unit.formatGlucoseValue
 import java.time.Instant
 import java.time.LocalDateTime
@@ -178,12 +171,14 @@ private fun BloodGlucoseScreen(
     onOpenRecordAction: (RecordActionId) -> Unit,
     openEditorInitially: Boolean,
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val records by viewModel.records.collectAsStateWithLifecycle()
     val hbA1cRecords by viewModel.hbA1cRecords.collectAsStateWithLifecycle()
     val diabetesType by viewModel.diabetesType.collectAsStateWithLifecycle()
-    val context = androidx.compose.ui.platform.LocalContext.current
     val sources by viewModel.sources.collectAsStateWithLifecycle()
-    val chartState by viewModel.chartState.collectAsStateWithLifecycle()
+    val chartScope by viewModel.chartScope.collectAsStateWithLifecycle()
+    val chartWindow by viewModel.chartWindow.collectAsStateWithLifecycle()
+    val chartWindowEnd by viewModel.chartWindowEnd.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var selectedRecordType by rememberSaveable { mutableIntStateOf(0) }
     var editingRecord by remember { mutableStateOf<BloodGlucoseRecord?>(null) }
@@ -323,9 +318,16 @@ private fun BloodGlucoseScreen(
                 direction = { initialTab, targetTab -> targetTab - initialTab },
             ) { tab ->
                 if (tab == 0) {
-                    BloodGlucoseChart(records, chartState, viewModel.chartStateKey) {
-                        viewModel.onChartEvent(BaseChartEvent.StateChanged(it))
-                    }
+                    BloodGlucoseChart(
+                        records = records,
+                        diabetesType = diabetesType,
+                        scope = chartScope,
+                        window = chartWindow,
+                        windowEnd = chartWindowEnd,
+                        onScopeChanged = viewModel::setChartScope,
+                        onWindowChanged = viewModel::setChartWindow,
+                        onWindowEndChanged = viewModel::setChartWindowEnd,
+                    )
                 } else {
                     when (tab) {
                         1 -> BloodGlucoseDataPage(
@@ -759,94 +761,37 @@ private fun <T> rangeText(range: UnitRange<T>, unitLabel: String): String where 
 @Composable
 private fun BloodGlucoseChart(
     records: List<BloodGlucoseRecord>,
-    chartState: com.woshiwangnima.healthdietpro.model.chart.ComposeChartState?,
-    chartStateKey: String,
-    onChartStateChanged: (com.woshiwangnima.healthdietpro.model.chart.ComposeChartState) -> Unit,
+    diabetesType: BloodGlucoseDiabetesType,
+    scope: com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection,
+    window: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow,
+    windowEnd: Long?,
+    onScopeChanged: (com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection) -> Unit,
+    onWindowChanged: (com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow) -> Unit,
+    onWindowEndChanged: (Long?) -> Unit,
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    var selectedDateMillis by rememberSaveable { mutableStateOf(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) }
-    var showDatePicker by rememberSaveable { mutableStateOf(false) }
-    val selectedDate = remember(selectedDateMillis) {
-        Instant.ofEpochMilli(selectedDateMillis).atZone(ZoneId.systemDefault()).toLocalDate()
-    }
-    val dayStart = remember(selectedDate) { selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
-    val nextDayStart = remember(selectedDate) { selectedDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
-    val seriesLabel = stringResource(R.string.blood_glucose_value)
-    val delayedSeriesLabel = stringResource(R.string.blood_glucose_delayed_series)
-    val unit = stringResource(R.string.blood_glucose_unit)
-    val valueWithUnitFormat = stringResource(R.string.blood_glucose_value_with_unit)
-    val data = remember(records, dayStart, nextDayStart) {
-        records.filter { it.timestamp in dayStart until nextDayStart }.sortedBy { it.timestamp }.map { record ->
-            DataPoint(record.timestamp, record.valueMmolPerL.toFloat(), formatBloodGlucoseTime(record.timestamp))
-        }
-    }
-    val delayedData = remember(records, dayStart) {
-        records.filter { it.timestamp in dayStart - 86_400_000L until dayStart }
-            .sortedBy { it.timestamp }
-            .map { record -> DataPoint(record.timestamp + 86_400_000L, record.valueMmolPerL.toFloat(), formatBloodGlucoseTime(record.timestamp + 86_400_000L)) }
-    }
-    val series = remember(data, context, seriesLabel) {
-        ChartSeries(
-            points = data,
-            label = seriesLabel,
-            color = ContextCompat.getColor(context, R.color.primary),
-            lineStyle = LineStyle.LINEAR,
-            lineType = LineType.SOLID,
-            pointShape = PointShape.CIRCLE,
-            pointFill = PointFill.FILLED,
-        )
-    }
-    val delayedSeries = remember(delayedData, context, delayedSeriesLabel) {
-        ChartSeries(
-            points = delayedData,
-            label = delayedSeriesLabel,
-            color = ContextCompat.getColor(context, R.color.secondary),
-            lineStyle = LineStyle.STEPPED_FRONT,
-            lineType = LineType.DASHED,
-            pointShape = PointShape.CIRCLE,
-            pointFill = PointFill.HOLLOW,
-        )
-    }
+    val resolvedScope = scope.resolve()
     Column(Modifier.fillMaxSize()) {
-        RecordTimePickerField(
-            title = stringResource(R.string.blood_glucose_time),
-            valueMillis = selectedDateMillis,
-            precision = RecordTimePrecision.DATE,
-            onClick = { showDatePicker = true },
-        )
-        ComposeChart(
-            spec = ComposeChartSpec(
-            title = stringResource(R.string.blood_glucose_title),
-            chartStateKey = chartStateKey,
-            canvasStyle = ChartCanvasStyle(
-                xAxisKind = ChartAxisKind.TimestampMs,
-                yValueFormatter = { "%.1f".format(it) },
-                xValueFormatter = ::formatBloodGlucoseAxisTime,
-                crosshairValueFormatter = { value, _ -> String.format(Locale.getDefault(), valueWithUnitFormat, value, unit) },
-                crosshairTimeFormatter = { timestamp -> formatBloodGlucoseTime(timestamp) },
-            ),
-            controlLabels = ChartControlLabels(
-                lineStyle = stringResource(R.string.view_chart_line_style),
-                xAxisRange = stringResource(R.string.view_chart_time_range),
-                xAxisInterval = stringResource(R.string.view_chart_time_interval),
-                yAxisBounds = stringResource(R.string.view_chart_y_axis_bounds),
-                fullscreen = stringResource(R.string.view_chart_fullscreen),
-            ),
-            series = listOf(series, delayedSeries),
-            xAxisLabel = stringResource(R.string.chart_axis_time_unit),
-            yAxisLabel = stringResource(R.string.blood_glucose_unit),
-            titleVisible = false,
-        ),
-            chartState = chartState,
-            onChartStateChanged = onChartStateChanged,
+        com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter(scope, onScopeChanged)
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow.entries.forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = window == option,
+                    onClick = { onWindowChanged(option) },
+                    shape = SegmentedButtonDefaults.itemShape(index, 4),
+                    label = { Text(stringResource(R.string.blood_glucose_chart_window_hours, option.durationMillis / 3_600_000L)) },
+                )
+            }
+        }
+        BloodGlucoseFixedWindowChart(
+            records = records,
+            scopeStart = resolvedScope.startMillis,
+            scopeEnd = resolvedScope.endMillis,
+            window = window,
+            sessionWindowEnd = windowEnd,
+            onSessionWindowEndChanged = onWindowEndChanged,
+            diabetesType = diabetesType,
             modifier = Modifier.weight(1f),
         )
-    }
-    if (showDatePicker) {
-        ComposeDatePickerDialog(selectedDateMillis, { showDatePicker = false }) { selected ->
-            selectedDateMillis = selected.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            showDatePicker = false
-        }
     }
 }
 

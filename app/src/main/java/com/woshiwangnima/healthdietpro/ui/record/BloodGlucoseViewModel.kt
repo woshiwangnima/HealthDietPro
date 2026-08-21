@@ -1,8 +1,8 @@
 package com.woshiwangnima.healthdietpro.ui.record
 
 import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartViewModel
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodHbA1cRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseSource
@@ -14,6 +14,11 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseReminderSe
 import com.woshiwangnima.healthdietpro.model.bloodglucose.evaluateBloodGlucoseAlerts
 import com.woshiwangnima.healthdietpro.common.notification.BloodGlucoseAlertNotifier
 import com.woshiwangnima.healthdietpro.model.bloodglucose.normalizeBloodGlucoseTimestamp
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRange
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
+import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,10 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal class BloodGlucoseViewModel(application: Application) : BaseChartViewModel(
-    application = application,
-    chartBaseKey = "blood_glucose_history",
-) {
+internal class BloodGlucoseViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = BloodGlucoseRepository.fromContext(application)
     private val targetRepository = BloodGlucoseTargetRepository.fromContext(application)
     private val reminderRepository = BloodGlucoseReminderRepository.fromContext(application)
@@ -39,6 +41,13 @@ internal class BloodGlucoseViewModel(application: Application) : BaseChartViewMo
     val diabetesType: StateFlow<BloodGlucoseDiabetesType> = _diabetesType.asStateFlow()
     private val _reminderSettings = MutableStateFlow(BloodGlucoseReminderSettings())
     val reminderSettings: StateFlow<BloodGlucoseReminderSettings> = _reminderSettings.asStateFlow()
+    private val preferences = UserPrefs.current(application)
+    private val _chartWindow = MutableStateFlow(loadChartWindow())
+    val chartWindow: StateFlow<BloodGlucoseChartWindow> = _chartWindow.asStateFlow()
+    private val _chartScope = MutableStateFlow(loadChartScope())
+    val chartScope: StateFlow<RecordTimeRangeSelection> = _chartScope.asStateFlow()
+    private val _chartWindowEnd = MutableStateFlow<Long?>(null)
+    val chartWindowEnd: StateFlow<Long?> = _chartWindowEnd.asStateFlow()
 
     init {
         refresh()
@@ -120,5 +129,52 @@ internal class BloodGlucoseViewModel(application: Application) : BaseChartViewMo
     fun setReminderSettings(settings: BloodGlucoseReminderSettings) {
         _reminderSettings.value = settings
         viewModelScope.launch(Dispatchers.IO) { reminderRepository.save(settings) }
+    }
+
+    fun setChartWindow(window: BloodGlucoseChartWindow) {
+        _chartWindow.value = window
+        preferences.putString(CHART_WINDOW_KEY, window.name)
+    }
+
+    fun setChartScope(scope: RecordTimeRangeSelection) {
+        _chartScope.value = scope
+        _chartWindowEnd.value = null
+        preferences.putString(CHART_SCOPE_KEY, scope.encode())
+    }
+
+    fun setChartWindowEnd(timestamp: Long?) {
+        _chartWindowEnd.value = timestamp
+    }
+
+    private fun loadChartWindow(): BloodGlucoseChartWindow =
+        runCatching { BloodGlucoseChartWindow.valueOf(preferences.getString(CHART_WINDOW_KEY, BloodGlucoseChartWindow.Hours24.name)) }
+            .getOrDefault(BloodGlucoseChartWindow.Hours24)
+
+    private fun loadChartScope(): RecordTimeRangeSelection {
+        val value = preferences.getString(CHART_SCOPE_KEY, "preset:${RecordTimeRangePreset.ALL.name}")
+        return value.decodeScope()
+    }
+
+    private fun RecordTimeRangeSelection.encode(): String = when (this) {
+        is RecordTimeRangeSelection.Preset -> "preset:${preset.name}"
+        is RecordTimeRangeSelection.Custom -> "custom:${range.startMillis}:${range.endMillis}"
+    }
+
+    private fun String.decodeScope(): RecordTimeRangeSelection = when {
+        startsWith("preset:") -> runCatching {
+            RecordTimeRangeSelection.Preset(RecordTimeRangePreset.valueOf(removePrefix("preset:")))
+        }.getOrDefault(RecordTimeRangeSelection.Preset(RecordTimeRangePreset.ALL))
+        startsWith("custom:") -> removePrefix("custom:").split(':').let { parts ->
+            val start = parts.getOrNull(0)?.toLongOrNull()
+            val end = parts.getOrNull(1)?.toLongOrNull()
+            if (start != null && end != null && start <= end) RecordTimeRangeSelection.Custom(RecordTimeRange(start, end))
+            else RecordTimeRangeSelection.Preset(RecordTimeRangePreset.ALL)
+        }
+        else -> RecordTimeRangeSelection.Preset(RecordTimeRangePreset.ALL)
+    }
+
+    private companion object {
+        const val CHART_WINDOW_KEY = "blood_glucose_chart_window"
+        const val CHART_SCOPE_KEY = "blood_glucose_chart_scope"
     }
 }
