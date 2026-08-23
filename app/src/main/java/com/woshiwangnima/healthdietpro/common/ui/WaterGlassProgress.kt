@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
 import kotlin.math.cos
@@ -43,8 +44,14 @@ internal fun WaterGlassProgress(
     valueLabel: String,
     supportingLabel: String,
     modifier: Modifier = Modifier,
+    liquidColor: androidx.compose.ui.graphics.Color? = null,
+    glassWidth: Dp = 184.dp,
+    glassHeight: Dp = 232.dp,
+    fillContainer: Boolean = false,
+    showLabels: Boolean = true,
 ) {
     val scheme = MaterialTheme.colorScheme
+    val fillColor = liquidColor ?: scheme.primary
     val fill by animateFloatAsState(progress.coerceIn(0f, 1f), tween(650), label = "glassFill")
     val transition = rememberInfiniteTransition(label = "glassWave")
     val phase by transition.animateFloat(
@@ -76,10 +83,13 @@ internal fun WaterGlassProgress(
         }
     }
     Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Box(Modifier.size(width = 184.dp, height = 232.dp), contentAlignment = Alignment.Center) {
+        Box(
+            if (fillContainer) Modifier.matchParentSize() else Modifier.size(width = glassWidth, height = glassHeight),
+            contentAlignment = Alignment.Center,
+        ) {
             Canvas(Modifier.matchParentSize()) {
-            val inset = 22.dp.toPx()
-            val corner = 20.dp.toPx()
+            val inset = (if (fillContainer) 2.dp else 22.dp).toPx()
+            val corner = (if (fillContainer) 10.dp else 20.dp).toPx()
             val glass = androidx.compose.ui.graphics.Path().apply {
                 addRoundRect(androidx.compose.ui.geometry.RoundRect(inset, inset, size.width - inset, size.height - inset, corner, corner))
             }
@@ -99,21 +109,23 @@ internal fun WaterGlassProgress(
                     lineTo(inset, size.height - inset)
                     close()
                 }
-                drawPath(wave, scheme.primary.copy(alpha = .72f))
-                drawPath(wave, scheme.primary.copy(alpha = .16f), style = Stroke(1.dp.toPx()))
+                drawPath(wave, fillColor.copy(alpha = .72f))
+                drawPath(wave, fillColor.copy(alpha = .16f), style = Stroke(1.dp.toPx()))
                 drawWaterSurfaceParticles(
                     liquidTop = liquidTop,
                     fill = fill,
-                    color = scheme.primary,
+                    color = fillColor,
                     particles = particles,
                 )
             }
             drawPath(glass, scheme.outline.copy(alpha = .75f), style = Stroke(2.dp.toPx()))
             drawPath(glass, scheme.surface.copy(alpha = .10f), style = Stroke(7.dp.toPx()))
             }
-            androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(valueLabel, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
-                Text(supportingLabel, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, textAlign = TextAlign.Center)
+            if (showLabels) {
+                androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(valueLabel, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+                    Text(supportingLabel, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                }
             }
         }
     }

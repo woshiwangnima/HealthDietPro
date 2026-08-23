@@ -38,6 +38,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 
@@ -58,6 +59,10 @@ internal fun AnimatedDonutChart(
     modifier: Modifier = Modifier,
     showLegend: Boolean = true,
     labelMaxLines: Int = 1,
+    centerAction: (@Composable () -> Unit)? = null,
+    chartHeight: Dp = 216.dp,
+    centerContentColor: Color? = null,
+    centerContentModifier: Modifier = Modifier,
 ) {
     val scheme = MaterialTheme.colorScheme
     val palette = remember(scheme) {
@@ -77,7 +82,7 @@ internal fun AnimatedDonutChart(
     }
     var labelLayouts by remember(normalized) { androidx.compose.runtime.mutableStateOf<List<DonutLabelLayout>>(emptyList()) }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().height(216.dp)) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().height(chartHeight)) {
             Canvas(Modifier.matchParentSize()) {
                 val stroke = minOf(28.dp.toPx(), size.minDimension * .16f)
                 val diameter = ((size.minDimension - stroke * 2f) * .9f).coerceAtLeast(0f)
@@ -111,15 +116,32 @@ internal fun AnimatedDonutChart(
                     drawCircle(layout.color, 3.dp.toPx(), end)
                 }
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.widthIn(max = 136.dp).padding(horizontal = 8.dp)) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .widthIn(max = 136.dp)
+                    .padding(horizontal = 8.dp)
+                    .then(centerContentModifier),
+            ) {
                 Text(
                     text = if (hasData) centerValue else stringResource(R.string.no_record),
                     style = MaterialTheme.typography.headlineSmall,
+                    color = centerContentColor ?: scheme.onSurface,
                     textAlign = TextAlign.Center,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                if (hasData) Text(centerLabel, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (hasData) {
+                    Text(
+                        centerLabel,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = centerContentColor ?: scheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                centerAction?.invoke()
             }
             DynamicDonutLabels(
                 segments = normalized,

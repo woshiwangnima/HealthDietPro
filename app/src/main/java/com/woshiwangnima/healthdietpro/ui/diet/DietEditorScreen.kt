@@ -48,6 +48,7 @@ import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.model.diet.DietFoodEntry
+import com.woshiwangnima.healthdietpro.model.diet.DietEditorDraftRepository
 import com.woshiwangnima.healthdietpro.model.diet.DietPrefs
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
@@ -64,22 +65,26 @@ internal fun DietEditorScreen(
     onCreateCustomFood: (FoodKind) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val now = System.currentTimeMillis()
-    val defaultPeriod = remember(prefs) { MealPeriod.entries.first().resolveDefault(now, prefs, java.time.ZoneId.systemDefault()) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val draftRepository = remember(context) { DietEditorDraftRepository.fromContext(context) }
+    val restoredDraft = remember(existing?.id) { draftRepository.load(existing?.id) }
+    val restored = restoredDraft ?: existing
+    val now = remember { System.currentTimeMillis() }
+    val defaultPeriod = remember(prefs, now) { MealPeriod.entries.first().resolveDefault(now, prefs, java.time.ZoneId.systemDefault()) }
     val (defaultStart, defaultEnd) = defaultDietTimes(prefs, defaultPeriod, now)
-    var mealStartAt by rememberSaveable(existing?.id) { mutableStateOf(existing?.mealStartAt ?: defaultStart) }
-    var mealEndAt by rememberSaveable(existing?.id) { mutableStateOf(existing?.mealEndAt ?: defaultEnd) }
+    var mealStartAt by rememberSaveable(existing?.id, restoredDraft?.id) { mutableStateOf(restored?.mealStartAt ?: defaultStart) }
+    var mealEndAt by rememberSaveable(existing?.id, restoredDraft?.id) { mutableStateOf(restored?.mealEndAt ?: defaultEnd) }
     var mealPeriod by rememberSaveable(existing?.id) {
-        mutableStateOf(existing?.mealPeriod ?: defaultPeriod)
+        mutableStateOf(restored?.mealPeriod ?: defaultPeriod)
     }
-    var note by rememberSaveable(existing?.id) { mutableStateOf(existing?.note.orEmpty()) }
-    var entries by rememberSaveable(existing?.id) { mutableStateOf(existing?.entries ?: emptyList()) }
+    var note by rememberSaveable(existing?.id, restoredDraft?.id) { mutableStateOf(restored?.note.orEmpty()) }
+    var entries by rememberSaveable(existing?.id, restoredDraft?.id) { mutableStateOf(restored?.entries ?: emptyList()) }
     var pickField by remember { mutableStateOf<DietTimeField?>(null) }
     var editingEntry by remember { mutableStateOf<DietFoodEntry?>(null) }
     var deletingEntry by remember { mutableStateOf<DietFoodEntry?>(null) }
     var showEntryEditor by remember { mutableStateOf(false) }
     var showDiscardDialog by rememberSaveable(existing?.id) { mutableStateOf(false) }
-    var endAtDefault by rememberSaveable(existing?.id) { mutableStateOf(existing == null) }
+    var endAtDefault by rememberSaveable(existing?.id, restoredDraft?.id) { mutableStateOf(restoredDraft == null && existing == null) }
 
     val current = DietRecord(
         id = existing?.id.orEmpty(),
@@ -88,14 +93,19 @@ internal fun DietEditorScreen(
         mealPeriod = mealPeriod,
         entries = entries,
         note = note.trim(),
-        recordedAt = existing?.recordedAt ?: now,
+        recordedAt = restored?.recordedAt ?: now,
     )
     val hasChanges = current != existing
     val valid = mealStartAt > 0L && mealEndAt >= mealStartAt && entries.isNotEmpty()
     val saveEnabled = valid && hasChanges
 
+    androidx.compose.runtime.LaunchedEffect(current) {
+        if (current != existing) draftRepository.save(existing?.id, current)
+    }
+
     fun onSaveRecord() {
         viewModel.save(current.copy(id = existing?.id ?: viewModel.newId()))
+        draftRepository.clear()
         onBack()
     }
 
@@ -104,7 +114,7 @@ internal fun DietEditorScreen(
     }
 
     fun requestBack() {
-        if (hasChanges) showDiscardDialog = true else onBack()
+        if (hasChanges) showDiscardDialog = true else { draftRepository.clear(); onBack() }
     }
     androidx.activity.compose.BackHandler(onBack = ::requestBack)
 
@@ -198,7 +208,7 @@ internal fun DietEditorScreen(
     }
     if (showDiscardDialog) {
         DiscardChangesDialog(
-            onDiscard = onBack,
+            onDiscard = { draftRepository.clear(); onBack() },
             onSave = ::onSaveRecord,
             onDismiss = { showDiscardDialog = false },
             saveEnabled = saveEnabled,

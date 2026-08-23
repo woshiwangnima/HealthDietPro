@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,6 +35,7 @@ import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
 import com.woshiwangnima.healthdietpro.common.time.resolve
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
+import com.woshiwangnima.healthdietpro.common.ui.ActionSectionCard
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
@@ -90,7 +91,11 @@ internal fun DietHomeScreen(
         Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
             AnimatedPageContent(selectedTab, Modifier.weight(1f), direction = { initial, target -> target - initial }) { tab ->
                 if (tab == 0) {
-                    DietStatisticsTab(uiState.records, uiState.goals)
+                    DietStatisticsTab(
+                        records = uiState.records,
+                        goals = uiState.goals,
+                        onOpenMeal = onOpen,
+                    )
                 } else {
                     DietRecordsTab(uiState, onAdd, onOpen, onEdit, onDelete)
                 }
@@ -207,60 +212,57 @@ private fun DietCard(
     val totalCalories = record.entries.sumOf { entry ->
         entry.resolvedNutrients["ENERGY"]?.value ?: 0.0
     }
-    Surface(
+    ActionSectionCard(
+        title = stringResource(record.mealPeriod.displayRes()),
+        titleIconRes = R.drawable.ic_diet,
         onClick = onOpen,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(record.mealPeriod.displayRes()), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-                Text(
-                    text = stringResource(R.string.diet_summary_calories, formatCalories(totalCalories)),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+        headerActions = {
+            androidx.compose.material3.IconButton(onClick = onEdit) {
+                androidx.compose.material3.Icon(
+                    painter = painterResource(R.drawable.ic_edit),
+                    contentDescription = stringResource(R.string.diet_edit),
+                    tint = MaterialTheme.colorScheme.primary,
                 )
-                androidx.compose.material3.IconButton(onClick = onEdit) {
-                    androidx.compose.material3.Icon(
-                        painter = painterResource(R.drawable.ic_edit),
-                        contentDescription = stringResource(R.string.diet_edit),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                }
-                androidx.compose.material3.IconButton(onClick = onDelete) {
-                    androidx.compose.material3.Icon(
-                        painter = painterResource(R.drawable.ic_delete),
-                        contentDescription = stringResource(R.string.diet_delete),
-                        tint = MaterialTheme.colorScheme.error,
-                    )
-                }
             }
+            androidx.compose.material3.IconButton(onClick = onDelete) {
+                androidx.compose.material3.Icon(
+                    painter = painterResource(R.drawable.ic_delete),
+                    contentDescription = stringResource(R.string.diet_delete),
+                    tint = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+    ) {
+        Text(
+            text = stringResource(R.string.diet_summary_calories, formatCalories(totalCalories)),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        HorizontalDivider()
+        Text(
+            text = stringResource(
+                R.string.diet_card_summary,
+                formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE),
+                formatRecordTimestamp(record.mealEndAt, RecordTimePrecision.MINUTE),
+                record.entries.size,
+                formatGrams(record.entries.sumOf(DietFoodEntry::netWeightGrams)),
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+        if (record.note.isNotBlank()) {
+            HorizontalDivider()
             Text(
-                text = stringResource(
-                    R.string.diet_card_summary,
-                    formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE),
-                    formatRecordTimestamp(record.mealEndAt, RecordTimePrecision.MINUTE),
-                    record.entries.size,
-                    formatGrams(record.entries.sumOf(DietFoodEntry::netWeightGrams)),
-                ),
+                text = record.note,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
-            if (record.note.isNotBlank()) {
-                Text(
-                    text = record.note,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
         }
     }
 }

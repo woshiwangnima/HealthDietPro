@@ -36,6 +36,20 @@ internal class BloodGlucoseRepository private constructor(private val context: C
         archive.update { it.copy(sources = sources) }
     }
 
+    fun deleteDataForSource(sourceId: String): BloodGlucoseSourceDataCounts {
+        var counts = BloodGlucoseSourceDataCounts()
+        archive.update { current ->
+            val glucose = current.records.count { it.sourceId == sourceId }
+            val hbA1c = current.hbA1cRecords.count { it.sourceId == sourceId }
+            counts = BloodGlucoseSourceDataCounts(glucose, hbA1c)
+            current.copy(
+                records = current.records.filterNot { it.sourceId == sourceId },
+                hbA1cRecords = current.hbA1cRecords.filterNot { it.sourceId == sourceId },
+            )
+        }
+        return counts
+    }
+
     fun reorderSources(orderedIds: List<String>) {
         archive.update { current -> current.copy(sources = reorderBloodGlucoseSources(current.sources, orderedIds)) }
     }
@@ -44,3 +58,8 @@ internal class BloodGlucoseRepository private constructor(private val context: C
         fun fromContext(context: Context) = BloodGlucoseRepository(context.applicationContext)
     }
 }
+
+internal data class BloodGlucoseSourceDataCounts(
+    val glucoseRecords: Int = 0,
+    val hbA1cRecords: Int = 0,
+)

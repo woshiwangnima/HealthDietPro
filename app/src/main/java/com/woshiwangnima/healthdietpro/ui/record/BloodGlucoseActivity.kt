@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,9 +30,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -71,10 +70,12 @@ import com.woshiwangnima.healthdietpro.common.ui.AppFormSubtitle
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.AppDestructiveTextButton
 import com.woshiwangnima.healthdietpro.common.ui.AppNumericStepperField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputKind
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputSpec
+import com.woshiwangnima.healthdietpro.common.ui.ParticleValueOrb
 import com.woshiwangnima.healthdietpro.common.ui.TextInputField
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
@@ -86,6 +87,8 @@ import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
+import com.woshiwangnima.healthdietpro.common.ui.SingleChoiceSegmentedOption
+import com.woshiwangnima.healthdietpro.common.ui.SingleChoiceSegmentedSelector
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.DiscardChangesDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
@@ -103,6 +106,7 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.isValidBloodGlucoseVal
 import com.woshiwangnima.healthdietpro.model.bloodglucose.isValidHbA1cValue
 import com.woshiwangnima.healthdietpro.model.bloodglucose.normalizeBloodGlucoseTimestamp
 import com.woshiwangnima.healthdietpro.model.bloodglucose.bloodGlucoseInputRange
+import com.woshiwangnima.healthdietpro.model.bloodglucose.bloodGlucoseParticleLevel
 import com.woshiwangnima.healthdietpro.model.bloodglucose.hbA1cInputRange
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
@@ -257,10 +261,13 @@ private fun BloodGlucoseScreen(
     if (route == BloodGlucoseRoute.Sources) {
         BloodGlucoseSourceSettingsScreen(
             sources = sources,
+            records = records,
+            hbA1cRecords = hbA1cRecords,
             onBack = { route = BloodGlucoseRoute.Settings },
             onAdd = { editingSourceId = null; route = BloodGlucoseRoute.SourceEditor },
             onEdit = { editingSourceId = it.id; route = BloodGlucoseRoute.SourceEditor },
             onDelete = { id -> viewModel.saveSources(sources.filterNot { it.id == id }) },
+            onDeleteData = viewModel::deleteDataForSource,
             onReorder = { ordered -> viewModel.reorderSources(ordered.map(BloodGlucoseSource::id)) },
         )
         return
@@ -424,18 +431,21 @@ private fun BloodGlucoseSettingsScreen(onBack: () -> Unit, onOpenTargets: () -> 
 @Composable
 private fun BloodGlucoseSourceSettingsScreen(
     sources: List<BloodGlucoseSource>,
+    records: List<BloodGlucoseRecord>,
+    hbA1cRecords: List<BloodHbA1cRecord>,
     onBack: () -> Unit,
     onAdd: () -> Unit,
     onEdit: (BloodGlucoseSource) -> Unit,
     onDelete: (String) -> Unit,
+    onDeleteData: (String) -> Unit,
     onReorder: (List<BloodGlucoseSource>) -> Unit,
 ) {
     var deleting by remember { mutableStateOf<BloodGlucoseSource?>(null) }
+    var deletingData by remember { mutableStateOf<BloodGlucoseSource?>(null) }
     var orderedSources by remember(sources) { mutableStateOf(sources) }
     BaseScreen(title = stringResource(R.string.blood_glucose_source_settings), onBack = onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.blood_glucose_source_settings_hint), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                 AppIconTextButton(stringResource(R.string.blood_glucose_source_add), R.drawable.ic_add, onAdd)
             }
             if (orderedSources.isEmpty()) {
@@ -446,12 +456,31 @@ private fun BloodGlucoseSourceSettingsScreen(
                     rowKey = { _, source -> source.id },
                     modifier = Modifier.weight(1f),
                     showPager = false,
-                    actionsWidth = 104.dp,
+                    actionsWidth = 220.dp,
                     columns = listOf(
-                        AppDataTableColumn("source", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_source_note)) }, ColumnWidth.Flex(1f, 180.dp)) { source -> AppDataTableText(source.note) },
+                        AppDataTableColumn("source", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_source_note)) }, ColumnWidth.Fixed(220.dp)) { source -> AppDataTableText(source.note) },
                     ),
-                    actionsHeader = { AppDataTableHeaderText(stringResource(R.string.body_record_delete)) },
-                    rowActions = { source -> AppDataTableDeleteAction(stringResource(R.string.body_record_delete), { deleting = source }) },
+                    actionsHeader = { AppDataTableHeaderText(stringResource(R.string.blood_glucose_source_actions)) },
+                    rowActions = { source ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            AppDestructiveTextButton(
+                                text = stringResource(R.string.blood_glucose_source_delete_data),
+                                onClick = { deletingData = source },
+                                modifier = Modifier.weight(1f),
+                                iconSize = 16.dp,
+                            )
+                            AppDestructiveTextButton(
+                                text = stringResource(R.string.blood_glucose_source_delete),
+                                onClick = { deleting = source },
+                                modifier = Modifier.weight(1f),
+                                iconSize = 16.dp,
+                            )
+                        }
+                    },
                     onRowClick = onEdit,
                     reorder = AppDataTableReorder(
                         onMove = { from, to -> orderedSources = orderedSources.toMutableList().apply { add(to, removeAt(from)) } },
@@ -466,8 +495,19 @@ private fun BloodGlucoseSourceSettingsScreen(
             onDismissRequest = { deleting = null },
             title = { Text(stringResource(R.string.body_record_delete_confirm_title)) },
             text = { Text(stringResource(R.string.blood_glucose_source_delete_message)) },
-            confirmButton = { TextButton(onClick = { onDelete(source.id); deleting = null }) { Text(stringResource(R.string.body_record_delete)) } },
+            confirmButton = { TextButton(onClick = { onDelete(source.id); deleting = null }) { Text(stringResource(R.string.blood_glucose_source_delete)) } },
             dismissButton = { TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } },
+        )
+    }
+    deletingData?.let { source ->
+        val glucoseCount = records.count { it.sourceId == source.id }
+        val hbA1cCount = hbA1cRecords.count { it.sourceId == source.id }
+        AlertDialog(
+            onDismissRequest = { deletingData = null },
+            title = { Text(stringResource(R.string.blood_glucose_source_delete_data_title)) },
+            text = { Text(stringResource(R.string.blood_glucose_source_delete_data_message, glucoseCount, hbA1cCount, source.note)) },
+            confirmButton = { TextButton(onClick = { onDeleteData(source.id); deletingData = null }) { Text(stringResource(R.string.blood_glucose_source_delete_data)) } },
+            dismissButton = { TextButton(onClick = { deletingData = null }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } },
         )
     }
 }
@@ -772,16 +812,21 @@ private fun BloodGlucoseChart(
     val resolvedScope = scope.resolve()
     Column(Modifier.fillMaxSize()) {
         com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter(scope, onScopeChanged)
-        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-            com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow.entries.forEachIndexed { index, option ->
-                SegmentedButton(
-                    selected = window == option,
-                    onClick = { onWindowChanged(option) },
-                    shape = SegmentedButtonDefaults.itemShape(index, 4),
-                    label = { Text(stringResource(R.string.blood_glucose_chart_window_hours, option.durationMillis / 3_600_000L)) },
-                )
-            }
+        val windowOptions = com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow.entries.map { option ->
+            SingleChoiceSegmentedOption(
+                id = option.name,
+                labelRes = R.string.blood_glucose_chart_window_hours,
+                labelArgs = listOf(option.durationMillis / 3_600_000L),
+            )
         }
+        SingleChoiceSegmentedSelector(
+            options = windowOptions,
+            selectedId = window.name,
+            onOptionSelected = { selected ->
+                onWindowChanged(com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow.valueOf(selected.id))
+            },
+            modifier = Modifier.padding(vertical = 8.dp),
+        )
         BloodGlucoseFixedWindowChart(
             records = records,
             scopeStart = resolvedScope.startMillis,
@@ -861,9 +906,29 @@ private fun GlucoseRecordList(
     onEdit: (BloodGlucoseRecord) -> Unit,
     onAskDelete: (BloodGlucoseRecord) -> Unit,
 ) {
+    val latestRecords = remember(records) { records.sortedByDescending(BloodGlucoseRecord::timestamp).take(2) }
+    val latestRecord = latestRecords.firstOrNull()
+    val particleLevel = remember(latestRecords) {
+        if (latestRecords.size == 2) bloodGlucoseParticleLevel(latestRecords[1], latestRecords[0]) else 0
+    }
+    val particleColor = when {
+        particleLevel < 0 -> Color(0xFFE53935)
+        particleLevel > 0 -> Color(0xFFF57C00)
+        else -> Color(0xFF43A047)
+    }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(stringResource(R.string.body_record_count, records.size), style = MaterialTheme.typography.titleMedium)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ParticleValueOrb(
+                valueLabel = latestRecord?.let { formatGlucoseValue(it.valueMmolPerL, unitId) } ?: "-",
+                supportingLabel = unit,
+                level = particleLevel,
+                particleColor = particleColor,
+                modifier = Modifier.size(104.dp),
+            )
             AppIconTextButton(stringResource(R.string.body_record_add), R.drawable.ic_add, onAdd)
         }
         if (records.isEmpty()) {

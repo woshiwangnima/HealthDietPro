@@ -114,6 +114,13 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
         viewModelScope.launch(Dispatchers.IO) { repository.saveSources(sources) }
     }
 
+    fun deleteDataForSource(sourceId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteDataForSource(sourceId)
+            refresh()
+        }
+    }
+
     fun reorderSources(orderedIds: List<String>) {
         val sources = com.woshiwangnima.healthdietpro.model.bloodglucose.reorderBloodGlucoseSources(_sources.value, orderedIds)
         _sources.value = sources

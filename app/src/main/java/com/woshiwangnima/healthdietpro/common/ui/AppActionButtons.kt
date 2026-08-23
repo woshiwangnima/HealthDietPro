@@ -33,7 +33,7 @@ internal fun AppIconTextButton(
         enabled = enabled,
     ) {
         AppButtonIcon(iconRes)
-        Text(text)
+        TextOverflowText(text = text, style = LocalTextStyle.current)
     }
 }
 
@@ -51,7 +51,7 @@ internal fun AppOutlinedIconTextButton(
         enabled = enabled,
     ) {
         AppButtonIcon(iconRes)
-        Text(text)
+        TextOverflowText(text = text, style = LocalTextStyle.current)
     }
 }
 
@@ -91,7 +91,11 @@ internal fun AppDestructiveTextButton(
         ),
     ) {
         AppButtonIcon(R.drawable.ic_delete, iconSize)
-        Text(text, style = textStyle)
+        TextOverflowText(
+            text = text,
+            modifier = Modifier.weight(1f),
+            style = textStyle,
+        )
     }
 }
 

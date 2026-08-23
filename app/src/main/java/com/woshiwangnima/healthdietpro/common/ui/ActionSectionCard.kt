@@ -1,9 +1,11 @@
 package com.woshiwangnima.healthdietpro.common.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,10 +38,14 @@ fun ActionSectionCard(
     contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
     collapsed: Boolean = false,
     onToggleCollapse: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
+    headerActions: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
@@ -63,6 +69,7 @@ fun ActionSectionCard(
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f),
                 )
+                headerActions()
                 if (onToggleCollapse != null) {
                     Spacer(Modifier.width(8.dp))
                     Surface(

@@ -3,6 +3,8 @@ package com.woshiwangnima.healthdietpro.ui.record
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -10,11 +12,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
@@ -24,14 +28,18 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Checkbox
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -39,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -51,24 +60,45 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
+import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
+import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
+import com.woshiwangnima.healthdietpro.common.ui.rememberAttentionShakeOffset
+import com.woshiwangnima.healthdietpro.common.range.Range
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartIndex
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartSlice
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseDiabetesType
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
+import com.woshiwangnima.healthdietpro.model.bloodglucose.GlucoseTimeRangeBand
+import com.woshiwangnima.healthdietpro.model.bloodglucose.GlucoseTimeRangeDistribution
+import com.woshiwangnima.healthdietpro.model.bloodglucose.calculateGlucoseTimeRangeDistribution
+import com.woshiwangnima.healthdietpro.model.bloodglucose.glucoseTimeReferenceRanges
 import com.woshiwangnima.healthdietpro.model.bloodglucose.scopedSlice
+import com.woshiwangnima.healthdietpro.model.diet.DietRepository
+import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
+import com.woshiwangnima.healthdietpro.model.sleep.SleepRepository
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseReference
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -88,26 +118,35 @@ internal fun BloodGlucoseFixedWindowChart(
     onSessionWindowEndChanged: (Long?) -> Unit = {},
 ) {
     val index = remember(records) { BloodGlucoseChartIndex(records) }
-    val initialEnd = remember(index, scopeStart, scopeEnd) {
-        index.slice(scopeStart, scopeEnd).lastOrNull()?.timestamp ?: scopeEnd
+    val currentScopeEnd = remember(scopeStart, scopeEnd) {
+        minOf(scopeEnd, System.currentTimeMillis()).coerceAtLeast(scopeStart)
     }
-    var ownedWindowEnd by remember(scopeStart, scopeEnd, window) { mutableLongStateOf(initialEnd) }
+    val initialEnd = remember(scopeStart, currentScopeEnd) { currentScopeEnd }
+    var ownedWindowEnd by remember(scopeStart, currentScopeEnd, window) { mutableLongStateOf(initialEnd) }
     val windowEnd = sessionWindowEnd ?: ownedWindowEnd
     var primaryStyle by remember { mutableStateOf(SeriesStyle(Color(0xFF1976D2), lineStyle = GlucoseLineStyle.Spline)) }
     var delayedStyle by remember { mutableStateOf(SeriesStyle(Color(0xFFF57C00), lineStyle = GlucoseLineStyle.Spline, linePattern = GlucoseLinePattern.Dotted, pointShape = GlucosePointShape.Cross)) }
     var selectedSeries by remember { mutableStateOf(SeriesKind.Primary) }
+    var selectedBar by remember { mutableStateOf<BarKind?>(BarKind.Diet) }
     var styleDialogSeries by remember { mutableStateOf<SeriesKind?>(null) }
+    var barStyleDialog by remember { mutableStateOf<BarKind?>(null) }
+    var barStyles by remember { mutableStateOf(defaultBarStyles()) }
+    var eventBars by remember { mutableStateOf(emptyList<BarSample>()) }
+    val context = LocalContext.current
     var fullscreen by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTargetRateHelp by remember { mutableStateOf(false) }
-    LaunchedEffect(initialEnd, scopeStart, scopeEnd, window) {
+    LaunchedEffect(initialEnd, scopeStart, currentScopeEnd, window, records) {
         if (sessionWindowEnd == null) ownedWindowEnd = initialEnd
+        eventBars = withContext(Dispatchers.IO) {
+            loadEventBars(context, scopeStart, currentScopeEnd)
+        }
     }
-    val slice = remember(index, scopeStart, scopeEnd, windowEnd, window) {
-        index.scopedSlice(scopeStart, scopeEnd, windowEnd, window)
+    val slice = remember(index, scopeStart, currentScopeEnd, windowEnd, window) {
+        index.scopedSlice(scopeStart, currentScopeEnd, windowEnd, window)
     }
     val earliest = slice.scoped.firstOrNull()?.timestamp ?: scopeStart
-    val latest = slice.scoped.lastOrNull()?.timestamp ?: scopeEnd
+    val latest = currentScopeEnd
     val setWindowEnd: (Long) -> Unit = { timestamp ->
         val clamped = timestamp.coerceIn(earliest, latest)
         ownedWindowEnd = clamped
@@ -120,9 +159,16 @@ internal fun BloodGlucoseFixedWindowChart(
         diabetesType = diabetesType,
         primaryStyle = primaryStyle,
         delayedStyle = delayedStyle,
+        barStyles = barStyles,
+        eventBars = eventBars,
+        panLatest = latest,
         selectedSeries = selectedSeries,
+        selectedBar = selectedBar,
         onSelectedSeries = { series ->
             if (series == selectedSeries) styleDialogSeries = series else selectedSeries = series
+        },
+        onBarSelected = { kind ->
+            if (kind == selectedBar) barStyleDialog = kind else selectedBar = kind
         },
         onWindowEndChanged = setWindowEnd,
         onDateClick = { showDatePicker = true },
@@ -139,6 +185,9 @@ internal fun BloodGlucoseFixedWindowChart(
             onDismiss = { styleDialogSeries = null },
         )
     }
+    barStyleDialog?.let { kind ->
+        BarStyleDialog(kind, barStyles.getValue(kind), { barStyles = barStyles + (kind to it) }, { barStyleDialog = null })
+    }
     if (showDatePicker) {
         ComposeDatePickerDialog(
             initialMillis = slice.windowStart,
@@ -148,6 +197,10 @@ internal fun BloodGlucoseFixedWindowChart(
                 setWindowEnd(selectedStart + window.durationMillis)
                 showDatePicker = false
             },
+            datesWithData = remember(records) {
+                records.map { Instant.ofEpochMilli(it.timestamp).atZone(ZoneId.systemDefault()).toLocalDate() }.toSet()
+            },
+            allowNoDataSelection = true,
         )
     }
     if (fullscreen) {
@@ -160,9 +213,16 @@ internal fun BloodGlucoseFixedWindowChart(
                         diabetesType = diabetesType,
                         primaryStyle = primaryStyle,
                         delayedStyle = delayedStyle,
+                        barStyles = barStyles,
+                        eventBars = eventBars,
+                        panLatest = latest,
                         selectedSeries = selectedSeries,
+                        selectedBar = selectedBar,
                         onSelectedSeries = { series ->
                             if (series == selectedSeries) styleDialogSeries = series else selectedSeries = series
+                        },
+                        onBarSelected = { kind ->
+                            if (kind == selectedBar) barStyleDialog = kind else selectedBar = kind
                         },
                         onWindowEndChanged = setWindowEnd,
                         onDateClick = {
@@ -183,7 +243,7 @@ internal fun BloodGlucoseFixedWindowChart(
         AlertDialog(
             onDismissRequest = { showTargetRateHelp = false },
             title = { Text(stringResource(R.string.blood_glucose_chart_target_rate_title)) },
-            text = { Text(stringResource(R.string.blood_glucose_chart_target_rate_help, glucoseRangeText(diabetesType))) },
+            text = { TargetTimeRangeHelp(glucoseRangeText(diabetesType)) },
             confirmButton = { TextButton(onClick = { showTargetRateHelp = false }) { Text(stringResource(R.string.compose_confirm_dialog_ok)) } },
         )
     }
@@ -208,8 +268,13 @@ private fun GlucoseChartSurface(
     diabetesType: BloodGlucoseDiabetesType,
     primaryStyle: SeriesStyle,
     delayedStyle: SeriesStyle,
+    barStyles: Map<BarKind, BarStyle>,
+    eventBars: List<BarSample>,
+    panLatest: Long,
     selectedSeries: SeriesKind,
+    selectedBar: BarKind?,
     onSelectedSeries: (SeriesKind) -> Unit,
+    onBarSelected: (BarKind) -> Unit,
     onWindowEndChanged: (Long) -> Unit,
     onDateClick: () -> Unit,
     onFullscreen: () -> Unit,
@@ -220,8 +285,11 @@ private fun GlucoseChartSurface(
 ) {
     val primary = remember(slice.primary) { slice.primary.map { RenderedPoint(it, it.timestamp, false) } }
     val delayed = remember(slice.delayed, window) { slice.delayed.map { RenderedPoint(it, it.timestamp + window.durationMillis, true) } }
+    val bars = remember(eventBars, slice.windowStart, slice.windowEnd) {
+        eventBars.filter { it.endTimestamp > slice.windowStart && it.startTimestamp < slice.windowEnd }
+    }
     val earliest = slice.scoped.firstOrNull()?.timestamp ?: slice.windowStart
-    val latest = slice.scoped.lastOrNull()?.timestamp ?: slice.windowEnd
+    val latest = panLatest
     val palette = ChartPalette(
         primary = primaryStyle.color.copy(alpha = primaryStyle.alpha),
         delayed = delayedStyle.color.copy(alpha = delayedStyle.alpha),
@@ -231,19 +299,27 @@ private fun GlucoseChartSurface(
         surface = MaterialTheme.colorScheme.surface,
     )
     var crosshair by remember { mutableStateOf<GlucoseCrosshair?>(null) }
+    var barCrosshair by remember { mutableStateOf<BarCrosshair?>(null) }
+    LaunchedEffect(selectedBar) { barCrosshair = null }
     val currentSlice by rememberUpdatedState(slice)
     val currentPrimary by rememberUpdatedState(primary)
     val currentDelayed by rememberUpdatedState(delayed)
     val currentSelectedSeries by rememberUpdatedState(selectedSeries)
     val currentPrimaryStyle by rememberUpdatedState(primaryStyle)
     val currentDelayedStyle by rememberUpdatedState(delayedStyle)
+    val currentSelectedBar by rememberUpdatedState(selectedBar)
+    val currentBars by rememberUpdatedState(bars)
     val delayedLabel = stringResource(R.string.blood_glucose_delayed_series, window.durationMillis / HOUR_MILLIS)
     val xAxisUnit = stringResource(R.string.blood_glucose_chart_x_axis_unit)
     val yAxisUnit = stringResource(R.string.blood_glucose_chart_y_axis_unit)
 
-    Column(modifier) {
+    Column(if (fullscreen) modifier else modifier.verticalScroll(rememberScrollState())) {
         if (slice.scoped.isEmpty()) {
             Text(stringResource(R.string.blood_glucose_chart_no_data_in_scope), modifier = Modifier.align(Alignment.CenterHorizontally), color = palette.axis)
+            if (!fullscreen) {
+                ChartLegend(primaryStyle, stringResource(R.string.blood_glucose_chart_primary_series), delayedStyle, delayedLabel, selectedSeries, onSelectedSeries)
+                BarLegend(barStyles, selectedBar, onBarSelected)
+            }
             return@Column
         }
         val drawingModifier = if (fullscreen) {
@@ -252,6 +328,11 @@ private fun GlucoseChartSurface(
             Modifier.fillMaxWidth().height(210.dp)
         }
         BoxWithConstraints(drawingModifier) {
+            var chartSize by remember { mutableStateOf(IntSize.Zero) }
+            var lineInfoOffset by remember { mutableStateOf(IntOffset.Zero) }
+            var barInfoOffset by remember { mutableStateOf(IntOffset.Zero) }
+            val currentLineInfoOffset by rememberUpdatedState(lineInfoOffset)
+            val currentBarInfoOffset by rememberUpdatedState(barInfoOffset)
             val currentMidnight = remember(slice.windowStart) {
                 Instant.ofEpochMilli(slice.windowStart).atZone(ZoneId.systemDefault()).toLocalDate()
                     .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -268,16 +349,27 @@ private fun GlucoseChartSurface(
             val markerLabel = remember(dateMarker) {
                 Instant.ofEpochMilli(dateMarker).atZone(ZoneId.systemDefault()).toLocalDate().format(DATE_LABEL_FORMATTER)
             }
+            fun handleChartTap(offset: Offset) {
+                val timestamp = chartTimestampAt(offset, chartSize.width, chartSize.height, currentSlice)
+                if (timestamp == null) {
+                    crosshair = null
+                    barCrosshair = null
+                } else {
+                    crosshair = crosshairAt(timestamp, currentSlice, if (currentSelectedSeries == SeriesKind.Primary) currentPrimary else currentDelayed, if (currentSelectedSeries == SeriesKind.Primary) currentPrimaryStyle else currentDelayedStyle)
+                    barCrosshair = currentSelectedBar?.let { kind -> barCrosshairAt(timestamp, currentSlice, currentBars, kind) }
+                }
+            }
             Canvas(
                 Modifier
                     .fillMaxSize()
+                    .onSizeChanged { chartSize = it }
                     .pointerInput("glucose-crosshair") {
                         detectTapGestures { offset ->
-                            crosshair = crosshairAt(offset, size.width, size.height, currentSlice, if (currentSelectedSeries == SeriesKind.Primary) currentPrimary else currentDelayed, if (currentSelectedSeries == SeriesKind.Primary) currentPrimaryStyle else currentDelayedStyle)
+                            handleChartTap(offset)
                         }
                     },
             ) {
-                drawGlucoseChart(slice, window, diabetesType, primary, delayed, palette, primaryStyle, delayedStyle, crosshair, xAxisUnit, yAxisUnit)
+                drawGlucoseChart(slice, window, diabetesType, primary, delayed, bars, barStyles, palette, primaryStyle, delayedStyle, crosshair, barCrosshair, xAxisUnit, yAxisUnit)
             }
             if (fullscreen) {
                 IconButton(onClick = { onExitFullscreen?.invoke() }, modifier = Modifier.align(Alignment.TopEnd)) {
@@ -288,17 +380,33 @@ private fun GlucoseChartSurface(
                     text = stringResource(R.string.view_chart_fullscreen),
                     iconRes = R.drawable.ic_fullscreen,
                     onClick = onFullscreen,
-                    modifier = Modifier.align(Alignment.TopEnd).padding(6.dp),
+                    modifier = Modifier.align(Alignment.TopEnd).padding(2.dp).graphicsLayer(scaleX = 0.82f, scaleY = 0.82f),
                 )
             }
-            AppOutlinedIconTextButton(
-                text = markerLabel,
-                iconRes = R.drawable.ic_birthday,
+            OutlinedButton(
                 onClick = onDateClick,
-                modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp + dateMarkerOffset, bottom = 3.dp).width(120.dp),
-            )
+                modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp + dateMarkerOffset, bottom = 1.dp).width(104.dp).graphicsLayer(scaleX = 0.82f, scaleY = 0.82f),
+            ) {
+                Icon(painterResource(R.drawable.ic_birthday), null, modifier = Modifier.size(16.dp))
+                TextOverflowText(
+                    text = markerLabel,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 3.dp),
+                )
+            }
             crosshair?.let { value ->
-                CrosshairInfo(value, palette, modifier = Modifier.align(Alignment.TopStart).padding(8.dp))
+                CrosshairInfo(value, palette, modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(2.dp)
+                    .onGloballyPositioned { lineInfoOffset = it.positionInParent().let { p -> IntOffset(p.x.toInt(), p.y.toInt()) } }
+                    .pointerInput("line-info-crosshair") { detectTapGestures { handleChartTap(Offset(currentLineInfoOffset.x.toFloat() + it.x, currentLineInfoOffset.y.toFloat() + it.y)) } })
+            }
+            barCrosshair?.let { value ->
+                BarCrosshairInfo(value, modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 2.dp, top = 82.dp)
+                    .onGloballyPositioned { barInfoOffset = it.positionInParent().let { p -> IntOffset(p.x.toInt(), p.y.toInt()) } }
+                    .pointerInput("bar-info-crosshair") { detectTapGestures { handleChartTap(Offset(currentBarInfoOffset.x.toFloat() + it.x, currentBarInfoOffset.y.toFloat() + it.y)) } })
             }
         }
         HorizontalPanArea(
@@ -309,7 +417,10 @@ private fun GlucoseChartSurface(
             primaryActionColor = MaterialTheme.colorScheme.primary,
             onWindowEndChanged = onWindowEndChanged,
         )
-        ChartLegend(primaryStyle, stringResource(R.string.blood_glucose_chart_primary_series), delayedStyle, delayedLabel, selectedSeries, onSelectedSeries)
+        if (!fullscreen) {
+            ChartLegend(primaryStyle, stringResource(R.string.blood_glucose_chart_primary_series), delayedStyle, delayedLabel, selectedSeries, onSelectedSeries)
+            BarLegend(barStyles, selectedBar, onBarSelected)
+        }
         if (!fullscreen) {
             GlucoseStatisticsCard(primary, diabetesType, window, onTargetRateHelp)
         }
@@ -329,7 +440,21 @@ private fun CrosshairInfo(value: GlucoseCrosshair, palette: ChartPalette, modifi
             },
             color = palette.axis,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 3.dp),
+        )
+    }
+}
+
+@Composable
+private fun BarCrosshairInfo(value: BarCrosshair, modifier: Modifier) {
+    val start = Instant.ofEpochMilli(value.startTimestamp).atZone(ZoneId.systemDefault()).format(CROSSHAIR_TIME_FORMATTER)
+    val end = Instant.ofEpochMilli(value.endTimestamp).atZone(ZoneId.systemDefault()).format(CROSSHAIR_TIME_FORMATTER)
+    Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f), shape = MaterialTheme.shapes.small, modifier = modifier) {
+        Text(
+            text = "${stringResource(value.kind.labelRes)}\n$start - $end",
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 3.dp),
         )
     }
 }
@@ -343,22 +468,22 @@ private fun GlucoseStatisticsCard(
 ) {
     val records = primary.map(RenderedPoint::record)
     val target = diabetesType.glucoseReferenceRangeMmolPerL
-    val inRange = records.count { record ->
-        (target.min == null || record.valueMmolPerL >= target.min.toDouble()) && (target.max == null || record.valueMmolPerL <= target.max.toDouble())
+    val timeDistribution = remember(records, target) {
+        calculateGlucoseTimeRangeDistribution(records, target)
     }
-    val rate = records.takeIf { it.isNotEmpty() }?.let { inRange.toDouble() / it.size * 100.0 }
     val highest = records.maxByOrNull(BloodGlucoseRecord::valueMmolPerL)
     val lowest = records.minByOrNull(BloodGlucoseRecord::valueMmolPerL)
+    val average = records.takeIf { it.isNotEmpty() }?.map(BloodGlucoseRecord::valueMmolPerL)?.average()
     val fluctuation = if (highest != null && lowest != null) highest.valueMmolPerL - lowest.valueMmolPerL else null
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.24f),
         shape = MaterialTheme.shapes.large,
         modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
     ) {
-        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            TargetRateCard(
+        Column(Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            TargetTimeRangeCard(
                 label = stringResource(R.string.blood_glucose_chart_target_rate, window.durationMillis / HOUR_MILLIS),
-                value = rate?.let { String.format(Locale.getDefault(), "%.1f%%", it) } ?: "?",
+                distribution = timeDistribution,
                 onHelp = onTargetRateHelp,
             )
             Row(
@@ -386,22 +511,104 @@ private fun GlucoseStatisticsCard(
                     timestamp = lowest?.timestamp?.let(::formatStatisticTimestamp),
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
+                MetricCard(
+                    label = stringResource(R.string.blood_glucose_chart_average),
+                    value = average?.let { String.format(Locale.getDefault(), "%.2f", it) } ?: "?",
+                    unit = "mmol/L",
+                    timestamp = null,
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                )
             }
         }
     }
 }
 
 @Composable
-private fun TargetRateCard(label: String, value: String, onHelp: () -> Unit) {
+private fun TargetTimeRangeCard(
+    label: String,
+    distribution: GlucoseTimeRangeDistribution,
+    onHelp: () -> Unit,
+) {
     Surface(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f), shape = MaterialTheme.shapes.medium, modifier = Modifier.fillMaxWidth()) {
-        Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-            TooltipLabel(label, Modifier.weight(1f))
-            IconButton(onClick = onHelp, modifier = Modifier.size(22.dp)) {
-                Icon(painterResource(R.drawable.ic_help), stringResource(R.string.blood_glucose_chart_target_rate_title), modifier = Modifier.size(16.dp))
+        Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TooltipLabel(label, Modifier.weight(1f))
+                IconButton(onClick = onHelp, modifier = Modifier.size(22.dp)) {
+                    Icon(painterResource(R.drawable.ic_help), stringResource(R.string.blood_glucose_chart_target_rate_title), modifier = Modifier.size(16.dp))
+                }
             }
+            val totalMillis = distribution.coveredMillis
+            val withinReferences = totalMillis > 0L && GlucoseTimeRangeBand.entries.all { band ->
+                val percent = distribution.millisFor(band).toFloat() / totalMillis * 100f
+                glucoseTimeReferenceRanges.first { it.value == band }.contains(percent)
+            }
+            val attentionShake = rememberAttentionShakeOffset(
+                active = totalMillis > 0L && !withinReferences,
+                label = "glucoseTargetTime",
+            )
+            AnimatedDonutChart(
+                segments = GlucoseTimeRangeBand.entries.map { band ->
+                    val durationMillis = distribution.millisFor(band)
+                    val percent = if (totalMillis > 0L) durationMillis.toDouble() / totalMillis * 100.0 else 0.0
+                    DonutChartSegment(
+                        id = band.name,
+                        label = stringResource(
+                            R.string.blood_glucose_chart_target_time_segment,
+                            stringResource(glucoseTimeBandLabelRes(band)),
+                            String.format(Locale.getDefault(), "%.1f", percent),
+                            formatTargetTime(durationMillis),
+                        ),
+                        value = durationMillis.toFloat(),
+                        color = glucoseTimeBandColor(band),
+                    )
+                },
+                centerValue = if (totalMillis > 0L) {
+                    String.format(
+                        Locale.getDefault(),
+                        "%.1f%%",
+                        distribution.inRangeMillis.toDouble() / totalMillis * 100.0,
+                    )
+                } else {
+                    "?"
+                },
+                centerLabel = stringResource(R.string.blood_glucose_chart_target_rate_title),
+                showLegend = false,
+                labelMaxLines = 2,
+                chartHeight = 173.dp,
+                centerContentColor = if (totalMillis > 0L && !withinReferences) MaterialTheme.colorScheme.tertiary else null,
+                centerContentModifier = Modifier.offset { IntOffset(0, attentionShake.roundToPx()) },
+            )
         }
-            StatisticValue(value, Modifier.weight(1f), TextAlign.End)
+    }
+}
+
+@Composable
+private fun TargetTimeRangeHelp(targetRangeText: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = stringResource(R.string.blood_glucose_chart_target_time_help_intro, targetRangeText),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        GlucoseTimeRangeHelpRow(GlucoseTimeRangeBand.HIGH, R.string.blood_glucose_chart_target_time_high_help)
+        GlucoseTimeRangeHelpRow(GlucoseTimeRangeBand.IN_RANGE, R.string.blood_glucose_chart_target_time_in_range_help)
+        GlucoseTimeRangeHelpRow(GlucoseTimeRangeBand.LOW, R.string.blood_glucose_chart_target_time_low_help)
+    }
+}
+
+@Composable
+private fun GlucoseTimeRangeHelpRow(band: GlucoseTimeRangeBand, descriptionRes: Int) {
+    val referenceRange = glucoseTimeReferenceRanges.first { it.value == band }
+    Row(verticalAlignment = Alignment.Top) {
+        Canvas(Modifier.size(10.dp).padding(top = 3.dp)) { drawCircle(glucoseTimeBandColor(band)) }
+        Spacer(Modifier.width(8.dp))
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(stringResource(glucoseTimeBandLabelRes(band)), style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(descriptionRes), style = MaterialTheme.typography.bodySmall)
+            Text(
+                stringResource(R.string.blood_glucose_chart_target_time_reference, formatPercentRange(referenceRange)),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -445,6 +652,38 @@ private fun StatisticValue(value: String, modifier: Modifier = Modifier, textAli
 private fun formatStatisticTimestamp(timestamp: Long): String =
     Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).format(RECORD_TIME_FORMATTER)
 
+@Composable
+private fun formatTargetTime(millis: Long): String {
+    val totalMinutes = (millis / 60_000.0).toInt()
+    val hours = totalMinutes / 60
+    val minutes = totalMinutes % 60
+    return if (hours > 0) {
+        stringResource(R.string.blood_glucose_chart_target_time_hours_minutes, hours, minutes)
+    } else {
+        stringResource(R.string.blood_glucose_chart_target_time_minutes, minutes)
+    }
+}
+
+private fun glucoseTimeBandLabelRes(band: GlucoseTimeRangeBand): Int = when (band) {
+    GlucoseTimeRangeBand.HIGH -> R.string.blood_glucose_chart_target_time_high
+    GlucoseTimeRangeBand.IN_RANGE -> R.string.blood_glucose_chart_target_time_in_range
+    GlucoseTimeRangeBand.LOW -> R.string.blood_glucose_chart_target_time_low
+}
+
+private fun glucoseTimeBandColor(band: GlucoseTimeRangeBand): Color = when (band) {
+    GlucoseTimeRangeBand.HIGH -> Color(0xFFF57C00)
+    GlucoseTimeRangeBand.IN_RANGE -> Color(0xFF43A047)
+    GlucoseTimeRangeBand.LOW -> Color(0xFFE53935)
+}
+
+private fun formatPercentRange(range: Range<Float>): String {
+    val lowerBracket = if (range.minInclusive) "[" else "("
+    val upperBracket = if (range.maxInclusive) "]" else ")"
+    val lower = range.min?.let { String.format(Locale.getDefault(), "%.0f%%", it) } ?: "-∞"
+    val upper = range.max?.let { String.format(Locale.getDefault(), "%.0f%%", it) } ?: "+∞"
+    return "$lowerBracket$lower, $upper$upperBracket"
+}
+
 private fun glucoseRangeText(diabetesType: BloodGlucoseDiabetesType): String {
     val range = diabetesType.glucoseReferenceRangeMmolPerL
     val min = range.min?.let { String.format(Locale.getDefault(), "%.1f", it) } ?: "-∞"
@@ -461,9 +700,29 @@ private fun ChartLegend(
     selected: SeriesKind,
     onSelected: (SeriesKind) -> Unit,
 ) {
-    Row(Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp), horizontalArrangement = Arrangement.Center) {
-        LegendItem(SeriesKind.Primary, primaryStyle, primaryLabel, selected == SeriesKind.Primary, onSelected)
-        LegendItem(SeriesKind.Delayed, delayedStyle, delayedLabel, selected == SeriesKind.Delayed, onSelected)
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
+        Row(Modifier.fillMaxWidth().padding(top = 1.dp, bottom = 1.dp), horizontalArrangement = Arrangement.Center) {
+            LegendItem(SeriesKind.Primary, primaryStyle, primaryLabel, selected == SeriesKind.Primary, onSelected)
+            LegendItem(SeriesKind.Delayed, delayedStyle, delayedLabel, selected == SeriesKind.Delayed, onSelected)
+        }
+    }
+}
+
+@Composable
+private fun BarLegend(styles: Map<BarKind, BarStyle>, selected: BarKind?, onSelected: (BarKind) -> Unit) {
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
+        Row(Modifier.fillMaxWidth().padding(bottom = 1.dp), horizontalArrangement = Arrangement.Center) {
+            BarKind.entries.forEach { kind ->
+                val style = styles.getValue(kind)
+                val isSelected = kind == selected
+                Surface(onClick = { onSelected(kind) }, shape = MaterialTheme.shapes.extraSmall, color = if (isSelected) style.color.copy(alpha = 0.12f) else Color.Transparent, border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, style.color.copy(alpha = 0.42f)) else null) {
+                    Row(Modifier.padding(horizontal = 4.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Canvas(Modifier.size(14.dp, 12.dp)) { drawRect(style.color.copy(alpha = style.mainAlpha), size = androidx.compose.ui.geometry.Size(size.width, size.height)) }
+                        Text(stringResource(kind.labelRes), style = MaterialTheme.typography.labelSmall, textDecoration = if (style.visible) null else TextDecoration.LineThrough, modifier = Modifier.padding(start = 3.dp))
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -530,13 +789,12 @@ private fun LegendItem(kind: SeriesKind, style: SeriesStyle, label: String, sele
         color = if (selected) style.color.copy(alpha = 0.12f) else Color.Transparent,
         border = if (selected) androidx.compose.foundation.BorderStroke(1.dp, style.color.copy(alpha = 0.42f)) else null,
     ) {
-        Row(Modifier.padding(horizontal = 8.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
             Canvas(Modifier.size(28.dp, 12.dp)) {
                 drawLine(style.color.copy(alpha = style.alpha), Offset(0f, size.height / 2), Offset(size.width, size.height / 2), 3f, StrokeCap.Round, style.linePattern.effect())
                 drawLegendPoint(style, Offset(size.width / 2, size.height / 2))
             }
-            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 4.dp))
-            if (selected) Text(stringResource(R.string.compose_chart_selected_series), style = MaterialTheme.typography.labelSmall, color = style.color, modifier = Modifier.padding(start = 4.dp))
+            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textDecoration = if (style.visible) null else TextDecoration.LineThrough, modifier = Modifier.padding(start = 4.dp))
         }
     }
 }
@@ -548,6 +806,10 @@ private fun SeriesStyleDialog(label: String, style: SeriesStyle, onStyleChanged:
         title = { Text(stringResource(R.string.blood_glucose_chart_series_style, label)) },
         text = {
             Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.blood_glucose_chart_show))
+                    Checkbox(checked = style.visible, onCheckedChange = { onStyleChanged(style.copy(visible = it)) })
+                }
                 Text(stringResource(R.string.blood_glucose_chart_color))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     CHART_COLORS.forEach { color ->
@@ -586,10 +848,32 @@ private fun SeriesStyleDialog(label: String, style: SeriesStyle, onStyleChanged:
     )
 }
 
-private fun crosshairAt(touch: Offset, width: Int, height: Int, slice: BloodGlucoseChartSlice, points: List<RenderedPoint>, style: SeriesStyle): GlucoseCrosshair? {
+@Composable
+private fun BarStyleDialog(kind: BarKind, style: BarStyle, onStyleChanged: (BarStyle) -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.blood_glucose_chart_bar_style, stringResource(kind.labelRes))) }, text = {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.blood_glucose_chart_show))
+                Checkbox(checked = style.visible, onCheckedChange = { onStyleChanged(style.copy(visible = it)) })
+            }
+            Text(stringResource(R.string.blood_glucose_chart_color))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { CHART_COLORS.forEach { color -> Surface(onClick = { onStyleChanged(style.copy(color = color)) }, color = color, modifier = Modifier.size(28.dp)) {} } }
+            Text(stringResource(R.string.blood_glucose_chart_main_opacity, (style.mainAlpha * 100).toInt()))
+            Slider(style.mainAlpha, { onStyleChanged(style.copy(mainAlpha = it)) }, valueRange = 0.1f..1f)
+            Text(stringResource(R.string.blood_glucose_chart_impact_opacity, (style.impactAlpha * 100).toInt()))
+            Slider(style.impactAlpha, { onStyleChanged(style.copy(impactAlpha = it)) }, valueRange = 0.1f..1f)
+        }
+    }, confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_ok)) } })
+}
+
+private fun chartTimestampAt(touch: Offset, width: Int, height: Int, slice: BloodGlucoseChartSlice): Long? {
     val bounds = ChartBounds(width.toFloat(), height.toFloat())
-    if (touch.x !in bounds.left..bounds.right || touch.y !in bounds.top..bounds.bottom) return null
-    val rawX = slice.windowStart + ((touch.x - bounds.left) / bounds.width * (slice.windowEnd - slice.windowStart)).toLong()
+    if (bounds.width <= 0f || slice.windowEnd <= slice.windowStart || touch.x !in bounds.left..bounds.right || touch.y !in bounds.top..bounds.bottom) return null
+    return slice.windowStart + ((touch.x - bounds.left) / bounds.width * (slice.windowEnd - slice.windowStart)).toLong()
+}
+
+private fun crosshairAt(timestamp: Long, slice: BloodGlucoseChartSlice, points: List<RenderedPoint>, style: SeriesStyle): GlucoseCrosshair? {
+    val rawX = timestamp
     val nextIndex = points.binarySearchBy(rawX) { it.drawingTimestamp }.let { if (it < 0) -it - 1 else it }
     val pair = points.getOrNull(nextIndex - 1)?.let { start ->
         points.getOrNull(nextIndex)?.let { end -> start to end }
@@ -609,16 +893,24 @@ private fun crosshairAt(touch: Offset, width: Int, height: Int, slice: BloodGluc
     return GlucoseCrosshair(rawX, value, if (pair.first.delayed) SeriesKind.Delayed else SeriesKind.Primary, if (pair.first.delayed) slice.windowEnd - slice.windowStart else 0L)
 }
 
+private fun barCrosshairAt(timestamp: Long, slice: BloodGlucoseChartSlice, bars: List<BarSample>, selectedKind: BarKind): BarCrosshair? {
+    return bars.firstOrNull { it.kind == selectedKind && timestamp in it.impactStartTimestamp()..it.impactEndTimestamp() }
+        ?.let { BarCrosshair(timestamp, it.startTimestamp, it.endTimestamp, it.kind) }
+}
+
 private fun DrawScope.drawGlucoseChart(
     slice: BloodGlucoseChartSlice,
     window: BloodGlucoseChartWindow,
     diabetesType: BloodGlucoseDiabetesType,
     primary: List<RenderedPoint>,
     delayed: List<RenderedPoint>,
+    bars: List<BarSample>,
+    barStyles: Map<BarKind, BarStyle>,
     palette: ChartPalette,
     primaryStyle: SeriesStyle,
     delayedStyle: SeriesStyle,
     crosshair: GlucoseCrosshair?,
+    barCrosshair: BarCrosshair?,
     xAxisUnit: String,
     yAxisUnit: String,
 ) {
@@ -650,8 +942,33 @@ private fun DrawScope.drawGlucoseChart(
     val visibleValues = primary.map { it.record.valueMmolPerL }
     visibleValues.maxOrNull()?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.2f", it), 2f, y(it) + 4f, axisPaint(palette.primary)) }
     visibleValues.minOrNull()?.takeIf { it != visibleValues.maxOrNull() }?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.2f", it), 2f, y(it) + 4f, axisPaint(palette.primary)) }
-    drawSeries(primary, ::x, ::y, palette.primary, primaryStyle)
-    drawSeries(delayed, ::x, ::y, palette.delayed, delayedStyle)
+    if (primaryStyle.visible) drawSeries(primary, ::x, ::y, palette.primary, primaryStyle)
+    if (delayedStyle.visible) drawSeries(delayed, ::x, ::y, palette.delayed, delayedStyle)
+    bars.forEach { bar ->
+        val style = barStyles.getValue(bar.kind)
+        if (style.visible) {
+            val left = x(bar.startTimestamp)
+            val right = x(bar.endTimestamp)
+            val top = bounds.bottom - bounds.height * bar.height
+            val impactLeft = x(bar.impactStartTimestamp()).coerceAtLeast(bounds.left)
+            val impactRight = x(bar.impactEndTimestamp()).coerceAtMost(bounds.right)
+            drawRect(style.color.copy(alpha = style.impactAlpha), Offset(impactLeft, top), androidx.compose.ui.geometry.Size((left - impactLeft).coerceAtLeast(0f), bounds.bottom - top))
+            drawRect(style.color.copy(alpha = style.impactAlpha), Offset(right, top), androidx.compose.ui.geometry.Size((impactRight - right).coerceAtLeast(0f), bounds.bottom - top))
+            drawRect(style.color.copy(alpha = style.mainAlpha), Offset(left, top), androidx.compose.ui.geometry.Size((right - left).coerceAtLeast(2f), bounds.bottom - top))
+        }
+    }
+    barCrosshair?.let { value ->
+        if (value.timestamp in slice.windowStart..slice.windowEnd) {
+            val pointX = x(value.timestamp)
+            val bar = bars.firstOrNull { it.kind == value.kind && value.timestamp in it.impactStartTimestamp()..it.impactEndTimestamp() }
+            val pointY = bar?.let { bounds.bottom - bounds.height * it.height } ?: bounds.bottom
+            val cross = barStyles.getValue(value.kind).color.copy(alpha = 0.82f)
+            drawLine(cross, Offset(pointX, bounds.top), Offset(pointX, bounds.bottom), 1.6f, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8f, 6f)))
+            drawLine(cross, Offset(bounds.left, pointY), Offset(bounds.right, pointY), 1.6f, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8f, 6f)))
+            drawCircle(palette.surface, 6f, Offset(pointX, pointY))
+            drawCircle(cross, 4f, Offset(pointX, pointY))
+        }
+    }
     crosshair?.let { value ->
         if (value.drawingTimestamp in slice.windowStart..slice.windowEnd && value.value in 0.0..slice.historicalMaximum) {
             val pointX = x(value.drawingTimestamp)
@@ -736,16 +1053,48 @@ private data class ChartBounds(val widthPx: Float, val heightPx: Float) {
 }
 private data class RenderedPoint(val record: BloodGlucoseRecord, val drawingTimestamp: Long, val delayed: Boolean)
 private data class GlucoseCrosshair(val drawingTimestamp: Long, val value: Double, val series: SeriesKind, val delayMillis: Long)
+private data class BarCrosshair(val timestamp: Long, val startTimestamp: Long, val endTimestamp: Long, val kind: BarKind)
 private data class ChartPalette(val primary: Color, val delayed: Color, val axis: Color, val grid: Color, val target: Color, val surface: Color)
 internal data class SeriesStyle(
     val color: Color,
     val alpha: Float = 1f,
+    val visible: Boolean = true,
     val lineStyle: GlucoseLineStyle = GlucoseLineStyle.Linear,
     val linePattern: GlucoseLinePattern = GlucoseLinePattern.Solid,
     val pointShape: GlucosePointShape = GlucosePointShape.Circle,
     val pointFill: GlucosePointFill = GlucosePointFill.Filled,
 )
 private enum class SeriesKind { Primary, Delayed }
+
+private enum class BarKind(val labelRes: Int) { Medication(R.string.blood_glucose_chart_bar_medication), Diet(R.string.blood_glucose_chart_bar_diet), Exercise(R.string.blood_glucose_chart_bar_exercise), Sleep(R.string.blood_glucose_chart_bar_sleep) }
+private data class BarStyle(val color: Color, val mainAlpha: Float = 0.5f, val impactAlpha: Float = 0.3f, val visible: Boolean = true)
+private data class BarSample(val startTimestamp: Long, val endTimestamp: Long, val kind: BarKind, val height: Float)
+private fun BarSample.impactStartTimestamp(): Long = when (kind) {
+    BarKind.Medication, BarKind.Exercise, BarKind.Sleep -> startTimestamp - 30 * MINUTE_MILLIS
+    BarKind.Diet -> startTimestamp - HOUR_MILLIS
+}
+private fun BarSample.impactEndTimestamp(): Long = when (kind) {
+    BarKind.Medication -> startTimestamp + 12 * HOUR_MILLIS
+    BarKind.Diet -> endTimestamp + 4 * HOUR_MILLIS
+    BarKind.Exercise, BarKind.Sleep -> endTimestamp + 30 * MINUTE_MILLIS
+}
+private fun defaultBarStyles() = mapOf(BarKind.Medication to BarStyle(Color(0xFFE53935)), BarKind.Diet to BarStyle(Color(0xFFF57C00)), BarKind.Exercise to BarStyle(Color(0xFF43A047)), BarKind.Sleep to BarStyle(Color(0xFF7E57C2)))
+private fun loadEventBars(context: android.content.Context, start: Long, end: Long): List<BarSample> {
+    val diseaseRepository = DiseaseRepository.fromContext(context)
+    val diabetesIds = diseaseRepository.loadAll().filter { disease ->
+        disease.id.contains("diabetes", ignoreCase = true) || disease.displayName(Locale.CHINA).contains("糖尿病") || disease.displayName(Locale.ENGLISH).contains("diabetes", ignoreCase = true)
+    }.mapTo(mutableSetOf()) { it.id }
+    val medicationBars = MedicationPrefs.getRecords(context).asSequence()
+        .filter { it.timestamp in start..end && (it.indicationReferences.any { ref -> (ref as? DiseaseReference.Curated)?.curatedDiseaseId?.values?.any(diabetesIds::contains) == true } || it.legacyPurposeTags.any { tag -> tag.contains("糖尿病") || tag.contains("diabetes", true) }) }
+        .map { BarSample(it.timestamp, it.timestamp + 10 * MINUTE_MILLIS, BarKind.Medication, 0.30f) }
+    val dietBars = DietRepository.fromContext(context).load().records.asSequence()
+        .filter { it.mealStartAt < end && it.mealEndAt > start }
+        .map { BarSample(it.mealStartAt, it.mealEndAt.coerceAtLeast(it.mealStartAt + MINUTE_MILLIS), BarKind.Diet, 0.24f) }
+    val sleepBars = SleepRepository.fromContext(context).load().records.asSequence()
+        .filter { it.sleepStartAt < end && (it.wakeUpAt ?: end) > start }
+        .map { BarSample(it.sleepStartAt, (it.wakeUpAt ?: end).coerceAtLeast(it.sleepStartAt + MINUTE_MILLIS), BarKind.Sleep, 0.12f) }
+    return (medicationBars + dietBars + sleepBars).toList()
+}
 internal enum class GlucoseLineStyle { Linear, Bezier, Spline, CatmullRom, Monotone, SteppedFront, SteppedBack }
 internal enum class GlucoseLinePattern { Solid, Dashed, Dotted, DotDashed }
 internal enum class GlucosePointShape { Circle, Triangle, Square, Diamond, Cross }
@@ -779,6 +1128,7 @@ private fun GlucosePointFill.labelRes(): Int = when (this) {
 }
 
 private const val HOUR_MILLIS = 3_600_000L
+private const val MINUTE_MILLIS = 60_000L
 private const val MAX_CONNECTED_GAP_MILLIS = 15 * 60_000L
 private const val Y_TICK_INTERVAL = 3.0
 private val TIME_LABEL_FORMATTER = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())

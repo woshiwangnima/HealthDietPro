@@ -53,14 +53,7 @@ internal fun DietMealDetailScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val mealTotals = remember(record) {
-        DayNutrients(
-            energy = record.entries.sumOf { it.resolvedNutrients["ENERGY"]?.value ?: 0.0 },
-            protein = record.entries.sumOf { it.resolvedNutrients["PROTEIN"]?.value ?: 0.0 },
-            fat = record.entries.sumOf { it.resolvedNutrients["FAT"]?.value ?: 0.0 },
-            carbs = record.entries.sumOf { it.resolvedNutrients["CHO"]?.value ?: 0.0 },
-        )
-    }
+    val mealTotals = remember(record) { sumNutrients(listOf(record)) }
     var activeSorts by remember { mutableStateOf(emptyList<Pair<String, SortOrder>>()) }
     val sortOptions = listOf(
         SortOption("KIND", stringResource(R.string.diet_sort_kind)),
@@ -88,37 +81,15 @@ internal fun DietMealDetailScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                     SectionTitle(R.drawable.ic_diet, stringResource(R.string.diet_meal_summary))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        NutrientMetric.entries.forEach { metric ->
-                            DietStatCard(
-                                label = stringResource(metric.labelRes),
-                                unit = metric.unit,
-                                value = formatCalories(mealTotals.value(metric)),
-                                modifier = Modifier.weight(1f),
-                            )
-                        }
-                    }
-                }
-            }
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    SectionTitle(R.drawable.ic_health_metrics, stringResource(R.string.diet_meal_goal_progress))
-                    NutrientProgressRow(NutrientMetric.ENERGY, mealTotals.energy, goals.energyKcal.toDouble())
-                    NutrientProgressRow(NutrientMetric.CARBS, mealTotals.carbs, goals.carbsGrams.toDouble())
-                    NutrientProgressRow(NutrientMetric.PROTEIN, mealTotals.protein, goals.proteinGrams.toDouble())
-                    NutrientProgressRow(NutrientMetric.FAT, mealTotals.fat, goals.fatGrams.toDouble())
+                    NutrientSummaryVisuals(mealTotals, goals)
                 }
             }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                     SectionTitle(R.drawable.ic_nutrients, stringResource(R.string.diet_meal_nutrient_list))
                     MealNutrientTable(
-                        perMealTotals = mapOf(record.mealPeriod to mealTotals),
+                        records = listOf(record),
                         dayTotals = dayTotals,
-                        periodColors = mapOf(record.mealPeriod to periodColor(record.mealPeriod)),
                     )
                 }
             }

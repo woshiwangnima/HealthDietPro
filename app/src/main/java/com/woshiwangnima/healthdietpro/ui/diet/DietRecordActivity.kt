@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +20,7 @@ import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.model.diet.DietPrefs
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
+import com.woshiwangnima.healthdietpro.model.diet.DietEditorDraftRepository
 import com.woshiwangnima.healthdietpro.model.diet.loadDietGoalsPrefs
 import com.woshiwangnima.healthdietpro.model.diet.loadDietPrefs
 import com.woshiwangnima.healthdietpro.model.diet.recommendedDietGoals
@@ -89,6 +91,8 @@ private fun DietRoute(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val context = androidx.compose.ui.platform.LocalContext.current
+    val draftRepository = remember(context) { DietEditorDraftRepository.fromContext(context) }
+    val pendingDraft = remember { draftRepository.loadDraft() }
     var prefs by remember { mutableStateOf(loadDietPrefs(context)) }
     var goals by remember { mutableStateOf(loadDietGoalsPrefs(context)) }
     val profile = remember { ProfilePrefs.load(context) }
@@ -100,9 +104,13 @@ private fun DietRoute(
             isMale = profile.gender == Gender.MALE,
         )
     }
-    var route by rememberSaveable { mutableStateOf(if (openEditorInitially) DietRoute.EDITOR else DietRoute.HOME) }
-    var editingRecord by remember { mutableStateOf<DietRecord?>(null) }
+    var route by rememberSaveable { mutableStateOf(if (openEditorInitially || pendingDraft != null) DietRoute.EDITOR else DietRoute.HOME) }
+    var editingRecord by remember { mutableStateOf(pendingDraft?.record?.takeIf { it.id.isNotBlank() }) }
     var viewingRecord by remember { mutableStateOf<DietRecord?>(null) }
+
+    LaunchedEffect(Unit) {
+        if (pendingDraft != null && route == DietRoute.HOME) route = DietRoute.EDITOR
+    }
 
     BackHandler(enabled = route != DietRoute.HOME) {
         when {

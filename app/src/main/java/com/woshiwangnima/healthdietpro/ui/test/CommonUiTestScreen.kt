@@ -40,6 +40,8 @@ import com.woshiwangnima.healthdietpro.common.ui.TextInputField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputKind
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputSpec
+import com.woshiwangnima.healthdietpro.common.ui.SingleChoiceSegmentedOption
+import com.woshiwangnima.healthdietpro.common.ui.SingleChoiceSegmentedSelector
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
 import com.woshiwangnima.healthdietpro.common.ui.WaterGlassProgress
@@ -53,6 +55,7 @@ internal enum class CommonUiTestCategory(val chineseName: String, val className:
     Chart("图表", "ComposeBaseChart"),
     HydrationVisuals("饮水可视化", "AnimatedDonutChart / WaterGlassProgress"),
     SegmentedTabs("等宽分段标签", "EqualWidthSegmentedTabs"),
+    SingleChoiceSegmentedButtons("单选分段选择器", "SingleChoiceSegmentedSelector"),
     InputField("输入框", "TextInputField / NumericInputField"),
 }
 
@@ -138,6 +141,21 @@ private fun CommonUiVariantScreen(category: CommonUiTestCategory, onBack: () -> 
                     ),
                     selectedIndex = selectedTab,
                     onSelected = { selectedTab = it },
+                )
+            }
+            CommonUiTestCategory.SingleChoiceSegmentedButtons -> {
+                Text("血糖图表的时间窗口选择器。")
+                val options = listOf(3, 6, 12, 24).map { hours ->
+                    SingleChoiceSegmentedOption(
+                        id = hours.toString(),
+                        labelRes = R.string.blood_glucose_chart_window_hours,
+                        labelArgs = listOf(hours),
+                    )
+                }
+                SingleChoiceSegmentedSelector(
+                    options = options,
+                    selectedId = options[selectedTab].id,
+                    onOptionSelected = { selectedTab = options.indexOf(it) },
                 )
             }
             CommonUiTestCategory.InputField -> {

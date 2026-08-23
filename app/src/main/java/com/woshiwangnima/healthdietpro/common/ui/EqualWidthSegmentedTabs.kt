@@ -2,8 +2,6 @@ package com.woshiwangnima.healthdietpro.common.ui
 
 import androidx.annotation.StringRes
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,11 +43,15 @@ fun EqualWidthSegmentedTabs(
         AnimatedNavigationRow(
             itemCount = tabs.size,
             selectedIndex = selectedIndex,
-            indicator = { indicatorModifier ->
-                Box(
-                    modifier = indicatorModifier
-                        .padding(3.dp)
-                        .background(navigationIndicatorColor(), RoundedCornerShape(9.dp)),
+            indicator = { indicatorModifier, resolvedSelectedIndex ->
+                MagneticFluidSliderIndicator(
+                    selectedIndex = resolvedSelectedIndex,
+                    itemCount = tabs.size,
+                    color = navigationIndicatorColor(),
+                    cornerRadius = 9.dp,
+                    horizontalInset = 3.dp,
+                    verticalInset = 3.dp,
+                    modifier = indicatorModifier,
                 )
             },
         ) { index ->
@@ -59,6 +61,7 @@ fun EqualWidthSegmentedTabs(
                 onClick = { onSelected(index) },
                 selectedContentColor = MaterialTheme.colorScheme.primary,
                 unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                rippleShape = RoundedCornerShape(9.dp),
             ) { contentColor ->
                 Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                     tab.iconRes?.let { Icon(painterResource(it), null, modifier = Modifier.size(16.dp), tint = contentColor) }
