@@ -15,6 +15,8 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.evaluateBloodGlucoseAl
 import com.woshiwangnima.healthdietpro.common.notification.BloodGlucoseAlertNotifier
 import com.woshiwangnima.healthdietpro.model.bloodglucose.normalizeBloodGlucoseTimestamp
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStylePrefs
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStyleRepository
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRange
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
@@ -30,6 +32,7 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
     private val repository = BloodGlucoseRepository.fromContext(application)
     private val targetRepository = BloodGlucoseTargetRepository.fromContext(application)
     private val reminderRepository = BloodGlucoseReminderRepository.fromContext(application)
+    private val chartStyleRepository = BloodGlucoseChartStyleRepository.fromContext(application)
     private val alertNotifier = BloodGlucoseAlertNotifier(application)
     private val _records = MutableStateFlow<List<BloodGlucoseRecord>>(emptyList())
     val records: StateFlow<List<BloodGlucoseRecord>> = _records.asStateFlow()
@@ -48,6 +51,8 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
     val chartScope: StateFlow<RecordTimeRangeSelection> = _chartScope.asStateFlow()
     private val _chartWindowEnd = MutableStateFlow<Long?>(null)
     val chartWindowEnd: StateFlow<Long?> = _chartWindowEnd.asStateFlow()
+    private val _chartStyle = MutableStateFlow(BloodGlucoseChartStylePrefs())
+    val chartStyle: StateFlow<BloodGlucoseChartStylePrefs> = _chartStyle.asStateFlow()
 
     init {
         refresh()
@@ -56,6 +61,9 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
         }
         viewModelScope.launch {
             _reminderSettings.value = withContext(Dispatchers.IO) { reminderRepository.load() }
+        }
+        viewModelScope.launch {
+            _chartStyle.value = withContext(Dispatchers.IO) { chartStyleRepository.load() }
         }
     }
 
@@ -151,6 +159,11 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
 
     fun setChartWindowEnd(timestamp: Long?) {
         _chartWindowEnd.value = timestamp
+    }
+
+    fun setChartStyle(style: BloodGlucoseChartStylePrefs) {
+        _chartStyle.value = style
+        viewModelScope.launch(Dispatchers.IO) { chartStyleRepository.save(style) }
     }
 
     private fun loadChartWindow(): BloodGlucoseChartWindow =

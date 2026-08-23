@@ -183,6 +183,7 @@ private fun BloodGlucoseScreen(
     val chartScope by viewModel.chartScope.collectAsStateWithLifecycle()
     val chartWindow by viewModel.chartWindow.collectAsStateWithLifecycle()
     val chartWindowEnd by viewModel.chartWindowEnd.collectAsStateWithLifecycle()
+    val chartStyle by viewModel.chartStyle.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var selectedRecordType by rememberSaveable { mutableIntStateOf(0) }
     var editingRecord by remember { mutableStateOf<BloodGlucoseRecord?>(null) }
@@ -331,15 +332,18 @@ private fun BloodGlucoseScreen(
                         scope = chartScope,
                         window = chartWindow,
                         windowEnd = chartWindowEnd,
+                        chartStyle = chartStyle,
                         onScopeChanged = viewModel::setChartScope,
                         onWindowChanged = viewModel::setChartWindow,
                         onWindowEndChanged = viewModel::setChartWindowEnd,
+                        onChartStyleChanged = viewModel::setChartStyle,
                     )
                 } else {
                     when (tab) {
                         1 -> BloodGlucoseDataPage(
                             records = records,
                             hbA1cRecords = hbA1cRecords,
+                            sources = sources,
                             diabetesType = diabetesType,
                             selectedRecordType = selectedRecordType,
                             onRecordTypeChange = { selectedRecordType = it },
@@ -805,9 +809,11 @@ private fun BloodGlucoseChart(
     scope: com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection,
     window: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow,
     windowEnd: Long?,
+    chartStyle: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStylePrefs,
     onScopeChanged: (com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection) -> Unit,
     onWindowChanged: (com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow) -> Unit,
     onWindowEndChanged: (Long?) -> Unit,
+    onChartStyleChanged: (com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStylePrefs) -> Unit,
 ) {
     val resolvedScope = scope.resolve()
     Column(Modifier.fillMaxSize()) {
@@ -835,6 +841,8 @@ private fun BloodGlucoseChart(
             sessionWindowEnd = windowEnd,
             onSessionWindowEndChanged = onWindowEndChanged,
             diabetesType = diabetesType,
+            chartStyle = chartStyle,
+            onChartStyleChanged = onChartStyleChanged,
             modifier = Modifier.weight(1f),
         )
     }
@@ -844,6 +852,7 @@ private fun BloodGlucoseChart(
 private fun BloodGlucoseDataPage(
     records: List<BloodGlucoseRecord>,
     hbA1cRecords: List<BloodHbA1cRecord>,
+    sources: List<BloodGlucoseSource>,
     diabetesType: BloodGlucoseDiabetesType,
     selectedRecordType: Int,
     onRecordTypeChange: (Int) -> Unit,
@@ -871,8 +880,8 @@ private fun BloodGlucoseDataPage(
             onSelected = onRecordTypeChange,
         )
         when (selectedRecordType) {
-            0 -> GlucoseRecordList(records, diabetesType, unitId, unit, onAdd, onEdit) { deletingRecord = it }
-            1 -> HbA1cRecordList(hbA1cRecords, diabetesType, unitId, unit, onAddHbA1c, onEditHbA1c) { deletingHbA1cRecord = it }
+            0 -> GlucoseRecordList(records, sources, diabetesType, unitId, unit, onAdd, onEdit) { deletingRecord = it }
+            1 -> HbA1cRecordList(hbA1cRecords, sources, diabetesType, unitId, unit, onAddHbA1c, onEditHbA1c) { deletingHbA1cRecord = it }
             2 -> OgttRecordPlaceholder()
         }
     }
@@ -899,6 +908,7 @@ private fun BloodGlucoseDataPage(
 @Composable
 private fun GlucoseRecordList(
     records: List<BloodGlucoseRecord>,
+    sources: List<BloodGlucoseSource>,
     diabetesType: BloodGlucoseDiabetesType,
     unitId: String,
     unit: String,
@@ -906,6 +916,8 @@ private fun GlucoseRecordList(
     onEdit: (BloodGlucoseRecord) -> Unit,
     onAskDelete: (BloodGlucoseRecord) -> Unit,
 ) {
+    val sourceNames = remember(sources) { sources.associate { it.id to it.note } }
+    val noSource = stringResource(R.string.data_source_none)
     val latestRecords = remember(records) { records.sortedByDescending(BloodGlucoseRecord::timestamp).take(2) }
     val latestRecord = latestRecords.firstOrNull()
     val particleLevel = remember(latestRecords) {
@@ -956,6 +968,9 @@ private fun GlucoseRecordList(
                             belowDescription = stringResource(R.string.blood_glucose_below_reference),
                         )
                     },
+                    AppDataTableColumn("source", { AppDataTableHeaderText(stringResource(R.string.data_source)) }, ColumnWidth.Fixed(130.dp)) {
+                        AppDataTableText(it.sourceId?.let(sourceNames::get) ?: noSource)
+                    },
                     AppDataTableColumn("note", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_note)) }, ColumnWidth.Flex(1f, 120.dp)) { AppDataTableText(it.note) },
                 ),
                 actionsWidth = 104.dp,
@@ -970,6 +985,7 @@ private fun GlucoseRecordList(
 @Composable
 private fun HbA1cRecordList(
     records: List<BloodHbA1cRecord>,
+    sources: List<BloodGlucoseSource>,
     diabetesType: BloodGlucoseDiabetesType,
     unitId: String,
     unit: String,
@@ -977,6 +993,8 @@ private fun HbA1cRecordList(
     onEdit: (BloodHbA1cRecord) -> Unit,
     onAskDelete: (BloodHbA1cRecord) -> Unit,
 ) {
+    val sourceNames = remember(sources) { sources.associate { it.id to it.note } }
+    val noSource = stringResource(R.string.data_source_none)
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(stringResource(R.string.body_record_count, records.size), style = MaterialTheme.typography.titleMedium)
@@ -1004,6 +1022,9 @@ private fun HbA1cRecordList(
                             aboveDescription = stringResource(R.string.hb_a1c_above_reference),
                             belowDescription = stringResource(R.string.hb_a1c_below_reference),
                         )
+                    },
+                    AppDataTableColumn("source", { AppDataTableHeaderText(stringResource(R.string.data_source)) }, ColumnWidth.Fixed(130.dp)) {
+                        AppDataTableText(it.sourceId?.let(sourceNames::get) ?: noSource)
                     },
                     AppDataTableColumn("note", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_note)) }, ColumnWidth.Flex(1f, 120.dp)) { AppDataTableText(it.note) },
                 ),

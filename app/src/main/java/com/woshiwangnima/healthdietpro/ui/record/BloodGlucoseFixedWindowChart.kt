@@ -55,6 +55,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
@@ -85,6 +86,9 @@ import com.woshiwangnima.healthdietpro.common.range.Range
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartIndex
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartSlice
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStylePrefs
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseSeriesStylePrefs
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseBarStylePrefs
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseDiabetesType
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.GlucoseTimeRangeBand
@@ -113,6 +117,8 @@ internal fun BloodGlucoseFixedWindowChart(
     scopeEnd: Long,
     window: BloodGlucoseChartWindow,
     diabetesType: BloodGlucoseDiabetesType,
+    chartStyle: BloodGlucoseChartStylePrefs,
+    onChartStyleChanged: (BloodGlucoseChartStylePrefs) -> Unit,
     modifier: Modifier = Modifier,
     sessionWindowEnd: Long? = null,
     onSessionWindowEndChanged: (Long?) -> Unit = {},
@@ -124,13 +130,15 @@ internal fun BloodGlucoseFixedWindowChart(
     val initialEnd = remember(scopeStart, currentScopeEnd) { currentScopeEnd }
     var ownedWindowEnd by remember(scopeStart, currentScopeEnd, window) { mutableLongStateOf(initialEnd) }
     val windowEnd = sessionWindowEnd ?: ownedWindowEnd
-    var primaryStyle by remember { mutableStateOf(SeriesStyle(Color(0xFF1976D2), lineStyle = GlucoseLineStyle.Spline)) }
-    var delayedStyle by remember { mutableStateOf(SeriesStyle(Color(0xFFF57C00), lineStyle = GlucoseLineStyle.Spline, linePattern = GlucoseLinePattern.Dotted, pointShape = GlucosePointShape.Cross)) }
+    val primaryStyle = chartStyle.primary.toUiStyle(defaultPrimaryStyle())
+    val delayedStyle = chartStyle.delayed.toUiStyle(defaultDelayedStyle())
     var selectedSeries by remember { mutableStateOf(SeriesKind.Primary) }
     var selectedBar by remember { mutableStateOf<BarKind?>(BarKind.Diet) }
     var styleDialogSeries by remember { mutableStateOf<SeriesKind?>(null) }
     var barStyleDialog by remember { mutableStateOf<BarKind?>(null) }
-    var barStyles by remember { mutableStateOf(defaultBarStyles()) }
+    val barStyles = BarKind.entries.associateWith { kind ->
+        chartStyle.bars[kind.name].toUiStyle(defaultBarStyles().getValue(kind))
+    }
     var eventBars by remember { mutableStateOf(emptyList<BarSample>()) }
     val context = LocalContext.current
     var fullscreen by remember { mutableStateOf(false) }
@@ -181,12 +189,22 @@ internal fun BloodGlucoseFixedWindowChart(
             label = if (series == SeriesKind.Primary) stringResource(R.string.blood_glucose_chart_primary_series)
             else stringResource(R.string.blood_glucose_delayed_series, window.durationMillis / HOUR_MILLIS),
             style = if (series == SeriesKind.Primary) primaryStyle else delayedStyle,
-            onStyleChanged = { if (series == SeriesKind.Primary) primaryStyle = it else delayedStyle = it },
+            onStyleChanged = { updated ->
+                onChartStyleChanged(
+                    if (series == SeriesKind.Primary) chartStyle.copy(primary = updated.toPrefs())
+                    else chartStyle.copy(delayed = updated.toPrefs())
+                )
+            },
             onDismiss = { styleDialogSeries = null },
         )
     }
     barStyleDialog?.let { kind ->
-        BarStyleDialog(kind, barStyles.getValue(kind), { barStyles = barStyles + (kind to it) }, { barStyleDialog = null })
+        BarStyleDialog(
+            kind,
+            barStyles.getValue(kind),
+            { updated -> onChartStyleChanged(chartStyle.copy(bars = chartStyle.bars + (kind.name to updated.toPrefs()))) },
+            { barStyleDialog = null },
+        )
     }
     if (showDatePicker) {
         ComposeDatePickerDialog(
@@ -538,13 +556,17 @@ private fun TargetTimeRangeCard(
                 }
             }
             val totalMillis = distribution.coveredMillis
-            val withinReferences = totalMillis > 0L && GlucoseTimeRangeBand.entries.all { band ->
-                val percent = distribution.millisFor(band).toFloat() / totalMillis * 100f
+            val allBandsWithinReferences = GlucoseTimeRangeBand.entries.all { band ->
+                val percent = if (totalMillis > 0L) {
+                    distribution.millisFor(band).toFloat() / totalMillis * 100f
+                } else {
+                    0f
+                }
                 glucoseTimeReferenceRanges.first { it.value == band }.contains(percent)
             }
-            val attentionShake = rememberAttentionShakeOffset(
-                active = totalMillis > 0L && !withinReferences,
-                label = "glucoseTargetTime",
+            val centerAttentionShake = rememberAttentionShakeOffset(
+                active = totalMillis > 0L && !allBandsWithinReferences,
+                label = "glucoseTargetTimeCenter",
             )
             AnimatedDonutChart(
                 segments = GlucoseTimeRangeBand.entries.map { band ->
@@ -560,6 +582,7 @@ private fun TargetTimeRangeCard(
                         ),
                         value = durationMillis.toFloat(),
                         color = glucoseTimeBandColor(band),
+                        needsAttention = !glucoseTimeReferenceRanges.first { it.value == band }.contains(percent.toFloat()),
                     )
                 },
                 centerValue = if (totalMillis > 0L) {
@@ -575,8 +598,8 @@ private fun TargetTimeRangeCard(
                 showLegend = false,
                 labelMaxLines = 2,
                 chartHeight = 173.dp,
-                centerContentColor = if (totalMillis > 0L && !withinReferences) MaterialTheme.colorScheme.tertiary else null,
-                centerContentModifier = Modifier.offset { IntOffset(0, attentionShake.roundToPx()) },
+                centerContentColor = if (totalMillis > 0L && !allBandsWithinReferences) MaterialTheme.colorScheme.tertiary else null,
+                centerContentModifier = Modifier.offset { IntOffset(0, centerAttentionShake.roundToPx()) },
             )
         }
     }
@@ -817,7 +840,7 @@ private fun SeriesStyleDialog(label: String, style: SeriesStyle, onStyleChanged:
                     }
                 }
                 Text(stringResource(R.string.blood_glucose_chart_opacity, (style.alpha * 100).toInt()))
-                Slider(style.alpha, { onStyleChanged(style.copy(alpha = it)) }, valueRange = 0.1f..1f)
+                Slider(style.alpha, { onStyleChanged(style.copy(alpha = it)) }, valueRange = 0f..1f)
                 AppDropdownField(
                     label = stringResource(R.string.view_chart_line_style),
                     value = stringResource(style.lineStyle.labelRes()),
@@ -859,9 +882,9 @@ private fun BarStyleDialog(kind: BarKind, style: BarStyle, onStyleChanged: (BarS
             Text(stringResource(R.string.blood_glucose_chart_color))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { CHART_COLORS.forEach { color -> Surface(onClick = { onStyleChanged(style.copy(color = color)) }, color = color, modifier = Modifier.size(28.dp)) {} } }
             Text(stringResource(R.string.blood_glucose_chart_main_opacity, (style.mainAlpha * 100).toInt()))
-            Slider(style.mainAlpha, { onStyleChanged(style.copy(mainAlpha = it)) }, valueRange = 0.1f..1f)
+            Slider(style.mainAlpha, { onStyleChanged(style.copy(mainAlpha = it)) }, valueRange = 0f..1f)
             Text(stringResource(R.string.blood_glucose_chart_impact_opacity, (style.impactAlpha * 100).toInt()))
-            Slider(style.impactAlpha, { onStyleChanged(style.copy(impactAlpha = it)) }, valueRange = 0.1f..1f)
+            Slider(style.impactAlpha, { onStyleChanged(style.copy(impactAlpha = it)) }, valueRange = 0f..1f)
         }
     }, confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_ok)) } })
 }
@@ -1068,6 +1091,50 @@ private enum class SeriesKind { Primary, Delayed }
 
 private enum class BarKind(val labelRes: Int) { Medication(R.string.blood_glucose_chart_bar_medication), Diet(R.string.blood_glucose_chart_bar_diet), Exercise(R.string.blood_glucose_chart_bar_exercise), Sleep(R.string.blood_glucose_chart_bar_sleep) }
 private data class BarStyle(val color: Color, val mainAlpha: Float = 0.5f, val impactAlpha: Float = 0.3f, val visible: Boolean = true)
+
+private fun defaultPrimaryStyle() = SeriesStyle(Color(0xFF1976D2), lineStyle = GlucoseLineStyle.Spline)
+
+private fun defaultDelayedStyle() = SeriesStyle(
+    Color(0xFFF57C00),
+    lineStyle = GlucoseLineStyle.Spline,
+    linePattern = GlucoseLinePattern.Dotted,
+    pointShape = GlucosePointShape.Cross,
+)
+
+private fun BloodGlucoseSeriesStylePrefs.toUiStyle(fallback: SeriesStyle): SeriesStyle = SeriesStyle(
+    color = Color(colorArgb.toInt()),
+    alpha = alpha.coerceIn(0f, 1f),
+    visible = visible,
+    lineStyle = runCatching { GlucoseLineStyle.valueOf(lineStyle) }.getOrDefault(fallback.lineStyle),
+    linePattern = runCatching { GlucoseLinePattern.valueOf(linePattern) }.getOrDefault(fallback.linePattern),
+    pointShape = runCatching { GlucosePointShape.valueOf(pointShape) }.getOrDefault(fallback.pointShape),
+    pointFill = runCatching { GlucosePointFill.valueOf(pointFill) }.getOrDefault(fallback.pointFill),
+)
+
+private fun SeriesStyle.toPrefs() = BloodGlucoseSeriesStylePrefs(
+    colorArgb = color.toArgb().toLong(),
+    alpha = alpha,
+    visible = visible,
+    lineStyle = lineStyle.name,
+    linePattern = linePattern.name,
+    pointShape = pointShape.name,
+    pointFill = pointFill.name,
+)
+
+private fun BloodGlucoseBarStylePrefs?.toUiStyle(fallback: BarStyle): BarStyle = BarStyle(
+    color = this?.let { Color(colorArgb.toInt()) } ?: fallback.color,
+    mainAlpha = this?.mainAlpha?.coerceIn(0f, 1f) ?: fallback.mainAlpha,
+    impactAlpha = this?.impactAlpha?.coerceIn(0f, 1f) ?: fallback.impactAlpha,
+    visible = this?.visible ?: fallback.visible,
+)
+
+private fun BarStyle.toPrefs() = BloodGlucoseBarStylePrefs(
+    colorArgb = color.toArgb().toLong(),
+    mainAlpha = mainAlpha,
+    impactAlpha = impactAlpha,
+    visible = visible,
+)
+
 private data class BarSample(val startTimestamp: Long, val endTimestamp: Long, val kind: BarKind, val height: Float)
 private fun BarSample.impactStartTimestamp(): Long = when (kind) {
     BarKind.Medication, BarKind.Exercise, BarKind.Sleep -> startTimestamp - 30 * MINUTE_MILLIS

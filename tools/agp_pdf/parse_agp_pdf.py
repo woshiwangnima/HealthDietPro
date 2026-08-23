@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+import unicodedata
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -22,7 +24,16 @@ PLOT_TOP = 10.0
 PLOT_BOTTOM = 170.0
 PLOT_VALUE_MAX = 25.0
 SAMPLE_INTERVAL_MINUTES = 5
-FIRST_DAY_EXPECTED_SAMPLES = 35
+
+REPORT_RANGE = re.compile(
+    r"\u76d1\u6d4b\u65f6\u95f4\s*:\s*(\d{4})/(\d{1,2})/(\d{1,2})\s*-\s*"
+    r"(\d{4})/(\d{1,2})/(\d{1,2})"
+)
+DAILY_SUMMARY = re.compile(
+    r"MBG\s*\u5e73\u5747\s*\u8461\s*\u8404\u7cd6\u503c\s*(\d+(?:\.\d+)?)\s*mmol/L.*?"
+    r"(\d{1,2})\u6708(\d{1,2})\u65e5",
+    re.DOTALL,
+)
 
 
 def endpoint(command: bytes, values: list[object]) -> tuple[float, float] | None:
@@ -85,29 +96,50 @@ def sample_curve(points: list[tuple[float, float]]) -> list[float | None]:
     return result
 
 
+def page_text(page) -> str:
+    return unicodedata.normalize("NFKC", page.extract_text() or "")
+
+
+def report_dates(reader: PdfReader) -> list[date]:
+    match = REPORT_RANGE.search(page_text(reader.pages[0]))
+    if match is None:
+        raise ValueError("Could not find the report monitoring date range on page 1")
+    start = date(*map(int, match.group(1, 2, 3)))
+    end = date(*map(int, match.group(4, 5, 6)))
+    if end < start:
+        raise ValueError(f"Invalid report monitoring date range: {start} - {end}")
+    return [start + timedelta(days=offset) for offset in range((end - start).days + 1)]
+
+
+def daily_summaries(pages, expected_dates: list[date]) -> list[tuple[date, float]]:
+    summaries = []
+    dates_by_month_day = {(item.month, item.day): item for item in expected_dates}
+    for page in pages:
+        for mean, month, day in DAILY_SUMMARY.findall(page_text(page)):
+            current_date = dates_by_month_day.get((int(month), int(day)))
+            if current_date is None:
+                raise ValueError(
+                    f"Daily chart date {month}-{day} is outside the report monitoring range"
+                )
+            summaries.append((current_date, float(mean)))
+    summary_dates = [item[0] for item in summaries]
+    if summary_dates != expected_dates:
+        raise ValueError(
+            "Daily chart dates do not exactly match the report monitoring range: "
+            f"expected {[item.isoformat() for item in expected_dates]}, "
+            f"found {[item.isoformat() for item in summary_dates]}"
+        )
+    return summaries
+
+
 def parse(pdf: Path, timezone: ZoneInfo) -> dict[str, object]:
     reader = PdfReader(pdf)
-    curves: list[list[tuple[float, float]]] = []
-    curves_by_page = [curve_paths(page) for page in reader.pages[1:5]]
-    # A partial day can be emitted as multiple disjoint vector paths. The first
-    # report day has one valid short path and one similarly shaped path from the
-    # daily-summary thumbnail above it. Keep the segment whose point count is
-    # consistent with the 2.92 hours reported for that day.
-    first_page = curves_by_page[0]
-    short_curves = [
-        curve for curve in first_page
-        if max(x for x, _ in curve) - min(x for x, _ in curve) < 200
-    ]
-    full_curves = [curve for curve in first_page if curve not in short_curves]
-    if len(short_curves) == 2:
-        # sample_curve returns 288 slots, so compare actual populated slots.
-        first_day_curve = min(
-            short_curves,
-            key=lambda curve: abs(sum(value is not None for value in sample_curve(curve)) - FIRST_DAY_EXPECTED_SAMPLES),
-        )
-        curves_by_page[0] = [first_day_curve, *full_curves]
+    expected_dates = report_dates(reader)
+    daily_pages = reader.pages[1:]
+    summaries = daily_summaries(daily_pages, expected_dates)
+    curves_by_page = [curve_paths(page) for page in daily_pages]
     curves = [curve for page_curves in curves_by_page for curve in page_curves]
-    if len(curves) != 15:
+    if len(curves) != len(summaries):
         details = [
             [
                 (round(min(x for x, _ in curve), 1), round(max(x for x, _ in curve), 1), len(curve))
@@ -115,19 +147,27 @@ def parse(pdf: Path, timezone: ZoneInfo) -> dict[str, object]:
             ]
             for page_curves in curves_by_page
         ]
-        raise ValueError(f"Expected 15 daily curves, found {len(curves)}: {details}")
+        raise ValueError(
+            f"Expected {len(summaries)} daily curves from the report dates, "
+            f"found {len(curves)}: {details}"
+        )
 
-    start = date(2026, 6, 15)
     readings = []
     days = []
-    for day_index, curve in enumerate(curves):
-        current_date = start + timedelta(days=day_index)
+    for (current_date, reported_mean), curve in zip(summaries, curves, strict=True):
         values = sample_curve(curve)
         present = [value for value in values if value is not None]
+        calculated_mean = round(sum(present) / len(present), 2) if present else None
+        if calculated_mean is None or abs(calculated_mean - reported_mean) > 0.02:
+            raise ValueError(
+                f"{current_date}: reconstructed mean {calculated_mean} does not match "
+                f"reported MBG {reported_mean} within 0.02 mmol/L"
+            )
         days.append({
             "date": current_date.isoformat(),
             "samples": len(present),
-            "meanMmolPerL": round(sum(present) / len(present), 2) if present else None,
+            "meanMmolPerL": calculated_mean,
+            "reportedMeanMmolPerL": reported_mean,
         })
         for slot, value in enumerate(values):
             if value is None:

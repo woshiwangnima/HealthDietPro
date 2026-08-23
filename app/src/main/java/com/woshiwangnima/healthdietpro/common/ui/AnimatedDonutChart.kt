@@ -48,6 +48,7 @@ internal data class DonutChartSegment(
     val label: String,
     val value: Float,
     val color: Color? = null,
+    val needsAttention: Boolean = false,
 )
 
 /** A compact animated donut chart with a bounded text legend for narrow layouts. */
@@ -202,16 +203,22 @@ private fun DynamicDonutLabels(
     androidx.compose.runtime.LaunchedEffect(layouts) { onLayoutsChanged(layouts) }
     Box(Modifier.fillMaxSize().onSizeChanged { size = it }) {
         layouts.forEach { layout ->
+            val segment = segments.first { it.id == layout.id }
+            val shakeOffset = rememberAttentionShakeOffset(
+                active = segment.needsAttention,
+                label = "donutLabelShake_${segment.id}",
+            )
             val width = layout.bounds.width.toInt().coerceAtLeast(1)
             val height = layout.bounds.height.toInt().coerceAtLeast(1)
             val labelModifier = Modifier
+                .offset { IntOffset(0, shakeOffset.roundToPx()) }
                 .offset { IntOffset(layout.bounds.left.toInt(), layout.bounds.top.toInt()) }
                 .widthIn(min = with(density) { width.toDp() }, max = with(density) { width.toDp() })
                 .height(with(density) { height.toDp() })
             val labelAlign = if (layout.bounds.center.x < size.width / 2f) TextAlign.End else TextAlign.Start
             if (maxLines > 1) {
                 Text(
-                    text = segments.first { it.id == layout.id }.label,
+                    text = segment.label,
                     modifier = labelModifier,
                     style = textStyle,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -221,7 +228,7 @@ private fun DynamicDonutLabels(
                 )
             } else {
                 TextOverflowText(
-                    text = segments.first { it.id == layout.id }.label,
+                    text = segment.label,
                     modifier = labelModifier,
                     style = textStyle,
                     color = MaterialTheme.colorScheme.onSurface,
