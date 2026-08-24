@@ -47,23 +47,32 @@ internal class BloodGlucoseChartStyleRepository private constructor(context: Con
     fun load(): BloodGlucoseChartStylePrefs {
         val encoded = preferences.getString(STORAGE_KEY, "")
         return encoded.takeIf(String::isNotEmpty)
-            ?.let { runCatching { json.decodeFromString<BloodGlucoseChartStylePrefs>(it) }.getOrNull() }
-            ?.sanitized()
+            ?.let(::decodeBloodGlucoseChartStyle)
             ?: BloodGlucoseChartStylePrefs()
     }
 
     fun save(style: BloodGlucoseChartStylePrefs) {
-        preferences.putString(STORAGE_KEY, json.encodeToString(style.sanitized()))
+        preferences.putString(STORAGE_KEY, encodeBloodGlucoseChartStyle(style))
     }
 
     companion object {
         private const val STORAGE_KEY = "blood_glucose_chart_style_v1"
-        private val json = Json { ignoreUnknownKeys = true }
-
         fun fromContext(context: Context): BloodGlucoseChartStyleRepository =
             BloodGlucoseChartStyleRepository(context.applicationContext)
     }
 }
+
+private val bloodGlucoseChartStyleJson = Json {
+    ignoreUnknownKeys = true
+    encodeDefaults = true
+    explicitNulls = false
+}
+
+internal fun encodeBloodGlucoseChartStyle(style: BloodGlucoseChartStylePrefs): String =
+    bloodGlucoseChartStyleJson.encodeToString(style.sanitized())
+
+internal fun decodeBloodGlucoseChartStyle(encoded: String): BloodGlucoseChartStylePrefs? =
+    runCatching { bloodGlucoseChartStyleJson.decodeFromString<BloodGlucoseChartStylePrefs>(encoded).sanitized() }.getOrNull()
 
 private fun BloodGlucoseChartStylePrefs.sanitized(): BloodGlucoseChartStylePrefs {
     val defaults = defaultBloodGlucoseBarStyles()
