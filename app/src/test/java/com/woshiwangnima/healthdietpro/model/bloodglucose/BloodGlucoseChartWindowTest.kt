@@ -35,7 +35,7 @@ class BloodGlucoseChartWindowTest {
         val before = index.scopedSlice(0, 10 * hour, 0, BloodGlucoseChartWindow.Hours3)
         val after = index.scopedSlice(0, 10 * hour, 20 * hour, BloodGlucoseChartWindow.Hours3)
 
-        assertEquals(2 * hour, before.windowEnd)
+        assertEquals(0L, before.windowEnd)
         assertEquals(10 * hour, after.windowEnd)
     }
 

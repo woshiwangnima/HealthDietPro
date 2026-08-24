@@ -99,7 +99,7 @@ internal fun calculateGlucoseTimeRangeDistribution(
                 (totalMillis * (to - from)).roundToLong()
             }
             allocatedMillis += durationMillis
-            when (classifyGlucoseValue(start.valueMmolPerL + (end.valueMmolPerL - start.valueMmolPerL) * ((from + to) / 2.0), targetRange)) {
+            when (classifyBloodGlucoseValue(start.valueMmolPerL + (end.valueMmolPerL - start.valueMmolPerL) * ((from + to) / 2.0), targetRange)) {
                 GlucoseTimeRangeBand.HIGH -> highMillis += durationMillis
                 GlucoseTimeRangeBand.IN_RANGE -> inRangeMillis += durationMillis
                 GlucoseTimeRangeBand.LOW -> lowMillis += durationMillis
@@ -115,7 +115,7 @@ private fun segmentCrossingFraction(start: Double, end: Double, boundary: Double
     return ((boundary - start) / change).takeIf { it > 0.0 && it < 1.0 }
 }
 
-private fun classifyGlucoseValue(value: Double, targetRange: Range<Float>): GlucoseTimeRangeBand = when {
+internal fun classifyBloodGlucoseValue(value: Double, targetRange: Range<Float>): GlucoseTimeRangeBand = when {
     targetRange.contains(value.toFloat()) -> GlucoseTimeRangeBand.IN_RANGE
     targetRange.min?.let { value < it || (!targetRange.minInclusive && value <= it) } == true -> GlucoseTimeRangeBand.LOW
     else -> GlucoseTimeRangeBand.HIGH
@@ -142,7 +142,7 @@ internal fun BloodGlucoseChartIndex.scopedSlice(
     window: BloodGlucoseChartWindow,
 ): BloodGlucoseChartSlice {
     val scoped = slice(scopeStart, scopeEnd)
-    val earliest = scoped.firstOrNull()?.timestamp ?: scopeStart
+    val earliest = scopeStart
     // The chart can continue through the end of the selected time range even
     // when no glucose record exists at the right edge.
     val end = requestedWindowEnd.coerceIn(earliest, scopeEnd)

@@ -1,6 +1,7 @@
 package com.woshiwangnima.healthdietpro.ui.record
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
@@ -70,6 +71,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -91,13 +93,20 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseSeriesStyl
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseBarStylePrefs
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseDiabetesType
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseTimingAnchor
 import com.woshiwangnima.healthdietpro.model.bloodglucose.GlucoseTimeRangeBand
 import com.woshiwangnima.healthdietpro.model.bloodglucose.GlucoseTimeRangeDistribution
 import com.woshiwangnima.healthdietpro.model.bloodglucose.calculateGlucoseTimeRangeDistribution
+import com.woshiwangnima.healthdietpro.model.bloodglucose.classifyBloodGlucoseValue
 import com.woshiwangnima.healthdietpro.model.bloodglucose.glucoseTimeReferenceRanges
 import com.woshiwangnima.healthdietpro.model.bloodglucose.scopedSlice
 import com.woshiwangnima.healthdietpro.model.diet.DietRepository
+import com.woshiwangnima.healthdietpro.model.diet.DietPrefs
+import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
+import com.woshiwangnima.healthdietpro.model.diet.loadDietPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
+import com.woshiwangnima.healthdietpro.model.sleep.SleepKind
+import com.woshiwangnima.healthdietpro.model.sleep.SleepRecord
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRepository
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseReference
@@ -140,20 +149,25 @@ internal fun BloodGlucoseFixedWindowChart(
         chartStyle.bars[kind.name].toUiStyle(defaultBarStyles().getValue(kind))
     }
     var eventBars by remember { mutableStateOf(emptyList<BarSample>()) }
+    var nightSleepRecords by remember { mutableStateOf(emptyList<SleepRecord>()) }
     val context = LocalContext.current
+    val dietPrefs = remember(context) { loadDietPrefs(context) }
     var fullscreen by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTargetRateHelp by remember { mutableStateOf(false) }
     LaunchedEffect(initialEnd, scopeStart, currentScopeEnd, window, records) {
         if (sessionWindowEnd == null) ownedWindowEnd = initialEnd
-        eventBars = withContext(Dispatchers.IO) {
-            loadEventBars(context, scopeStart, currentScopeEnd)
+        val loaded = withContext(Dispatchers.IO) {
+            loadEventBars(context, scopeStart, currentScopeEnd) to SleepRepository.fromContext(context).load().records
+                .filter { it.kind == SleepKind.NIGHT_SLEEP && it.wakeUpAt != null }
         }
+        eventBars = loaded.first
+        nightSleepRecords = loaded.second
     }
     val slice = remember(index, scopeStart, currentScopeEnd, windowEnd, window) {
         index.scopedSlice(scopeStart, currentScopeEnd, windowEnd, window)
     }
-    val earliest = slice.scoped.firstOrNull()?.timestamp ?: scopeStart
+    val earliest = scopeStart
     val latest = currentScopeEnd
     val setWindowEnd: (Long) -> Unit = { timestamp ->
         val clamped = timestamp.coerceIn(earliest, latest)
@@ -163,12 +177,16 @@ internal fun BloodGlucoseFixedWindowChart(
 
     GlucoseChartSurface(
         slice = slice,
+        allRecords = records,
+        dietPrefs = dietPrefs,
+        nightSleepRecords = nightSleepRecords,
         window = window,
         diabetesType = diabetesType,
         primaryStyle = primaryStyle,
         delayedStyle = delayedStyle,
         barStyles = barStyles,
         eventBars = eventBars,
+        panEarliest = earliest,
         panLatest = latest,
         selectedSeries = selectedSeries,
         selectedBar = selectedBar,
@@ -227,12 +245,16 @@ internal fun BloodGlucoseFixedWindowChart(
                 FixedLandscapeBox {
                     GlucoseChartSurface(
                         slice = slice,
+                        allRecords = records,
+                        dietPrefs = dietPrefs,
+                        nightSleepRecords = nightSleepRecords,
                         window = window,
                         diabetesType = diabetesType,
                         primaryStyle = primaryStyle,
                         delayedStyle = delayedStyle,
                         barStyles = barStyles,
                         eventBars = eventBars,
+                        panEarliest = earliest,
                         panLatest = latest,
                         selectedSeries = selectedSeries,
                         selectedBar = selectedBar,
@@ -282,12 +304,16 @@ private fun FixedLandscapeBox(content: @Composable () -> Unit) {
 @Composable
 private fun GlucoseChartSurface(
     slice: BloodGlucoseChartSlice,
+    allRecords: List<BloodGlucoseRecord>,
+    dietPrefs: DietPrefs,
+    nightSleepRecords: List<SleepRecord>,
     window: BloodGlucoseChartWindow,
     diabetesType: BloodGlucoseDiabetesType,
     primaryStyle: SeriesStyle,
     delayedStyle: SeriesStyle,
     barStyles: Map<BarKind, BarStyle>,
     eventBars: List<BarSample>,
+    panEarliest: Long,
     panLatest: Long,
     selectedSeries: SeriesKind,
     selectedBar: BarKind?,
@@ -306,7 +332,7 @@ private fun GlucoseChartSurface(
     val bars = remember(eventBars, slice.windowStart, slice.windowEnd) {
         eventBars.filter { it.endTimestamp > slice.windowStart && it.startTimestamp < slice.windowEnd }
     }
-    val earliest = slice.scoped.firstOrNull()?.timestamp ?: slice.windowStart
+    val earliest = panEarliest
     val latest = panLatest
     val palette = ChartPalette(
         primary = primaryStyle.color.copy(alpha = primaryStyle.alpha),
@@ -337,6 +363,13 @@ private fun GlucoseChartSurface(
             if (!fullscreen) {
                 ChartLegend(primaryStyle, stringResource(R.string.blood_glucose_chart_primary_series), delayedStyle, delayedLabel, selectedSeries, onSelectedSeries)
                 BarLegend(barStyles, selectedBar, onBarSelected)
+                EightPointGlucoseCard(
+                    records = allRecords,
+                    selectedDate = Instant.ofEpochMilli(slice.windowStart).atZone(ZoneId.systemDefault()).toLocalDate(),
+                    targetRange = diabetesType.glucoseReferenceRangeMmolPerL,
+                    dietPrefs = dietPrefs,
+                    nightSleepRecords = nightSleepRecords,
+                )
             }
             return@Column
         }
@@ -441,6 +474,13 @@ private fun GlucoseChartSurface(
         }
         if (!fullscreen) {
             GlucoseStatisticsCard(primary, diabetesType, window, onTargetRateHelp)
+            EightPointGlucoseCard(
+                records = allRecords,
+                selectedDate = Instant.ofEpochMilli(slice.windowStart).atZone(ZoneId.systemDefault()).toLocalDate(),
+                targetRange = diabetesType.glucoseReferenceRangeMmolPerL,
+                dietPrefs = dietPrefs,
+                nightSleepRecords = nightSleepRecords,
+            )
         }
     }
 }
@@ -538,6 +578,340 @@ private fun GlucoseStatisticsCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun EightPointGlucoseCard(
+    records: List<BloodGlucoseRecord>,
+    selectedDate: java.time.LocalDate,
+    targetRange: Range<Float>,
+    dietPrefs: DietPrefs,
+    nightSleepRecords: List<SleepRecord>,
+) {
+    val zone = remember { ZoneId.systemDefault() }
+    val dates = remember(selectedDate) { (6 downTo 0).map { selectedDate.minusDays(it.toLong()) } }
+    val mealWindows = remember(dietPrefs) { EightPointMealWindows.from(dietPrefs) }
+    var sourceDefinition by remember { mutableStateOf<EightPointSlotDefinition?>(null) }
+    val valuesByDate = remember(records, dates, zone, mealWindows, nightSleepRecords) {
+        dates.associateWith { date ->
+            buildMap<EightPointSlot, EightPointResolvedValue> {
+                records.asSequence()
+                    .filter { Instant.ofEpochMilli(it.timestamp).atZone(zone).toLocalDate() == date }
+                    .sortedBy(BloodGlucoseRecord::timestamp)
+                    .forEach { record ->
+                        val resolved = record.eightPointResolution(zone, mealWindows, nightSleepRecords)
+                        val existing = get(resolved.slot)
+                        if (existing == null || (existing.isFallback && !resolved.isFallback) || existing.isFallback == resolved.isFallback) {
+                            put(resolved.slot, resolved)
+                        }
+                    }
+            }
+        }
+    }
+    val unknownColor = MaterialTheme.colorScheme.outlineVariant
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.24f),
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.padding(top = 6.dp).fillMaxWidth().height(382.dp),
+    ) {
+        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(
+                stringResource(R.string.blood_glucose_eight_point_chart_title),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    EightPointLegendItem(glucoseTimeBandColor(GlucoseTimeRangeBand.HIGH), stringResource(R.string.blood_glucose_chart_target_time_high))
+                    EightPointLegendItem(glucoseTimeBandColor(GlucoseTimeRangeBand.IN_RANGE), stringResource(R.string.blood_glucose_chart_target_time_in_range))
+                    EightPointLegendItem(glucoseTimeBandColor(GlucoseTimeRangeBand.LOW), stringResource(R.string.blood_glucose_chart_target_time_low))
+                    EightPointLegendItem(unknownColor, stringResource(R.string.blood_glucose_eight_point_unknown))
+                }
+                Box(Modifier.width(1.dp).height(24.dp).background(MaterialTheme.colorScheme.outlineVariant))
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    EightPointNumberSample(
+                        label = stringResource(R.string.blood_glucose_eight_point_determinate_value),
+                        isFallback = false,
+                    )
+                    EightPointNumberSample(
+                        label = stringResource(R.string.blood_glucose_eight_point_fallback_value),
+                        isFallback = true,
+                    )
+                }
+            }
+            Column(Modifier.fillMaxWidth().weight(1f)) {
+                Row(Modifier.fillMaxWidth().height(44.dp)) {
+                    EightPointGridHeader(text = "", modifier = Modifier.weight(1f))
+                    EIGHT_POINT_SLOT_DEFINITIONS.forEach { definition ->
+                        EightPointGridHeader(
+                            text = stringResource(definition.labelRes),
+                            modifier = Modifier.weight(1f),
+                            onClick = { sourceDefinition = definition },
+                        )
+                    }
+                }
+                dates.forEach { date ->
+                    Row(Modifier.fillMaxWidth().weight(1f)) {
+                        EightPointGridHeader(date.format(EIGHT_POINT_DATE_FORMATTER), Modifier.weight(1f))
+                        EIGHT_POINT_SLOT_DEFINITIONS.forEach { definition ->
+                            EightPointGlucoseValue(
+                                value = valuesByDate.getValue(date)[definition.slot],
+                                targetRange = targetRange,
+                                unknownColor = unknownColor,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    sourceDefinition?.let { definition ->
+        AlertDialog(
+            onDismissRequest = { sourceDefinition = null },
+            title = { Text(stringResource(definition.labelRes)) },
+            text = { Text(stringResource(definition.sourceDescriptionRes)) },
+            confirmButton = {
+                TextButton(onClick = { sourceDefinition = null }) {
+                    Text(stringResource(R.string.compose_confirm_dialog_ok))
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun EightPointLegendItem(color: Color, label: String) {
+    Row(
+        modifier = Modifier.padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Canvas(Modifier.size(9.dp)) { drawCircle(color) }
+        Text(
+            label,
+            modifier = Modifier.padding(start = 3.dp),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun EightPointNumberSample(label: String, isFallback: Boolean) {
+    Column(
+        modifier = Modifier.padding(horizontal = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "6.20",
+            style = if (isFallback) MaterialTheme.typography.labelSmall else MaterialTheme.typography.titleSmall,
+            fontWeight = if (isFallback) FontWeight.Normal else FontWeight.Bold,
+            color = if (isFallback) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+        )
+        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun EightPointGridHeader(text: String, modifier: Modifier, onClick: (() -> Unit)? = null) {
+    Surface(
+        color = Color.Transparent,
+        shape = MaterialTheme.shapes.extraSmall,
+        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = modifier.fillMaxHeight().padding(1.dp).then(
+            if (onClick == null) Modifier else Modifier.clickable(onClick = onClick),
+        ),
+    ) {
+        Box(Modifier.fillMaxSize().padding(horizontal = 1.dp), contentAlignment = Alignment.Center) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun EightPointGlucoseValue(
+    value: EightPointResolvedValue?,
+    targetRange: Range<Float>,
+    unknownColor: Color,
+    modifier: Modifier,
+) {
+    val record = value?.record
+    val isFallback = value?.isFallback ?: true
+    val band = record?.let { classifyBloodGlucoseValue(it.valueMmolPerL, targetRange) }
+    val color = band?.let(::glucoseTimeBandColor) ?: unknownColor
+    Surface(
+        color = color.copy(alpha = 0.26f),
+        shape = MaterialTheme.shapes.extraSmall,
+        border = BorderStroke(0.5.dp, color.copy(alpha = 0.6f)),
+        modifier = modifier.fillMaxHeight().padding(1.dp),
+    ) {
+        Box(Modifier.fillMaxSize().padding(horizontal = 1.dp), contentAlignment = Alignment.Center) {
+            Text(
+                text = record?.let { String.format(Locale.getDefault(), "%.2f", it.valueMmolPerL) } ?: "-",
+                style = if (isFallback) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodyMedium,
+                fontWeight = if (isFallback) FontWeight.Normal else FontWeight.Bold,
+                color = if (isFallback) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+private enum class EightPointSlot {
+    Dawn,
+    Breakfast,
+    BreakfastAfterTwoHours,
+    Lunch,
+    LunchAfterTwoHours,
+    Dinner,
+    DinnerBeforeTwoHours,
+    Bedtime,
+}
+
+private enum class EightPointSlotSource {
+    NightSleepInterval,
+    MealTimeRange,
+    MealEndPlusTwoHours,
+    MealStartMinusTwoHours,
+    NightSleepStart,
+}
+
+private data class EightPointSlotDefinition(
+    val slot: EightPointSlot,
+    val labelRes: Int,
+    val sourceDescriptionRes: Int,
+    val source: EightPointSlotSource,
+    val resolutionPriority: Int,
+    val mealPeriod: MealPeriod? = null,
+)
+
+private val EIGHT_POINT_SLOT_DEFINITIONS = listOf(
+    EightPointSlotDefinition(EightPointSlot.Dawn, R.string.blood_glucose_eight_point_dawn, R.string.blood_glucose_eight_point_dawn_source, EightPointSlotSource.NightSleepInterval, 8),
+    EightPointSlotDefinition(EightPointSlot.Breakfast, R.string.blood_glucose_eight_point_breakfast, R.string.blood_glucose_eight_point_breakfast_source, EightPointSlotSource.MealTimeRange, 0, MealPeriod.BREAKFAST),
+    EightPointSlotDefinition(EightPointSlot.BreakfastAfterTwoHours, R.string.blood_glucose_eight_point_breakfast_after_two_hours, R.string.blood_glucose_eight_point_breakfast_after_two_hours_source, EightPointSlotSource.MealEndPlusTwoHours, 1, MealPeriod.BREAKFAST),
+    EightPointSlotDefinition(EightPointSlot.Lunch, R.string.blood_glucose_eight_point_lunch, R.string.blood_glucose_eight_point_lunch_source, EightPointSlotSource.MealTimeRange, 2, MealPeriod.LUNCH),
+    EightPointSlotDefinition(EightPointSlot.LunchAfterTwoHours, R.string.blood_glucose_eight_point_lunch_after_two_hours, R.string.blood_glucose_eight_point_lunch_after_two_hours_source, EightPointSlotSource.MealEndPlusTwoHours, 3, MealPeriod.LUNCH),
+    EightPointSlotDefinition(EightPointSlot.Dinner, R.string.blood_glucose_eight_point_dinner, R.string.blood_glucose_eight_point_dinner_source, EightPointSlotSource.MealTimeRange, 4, MealPeriod.DINNER),
+    EightPointSlotDefinition(EightPointSlot.DinnerBeforeTwoHours, R.string.blood_glucose_eight_point_dinner_before_two_hours, R.string.blood_glucose_eight_point_dinner_before_two_hours_source, EightPointSlotSource.MealStartMinusTwoHours, 5, MealPeriod.DINNER),
+    EightPointSlotDefinition(EightPointSlot.Bedtime, R.string.blood_glucose_eight_point_bedtime, R.string.blood_glucose_eight_point_bedtime_source, EightPointSlotSource.NightSleepStart, 7),
+)
+
+private data class EightPointResolvedValue(
+    val slot: EightPointSlot,
+    val record: BloodGlucoseRecord,
+    val isFallback: Boolean,
+)
+
+private data class EightPointMealWindow(val startMinute: Int, val endMinute: Int) {
+    fun contains(minuteOfDay: Int): Boolean =
+        if (startMinute <= endMinute) minuteOfDay in startMinute..endMinute
+        else minuteOfDay >= startMinute || minuteOfDay <= endMinute
+
+    fun matchesOffset(minuteOfDay: Int, offsetMinutes: Int): Boolean {
+        val baseMinute = if (offsetMinutes < 0) startMinute else endMinute
+        val target = Math.floorMod(baseMinute + offsetMinutes, MINUTES_PER_DAY)
+        val distance = Math.floorMod(minuteOfDay - target, MINUTES_PER_DAY)
+        return distance <= 30 || distance >= MINUTES_PER_DAY - 30
+    }
+}
+
+private data class EightPointMealWindows(
+    val breakfast: EightPointMealWindow?,
+    val lunch: EightPointMealWindow?,
+    val dinner: EightPointMealWindow?,
+) {
+    companion object {
+        fun from(prefs: DietPrefs): EightPointMealWindows = EightPointMealWindows(
+            breakfast = prefs.windowFor(MealPeriod.BREAKFAST),
+            lunch = prefs.windowFor(MealPeriod.LUNCH),
+            dinner = prefs.windowFor(MealPeriod.DINNER),
+        )
+    }
+
+    fun forPeriod(period: MealPeriod): EightPointMealWindow? = when (period) {
+        MealPeriod.BREAKFAST -> breakfast
+        MealPeriod.LUNCH -> lunch
+        MealPeriod.DINNER -> dinner
+        else -> null
+    }
+}
+
+private fun DietPrefs.windowFor(period: MealPeriod): EightPointMealWindow? {
+    val prefs = forPeriod(period)
+    return prefs.rangeStartMinute?.let { start -> prefs.rangeEndMinute?.let { end -> EightPointMealWindow(start, end) } }
+}
+
+private fun BloodGlucoseRecord.eightPointResolution(
+    zone: ZoneId,
+    mealWindows: EightPointMealWindows,
+    nightSleepRecords: List<SleepRecord>,
+): EightPointResolvedValue {
+    val resolvedSlot = EIGHT_POINT_SLOT_DEFINITIONS
+        .sortedBy(EightPointSlotDefinition::resolutionPriority)
+        .firstOrNull { it.matches(this, zone, mealWindows, nightSleepRecords) }
+        ?.slot
+    return EightPointResolvedValue(
+        slot = resolvedSlot ?: fallbackEightPointSlot(zone),
+        record = this,
+        isFallback = resolvedSlot == null,
+    )
+}
+
+private fun EightPointSlotDefinition.matches(
+    record: BloodGlucoseRecord,
+    zone: ZoneId,
+    mealWindows: EightPointMealWindows,
+    nightSleepRecords: List<SleepRecord>,
+): Boolean {
+    val minuteOfDay = Instant.ofEpochMilli(record.timestamp).atZone(zone).let { it.hour * 60 + it.minute }
+    return when (source) {
+        EightPointSlotSource.NightSleepInterval -> nightSleepRecords.any { it.contains(record.timestamp) }
+        EightPointSlotSource.NightSleepStart -> nightSleepRecords.any { it.matchesSleepStart(record.timestamp) }
+        EightPointSlotSource.MealTimeRange -> mealPeriod?.let(mealWindows::forPeriod)?.contains(minuteOfDay) == true
+        EightPointSlotSource.MealEndPlusTwoHours -> mealPeriod?.let(mealWindows::forPeriod)?.matchesOffset(minuteOfDay, 120) == true
+        EightPointSlotSource.MealStartMinusTwoHours -> mealPeriod?.let(mealWindows::forPeriod)?.matchesOffset(minuteOfDay, -120) == true
+    }
+}
+
+private fun SleepRecord.contains(timestamp: Long): Boolean =
+    timestamp in sleepStartAt..(wakeUpAt ?: sleepStartAt)
+
+private fun SleepRecord.matchesSleepStart(timestamp: Long): Boolean =
+    abs(timestamp - sleepStartAt) <= 30 * MINUTE_MILLIS
+
+private fun BloodGlucoseRecord.fallbackEightPointSlot(zone: ZoneId): EightPointSlot = when (timingAnchor) {
+    BloodGlucoseTimingAnchor.WAKE_UP -> EightPointSlot.Dawn
+    BloodGlucoseTimingAnchor.BREAKFAST -> if ((relativeMinutes ?: 0) >= 90) EightPointSlot.BreakfastAfterTwoHours else EightPointSlot.Breakfast
+    BloodGlucoseTimingAnchor.LUNCH -> if ((relativeMinutes ?: 0) >= 90) EightPointSlot.LunchAfterTwoHours else EightPointSlot.Lunch
+    BloodGlucoseTimingAnchor.DINNER -> if ((relativeMinutes ?: 0) <= -90) EightPointSlot.DinnerBeforeTwoHours else EightPointSlot.Dinner
+    BloodGlucoseTimingAnchor.BEDTIME -> EightPointSlot.Bedtime
+    null -> when (Instant.ofEpochMilli(timestamp).atZone(zone).hour) {
+        in 0..5 -> EightPointSlot.Dawn
+        in 6..8 -> EightPointSlot.Breakfast
+        in 9..10 -> EightPointSlot.BreakfastAfterTwoHours
+        in 11..12 -> EightPointSlot.Lunch
+        in 13..14 -> EightPointSlot.LunchAfterTwoHours
+        in 15..16 -> EightPointSlot.DinnerBeforeTwoHours
+        in 17..19 -> EightPointSlot.Dinner
+        else -> EightPointSlot.Bedtime
     }
 }
 
@@ -1196,10 +1570,12 @@ private fun GlucosePointFill.labelRes(): Int = when (this) {
 
 private const val HOUR_MILLIS = 3_600_000L
 private const val MINUTE_MILLIS = 60_000L
+private const val MINUTES_PER_DAY = 24 * 60
 private const val MAX_CONNECTED_GAP_MILLIS = 15 * 60_000L
 private const val Y_TICK_INTERVAL = 3.0
 private val TIME_LABEL_FORMATTER = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
 private val DATE_LABEL_FORMATTER = DateTimeFormatter.ofPattern("MM-dd", Locale.getDefault())
+private val EIGHT_POINT_DATE_FORMATTER = DateTimeFormatter.ofPattern("MM.dd", Locale.getDefault())
 private val CROSSHAIR_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.getDefault())
 private val RECORD_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 private val CHART_COLORS = listOf(Color(0xFF1976D2), Color(0xFF388E3C), Color(0xFFF57C00), Color(0xFFD32F2F), Color(0xFF7B1FA2))
