@@ -34,8 +34,7 @@ import com.woshiwangnima.healthdietpro.common.ui.ActionGridItem
 import com.woshiwangnima.healthdietpro.common.ui.ActionSectionCard
 import com.woshiwangnima.healthdietpro.common.ui.SearchActivityPanel
 import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
-import com.woshiwangnima.healthdietpro.common.time.RelativeTimeUnit
-import com.woshiwangnima.healthdietpro.common.time.relativeTimeSince
+import com.woshiwangnima.healthdietpro.common.ui.recordLatestSummary
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 
 @Composable
@@ -104,7 +103,7 @@ fun RecordScreen(
                             title = stringResource(item.titleRes),
                             iconRes = item.iconRes,
                             enabled = item.enabled,
-                            summary = item.latestTimestamp?.let { timestamp -> stringResource(com.woshiwangnima.healthdietpro.R.string.record_latest_summary, relativeTime(timestamp), item.latestValue.orEmpty()) } ?: stringResource(com.woshiwangnima.healthdietpro.R.string.record_no_data),
+                            summary = item.latestTimestamp?.let { timestamp -> recordLatestSummary(timestamp, item.latestValue.orEmpty()) } ?: stringResource(com.woshiwangnima.healthdietpro.R.string.record_no_data),
                             showSummary = item.showSummary,
                             onClick = { onActionClick(item.id) },
                             onAddClick = item.id.takeIf { it in quickAddActionIds }?.let { actionId -> { onAddActionClick(actionId) } },
@@ -183,20 +182,6 @@ private val quickAddActionIds = setOf(
     RecordActionId.Sleep,
     RecordActionId.Diet,
 )
-
-@Composable
-private fun relativeTime(timestamp: Long): String {
-    val relativeTime = relativeTimeSince(timestamp, System.currentTimeMillis())
-    val textRes = when (relativeTime.unit) {
-        RelativeTimeUnit.SECOND -> com.woshiwangnima.healthdietpro.R.string.record_seconds_ago
-        RelativeTimeUnit.MINUTE -> com.woshiwangnima.healthdietpro.R.string.record_minutes_ago
-        RelativeTimeUnit.HOUR -> com.woshiwangnima.healthdietpro.R.string.record_hours_ago
-        RelativeTimeUnit.DAY -> com.woshiwangnima.healthdietpro.R.string.record_days_ago
-        RelativeTimeUnit.MONTH -> com.woshiwangnima.healthdietpro.R.string.record_months_ago
-        RelativeTimeUnit.YEAR -> com.woshiwangnima.healthdietpro.R.string.record_years_ago
-    }
-    return stringResource(textRes, relativeTime.amount)
-}
 
 @Composable
 private fun RecordActionItemUiState.matchesQuery(query: String): Boolean =

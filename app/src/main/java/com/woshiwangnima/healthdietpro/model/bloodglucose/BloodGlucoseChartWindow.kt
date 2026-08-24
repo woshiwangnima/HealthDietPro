@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.model.bloodglucose
 
 import com.woshiwangnima.healthdietpro.common.range.Range
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
+import com.woshiwangnima.healthdietpro.common.range.findRangeBand
 import kotlin.math.roundToLong
 
 internal enum class BloodGlucoseChartWindow(val durationMillis: Long, val tickMillis: Long) {
@@ -43,6 +44,15 @@ internal val glucoseTimeReferenceRanges = listOf(
     RangeBand(max = 4f, maxInclusive = false, value = GlucoseTimeRangeBand.LOW),
 )
 
+/** Maps absolute glucose change rate (mmol/L/min) to the trend indicator magnitude. */
+internal val bloodGlucoseTrendRateRanges = listOf(
+    RangeBand(min = 0.0, minInclusive = true, max = 0.05, maxInclusive = true, value = 0),
+    RangeBand(min = 0.05, minInclusive = false, max = 0.09, maxInclusive = true, value = 1),
+    RangeBand(min = 0.09, minInclusive = false, max = 0.13, maxInclusive = true, value = 2),
+    RangeBand(min = 0.13, minInclusive = false, max = 0.17, maxInclusive = true, value = 3),
+    RangeBand(min = 0.17, minInclusive = false, max = null, value = 4),
+)
+
 /** Maps the latest pair's per-minute rate of change to -4..4; zero represents stable glucose. */
 internal fun bloodGlucoseParticleLevel(
     previous: BloodGlucoseRecord,
@@ -51,13 +61,7 @@ internal fun bloodGlucoseParticleLevel(
     val elapsedMinutes = (latest.timestamp - previous.timestamp) / 60_000.0
     if (elapsedMinutes <= 0.0) return 0
     val ratePerMinute = (latest.valueMmolPerL - previous.valueMmolPerL) / elapsedMinutes
-    val magnitude = when (kotlin.math.abs(ratePerMinute)) {
-        in 0.0..0.05 -> 0
-        in 0.0..0.09 -> 1
-        in 0.0..0.13 -> 2
-        in 0.0..0.17 -> 3
-        else -> 4
-    }
+    val magnitude = kotlin.math.abs(ratePerMinute).findRangeBand(bloodGlucoseTrendRateRanges)?.value ?: 4
     return if (ratePerMinute >= 0.0) magnitude else -magnitude
 }
 

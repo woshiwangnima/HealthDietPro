@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -16,10 +17,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -64,34 +69,90 @@ internal fun ParticleValueOrb(
             }
         }
     }
-    Surface(
-        color = scheme.surfaceVariant.copy(alpha = .48f),
-        shape = androidx.compose.foundation.shape.CircleShape,
-        border = androidx.compose.foundation.BorderStroke(edgeWidth, currentColor.copy(alpha = edgeAlpha)),
-        modifier = modifier.clip(androidx.compose.foundation.shape.CircleShape),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Canvas(Modifier.matchParentSize()) {
-                drawCircle(particleColor.copy(alpha = .08f))
-                drawValueOrbParticles(particles, currentColor)
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
-            ) {
-                TextOverflowText(
-                    text = valueLabel,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                )
-                TextOverflowText(
-                    text = supportingLabel,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = scheme.onSurfaceVariant,
-                    maxLines = 1,
-                )
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Surface(
+            color = scheme.surfaceVariant.copy(alpha = .48f),
+            shape = androidx.compose.foundation.shape.CircleShape,
+            border = androidx.compose.foundation.BorderStroke(edgeWidth, currentColor.copy(alpha = edgeAlpha)),
+            modifier = Modifier.fillMaxSize().padding(13.dp).clip(androidx.compose.foundation.shape.CircleShape),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Canvas(Modifier.matchParentSize()) {
+                    drawCircle(particleColor.copy(alpha = .08f))
+                    drawValueOrbParticles(particles, currentColor)
+                }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+                ) {
+                    TextOverflowText(
+                        text = valueLabel,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                    )
+                    TextOverflowText(
+                        text = supportingLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = scheme.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+                }
             }
         }
+        Canvas(Modifier.matchParentSize()) {
+            drawTrendIndicatorArrows(currentLevel, currentColor)
+        }
+    }
+}
+
+@Composable
+internal fun TrendIndicatorArrowPreview(
+    level: Int,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    Canvas(modifier) {
+        val center = Offset(size.width / 2f, size.height / 2f)
+        drawCircle(scheme.surfaceVariant, size.minDimension * .38f, center)
+        drawCircle(scheme.outlineVariant, size.minDimension * .38f, center, style = Stroke(1.dp.toPx()))
+        drawTrendIndicatorArrows(level.coerceIn(-4, 4), color)
+    }
+}
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawTrendIndicatorArrows(level: Int, color: Color) {
+    val (angleDegrees, arrowCount) = when (level) {
+        4 -> 0f to 2
+        3 -> 0f to 1
+        2 -> 45f to 2
+        1 -> 45f to 1
+        0 -> 90f to 1
+        -1 -> 135f to 1
+        -2 -> 135f to 2
+        -3 -> 180f to 1
+        else -> 180f to 2
+    }
+    val angleRadians = Math.toRadians(angleDegrees.toDouble())
+    val outward = Offset(sin(angleRadians).toFloat(), -cos(angleRadians).toFloat())
+    val center = Offset(size.width / 2f, size.height / 2f)
+    val arrowLength = size.minDimension * .055f
+    val arrowHalfWidth = size.minDimension * .055f
+    val centerRadii = if (arrowCount == 2) {
+        listOf(size.minDimension * .4025f, size.minDimension * .4625f)
+    } else {
+        listOf(size.minDimension * .435f)
+    }
+    val tangent = Offset(-outward.y, outward.x)
+    centerRadii.forEach { centerRadius ->
+        val tip = center + outward * (centerRadius + arrowLength / 2f)
+        val base = tip - outward * arrowLength
+        val path = Path().apply {
+            moveTo(tip.x, tip.y)
+            lineTo(base.x + tangent.x * arrowHalfWidth, base.y + tangent.y * arrowHalfWidth)
+            lineTo(base.x - tangent.x * arrowHalfWidth, base.y - tangent.y * arrowHalfWidth)
+            close()
+        }
+        drawPath(path, color)
     }
 }
 

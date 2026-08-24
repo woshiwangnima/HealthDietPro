@@ -8,6 +8,8 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +55,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -76,6 +81,7 @@ import com.woshiwangnima.healthdietpro.common.ui.NumericInputField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputKind
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputSpec
 import com.woshiwangnima.healthdietpro.common.ui.ParticleValueOrb
+import com.woshiwangnima.healthdietpro.common.ui.TrendIndicatorArrowPreview
 import com.woshiwangnima.healthdietpro.common.ui.TextInputField
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
@@ -93,7 +99,9 @@ import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.DiscardChangesDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.SettingRow
+import com.woshiwangnima.healthdietpro.common.ui.recordLatestUpdatePrefix
 import com.woshiwangnima.healthdietpro.common.range.UnitRange
+import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodHbA1cRecord
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseSource
@@ -107,6 +115,7 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.isValidHbA1cValue
 import com.woshiwangnima.healthdietpro.model.bloodglucose.normalizeBloodGlucoseTimestamp
 import com.woshiwangnima.healthdietpro.model.bloodglucose.bloodGlucoseInputRange
 import com.woshiwangnima.healthdietpro.model.bloodglucose.bloodGlucoseParticleLevel
+import com.woshiwangnima.healthdietpro.model.bloodglucose.bloodGlucoseTrendRateRanges
 import com.woshiwangnima.healthdietpro.model.bloodglucose.hbA1cInputRange
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
@@ -923,11 +932,11 @@ private fun GlucoseRecordList(
     val particleLevel = remember(latestRecords) {
         if (latestRecords.size == 2) bloodGlucoseParticleLevel(latestRecords[1], latestRecords[0]) else 0
     }
-    val particleColor = when {
-        particleLevel < 0 -> Color(0xFFE53935)
-        particleLevel > 0 -> Color(0xFFF57C00)
-        else -> Color(0xFF43A047)
-    }
+    val particleColor = bloodGlucoseTrendColor(particleLevel)
+    val trendIndicatorContentDescription = stringResource(R.string.blood_glucose_trend_indicator)
+    val latestUpdatePrefix = latestRecord?.let { recordLatestUpdatePrefix(it.timestamp) }
+        ?: stringResource(R.string.record_no_data)
+    var showTrendIndicatorInfo by rememberSaveable { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -939,7 +948,18 @@ private fun GlucoseRecordList(
                 supportingLabel = unit,
                 level = particleLevel,
                 particleColor = particleColor,
-                modifier = Modifier.size(104.dp),
+                modifier = Modifier
+                    .size(112.dp)
+                    .semantics { contentDescription = trendIndicatorContentDescription }
+                    .clickable { showTrendIndicatorInfo = true },
+            )
+            Text(
+                latestUpdatePrefix,
+                modifier = Modifier.weight(1f).padding(start = 8.dp, end = 8.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             AppIconTextButton(stringResource(R.string.body_record_add), R.drawable.ic_add, onAdd)
         }
@@ -980,6 +1000,76 @@ private fun GlucoseRecordList(
             )
         }
     }
+    if (showTrendIndicatorInfo) {
+        BloodGlucoseTrendIndicatorInfoDialog(onDismiss = { showTrendIndicatorInfo = false })
+    }
+}
+
+@Composable
+private fun BloodGlucoseTrendIndicatorInfoDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.blood_glucose_trend_indicator_info_title)) },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    stringResource(R.string.blood_glucose_trend_indicator_info_description),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                listOf(4, 3, 2, 1, 0, -1, -2, -3, -4).forEach { level ->
+                    val band = bloodGlucoseTrendRateRanges.first { it.value == abs(level) }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TrendIndicatorArrowPreview(
+                            level = level,
+                            color = bloodGlucoseTrendColor(level),
+                            modifier = Modifier.size(44.dp),
+                        )
+                        Column(modifier = Modifier.weight(1f).padding(start = 8.dp)) {
+                            Text(stringResource(bloodGlucoseTrendLabelRes(level)))
+                            Text(
+                                bloodGlucoseTrendRangeText(band),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.blood_glucose_trend_indicator_close)) }
+        },
+    )
+}
+
+private fun bloodGlucoseTrendColor(level: Int): Color = when {
+    level < 0 -> Color(0xFFE53935)
+    level > 0 -> Color(0xFFF57C00)
+    else -> Color(0xFF43A047)
+}
+
+private fun bloodGlucoseTrendLabelRes(level: Int): Int = when (level) {
+    4 -> R.string.blood_glucose_trend_case_positive_4
+    3 -> R.string.blood_glucose_trend_case_positive_3
+    2 -> R.string.blood_glucose_trend_case_positive_2
+    1 -> R.string.blood_glucose_trend_case_positive_1
+    0 -> R.string.blood_glucose_trend_case_stable
+    -1 -> R.string.blood_glucose_trend_case_negative_1
+    -2 -> R.string.blood_glucose_trend_case_negative_2
+    -3 -> R.string.blood_glucose_trend_case_negative_3
+    else -> R.string.blood_glucose_trend_case_negative_4
+}
+
+private fun bloodGlucoseTrendRangeText(band: RangeBand<Double, Int>): String {
+    val min = band.min?.let { String.format(Locale.getDefault(), "%.2f", it) } ?: "-∞"
+    val max = band.max?.let { String.format(Locale.getDefault(), "%.2f", it) } ?: "∞"
+    return "${if (band.minInclusive) '[' else '('}$min, $max${if (band.maxInclusive) ']' else ')'} mmol/L/min"
 }
 
 @Composable
