@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.compose.foundation)
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)

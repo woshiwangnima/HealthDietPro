@@ -1543,4 +1543,24 @@
     <string name="diet_meal_time_range">%1$s → %2$s</string>
     <string name="diet_meal_goal_progress">Goal progress</string>
     <string name="diet_meal_detail_meta">%1$d foods · net %2$s</string>
+    <string name="blood_glucose_diet_event_analysis_title">Diet event glucose analysis</string>
+    <string name="blood_glucose_sleep_event_analysis_title">Sleep event glucose analysis</string>
+    <string name="diet_event_analysis_glycemic_rise">Glycemic rise</string>
+    <string name="diet_event_analysis_variability">Variability</string>
+    <string name="diet_event_analysis_axis_before_meal">1 h before meal</string>
+    <string name="diet_event_analysis_axis_meal_time">Meal %1$s</string>
+    <string name="diet_event_analysis_axis_after_meal">%1$d h after meal</string>
+    <string name="diet_event_analysis_meal_selector">Choose meal</string>
+    <string name="diet_event_analysis_meal_option">%1$s %2$s</string>
+    <string name="diet_event_analysis_pre_meal_one_hour">1 h before meal</string>
+    <string name="diet_event_analysis_at_meal_time">At meal time</string>
+    <string name="diet_event_analysis_after_meal_one_hour">1 h after meal</string>
+    <string name="diet_event_analysis_after_meal_two_hours">2 h after meal</string>
+    <string name="diet_event_analysis_after_meal_three_hours">3 h after meal</string>
+    <string name="diet_event_analysis_after_meal_four_hours">4 h after meal</string>
+    <string name="diet_event_analysis_measurement_meta">%1$s · %2$s</string>
+    <string name="diet_event_analysis_crosshair_value">%1$s\n%2$s %3$s</string>
+    <string name="diet_event_analysis_post_meal_peak">Post-meal peak glucose</string>
+    <string name="diet_event_analysis_time_to_peak">Time to post-meal peak</string>
+    <string name="diet_event_analysis_time_to_recovery">Time to pre-meal glucose recovery</string>
 </resources>

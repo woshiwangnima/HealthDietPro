@@ -34,6 +34,7 @@ import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 class DietRecordActivity : BaseActivity() {
     companion object {
         const val EXTRA_OPEN_EDITOR = "open_editor"
+        const val EXTRA_OPEN_RECORD_ID = "open_record_id"
     }
 
     private val dietViewModel: DietViewModel by lazy {
@@ -59,6 +60,7 @@ class DietRecordActivity : BaseActivity() {
                     onCreateCustomFood = ::launchCustomFoodEditor,
                     onOpenFoodDetail = ::openFoodDetail,
                     openEditorInitially = intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false),
+                    openRecordId = intent.getStringExtra(EXTRA_OPEN_RECORD_ID),
                 )
             }
         }
@@ -88,6 +90,7 @@ private fun DietRoute(
     onCreateCustomFood: (FoodKind) -> Unit,
     onOpenFoodDetail: (String) -> Unit,
     openEditorInitially: Boolean,
+    openRecordId: String?,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -104,7 +107,15 @@ private fun DietRoute(
             isMale = profile.gender == Gender.MALE,
         )
     }
-    var route by rememberSaveable { mutableStateOf(if (openEditorInitially || pendingDraft != null) DietRoute.EDITOR else DietRoute.HOME) }
+    var route by rememberSaveable {
+        mutableStateOf(
+            when {
+                openRecordId != null -> DietRoute.DETAIL
+                openEditorInitially || pendingDraft != null -> DietRoute.EDITOR
+                else -> DietRoute.HOME
+            },
+        )
+    }
     var editingRecord by remember { mutableStateOf(pendingDraft?.record?.takeIf { it.id.isNotBlank() }) }
     var viewingRecord by remember { mutableStateOf<DietRecord?>(null) }
 
@@ -115,6 +126,7 @@ private fun DietRoute(
     BackHandler(enabled = route != DietRoute.HOME) {
         when {
             openEditorInitially && route == DietRoute.EDITOR -> onFinish()
+            route == DietRoute.DETAIL && openRecordId != null -> onFinish()
             route == DietRoute.DETAIL -> route = DietRoute.HOME
             route == DietRoute.DEFAULT_DURATION -> route = DietRoute.SETTINGS
             route == DietRoute.GOALS -> route = DietRoute.SETTINGS
@@ -138,7 +150,7 @@ private fun DietRoute(
         DietRoute.DETAIL -> {
             val detailRecord = viewingRecord?.let { current ->
                 uiState.records.firstOrNull { it.id == current.id } ?: current
-            }
+            } ?: openRecordId?.let { id -> uiState.records.firstOrNull { it.id == id } }
             if (detailRecord != null) {
                 val zone = remember { java.time.ZoneId.systemDefault() }
                 val detailDayStart = remember(detailRecord, zone) {
@@ -157,7 +169,7 @@ private fun DietRoute(
                     dayTotals = detailDayTotals,
                     onEdit = { editingRecord = detailRecord; route = DietRoute.EDITOR },
                     onOpenFood = { entry -> entry.foodId?.let(onOpenFoodDetail) },
-                    onBack = { route = DietRoute.HOME },
+                    onBack = { if (openRecordId != null) onFinish() else route = DietRoute.HOME },
                     modifier = Modifier,
                 )
             }

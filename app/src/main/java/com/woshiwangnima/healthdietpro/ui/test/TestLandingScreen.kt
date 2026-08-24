@@ -18,6 +18,7 @@ internal fun TestLandingScreen(
     onOpenCommands: () -> Unit,
     onOpenCommonUi: () -> Unit,
     onOpenCrossSection: () -> Unit,
+    onOpenMealIcons: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BaseScreen(title = "测试", includeStatusBarPadding = false) { padding ->
@@ -30,6 +31,7 @@ internal fun TestLandingScreen(
                 AppIconTextButton("通用UI功能测试", R.drawable.ic_nav_test, onOpenCommonUi, Modifier.fillMaxWidth())
                 AppIconTextButton("截面形状系统", R.drawable.ic_nav_test, onOpenCrossSection, Modifier.fillMaxWidth())
             }
+            AppIconTextButton("Meal icon candidates", R.drawable.ic_diet, onOpenMealIcons, Modifier.fillMaxWidth())
         }
     }
 }

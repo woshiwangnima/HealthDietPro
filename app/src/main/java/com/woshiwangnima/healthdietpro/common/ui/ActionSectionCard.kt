@@ -40,6 +40,7 @@ fun ActionSectionCard(
     onToggleCollapse: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
     headerActions: @Composable RowScope.() -> Unit = {},
+    titleIcon: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     Card(
@@ -54,14 +55,19 @@ fun ActionSectionCard(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                titleIconRes?.let { iconRes ->
-                    Icon(
-                        painter = painterResource(iconRes),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(18.dp),
-                    )
+                if (titleIcon != null) {
+                    titleIcon()
                     Spacer(Modifier.width(8.dp))
+                } else {
+                    titleIconRes?.let { iconRes ->
+                        Icon(
+                            painter = painterResource(iconRes),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
                 }
                 Text(
                     text = title,

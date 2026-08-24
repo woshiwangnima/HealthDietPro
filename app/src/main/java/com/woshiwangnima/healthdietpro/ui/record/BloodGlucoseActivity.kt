@@ -128,6 +128,9 @@ import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.ui.event.EventScreen
 import com.woshiwangnima.healthdietpro.ui.event.EventViewModel
 import com.woshiwangnima.healthdietpro.ui.event.EventInfoScreen
+import com.woshiwangnima.healthdietpro.ui.event.EventGlucoseAnalysisScreen
+import com.woshiwangnima.healthdietpro.ui.event.DietEventGlucoseAnalysisScreen
+import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.common.time.resolve
 import com.woshiwangnima.healthdietpro.model.unit.formatGlucoseValue
 import java.time.Instant
@@ -149,10 +152,20 @@ class BloodGlucoseActivity : BaseActivity() {
     private val eventViewModel: EventViewModel by viewModels { EventViewModel.Factory(application) }
 
     private fun openRecordAction(action: RecordActionId) {
-        if (action == RecordActionId.Medication) {
-            startActivity(android.content.Intent(this, MedicationListActivity::class.java))
+        when (action) {
+            RecordActionId.Medication -> startActivity(android.content.Intent(this, MedicationListActivity::class.java))
+            RecordActionId.Diet -> startActivity(android.content.Intent(this, com.woshiwangnima.healthdietpro.ui.diet.DietRecordActivity::class.java))
+            RecordActionId.Sleep -> startActivity(android.content.Intent(this, com.woshiwangnima.healthdietpro.ui.sleep.SleepRecordActivity::class.java))
+            else -> return
         }
         finish()
+    }
+
+    private fun openDietDetail(recordId: String) {
+        startActivity(
+            android.content.Intent(this, com.woshiwangnima.healthdietpro.ui.diet.DietRecordActivity::class.java)
+                .putExtra(com.woshiwangnima.healthdietpro.ui.diet.DietRecordActivity.EXTRA_OPEN_RECORD_ID, recordId),
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -164,6 +177,7 @@ class BloodGlucoseActivity : BaseActivity() {
                     eventViewModel = eventViewModel,
                     onBack = ::finish,
                     onOpenRecordAction = ::openRecordAction,
+                    onOpenDietDetail = ::openDietDetail,
                     openEditorInitially = intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false),
                 )
             }
@@ -182,6 +196,7 @@ private fun BloodGlucoseScreen(
     eventViewModel: EventViewModel,
     onBack: () -> Unit,
     onOpenRecordAction: (RecordActionId) -> Unit,
+    onOpenDietDetail: (String) -> Unit,
     openEditorInitially: Boolean,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -193,6 +208,7 @@ private fun BloodGlucoseScreen(
     val chartWindow by viewModel.chartWindow.collectAsStateWithLifecycle()
     val chartWindowEnd by viewModel.chartWindowEnd.collectAsStateWithLifecycle()
     val chartStyle by viewModel.chartStyle.collectAsStateWithLifecycle()
+    val eventUiState by eventViewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var selectedRecordType by rememberSaveable { mutableIntStateOf(0) }
     var editingRecord by remember { mutableStateOf<BloodGlucoseRecord?>(null) }
@@ -201,6 +217,10 @@ private fun BloodGlucoseScreen(
     var showEditor by remember { mutableStateOf(openEditorInitially) }
     var showHbA1cEditor by remember { mutableStateOf(false) }
     var route by rememberSaveable { mutableStateOf(BloodGlucoseRoute.Records) }
+    var selectedDietEvent by remember { mutableStateOf<DietRecord?>(null) }
+    val glucoseUnitId = AppPrefs.getUnit(context, UnitCategoryType.Glucose.id, UnitCategoryType.Glucose.defaultUnitId)
+    val glucoseUnitLabel = UnitConverter.getRepository()?.getUnit(UnitCategoryType.Glucose.id, glucoseUnitId)
+        ?.symbol(Locale.getDefault()) ?: glucoseUnitId
     val tabs = remember {
         listOf(
             DetailTabItem("chart", R.string.detail_tab_chart, R.drawable.ic_chart),
@@ -243,7 +263,7 @@ private fun BloodGlucoseScreen(
             BloodGlucoseRoute.Reminders -> BloodGlucoseRoute.Settings
             BloodGlucoseRoute.Sources -> BloodGlucoseRoute.Settings
             BloodGlucoseRoute.SourceEditor -> BloodGlucoseRoute.Sources
-            BloodGlucoseRoute.EventInfo, BloodGlucoseRoute.DataInfo, BloodGlucoseRoute.Settings, BloodGlucoseRoute.Records -> BloodGlucoseRoute.Records
+            BloodGlucoseRoute.EventInfo, BloodGlucoseRoute.DataInfo, BloodGlucoseRoute.DietEventAnalysis, BloodGlucoseRoute.SleepEventAnalysis, BloodGlucoseRoute.Settings, BloodGlucoseRoute.Records -> BloodGlucoseRoute.Records
         }
     }
 
@@ -307,6 +327,32 @@ private fun BloodGlucoseScreen(
         BloodGlucoseDataInfoScreen(onBack = { route = BloodGlucoseRoute.Records })
         return
     }
+    if (route == BloodGlucoseRoute.DietEventAnalysis) {
+        selectedDietEvent?.let { dietEvent ->
+            DietEventGlucoseAnalysisScreen(
+                record = dietEvent,
+                bloodGlucoseRecords = records,
+                unitId = glucoseUnitId,
+                unitLabel = glucoseUnitLabel,
+                targetRange = diabetesType.glucoseReferenceRangeMmolPerL,
+                onBack = { route = BloodGlucoseRoute.Records },
+                sameDayRecords = eventUiState.dietRecords,
+                onRecordSelected = { selectedDietEvent = it },
+                onOpenDietDetail = onOpenDietDetail,
+            )
+        } ?: EventGlucoseAnalysisScreen(
+            title = stringResource(R.string.blood_glucose_diet_event_analysis_title),
+            onBack = { route = BloodGlucoseRoute.Records },
+        )
+        return
+    }
+    if (route == BloodGlucoseRoute.SleepEventAnalysis) {
+        EventGlucoseAnalysisScreen(
+            title = stringResource(R.string.blood_glucose_sleep_event_analysis_title),
+            onBack = { route = BloodGlucoseRoute.Records },
+        )
+        return
+    }
 
     BaseScreen(
         title = stringResource(R.string.blood_glucose_title),
@@ -363,7 +409,14 @@ private fun BloodGlucoseScreen(
                             onEditHbA1c = { editingHbA1cRecord = it; showHbA1cEditor = true },
                             onDeleteHbA1c = viewModel::deleteHbA1c,
                         )
-                        2 -> EventScreen(viewModel = eventViewModel)
+                        2 -> EventScreen(
+                            viewModel = eventViewModel,
+                            onOpenDietAnalysis = { dietEvent ->
+                                selectedDietEvent = dietEvent
+                                route = BloodGlucoseRoute.DietEventAnalysis
+                            },
+                            onOpenSleepAnalysis = { route = BloodGlucoseRoute.SleepEventAnalysis },
+                        )
                     }
                 }
             }
@@ -374,7 +427,7 @@ private fun BloodGlucoseScreen(
     }
 }
 
-private enum class BloodGlucoseRoute { Records, Settings, Targets, Reminders, Sources, SourceEditor, EventInfo, DataInfo }
+private enum class BloodGlucoseRoute { Records, Settings, Targets, Reminders, Sources, SourceEditor, EventInfo, DataInfo, DietEventAnalysis, SleepEventAnalysis }
 
 @Composable
 private fun BloodGlucoseDataInfoScreen(onBack: () -> Unit) {

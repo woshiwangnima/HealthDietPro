@@ -1,6 +1,7 @@
 package com.woshiwangnima.healthdietpro.ui.sleep
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -184,20 +185,22 @@ private fun SleepKindFilter(selected: SleepKind?, onFilterKindChange: (SleepKind
 }
 
 @Composable
-private fun SleepCard(
+internal fun SleepCard(
     record: SleepRecord,
     timer: com.woshiwangnima.healthdietpro.common.timer.TimerInstance?,
-    onWakeUp: (() -> Unit)?,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-    onDeleteTimer: () -> Unit,
+    onWakeUp: (() -> Unit)? = null,
+    onEdit: (() -> Unit)? = null,
+    onOpen: (() -> Unit)? = onEdit,
+    onDelete: (() -> Unit)? = null,
+    onDeleteTimer: (() -> Unit)? = null,
     highlighted: Boolean,
 ) {
     Surface(
-        onClick = onEdit,
         color = if (highlighted) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (onOpen != null) Modifier.clickable(onClick = onOpen) else Modifier),
     ) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -210,19 +213,15 @@ private fun SleepCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                androidx.compose.material3.IconButton(onClick = onEdit) {
-                    androidx.compose.material3.Icon(
-                        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_edit),
-                        contentDescription = stringResource(R.string.sleep_edit),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
+                onEdit?.let { edit ->
+                    androidx.compose.material3.IconButton(onClick = edit) {
+                        androidx.compose.material3.Icon(androidx.compose.ui.res.painterResource(R.drawable.ic_edit), stringResource(R.string.sleep_edit), tint = MaterialTheme.colorScheme.primary)
+                    }
                 }
-                androidx.compose.material3.IconButton(onClick = onDelete) {
-                    androidx.compose.material3.Icon(
-                        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_delete),
-                        contentDescription = stringResource(R.string.sleep_delete),
-                        tint = MaterialTheme.colorScheme.error,
-                    )
+                onDelete?.let { delete ->
+                    androidx.compose.material3.IconButton(onClick = delete) {
+                        androidx.compose.material3.Icon(androidx.compose.ui.res.painterResource(R.drawable.ic_delete), stringResource(R.string.sleep_delete), tint = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
             Text(

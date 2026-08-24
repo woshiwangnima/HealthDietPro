@@ -203,33 +203,29 @@ private fun DietDateHeader(date: LocalDate) {
 }
 
 @Composable
-private fun DietCard(
+internal fun DietCard(
     record: DietRecord,
-    onOpen: () -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
+    onOpen: (() -> Unit)? = null,
+    onEdit: (() -> Unit)? = null,
+    onDelete: (() -> Unit)? = null,
 ) {
     val totalCalories = record.entries.sumOf { entry ->
         entry.resolvedNutrients["ENERGY"]?.value ?: 0.0
     }
     ActionSectionCard(
         title = stringResource(record.mealPeriod.displayRes()),
-        titleIconRes = R.drawable.ic_diet,
+        titleIcon = { MealPeriodIcon(record.mealPeriod) },
         onClick = onOpen,
         headerActions = {
-            androidx.compose.material3.IconButton(onClick = onEdit) {
-                androidx.compose.material3.Icon(
-                    painter = painterResource(R.drawable.ic_edit),
-                    contentDescription = stringResource(R.string.diet_edit),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
+            onEdit?.let { edit ->
+                androidx.compose.material3.IconButton(onClick = edit) {
+                    androidx.compose.material3.Icon(painterResource(R.drawable.ic_edit), stringResource(R.string.diet_edit), tint = MaterialTheme.colorScheme.primary)
+                }
             }
-            androidx.compose.material3.IconButton(onClick = onDelete) {
-                androidx.compose.material3.Icon(
-                    painter = painterResource(R.drawable.ic_delete),
-                    contentDescription = stringResource(R.string.diet_delete),
-                    tint = MaterialTheme.colorScheme.error,
-                )
+            onDelete?.let { delete ->
+                androidx.compose.material3.IconButton(onClick = delete) {
+                    androidx.compose.material3.Icon(painterResource(R.drawable.ic_delete), stringResource(R.string.diet_delete), tint = MaterialTheme.colorScheme.error)
+                }
             }
         },
     ) {

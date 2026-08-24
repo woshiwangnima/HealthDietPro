@@ -100,6 +100,7 @@ import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestScreen
 import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestCategory
 import com.woshiwangnima.healthdietpro.ui.test.TestLandingScreen
 import com.woshiwangnima.healthdietpro.ui.test.CrossSectionUiTestScreen
+import com.woshiwangnima.healthdietpro.ui.test.MealIconCandidatesScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComponentsPreviewScreen
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabPersistence
 import com.woshiwangnima.healthdietpro.util.UnitConverter
@@ -539,11 +540,12 @@ class MainActivity : BaseActivity() {
                     val isVerified by testAccessViewModel.isVerified.collectAsState()
                     if (isVerified) {
                         when (testPage) {
-                            TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, { testPage = TestPage.CrossSection }, Modifier.fillMaxSize())
+                            TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, { testPage = TestPage.CrossSection }, { testPage = TestPage.MealIcons }, Modifier.fillMaxSize())
                             TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTodayWaterRecords, ::addTestSearchHistories, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                             TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
                             TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
                             TestPage.CrossSection -> CrossSectionUiTestScreen(onBack = { testPage = TestPage.Landing }, Modifier.fillMaxSize())
+                            TestPage.MealIcons -> MealIconCandidatesScreen(onBack = { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                         }
                     } else {
                         TestAccessScreen(
@@ -964,5 +966,5 @@ class MainActivity : BaseActivity() {
         const val EXTRA_IMPORT_AGP_PREVIEW = "import_agp_preview"
     }
 
-    private enum class TestPage { Landing, Commands, Features, CommonUi, CrossSection }
+    private enum class TestPage { Landing, Commands, Features, CommonUi, CrossSection, MealIcons }
 }
