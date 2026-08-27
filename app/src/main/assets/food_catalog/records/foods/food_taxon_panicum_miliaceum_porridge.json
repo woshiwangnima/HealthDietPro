@@ -1,0 +1,68 @@
+{
+  "id": "food:taxon:panicum_miliaceum:porridge",
+  "names": {
+    "zh": [
+      "小米粥"
+    ],
+    "en": [
+      "Millet porridge"
+    ]
+  },
+  "commonness": 4,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 62,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 6.3,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "小米粥, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Millet porridge, preparation-matched reference"
+    }
+  ],
+  "description": {
+    "zh": "小米粥的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Millet porridge are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "food",
+  "components": [
+    {
+      "foodId": "food:taxon:panicum_miliaceum:raw",
+      "quantity": {
+        "value": 13,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 87,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "stewed",
+  "servesPeople": 1,
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "recipeSteps": [
+    {
+      "text": "小米淘洗后加水。"
+    },
+    {
+      "text": "煮至米粒软烂成粥。"
+    }
+  ]
+}

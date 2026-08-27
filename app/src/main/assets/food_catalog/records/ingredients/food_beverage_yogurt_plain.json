@@ -1,0 +1,89 @@
+{
+  "id": "food:beverage:yogurt:plain",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "原味酸奶"
+    ],
+    "en": [
+      "Plain yogurt"
+    ]
+  },
+  "categoryTags": [
+    "food.dairy.fermented"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 72,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 3.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 8.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 36,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Plain yogurt; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "原味酸奶为配方计算使用的基础食材。",
+    "en": "Plain yogurt is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3,
+  "hydrationMlPer100g": 82,
+  "densityGramsPerMl": 1,
+  "servings": [
+    {
+      "id": "per_100ml",
+      "nutritionTableKey": "standard.100g_edible",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "100 毫升",
+        "en": "100 ml"
+      }
+    },
+    {
+      "id": "cup_250ml",
+      "nutritionTableKey": "standard.100g_edible",
+      "ratioToTable": 2.5,
+      "labels": {
+        "zh": "1 杯（250 毫升）",
+        "en": "1 cup (250 ml)"
+      }
+    }
+  ]
+}

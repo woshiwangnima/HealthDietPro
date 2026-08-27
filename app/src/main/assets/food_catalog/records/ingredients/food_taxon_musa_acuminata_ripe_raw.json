@@ -1,0 +1,87 @@
+{
+  "id": "food:taxon:musa_acuminata:ripe:raw",
+  "names": {
+    "zh": [
+      "香蕉",
+      "熟香蕉",
+      "甘蕉"
+    ],
+    "en": [
+      "Banana",
+      "Ripe banana"
+    ]
+  },
+  "categoryTags": [
+    "food.fruit"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 51,
+      "unit": "GI",
+      "note": "ripeness changes GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 11.2,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.21,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "banana, raw"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "banana"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 93,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 22,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "成熟香蕉提供碳水化合物和钾；成熟度越高，糖和淀粉的比例及升糖反应可能变化。",
+    "en": "Ripe banana provides carbohydrate and potassium; ripeness changes the balance of sugars and starch and may alter glycemic response."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

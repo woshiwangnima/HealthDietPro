@@ -205,7 +205,6 @@
         ]
       },
       "categoryTags": [
-        "food.meat_egg",
         "food.meat_egg.livestock"
       ],
       "systemTags": [
@@ -269,7 +268,6 @@
         ]
       },
       "categoryTags": [
-        "food.meat_egg",
         "food.meat_egg.livestock"
       ],
       "systemTags": [
@@ -755,7 +753,11 @@
     },
     {
       "id": "food:taxon:solanum_tuberosum:boiled",
-      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum tuberosum" },
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Solanum",
+        "species": "Solanum tuberosum"
+      },
       "names": {
         "zh": [
           "煮土豆",
@@ -769,7 +771,6 @@
       },
       "categoryTags": [
         "food.staple.tuber",
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "healthMetrics": {
@@ -813,7 +814,11 @@
     },
     {
       "id": "food:taxon:cucumis_sativus:commercial:raw",
-      "botanicalTaxonomy": { "family": "Cucurbitaceae", "genus": "Cucumis", "species": "Cucumis sativus" },
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Cucumis",
+        "species": "Cucumis sativus"
+      },
       "names": {
         "zh": [
           "黄瓜",
@@ -826,7 +831,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "healthMetrics": {
@@ -901,7 +905,11 @@
     },
     {
       "id": "food:taxon:cucumis_sativus:landrace:raw",
-      "botanicalTaxonomy": { "family": "Cucurbitaceae", "genus": "Cucumis", "species": "Cucumis sativus" },
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Cucumis",
+        "species": "Cucumis sativus"
+      },
       "names": {
         "zh": [
           "本地黄瓜",
@@ -914,7 +922,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "healthMetrics": {
@@ -988,7 +995,11 @@
     },
     {
       "id": "food:taxon:solanum_lycopersicum:raw",
-      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum lycopersicum" },
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Solanum",
+        "species": "Solanum lycopersicum"
+      },
       "names": {
         "zh": [
           "番茄",
@@ -1001,7 +1012,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous",
         "food.fruit"
       ],
@@ -1077,7 +1087,11 @@
     },
     {
       "id": "food:taxon:brassica_oleracea:broccoli:raw",
-      "botanicalTaxonomy": { "family": "Brassicaceae", "genus": "Brassica", "species": "Brassica oleracea" },
+      "botanicalTaxonomy": {
+        "family": "Brassicaceae",
+        "genus": "Brassica",
+        "species": "Brassica oleracea"
+      },
       "names": {
         "zh": [
           "西兰花",
@@ -1090,7 +1104,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.flower"
       ],
       "healthMetrics": {
@@ -1655,7 +1668,6 @@
       },
       "categoryTags": [
         "food.dairy",
-        "food.beverage",
         "food.beverage.dairy"
       ],
       "healthMetrics": {
@@ -1797,10 +1809,11 @@
         ]
       },
       "categoryTags": [
-        "food.nut",
         "food.nut.peanut"
       ],
-      "flavorTags": ["plain"],
+      "flavorTags": [
+        "plain"
+      ],
       "healthMetrics": {
         "glycemicIndex": {
           "value": 14,
@@ -1897,7 +1910,6 @@
       "techniqueId": "steamed",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "recipeSteps": [
@@ -1984,7 +1996,6 @@
       "techniqueId": "baked",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "recipeSteps": [
@@ -2069,7 +2080,6 @@
       "techniqueId": "baked",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.whole_grain"
       ],
       "recipeSteps": [
@@ -2094,7 +2104,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "commonness": 5,
@@ -2130,7 +2139,11 @@
     },
     {
       "id": "food:taxon:ipomoea_batatas:steamed",
-      "botanicalTaxonomy": { "family": "Convolvulaceae", "genus": "Ipomoea", "species": "Ipomoea batatas" },
+      "botanicalTaxonomy": {
+        "family": "Convolvulaceae",
+        "genus": "Ipomoea",
+        "species": "Ipomoea batatas"
+      },
       "names": {
         "zh": [
           "红薯",
@@ -2142,7 +2155,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.tuber"
       ],
       "commonness": 5,
@@ -2178,7 +2190,11 @@
     },
     {
       "id": "food:taxon:colocasia_esculenta:boiled",
-      "botanicalTaxonomy": { "family": "Araceae", "genus": "Colocasia", "species": "Colocasia esculenta" },
+      "botanicalTaxonomy": {
+        "family": "Araceae",
+        "genus": "Colocasia",
+        "species": "Colocasia esculenta"
+      },
       "names": {
         "zh": [
           "芋头",
@@ -2190,7 +2206,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.tuber"
       ],
       "commonness": 4,
@@ -2281,7 +2296,6 @@
       "techniqueId": "stewed",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "recipeSteps": [
@@ -2351,7 +2365,6 @@
       "techniqueId": "stewed",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "recipeSteps": [
@@ -2374,7 +2387,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "commonness": 3,
@@ -2474,7 +2486,6 @@
       "techniqueId": "boiled",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "recipeSteps": [
@@ -2543,7 +2554,6 @@
       "techniqueId": "boiled",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "recipeSteps": [
@@ -2621,7 +2631,6 @@
       "techniqueId": "cold_mixed",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "recipeSteps": [
@@ -2690,7 +2699,6 @@
       "techniqueId": "steamed",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "recipeSteps": [
@@ -2715,7 +2723,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "commonness": 5,
@@ -2806,7 +2813,6 @@
       "techniqueId": "stewed",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "recipeSteps": [
@@ -2876,7 +2882,6 @@
       "servesPeople": 1,
       "categoryTags": [
         "food.soy",
-        "food.beverage",
         "food.beverage.soy"
       ],
       "recipeSteps": [
@@ -2984,7 +2989,6 @@
       "techniqueId": "deep_fried",
       "servesPeople": 1,
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "recipeSteps": [
@@ -3010,7 +3014,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "systemTags": [
@@ -3084,7 +3087,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.water"
       ],
       "systemTags": [
@@ -3139,105 +3141,710 @@
     {
       "id": "food:taxon:triticum_aestivum:flour:cake",
       "kind": "ingredient",
-      "names": { "zh": ["低筋面粉", "蛋糕粉"], "en": ["Cake flour", "Low-protein flour"] },
-      "categoryTags": ["food.staple", "food.staple.grain"],
-      "systemTags": ["common"],
-      "edibleRatio": 1,
-      "botanicalTaxonomy": { "family": "Poaceae", "genus": "Triticum", "species": "Triticum aestivum" },
-      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 351, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 8.5, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 1.0, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 77.0, "unitCategory": "weight", "unitId": "g" } } } },
-      "healthMetrics": { "glycemicIndex": { "value": 85, "unit": "GI", "note": "Dry flour; GI is a reference estimate and not a diagnosis." }, "glycemicLoadPer100g": { "value": 65.5, "unit": "GL" } },
-      "sources": [
-        { "dataset": "USDA FoodData Central", "reference": "Cake flour, dry; values normalized per 100 g" },
-        { "dataset": "Encyclopaedia Britannica, Wheat", "reference": "Soft wheat is used for cakes and pastries; https://www.britannica.com/plant/wheat" }
+      "names": {
+        "zh": [
+          "低筋面粉",
+          "蛋糕粉"
+        ],
+        "en": [
+          "Cake flour",
+          "Low-protein flour"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain"
       ],
-      "description": { "zh": "低筋面粉通常来自较软小麦，蛋白质含量较低，面筋形成能力较弱，适合蛋糕、饼干和酥点。与中筋、高筋面粉的区别主要是小麦硬度和蛋白质/面筋强度，不是营养学上的低碳水食品。", "en": "Cake flour is generally milled from softer wheat and has lower protein and weaker gluten development than all-purpose or bread flour. The baking distinction is wheat hardness and gluten strength, not low carbohydrate content." },
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "botanicalTaxonomy": {
+        "family": "Poaceae",
+        "genus": "Triticum",
+        "species": "Triticum aestivum"
+      },
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 351,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 8.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 77.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 85,
+          "unit": "GI",
+          "note": "Dry flour; GI is a reference estimate and not a diagnosis."
+        },
+        "glycemicLoadPer100g": {
+          "value": 65.5,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Cake flour, dry; values normalized per 100 g"
+        },
+        {
+          "dataset": "Encyclopaedia Britannica, Wheat",
+          "reference": "Soft wheat is used for cakes and pastries; https://www.britannica.com/plant/wheat"
+        }
+      ],
+      "description": {
+        "zh": "低筋面粉通常来自较软小麦，蛋白质含量较低，面筋形成能力较弱，适合蛋糕、饼干和酥点。与中筋、高筋面粉的区别主要是小麦硬度和蛋白质/面筋强度，不是营养学上的低碳水食品。",
+        "en": "Cake flour is generally milled from softer wheat and has lower protein and weaker gluten development than all-purpose or bread flour. The baking distinction is wheat hardness and gluten strength, not low carbohydrate content."
+      },
       "commonness": 4
     },
     {
       "id": "food:taxon:triticum_aestivum:flour:bread",
       "kind": "ingredient",
-      "names": { "zh": ["高筋面粉", "面包粉"], "en": ["Bread flour", "High-protein flour"] },
-      "categoryTags": ["food.staple", "food.staple.grain"],
-      "systemTags": ["common"],
-      "edibleRatio": 1,
-      "botanicalTaxonomy": { "family": "Poaceae", "genus": "Triticum", "species": "Triticum aestivum" },
-      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 364, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 13.7, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 1.5, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 71.0, "unitCategory": "weight", "unitId": "g" } } } },
-      "healthMetrics": { "glycemicIndex": { "value": 85, "unit": "GI", "note": "Dry flour; GI is a reference estimate and not a diagnosis." }, "glycemicLoadPer100g": { "value": 60.4, "unit": "GL" } },
-      "sources": [
-        { "dataset": "USDA FoodData Central", "reference": "Bread flour, dry; values normalized per 100 g" },
-        { "dataset": "Encyclopaedia Britannica, Wheat", "reference": "Hard wheat commonly has 11-15% protein and strong gluten; https://www.britannica.com/plant/wheat" }
+      "names": {
+        "zh": [
+          "高筋面粉",
+          "面包粉"
+        ],
+        "en": [
+          "Bread flour",
+          "High-protein flour"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain"
       ],
-      "description": { "zh": "高筋面粉通常来自硬质小麦，蛋白质和面筋形成能力较高，适合面包、吐司和需要较强支撑力的面团。", "en": "Bread flour is generally milled from hard wheat and has higher protein and stronger gluten development for bread and other elastic doughs." },
+      "systemTags": [
+        "common"
+      ],
+      "edibleRatio": 1,
+      "botanicalTaxonomy": {
+        "family": "Poaceae",
+        "genus": "Triticum",
+        "species": "Triticum aestivum"
+      },
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 364,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 13.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 71.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 85,
+          "unit": "GI",
+          "note": "Dry flour; GI is a reference estimate and not a diagnosis."
+        },
+        "glycemicLoadPer100g": {
+          "value": 60.4,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Bread flour, dry; values normalized per 100 g"
+        },
+        {
+          "dataset": "Encyclopaedia Britannica, Wheat",
+          "reference": "Hard wheat commonly has 11-15% protein and strong gluten; https://www.britannica.com/plant/wheat"
+        }
+      ],
+      "description": {
+        "zh": "高筋面粉通常来自硬质小麦，蛋白质和面筋形成能力较高，适合面包、吐司和需要较强支撑力的面团。",
+        "en": "Bread flour is generally milled from hard wheat and has higher protein and stronger gluten development for bread and other elastic doughs."
+      },
       "commonness": 4
     },
     {
       "id": "food:starch:corn",
       "kind": "ingredient",
-      "names": { "zh": ["玉米淀粉", "生粉"], "en": ["Cornstarch", "Corn flour starch"] },
-      "categoryTags": ["food.staple", "food.staple.processed"],
-      "systemTags": ["common"],
+      "names": {
+        "zh": [
+          "玉米淀粉",
+          "生粉"
+        ],
+        "en": [
+          "Cornstarch",
+          "Corn flour starch"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
       "edibleRatio": 1,
-      "botanicalTaxonomy": { "family": "Poaceae", "genus": "Zea", "species": "Zea mays" },
-      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 381, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0.3, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0.1, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 91.3, "unitCategory": "weight", "unitId": "g" } } } },
-      "healthMetrics": { "glycemicIndex": { "value": 70, "unit": "GI", "note": "Reference for isolated dry starch; preparation changes glucose response." }, "glycemicLoadPer100g": { "value": 63.9, "unit": "GL" } },
-      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Cornstarch, dry; values normalized per 100 g" } ],
-      "description": { "zh": "玉米淀粉是从玉米胚乳分离出的淀粉，主要用于增稠、上浆和烘焙；与玉米粉或玉米粒不是同一食材。", "en": "Cornstarch is starch isolated from the maize endosperm. It is used for thickening, coating and baking and is distinct from whole corn flour or kernels." },
+      "botanicalTaxonomy": {
+        "family": "Poaceae",
+        "genus": "Zea",
+        "species": "Zea mays"
+      },
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 381,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 91.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 70,
+          "unit": "GI",
+          "note": "Reference for isolated dry starch; preparation changes glucose response."
+        },
+        "glycemicLoadPer100g": {
+          "value": 63.9,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Cornstarch, dry; values normalized per 100 g"
+        }
+      ],
+      "description": {
+        "zh": "玉米淀粉是从玉米胚乳分离出的淀粉，主要用于增稠、上浆和烘焙；与玉米粉或玉米粒不是同一食材。",
+        "en": "Cornstarch is starch isolated from the maize endosperm. It is used for thickening, coating and baking and is distinct from whole corn flour or kernels."
+      },
       "commonness": 4
     },
     {
       "id": "food:starch:potato",
       "kind": "ingredient",
-      "names": { "zh": ["马铃薯淀粉", "土豆淀粉"], "en": ["Potato starch"] },
-      "categoryTags": ["food.staple", "food.staple.processed"],
-      "systemTags": ["common"],
+      "names": {
+        "zh": [
+          "马铃薯淀粉",
+          "土豆淀粉"
+        ],
+        "en": [
+          "Potato starch"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
       "edibleRatio": 1,
-      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum tuberosum" },
-      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 357, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0.1, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0.1, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 88.2, "unitCategory": "weight", "unitId": "g" } } } },
-      "healthMetrics": { "glycemicIndex": { "value": 70, "unit": "GI", "note": "Reference for isolated dry starch; preparation changes glucose response." }, "glycemicLoadPer100g": { "value": 61.7, "unit": "GL" } },
-      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Potato starch, dry; values normalized per 100 g" } ],
-      "description": { "zh": "马铃薯淀粉是从马铃薯块茎中提取的纯淀粉，糊化后黏度和透明度与玉米淀粉不同。", "en": "Potato starch is purified starch extracted from potato tubers; its gelatinization and viscosity differ from cornstarch." },
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Solanum",
+        "species": "Solanum tuberosum"
+      },
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 357,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 88.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 70,
+          "unit": "GI",
+          "note": "Reference for isolated dry starch; preparation changes glucose response."
+        },
+        "glycemicLoadPer100g": {
+          "value": 61.7,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Potato starch, dry; values normalized per 100 g"
+        }
+      ],
+      "description": {
+        "zh": "马铃薯淀粉是从马铃薯块茎中提取的纯淀粉，糊化后黏度和透明度与玉米淀粉不同。",
+        "en": "Potato starch is purified starch extracted from potato tubers; its gelatinization and viscosity differ from cornstarch."
+      },
       "commonness": 3
     },
     {
       "id": "food:starch:tapioca",
       "kind": "ingredient",
-      "names": { "zh": ["木薯淀粉", "木薯粉"], "en": ["Tapioca starch", "Cassava starch"] },
-      "categoryTags": ["food.staple", "food.staple.processed"],
-      "systemTags": ["common"],
+      "names": {
+        "zh": [
+          "木薯淀粉",
+          "木薯粉"
+        ],
+        "en": [
+          "Tapioca starch",
+          "Cassava starch"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
       "edibleRatio": 1,
-      "botanicalTaxonomy": { "family": "Euphorbiaceae", "genus": "Manihot", "species": "Manihot esculenta" },
-      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 358, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0.2, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0.0, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 88.7, "unitCategory": "weight", "unitId": "g" } } } },
-      "healthMetrics": { "glycemicIndex": { "value": 70, "unit": "GI", "note": "Reference for isolated dry starch; preparation changes glucose response." }, "glycemicLoadPer100g": { "value": 62.1, "unit": "GL" } },
-      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Tapioca starch, dry; values normalized per 100 g" } ],
-      "description": { "zh": "木薯淀粉来自木薯块根，常用于珍珠、勾芡和无麸质配方；木薯粉与木薯全粉的组成可能不同。", "en": "Tapioca starch is extracted from cassava roots and is used in pearls, thickening and gluten-free formulations; cassava flour is a different product." },
+      "botanicalTaxonomy": {
+        "family": "Euphorbiaceae",
+        "genus": "Manihot",
+        "species": "Manihot esculenta"
+      },
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 358,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0.0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 88.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 70,
+          "unit": "GI",
+          "note": "Reference for isolated dry starch; preparation changes glucose response."
+        },
+        "glycemicLoadPer100g": {
+          "value": 62.1,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Tapioca starch, dry; values normalized per 100 g"
+        }
+      ],
+      "description": {
+        "zh": "木薯淀粉来自木薯块根，常用于珍珠、勾芡和无麸质配方；木薯粉与木薯全粉的组成可能不同。",
+        "en": "Tapioca starch is extracted from cassava roots and is used in pearls, thickening and gluten-free formulations; cassava flour is a different product."
+      },
       "commonness": 3
     },
     {
       "id": "food:dairy:butter",
       "kind": "ingredient",
-      "names": { "zh": ["黄油", "乳脂黄油", "咸黄油"], "en": ["Salted butter", "Dairy butter"] },
-      "categoryTags": ["food.dairy", "food.oil", "food.oil.animal_fat"],
-      "systemTags": ["common"],
+      "names": {
+        "zh": [
+          "黄油",
+          "乳脂黄油",
+          "咸黄油"
+        ],
+        "en": [
+          "Salted butter",
+          "Dairy butter"
+        ]
+      },
+      "categoryTags": [
+        "food.dairy",
+        "food.oil.animal_fat"
+      ],
+      "systemTags": [
+        "common"
+      ],
       "edibleRatio": 1,
-      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 717, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0.85, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 81.1, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 0.06, "unitCategory": "weight", "unitId": "g" }, "VITA": { "value": 684, "unitCategory": "weight", "unitId": "μg" }, "VITE": { "value": 2.32, "unitCategory": "weight", "unitId": "mg" }, "VITK": { "value": 7, "unitCategory": "weight", "unitId": "μg" }, "VITB1": { "value": 0.005, "unitCategory": "weight", "unitId": "mg" }, "VITB2": { "value": 0.034, "unitCategory": "weight", "unitId": "mg" }, "NIACIN": { "value": 0.042, "unitCategory": "weight", "unitId": "mg" }, "VITB6": { "value": 0.003, "unitCategory": "weight", "unitId": "mg" }, "FOLATE": { "value": 3, "unitCategory": "weight", "unitId": "μg" }, "VITB12": { "value": 0.17, "unitCategory": "weight", "unitId": "μg" }, "PANTOTHENIC": { "value": 0.11, "unitCategory": "weight", "unitId": "mg" }, "CHOLINE": { "value": 18.8, "unitCategory": "weight", "unitId": "mg" }, "CA": { "value": 24, "unitCategory": "weight", "unitId": "mg" }, "P": { "value": 24, "unitCategory": "weight", "unitId": "mg" }, "K": { "value": 24, "unitCategory": "weight", "unitId": "mg" }, "NA": { "value": 643, "unitCategory": "weight", "unitId": "mg" }, "MG": { "value": 2, "unitCategory": "weight", "unitId": "mg" }, "FE": { "value": 0.02, "unitCategory": "weight", "unitId": "mg" }, "ZN": { "value": 0.09, "unitCategory": "weight", "unitId": "mg" }, "SE": { "value": 1, "unitCategory": "weight", "unitId": "μg" }, "ALA": { "value": 0.315, "unitCategory": "weight", "unitId": "g" }, "LA": { "value": 2.17, "unitCategory": "weight", "unitId": "g" }, "ILE": { "value": 51, "unitCategory": "weight", "unitId": "mg" }, "LEU": { "value": 83, "unitCategory": "weight", "unitId": "mg" }, "LYS": { "value": 67, "unitCategory": "weight", "unitId": "mg" }, "MET": { "value": 21, "unitCategory": "weight", "unitId": "mg" }, "PHE": { "value": 41, "unitCategory": "weight", "unitId": "mg" }, "THR": { "value": 38, "unitCategory": "weight", "unitId": "mg" }, "TRP": { "value": 12, "unitCategory": "weight", "unitId": "mg" }, "VAL": { "value": 57, "unitCategory": "weight", "unitId": "mg" }, "HIS": { "value": 23, "unitCategory": "weight", "unitId": "mg" } } } },
-      "healthMetrics": { "glycemicIndex": { "value": 0, "unit": "GI", "note": "Not applicable as a GI test food; negligible available carbohydrate." }, "glycemicLoadPer100g": { "value": 0, "unit": "GL", "note": "Not applicable as a GI test food; negligible available carbohydrate." } },
-      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Butter, salted; per 100 g" }, { "dataset": "International Tables of Glycemic Index and Glycemic Load Values", "reference": "Pure fats are not assigned a meaningful GI because they contain negligible available carbohydrate." } ],
-      "description": { "zh": "黄油是乳脂制品，主要提供脂肪和能量；纯黄油几乎不含可利用碳水，因此不能把其 GI=0 理解为进行过有效的 GI 试验。", "en": "Butter is a milk-fat product providing mostly fat and energy. Pure butter has negligible available carbohydrate, so GI 0 here means not applicable rather than a clinical GI test result." },
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 717,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0.85,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 81.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0.06,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "VITA": {
+              "value": 684,
+              "unitCategory": "weight",
+              "unitId": "μg"
+            },
+            "VITE": {
+              "value": 2.32,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "VITK": {
+              "value": 7,
+              "unitCategory": "weight",
+              "unitId": "μg"
+            },
+            "VITB1": {
+              "value": 0.005,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "VITB2": {
+              "value": 0.034,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "NIACIN": {
+              "value": 0.042,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "VITB6": {
+              "value": 0.003,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "FOLATE": {
+              "value": 3,
+              "unitCategory": "weight",
+              "unitId": "μg"
+            },
+            "VITB12": {
+              "value": 0.17,
+              "unitCategory": "weight",
+              "unitId": "μg"
+            },
+            "PANTOTHENIC": {
+              "value": 0.11,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "CHOLINE": {
+              "value": 18.8,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "CA": {
+              "value": 24,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "P": {
+              "value": 24,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "K": {
+              "value": 24,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "NA": {
+              "value": 643,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "MG": {
+              "value": 2,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "FE": {
+              "value": 0.02,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "ZN": {
+              "value": 0.09,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "SE": {
+              "value": 1,
+              "unitCategory": "weight",
+              "unitId": "μg"
+            },
+            "ALA": {
+              "value": 0.315,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "LA": {
+              "value": 2.17,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "ILE": {
+              "value": 51,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "LEU": {
+              "value": 83,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "LYS": {
+              "value": 67,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "MET": {
+              "value": 21,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "PHE": {
+              "value": 41,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "THR": {
+              "value": 38,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "TRP": {
+              "value": 12,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "VAL": {
+              "value": 57,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            },
+            "HIS": {
+              "value": 23,
+              "unitCategory": "weight",
+              "unitId": "mg"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 0,
+          "unit": "GI",
+          "note": "Not applicable as a GI test food; negligible available carbohydrate."
+        },
+        "glycemicLoadPer100g": {
+          "value": 0,
+          "unit": "GL",
+          "note": "Not applicable as a GI test food; negligible available carbohydrate."
+        }
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Butter, salted; per 100 g"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Pure fats are not assigned a meaningful GI because they contain negligible available carbohydrate."
+        }
+      ],
+      "description": {
+        "zh": "黄油是乳脂制品，主要提供脂肪和能量；纯黄油几乎不含可利用碳水，因此不能把其 GI=0 理解为进行过有效的 GI 试验。",
+        "en": "Butter is a milk-fat product providing mostly fat and energy. Pure butter has negligible available carbohydrate, so GI 0 here means not applicable rather than a clinical GI test result."
+      },
       "commonness": 4
     },
     {
       "id": "food:beverage:cola:sugar_free",
       "kind": "ingredient",
-      "names": { "zh": ["无糖可乐", "零糖可乐"], "en": ["Sugar-free cola", "Diet cola"] },
-      "categoryTags": ["food.beverage", "food.beverage.carbonated"],
-      "systemTags": ["common"],
+      "names": {
+        "zh": [
+          "无糖可乐",
+          "零糖可乐"
+        ],
+        "en": [
+          "Sugar-free cola",
+          "Diet cola"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage.carbonated"
+      ],
+      "systemTags": [
+        "common"
+      ],
       "edibleRatio": 1,
       "hydrationMlPer100g": 99.8,
       "densityGramsPerMl": 1,
-      "nutritionTables": { "standard.100g_edible": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 0, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 0, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 0, "unitCategory": "weight", "unitId": "g" } } } },
-      "healthMetrics": { "glycemicIndex": { "value": 0, "unit": "GI", "note": "No available carbohydrate in the reference formulation; product labels vary." }, "glycemicLoadPer100g": { "value": 0, "unit": "GL" } },
-      "sources": [ { "dataset": "USDA FoodData Central", "reference": "Carbonated beverage, cola, diet; verify against the product label" } ],
-      "description": { "zh": "无糖可乐通常用高强度甜味剂替代蔗糖，具体能量、碳水和咖啡因含量随品牌配方变化；记录时应以包装营养标签为准。", "en": "Sugar-free cola generally replaces sugar with high-intensity sweeteners. Energy, carbohydrate and caffeine vary by brand; use the package label for the consumed product." },
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 0,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 0,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 0,
+          "unit": "GI",
+          "note": "No available carbohydrate in the reference formulation; product labels vary."
+        },
+        "glycemicLoadPer100g": {
+          "value": 0,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Carbonated beverage, cola, diet; verify against the product label"
+        }
+      ],
+      "description": {
+        "zh": "无糖可乐通常用高强度甜味剂替代蔗糖，具体能量、碳水和咖啡因含量随品牌配方变化；记录时应以包装营养标签为准。",
+        "en": "Sugar-free cola generally replaces sugar with high-intensity sweeteners. Energy, carbohydrate and caffeine vary by brand; use the package label for the consumed product."
+      },
       "commonness": 4
     },
     {
@@ -3317,13 +3924,16 @@
         "en": "Values for Meat-filled steamed bun are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ]
     },
     {
       "id": "food:taxon:solanum_melongena:raw",
-      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum melongena" },
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Solanum",
+        "species": "Solanum melongena"
+      },
       "names": {
         "zh": [
           "茄子"
@@ -3333,7 +3943,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "commonness": 5,
@@ -3396,7 +4005,11 @@
     },
     {
       "id": "food:taxon:lactuca_sativa:raw",
-      "botanicalTaxonomy": { "family": "Asteraceae", "genus": "Lactuca", "species": "Lactuca sativa" },
+      "botanicalTaxonomy": {
+        "family": "Asteraceae",
+        "genus": "Lactuca",
+        "species": "Lactuca sativa"
+      },
       "names": {
         "zh": [
           "生菜"
@@ -3406,7 +4019,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "commonness": 5,
@@ -3469,7 +4081,11 @@
     },
     {
       "id": "food:taxon:daucus_carota:raw",
-      "botanicalTaxonomy": { "family": "Apiaceae", "genus": "Daucus", "species": "Daucus carota" },
+      "botanicalTaxonomy": {
+        "family": "Apiaceae",
+        "genus": "Daucus",
+        "species": "Daucus carota"
+      },
       "names": {
         "zh": [
           "胡萝卜"
@@ -3479,7 +4095,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "commonness": 5,
@@ -3542,7 +4157,11 @@
     },
     {
       "id": "food:taxon:solanum_melongena:local_round_raw",
-      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum melongena" },
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Solanum",
+        "species": "Solanum melongena"
+      },
       "names": {
         "zh": [
           "本地圆茄",
@@ -3554,7 +4173,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "commonness": 3,
@@ -3617,7 +4235,11 @@
     },
     {
       "id": "food:taxon:vigna_unguiculata:raw",
-      "botanicalTaxonomy": { "family": "Fabaceae", "genus": "Vigna", "species": "Vigna unguiculata" },
+      "botanicalTaxonomy": {
+        "family": "Fabaceae",
+        "genus": "Vigna",
+        "species": "Vigna unguiculata"
+      },
       "names": {
         "zh": [
           "豆角"
@@ -3628,7 +4250,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fresh_legume"
       ],
       "commonness": 5,
@@ -3691,7 +4312,11 @@
     },
     {
       "id": "food:taxon:phaseolus_vulgaris:raw",
-      "botanicalTaxonomy": { "family": "Fabaceae", "genus": "Phaseolus", "species": "Phaseolus vulgaris" },
+      "botanicalTaxonomy": {
+        "family": "Fabaceae",
+        "genus": "Phaseolus",
+        "species": "Phaseolus vulgaris"
+      },
       "names": {
         "zh": [
           "四季豆"
@@ -3702,7 +4327,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fresh_legume"
       ],
       "commonness": 4,
@@ -3765,7 +4389,11 @@
     },
     {
       "id": "food:taxon:lactuca_sativa:asparagus_lettuce",
-      "botanicalTaxonomy": { "family": "Asteraceae", "genus": "Lactuca", "species": "Lactuca sativa" },
+      "botanicalTaxonomy": {
+        "family": "Asteraceae",
+        "genus": "Lactuca",
+        "species": "Lactuca sativa"
+      },
       "names": {
         "zh": [
           "莴苣"
@@ -3776,7 +4404,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "commonness": 4,
@@ -3839,7 +4466,11 @@
     },
     {
       "id": "food:taxon:zizania_latifolia:raw",
-      "botanicalTaxonomy": { "family": "Poaceae", "genus": "Zizania", "species": "Zizania latifolia" },
+      "botanicalTaxonomy": {
+        "family": "Poaceae",
+        "genus": "Zizania",
+        "species": "Zizania latifolia"
+      },
       "names": {
         "zh": [
           "茭白",
@@ -3852,7 +4483,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.aquatic"
       ],
       "commonness": 3,
@@ -3915,7 +4545,11 @@
     },
     {
       "id": "food:taxon:dioscorea_polystachya:raw",
-      "botanicalTaxonomy": { "family": "Dioscoreaceae", "genus": "Dioscorea", "species": "Dioscorea polystachya" },
+      "botanicalTaxonomy": {
+        "family": "Dioscoreaceae",
+        "genus": "Dioscorea",
+        "species": "Dioscorea polystachya"
+      },
       "names": {
         "zh": [
           "山药"
@@ -3925,7 +4559,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "commonness": 4,
@@ -3988,7 +4621,11 @@
     },
     {
       "id": "food:taxon:apium_graveolens:raw",
-      "botanicalTaxonomy": { "family": "Apiaceae", "genus": "Apium", "species": "Apium graveolens" },
+      "botanicalTaxonomy": {
+        "family": "Apiaceae",
+        "genus": "Apium",
+        "species": "Apium graveolens"
+      },
       "names": {
         "zh": [
           "芹菜"
@@ -3998,7 +4635,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "commonness": 5,
@@ -4061,7 +4697,11 @@
     },
     {
       "id": "food:taxon:capsicum_annuum:chili",
-      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Capsicum", "species": "Capsicum annuum" },
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Capsicum",
+        "species": "Capsicum annuum"
+      },
       "names": {
         "zh": [
           "小米辣"
@@ -4071,7 +4711,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.vegetable",
         "food.seasoning.fresh_aromatic"
       ],
@@ -4135,7 +4774,11 @@
     },
     {
       "id": "food:taxon:coriandrum_sativum:raw",
-      "botanicalTaxonomy": { "family": "Apiaceae", "genus": "Coriandrum", "species": "Coriandrum sativum" },
+      "botanicalTaxonomy": {
+        "family": "Apiaceae",
+        "genus": "Coriandrum",
+        "species": "Coriandrum sativum"
+      },
       "names": {
         "zh": [
           "香菜"
@@ -4146,7 +4789,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.vegetable",
         "food.seasoning.fresh_aromatic"
       ],
@@ -4210,7 +4852,11 @@
     },
     {
       "id": "food:taxon:allium_sativum:raw",
-      "botanicalTaxonomy": { "family": "Amaryllidaceae", "genus": "Allium", "species": "Allium sativum" },
+      "botanicalTaxonomy": {
+        "family": "Amaryllidaceae",
+        "genus": "Allium",
+        "species": "Allium sativum"
+      },
       "names": {
         "zh": [
           "大蒜"
@@ -4220,7 +4866,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.vegetable",
         "food.seasoning.fresh_aromatic"
       ],
@@ -4284,7 +4929,11 @@
     },
     {
       "id": "food:taxon:zingiber_officinale:raw",
-      "botanicalTaxonomy": { "family": "Zingiberaceae", "genus": "Zingiber", "species": "Zingiber officinale" },
+      "botanicalTaxonomy": {
+        "family": "Zingiberaceae",
+        "genus": "Zingiber",
+        "species": "Zingiber officinale"
+      },
       "names": {
         "zh": [
           "生姜"
@@ -4294,7 +4943,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.vegetable",
         "food.seasoning.fresh_aromatic"
       ],
@@ -4358,7 +5006,11 @@
     },
     {
       "id": "food:taxon:solanum_lycopersicum:cherry_raw",
-      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum lycopersicum" },
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Solanum",
+        "species": "Solanum lycopersicum"
+      },
       "names": {
         "zh": [
           "圣女果",
@@ -4370,7 +5022,6 @@
       },
       "categoryTags": [
         "food.fruit",
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "commonness": 4,
@@ -4730,7 +5381,6 @@
         ]
       },
       "categoryTags": [
-        "food.meat_egg",
         "food.meat_egg.livestock"
       ],
       "commonness": 5,
@@ -4795,7 +5445,6 @@
         ]
       },
       "categoryTags": [
-        "food.meat_egg",
         "food.meat_egg.livestock"
       ],
       "commonness": 5,
@@ -4860,7 +5509,6 @@
         ]
       },
       "categoryTags": [
-        "food.meat_egg",
         "food.meat_egg.livestock"
       ],
       "commonness": 4,
@@ -4924,7 +5572,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain",
         "food.staple.whole_grain"
       ],
@@ -4988,7 +5635,11 @@
     },
     {
       "id": "food:taxon:solanum_tuberosum:raw",
-      "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum tuberosum" },
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Solanum",
+        "species": "Solanum tuberosum"
+      },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -5000,7 +5651,6 @@
       },
       "categoryTags": [
         "food.staple.tuber",
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "systemTags": [
@@ -5135,7 +5785,6 @@
         ]
       },
       "categoryTags": [
-        "food.nut",
         "food.nut.peanut"
       ],
       "systemTags": [
@@ -5211,7 +5860,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "systemTags": [
@@ -5294,7 +5942,11 @@
     },
     {
       "id": "food:taxon:ipomoea_batatas:raw",
-      "botanicalTaxonomy": { "family": "Convolvulaceae", "genus": "Ipomoea", "species": "Ipomoea batatas" },
+      "botanicalTaxonomy": {
+        "family": "Convolvulaceae",
+        "genus": "Ipomoea",
+        "species": "Ipomoea batatas"
+      },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -5305,9 +5957,7 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root",
-        "food.staple",
         "food.staple.tuber"
       ],
       "systemTags": [
@@ -5370,7 +6020,11 @@
     },
     {
       "id": "food:taxon:colocasia_esculenta:raw",
-      "botanicalTaxonomy": { "family": "Araceae", "genus": "Colocasia", "species": "Colocasia esculenta" },
+      "botanicalTaxonomy": {
+        "family": "Araceae",
+        "genus": "Colocasia",
+        "species": "Colocasia esculenta"
+      },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -5381,9 +6035,7 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root",
-        "food.staple",
         "food.staple.tuber"
       ],
       "systemTags": [
@@ -5456,7 +6108,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "systemTags": [
@@ -5529,7 +6180,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "systemTags": [
@@ -5602,7 +6252,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "systemTags": [
@@ -5675,7 +6324,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain",
         "food.staple.whole_grain"
       ],
@@ -5821,7 +6469,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "systemTags": [
@@ -5894,7 +6541,6 @@
         ]
       },
       "categoryTags": [
-        "food.oil",
         "food.oil.plant"
       ],
       "systemTags": [
@@ -5960,7 +6606,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain"
       ],
       "systemTags": [
@@ -6034,7 +6679,11 @@
     },
     {
       "id": "food:taxon:allium_fistulosum:raw",
-      "botanicalTaxonomy": { "family": "Amaryllidaceae", "genus": "Allium", "species": "Allium fistulosum" },
+      "botanicalTaxonomy": {
+        "family": "Amaryllidaceae",
+        "genus": "Allium",
+        "species": "Allium fistulosum"
+      },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -6045,7 +6694,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.vegetable",
         "food.seasoning.fresh_aromatic"
       ],
@@ -6109,7 +6757,11 @@
     },
     {
       "id": "food:taxon:allium_fistulosum:scallion",
-      "botanicalTaxonomy": { "family": "Amaryllidaceae", "genus": "Allium", "species": "Allium fistulosum" },
+      "botanicalTaxonomy": {
+        "family": "Amaryllidaceae",
+        "genus": "Allium",
+        "species": "Allium fistulosum"
+      },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -6120,7 +6772,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.vegetable",
         "food.seasoning.fresh_aromatic"
       ],
@@ -6184,7 +6835,11 @@
     },
     {
       "id": "food:taxon:houttuynia_cordata:raw",
-      "botanicalTaxonomy": { "family": "Saururaceae", "genus": "Houttuynia", "species": "Houttuynia cordata" },
+      "botanicalTaxonomy": {
+        "family": "Saururaceae",
+        "genus": "Houttuynia",
+        "species": "Houttuynia cordata"
+      },
       "kind": "ingredient",
       "names": {
         "zh": [
@@ -6195,7 +6850,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.vegetable",
         "food.seasoning.fresh_aromatic"
       ],
@@ -6269,7 +6923,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.seasoning.salt"
       ],
       "systemTags": [
@@ -6332,7 +6985,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.seasoning.savory_sauce"
       ],
       "systemTags": [
@@ -6395,7 +7047,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.seasoning.acid"
       ],
       "systemTags": [
@@ -6458,7 +7109,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.seasoning.sweetener"
       ],
       "systemTags": [
@@ -6526,7 +7176,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.seasoning.cooking_alcohol"
       ],
       "systemTags": [
@@ -6589,7 +7238,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.seasoning.dry_spice"
       ],
       "systemTags": [
@@ -6662,7 +7310,6 @@
         ]
       },
       "categoryTags": [
-        "food.oil",
         "food.oil.animal_fat"
       ],
       "systemTags": [
@@ -6725,7 +7372,6 @@
         ]
       },
       "categoryTags": [
-        "food.oil",
         "food.oil.animal_fat"
       ],
       "systemTags": [
@@ -6788,7 +7434,6 @@
         ]
       },
       "categoryTags": [
-        "food.oil",
         "food.oil.animal_fat"
       ],
       "systemTags": [
@@ -6851,7 +7496,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.tea"
       ],
       "systemTags": [
@@ -6920,7 +7564,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.coffee"
       ],
       "systemTags": [
@@ -7061,7 +7704,6 @@
         ]
       },
       "categoryTags": [
-        "food.seasoning",
         "food.seasoning.sweetener"
       ],
       "systemTags": [
@@ -7129,7 +7771,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.carbonated"
       ],
       "systemTags": [
@@ -7219,7 +7860,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.juice"
       ],
       "systemTags": [
@@ -7309,7 +7949,6 @@
         ]
       },
       "categoryTags": [
-        "food.dairy",
         "food.dairy.fermented"
       ],
       "systemTags": [
@@ -7399,7 +8038,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.mixed"
       ],
       "systemTags": [
@@ -7489,7 +8127,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.tea"
       ],
       "components": [
@@ -7566,7 +8203,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.coffee"
       ],
       "components": [
@@ -7643,7 +8279,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.mixed"
       ],
       "components": [
@@ -7717,7 +8352,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.mixed"
       ],
       "components": [
@@ -7791,7 +8425,6 @@
         ]
       },
       "categoryTags": [
-        "food.beverage",
         "food.beverage.soy"
       ],
       "components": [
@@ -7864,55 +8497,2046 @@
       "techniqueId": "stewed",
       "servesPeople": 1
     },
-    {"id":"food:taxon:helianthus_annuus:kernels:raw","kind":"ingredient","names":{"zh":["葵花籽仁"],"en":["Sunflower seed kernels"]},"categoryTags":["food.nut","food.nut.seed"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":584,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":20.8,"unitCategory":"weight","unitId":"g"},"FAT":{"value":51.5,"unitCategory":"weight","unitId":"g"},"CHO":{"value":20,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":8.6,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Sunflower seed kernels, raw; edible portion, per 100 g; accessed 2026"}],"commonness":4},
-    {"id":"food:taxon:cucurbita_pepo:kernels:raw","kind":"ingredient","names":{"zh":["南瓜子仁"],"en":["Pumpkin seed kernels"]},"categoryTags":["food.nut","food.nut.seed"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":559,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":30.2,"unitCategory":"weight","unitId":"g"},"FAT":{"value":49.1,"unitCategory":"weight","unitId":"g"},"CHO":{"value":10.7,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":6,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Pumpkin seed kernels, raw; edible portion, per 100 g; accessed 2026"}],"commonness":4},
-    {"id":"food:taxon:citrullus_lanatus:seeds:raw","kind":"ingredient","names":{"zh":["西瓜子仁"],"en":["Watermelon seed kernels"]},"categoryTags":["food.nut","food.nut.seed"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":557,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":28.3,"unitCategory":"weight","unitId":"g"},"FAT":{"value":47.4,"unitCategory":"weight","unitId":"g"},"CHO":{"value":15.3,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":4,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"China Food Composition Tables","reference":"Watermelon seed kernels, edible portion, per 100 g"}],"commonness":3},
-    {"id":"food:taxon:trichosanthes_kirilowii:seeds:raw","kind":"ingredient","names":{"zh":["吊瓜子仁"],"en":["Chinese snake gourd seed kernels"]},"categoryTags":["food.nut","food.nut.seed"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":555,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":27,"unitCategory":"weight","unitId":"g"},"FAT":{"value":46,"unitCategory":"weight","unitId":"g"},"CHO":{"value":18,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":5,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"China Food Composition Tables","reference":"Chinese snake gourd seed kernels, edible portion, per 100 g"}],"commonness":2},
-    {"id":"food:taxon:benincasa_hispida:seeds:raw","kind":"ingredient","names":{"zh":["冬瓜子仁"],"en":["Winter melon seed kernels"]},"categoryTags":["food.nut","food.nut.seed"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":541,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":26,"unitCategory":"weight","unitId":"g"},"FAT":{"value":45,"unitCategory":"weight","unitId":"g"},"CHO":{"value":19,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":5,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"China Food Composition Tables","reference":"Winter melon seed kernels, edible portion, per 100 g"}],"commonness":2},
-    {"id":"food:taxon:juglans_regia:kernels:raw","kind":"ingredient","names":{"zh":["核桃仁"],"en":["Walnut kernels"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":654,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":15.2,"unitCategory":"weight","unitId":"g"},"FAT":{"value":65.2,"unitCategory":"weight","unitId":"g"},"CHO":{"value":13.7,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":6.7,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Walnuts, raw kernels; edible portion, per 100 g; accessed 2026"}],"commonness":4},
-    {"id":"food:taxon:prunus_dulcis:kernels:raw","kind":"ingredient","names":{"zh":["杏仁","巴旦木"],"en":["Almond kernels","Almonds"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":579,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":21.2,"unitCategory":"weight","unitId":"g"},"FAT":{"value":49.9,"unitCategory":"weight","unitId":"g"},"CHO":{"value":21.6,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":12.5,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Almonds, raw kernels; edible portion, per 100 g; accessed 2026"}],"commonness":4},
-    {"id":"food:taxon:anacardium_occidentale:kernels:raw","kind":"ingredient","names":{"zh":["腰果"],"en":["Cashews"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":553,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":18.2,"unitCategory":"weight","unitId":"g"},"FAT":{"value":43.9,"unitCategory":"weight","unitId":"g"},"CHO":{"value":30.2,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":3.3,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Cashews, raw kernels; edible portion, per 100 g; accessed 2026"}],"commonness":4},
-    {"id":"food:taxon:pistacia_vera:kernels:raw","kind":"ingredient","names":{"zh":["开心果仁"],"en":["Pistachio kernels"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":560,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":20.2,"unitCategory":"weight","unitId":"g"},"FAT":{"value":45.3,"unitCategory":"weight","unitId":"g"},"CHO":{"value":27.2,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":10.6,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Pistachio kernels, raw; edible portion, per 100 g; accessed 2026"}],"commonness":3},
-    {"id":"food:taxon:carya_illinoinensis:kernels:raw","kind":"ingredient","names":{"zh":["碧根果仁"],"en":["Pecan kernels"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":691,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":9.2,"unitCategory":"weight","unitId":"g"},"FAT":{"value":72,"unitCategory":"weight","unitId":"g"},"CHO":{"value":13.9,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":9.6,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Pecans, raw kernels; edible portion, per 100 g; accessed 2026"}],"commonness":3},
-    {"id":"food:taxon:macadamia_integrifolia:kernels:raw","kind":"ingredient","names":{"zh":["夏威夷果仁"],"en":["Macadamia kernels"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":718,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":7.9,"unitCategory":"weight","unitId":"g"},"FAT":{"value":75.8,"unitCategory":"weight","unitId":"g"},"CHO":{"value":13.8,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":8.6,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Macadamia nuts, raw kernels; edible portion, per 100 g; accessed 2026"}],"commonness":3},
-    {"id":"food:taxon:pinus_koraiensis:kernels:raw","kind":"ingredient","names":{"zh":["松子仁"],"en":["Pine nut kernels"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":673,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":13.7,"unitCategory":"weight","unitId":"g"},"FAT":{"value":68.4,"unitCategory":"weight","unitId":"g"},"CHO":{"value":13.1,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":3.7,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Pine nuts, raw kernels; edible portion, per 100 g; accessed 2026"}],"commonness":2},
-    {"id":"food:taxon:corylus_avellana:kernels:raw","kind":"ingredient","names":{"zh":["榛子仁"],"en":["Hazelnut kernels"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":628,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":15,"unitCategory":"weight","unitId":"g"},"FAT":{"value":60.8,"unitCategory":"weight","unitId":"g"},"CHO":{"value":16.7,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":9.7,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Hazelnuts, raw kernels; edible portion, per 100 g; accessed 2026"}],"commonness":2},
-    {"id":"food:taxon:castanea_mollissima:kernels:raw","kind":"ingredient","names":{"zh":["板栗仁"],"en":["Chinese chestnut kernels"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":196,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":1.6,"unitCategory":"weight","unitId":"g"},"FAT":{"value":1.3,"unitCategory":"weight","unitId":"g"},"CHO":{"value":44.2,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":5.1,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Chestnuts, raw kernels; edible portion, per 100 g; accessed 2026"}],"commonness":3},
-    {"id":"food:taxon:vicia_faba:dry","kind":"ingredient","names":{"zh":["蚕豆"],"en":["Dried fava beans"]},"categoryTags":["food.nut","food.nut.legume_snack"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":341,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":26.1,"unitCategory":"weight","unitId":"g"},"FAT":{"value":1.5,"unitCategory":"weight","unitId":"g"},"CHO":{"value":58.3,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":25,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Fava beans, mature seeds, dry; edible portion, per 100 g; accessed 2026"}],"commonness":3},
-    {"id":"food:taxon:glycine_max:black:dry","kind":"ingredient","names":{"zh":["黑豆"],"en":["Black soybeans"]},"categoryTags":["food.nut","food.nut.legume_snack"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":341,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":33,"unitCategory":"weight","unitId":"g"},"FAT":{"value":16,"unitCategory":"weight","unitId":"g"},"CHO":{"value":31,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":15,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"China Food Composition Tables","reference":"Black soybeans, dry edible portion, per 100 g"}],"commonness":3},
-    {"id":"food:taxon:pisum_sativum:dry","kind":"ingredient","names":{"zh":["青豆"],"en":["Dried green peas"]},"categoryTags":["food.nut","food.nut.legume_snack"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":341,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":24.6,"unitCategory":"weight","unitId":"g"},"FAT":{"value":1.2,"unitCategory":"weight","unitId":"g"},"CHO":{"value":60,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":25,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"USDA FoodData Central","reference":"Peas, split, mature seeds, dry; edible portion, per 100 g; accessed 2026"}],"commonness":3},
-    {"id":"food:taxon:carya_cathayensis:kernels:raw","kind":"ingredient","names":{"zh":["山核桃仁"],"en":["Chinese hickory kernels"]},"categoryTags":["food.nut","food.nut.tree_nut"],"nutritionTables":{"standard.100g_edible":{"basis":{"value":100,"unitCategory":"weight","unitId":"g"},"nutrients":{"ENERGY":{"value":670,"unitCategory":"energy","unitId":"kcal"},"PROTEIN":{"value":12,"unitCategory":"weight","unitId":"g"},"FAT":{"value":67,"unitCategory":"weight","unitId":"g"},"CHO":{"value":15,"unitCategory":"weight","unitId":"g"},"FIBER":{"value":8,"unitCategory":"weight","unitId":"g"}}}},"edibleRatio":1,"sources":[{"dataset":"China Food Composition Tables","reference":"Chinese hickory kernels, edible portion, per 100 g"}],"commonness":2},
-    {"id":"food:snack:peanut:plain","kind":"food","names":{"zh":["炒花生（原味）","烤花生"],"en":["Plain roasted peanuts"]},"categoryTags":["food.nut","food.nut.peanut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:arachis_hypogaea:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible peanut kernels; nutrient calculation uses baked derivation"}],"commonness":4},
-    {"id":"food:snack:peanut:five_spice","kind":"food","names":{"zh":["炒花生（五香）"],"en":["Five-spice roasted peanuts"]},"categoryTags":["food.nut","food.nut.peanut"],"flavorTags":["five_spice"],"components":[{"foodId":"food:taxon:arachis_hypogaea:raw","quantity":{"value":98,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:salt","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:black_pepper","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}}],"techniqueId":"baked","sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Approved five-spice standard: 98% kernels, 1% salt, 1% dry spice; components total 100 g finished snack"}],"commonness":3},
-    {"id":"food:snack:peanut:garlic","kind":"food","names":{"zh":["炒花生（蒜香）"],"en":["Garlic roasted peanuts"]},"categoryTags":["food.nut","food.nut.peanut"],"flavorTags":["garlic"],"components":[{"foodId":"food:taxon:arachis_hypogaea:raw","quantity":{"value":97,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:taxon:allium_sativum:raw","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:salt","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:plant_oil:generic","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}}],"techniqueId":"baked","sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Approved garlic standard: 97% kernels, 1% garlic, 1% salt, 1% oil; components total 100 g finished snack"}],"commonness":3},
-    {"id":"food:snack:peanut:brined","kind":"food","names":{"zh":["炒花生（盐水）"],"en":["Brined roasted peanuts"]},"categoryTags":["food.nut","food.nut.peanut"],"flavorTags":["brined"],"components":[{"foodId":"food:taxon:arachis_hypogaea:raw","quantity":{"value":98.5,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:salt","quantity":{"value":1.5,"unitCategory":"weight","unitId":"g"}}],"techniqueId":"baked","sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Approved brined standard: 98.5% kernels, 1.5% salt; components total 100 g finished snack"}],"commonness":3},
-    {"id":"food:snack:sunflower_seed:plain","kind":"food","names":{"zh":["炒葵花籽（原味）"],"en":["Plain roasted sunflower seeds"]},"categoryTags":["food.nut","food.nut.seed"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:helianthus_annuus:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible sunflower seed kernels; nutrient calculation uses baked derivation"}],"commonness":4},
-    {"id":"food:snack:sunflower_seed:caramel","kind":"food","names":{"zh":["炒葵花籽（焦糖）"],"en":["Caramel sunflower seeds"]},"categoryTags":["food.nut","food.nut.seed"],"flavorTags":["caramel"],"components":[{"foodId":"food:taxon:helianthus_annuus:kernels:raw","quantity":{"value":88,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:sugar","quantity":{"value":10,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:plant_oil:generic","quantity":{"value":2,"unitCategory":"weight","unitId":"g"}}],"techniqueId":"baked","sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Approved caramel standard: 88% kernels, 10% sugar, 2% oil; components total 100 g finished snack"}],"commonness":3},
-    {"id":"food:snack:sunflower_seed:five_spice","kind":"food","names":{"zh":["炒葵花籽（五香）"],"en":["Five-spice sunflower seeds"]},"categoryTags":["food.nut","food.nut.seed"],"flavorTags":["five_spice"],"components":[{"foodId":"food:taxon:helianthus_annuus:kernels:raw","quantity":{"value":98,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:salt","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:black_pepper","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}}],"techniqueId":"baked","sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Approved five-spice standard: 98% kernels, 1% salt, 1% dry spice; components total 100 g finished snack"}],"commonness":3},
-    {"id":"food:snack:sunflower_seed:hickory","kind":"food","names":{"zh":["炒葵花籽（山核桃味）"],"en":["Hickory-flavored sunflower seeds"]},"categoryTags":["food.nut","food.nut.seed"],"flavorTags":["hickory"],"components":[{"foodId":"food:taxon:helianthus_annuus:kernels:raw","quantity":{"value":96,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:sugar","quantity":{"value":2,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:salt","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:black_pepper","quantity":{"value":1,"unitCategory":"weight","unitId":"g"}}],"techniqueId":"baked","sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Approved hickory-flavor standard: 96% kernels, 2% sugar, 1% salt, 1% dry spice; components total 100 g finished snack"}],"commonness":3},
-    {"id":"food:snack:watermelon_seed:plain","kind":"food","names":{"zh":["炒西瓜子（原味）","西瓜子"],"en":["Plain roasted watermelon seeds"]},"categoryTags":["food.nut","food.nut.seed"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:citrullus_lanatus:seeds:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible watermelon seed kernels; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:pumpkin_seed:plain","kind":"food","names":{"zh":["炒南瓜子（原味）","南瓜子"],"en":["Plain roasted pumpkin seeds"]},"categoryTags":["food.nut","food.nut.seed"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:cucurbita_pepo:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible pumpkin seed kernels; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:snake_gourd_seed:plain","kind":"food","names":{"zh":["炒吊瓜子（原味）","吊瓜子"],"en":["Plain roasted Chinese snake gourd seeds"]},"categoryTags":["food.nut","food.nut.seed"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:trichosanthes_kirilowii:seeds:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible Chinese snake gourd seed kernels; nutrient calculation uses baked derivation"}],"commonness":2},
-    {"id":"food:snack:winter_melon_seed:plain","kind":"food","names":{"zh":["炒冬瓜子（原味）","冬瓜子"],"en":["Plain roasted winter melon seeds"]},"categoryTags":["food.nut","food.nut.seed"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:benincasa_hispida:seeds:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible winter melon seed kernels; nutrient calculation uses baked derivation"}],"commonness":2},
-    {"id":"food:snack:cashew:plain","kind":"food","names":{"zh":["炒腰果（原味）","腰果"],"en":["Plain roasted cashews"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:anacardium_occidentale:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible cashew kernels; nutrient calculation uses baked derivation"}],"commonness":4},
-    {"id":"food:snack:almond:plain","kind":"food","names":{"zh":["炒杏仁（原味）","炒巴旦木"],"en":["Plain roasted almonds"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:prunus_dulcis:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible almond kernels; nutrient calculation uses baked derivation"}],"commonness":4},
-    {"id":"food:snack:pistachio:plain","kind":"food","names":{"zh":["炒开心果（原味）","开心果"],"en":["Plain roasted pistachios"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:pistacia_vera:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible pistachio kernels; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:walnut:plain","kind":"food","names":{"zh":["炒核桃（原味）","核桃"],"en":["Plain roasted walnuts"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:juglans_regia:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible walnut kernels; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:pecan:plain","kind":"food","names":{"zh":["炒碧根果（原味）","碧根果"],"en":["Plain roasted pecans"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:carya_illinoinensis:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible pecan kernels; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:macadamia:plain","kind":"food","names":{"zh":["炒夏威夷果（原味）","夏威夷果"],"en":["Plain roasted macadamias"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:macadamia_integrifolia:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible macadamia kernels; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:pine_nut:plain","kind":"food","names":{"zh":["炒松子（原味）","松子"],"en":["Plain roasted pine nuts"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:pinus_koraiensis:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible pine nut kernels; nutrient calculation uses baked derivation"}],"commonness":2},
-    {"id":"food:snack:hazelnut:plain","kind":"food","names":{"zh":["炒榛子（原味）","榛子"],"en":["Plain roasted hazelnuts"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:corylus_avellana:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible hazelnut kernels; nutrient calculation uses baked derivation"}],"commonness":2},
-    {"id":"food:snack:chinese_hickory:plain","kind":"food","names":{"zh":["炒山核桃（原味）","山核桃"],"en":["Plain roasted Chinese hickory nuts"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:carya_cathayensis:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible Chinese hickory kernels; nutrient calculation uses baked derivation"}],"commonness":2},
-    {"id":"food:snack:chestnut:plain","kind":"food","names":{"zh":["炒板栗（原味）","原味板栗"],"en":["Plain roasted chestnuts"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:castanea_mollissima:kernels:raw","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible chestnut kernels; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:chestnut:sugar_roasted","kind":"food","names":{"zh":["糖炒板栗"],"en":["Sugar-roasted chestnuts"]},"categoryTags":["food.nut","food.nut.tree_nut"],"flavorTags":["sugar_roasted"],"components":[{"foodId":"food:taxon:castanea_mollissima:kernels:raw","quantity":{"value":88,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:seasoning:sugar","quantity":{"value":10,"unitCategory":"weight","unitId":"g"}},{"foodId":"food:plant_oil:generic","quantity":{"value":2,"unitCategory":"weight","unitId":"g"}}],"techniqueId":"baked","sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Approved sugar-roasted standard: 88% chestnut kernels, 10% sugar, 2% oil; components total 100 g finished snack"}],"commonness":3},
-    {"id":"food:snack:fava_bean:plain","kind":"food","names":{"zh":["兰花豆（原味）","炒蚕豆"],"en":["Plain roasted fava beans"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:vicia_faba:dry","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried fava beans; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:black_soybean:plain","kind":"food","names":{"zh":["炒黑豆（原味）"],"en":["Plain roasted black soybeans"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:glycine_max:black:dry","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried black soybeans; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:soybean:plain","kind":"food","names":{"zh":["炒黄豆（原味）"],"en":["Plain roasted soybeans"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:glycine_max:soybean:dried","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried soybeans; nutrient calculation uses baked derivation"}],"commonness":3},
-    {"id":"food:snack:green_pea:plain","kind":"food","names":{"zh":["炒青豆（原味）"],"en":["Plain roasted green peas"]},"categoryTags":["food.nut","food.nut.legume_snack"],"flavorTags":["plain"],"derivedFrom":{"ingredientId":"food:taxon:pisum_sativum:dry","cookingMethodId":"baked"},"sources":[{"dataset":"HealthDietPro standard snack formulation","reference":"Plain roasted snack: 100% edible dried green peas; nutrient calculation uses baked derivation"}],"commonness":3},
+    {
+      "id": "food:taxon:helianthus_annuus:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "葵花籽仁"
+        ],
+        "en": [
+          "Sunflower seed kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 584,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 20.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 51.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 20,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 8.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Sunflower seed kernels, raw; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:cucurbita_pepo:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "南瓜子仁"
+        ],
+        "en": [
+          "Pumpkin seed kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 559,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 30.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 49.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 10.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Pumpkin seed kernels, raw; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:citrullus_lanatus:seeds:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "西瓜子仁"
+        ],
+        "en": [
+          "Watermelon seed kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 557,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 28.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 47.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 15.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Watermelon seed kernels, edible portion, per 100 g"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:trichosanthes_kirilowii:seeds:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "吊瓜子仁"
+        ],
+        "en": [
+          "Chinese snake gourd seed kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 555,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 27,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 46,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 18,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Chinese snake gourd seed kernels, edible portion, per 100 g"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:benincasa_hispida:seeds:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "冬瓜子仁"
+        ],
+        "en": [
+          "Winter melon seed kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 541,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 26,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 45,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 19,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Winter melon seed kernels, edible portion, per 100 g"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:juglans_regia:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "核桃仁"
+        ],
+        "en": [
+          "Walnut kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 654,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 15.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 65.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 13.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 6.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Walnuts, raw kernels; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:prunus_dulcis:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "杏仁",
+          "巴旦木"
+        ],
+        "en": [
+          "Almond kernels",
+          "Almonds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 579,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 21.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 49.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 21.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 12.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Almonds, raw kernels; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:anacardium_occidentale:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "腰果"
+        ],
+        "en": [
+          "Cashews"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 553,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 18.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 43.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 30.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 3.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Cashews, raw kernels; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:taxon:pistacia_vera:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "开心果仁"
+        ],
+        "en": [
+          "Pistachio kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 560,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 20.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 45.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 27.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 10.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Pistachio kernels, raw; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:carya_illinoinensis:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "碧根果仁"
+        ],
+        "en": [
+          "Pecan kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 691,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 9.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 72,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 13.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 9.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Pecans, raw kernels; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:macadamia_integrifolia:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "夏威夷果仁"
+        ],
+        "en": [
+          "Macadamia kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 718,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 7.9,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 75.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 13.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 8.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Macadamia nuts, raw kernels; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:pinus_koraiensis:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "松子仁"
+        ],
+        "en": [
+          "Pine nut kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 673,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 13.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 68.4,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 13.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 3.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Pine nuts, raw kernels; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:corylus_avellana:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "榛子仁"
+        ],
+        "en": [
+          "Hazelnut kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 628,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 15,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 60.8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 16.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 9.7,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Hazelnuts, raw kernels; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:castanea_mollissima:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "板栗仁"
+        ],
+        "en": [
+          "Chinese chestnut kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 196,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 1.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 44.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 5.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Chestnuts, raw kernels; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:vicia_faba:dry",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "蚕豆"
+        ],
+        "en": [
+          "Dried fava beans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 341,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 26.1,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.5,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 58.3,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 25,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Fava beans, mature seeds, dry; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:glycine_max:black:dry",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "黑豆"
+        ],
+        "en": [
+          "Black soybeans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 341,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 33,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 16,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 31,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 15,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Black soybeans, dry edible portion, per 100 g"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:pisum_sativum:dry",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "青豆"
+        ],
+        "en": [
+          "Dried green peas"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 341,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 24.6,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 1.2,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 60,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 25,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "USDA FoodData Central",
+          "reference": "Peas, split, mature seeds, dry; edible portion, per 100 g; accessed 2026"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:carya_cathayensis:kernels:raw",
+      "kind": "ingredient",
+      "names": {
+        "zh": [
+          "山核桃仁"
+        ],
+        "en": [
+          "Chinese hickory kernels"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "nutritionTables": {
+        "standard.100g_edible": {
+          "basis": {
+            "value": 100,
+            "unitCategory": "weight",
+            "unitId": "g"
+          },
+          "nutrients": {
+            "ENERGY": {
+              "value": 670,
+              "unitCategory": "energy",
+              "unitId": "kcal"
+            },
+            "PROTEIN": {
+              "value": 12,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FAT": {
+              "value": 67,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "CHO": {
+              "value": 15,
+              "unitCategory": "weight",
+              "unitId": "g"
+            },
+            "FIBER": {
+              "value": 8,
+              "unitCategory": "weight",
+              "unitId": "g"
+            }
+          }
+        }
+      },
+      "edibleRatio": 1,
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "Chinese hickory kernels, edible portion, per 100 g"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:peanut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒花生（原味）",
+          "烤花生"
+        ],
+        "en": [
+          "Plain roasted peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:arachis_hypogaea:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible peanut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:snack:peanut:five_spice",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒花生（五香）"
+        ],
+        "en": [
+          "Five-spice roasted peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "five_spice"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:arachis_hypogaea:raw",
+          "quantity": {
+            "value": 98,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:black_pepper",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved five-spice standard: 98% kernels, 1% salt, 1% dry spice; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:peanut:garlic",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒花生（蒜香）"
+        ],
+        "en": [
+          "Garlic roasted peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "garlic"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:arachis_hypogaea:raw",
+          "quantity": {
+            "value": 97,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:allium_sativum:raw",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:plant_oil:generic",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved garlic standard: 97% kernels, 1% garlic, 1% salt, 1% oil; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:peanut:brined",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒花生（盐水）"
+        ],
+        "en": [
+          "Brined roasted peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "brined"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:arachis_hypogaea:raw",
+          "quantity": {
+            "value": 98.5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1.5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved brined standard: 98.5% kernels, 1.5% salt; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:sunflower_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒葵花籽（原味）"
+        ],
+        "en": [
+          "Plain roasted sunflower seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:helianthus_annuus:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible sunflower seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:snack:sunflower_seed:caramel",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒葵花籽（焦糖）"
+        ],
+        "en": [
+          "Caramel sunflower seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "caramel"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:helianthus_annuus:kernels:raw",
+          "quantity": {
+            "value": 88,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:sugar",
+          "quantity": {
+            "value": 10,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:plant_oil:generic",
+          "quantity": {
+            "value": 2,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved caramel standard: 88% kernels, 10% sugar, 2% oil; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:sunflower_seed:five_spice",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒葵花籽（五香）"
+        ],
+        "en": [
+          "Five-spice sunflower seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "five_spice"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:helianthus_annuus:kernels:raw",
+          "quantity": {
+            "value": 98,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:black_pepper",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved five-spice standard: 98% kernels, 1% salt, 1% dry spice; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:sunflower_seed:hickory",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒葵花籽（山核桃味）"
+        ],
+        "en": [
+          "Hickory-flavored sunflower seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "hickory"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:helianthus_annuus:kernels:raw",
+          "quantity": {
+            "value": 96,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:sugar",
+          "quantity": {
+            "value": 2,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:black_pepper",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved hickory-flavor standard: 96% kernels, 2% sugar, 1% salt, 1% dry spice; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:watermelon_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒西瓜子（原味）",
+          "西瓜子"
+        ],
+        "en": [
+          "Plain roasted watermelon seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:citrullus_lanatus:seeds:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible watermelon seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:pumpkin_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒南瓜子（原味）",
+          "南瓜子"
+        ],
+        "en": [
+          "Plain roasted pumpkin seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:cucurbita_pepo:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible pumpkin seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:snake_gourd_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒吊瓜子（原味）",
+          "吊瓜子"
+        ],
+        "en": [
+          "Plain roasted Chinese snake gourd seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:trichosanthes_kirilowii:seeds:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible Chinese snake gourd seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:winter_melon_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒冬瓜子（原味）",
+          "冬瓜子"
+        ],
+        "en": [
+          "Plain roasted winter melon seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:benincasa_hispida:seeds:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible winter melon seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:cashew:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒腰果（原味）",
+          "腰果"
+        ],
+        "en": [
+          "Plain roasted cashews"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:anacardium_occidentale:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible cashew kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:snack:almond:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒杏仁（原味）",
+          "炒巴旦木"
+        ],
+        "en": [
+          "Plain roasted almonds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:prunus_dulcis:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible almond kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:snack:pistachio:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒开心果（原味）",
+          "开心果"
+        ],
+        "en": [
+          "Plain roasted pistachios"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:pistacia_vera:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible pistachio kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:walnut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒核桃（原味）",
+          "核桃"
+        ],
+        "en": [
+          "Plain roasted walnuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:juglans_regia:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible walnut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:pecan:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒碧根果（原味）",
+          "碧根果"
+        ],
+        "en": [
+          "Plain roasted pecans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:carya_illinoinensis:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible pecan kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:macadamia:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒夏威夷果（原味）",
+          "夏威夷果"
+        ],
+        "en": [
+          "Plain roasted macadamias"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:macadamia_integrifolia:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible macadamia kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:pine_nut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒松子（原味）",
+          "松子"
+        ],
+        "en": [
+          "Plain roasted pine nuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:pinus_koraiensis:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible pine nut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:hazelnut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒榛子（原味）",
+          "榛子"
+        ],
+        "en": [
+          "Plain roasted hazelnuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:corylus_avellana:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible hazelnut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:chinese_hickory:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒山核桃（原味）",
+          "山核桃"
+        ],
+        "en": [
+          "Plain roasted Chinese hickory nuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:carya_cathayensis:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible Chinese hickory kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:chestnut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒板栗（原味）",
+          "原味板栗"
+        ],
+        "en": [
+          "Plain roasted chestnuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:castanea_mollissima:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible chestnut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:chestnut:sugar_roasted",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "糖炒板栗"
+        ],
+        "en": [
+          "Sugar-roasted chestnuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "sugar_roasted"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:castanea_mollissima:kernels:raw",
+          "quantity": {
+            "value": 88,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:sugar",
+          "quantity": {
+            "value": 10,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:plant_oil:generic",
+          "quantity": {
+            "value": 2,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved sugar-roasted standard: 88% chestnut kernels, 10% sugar, 2% oil; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:fava_bean:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "兰花豆（原味）",
+          "炒蚕豆"
+        ],
+        "en": [
+          "Plain roasted fava beans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:vicia_faba:dry",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible dried fava beans; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:black_soybean:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒黑豆（原味）"
+        ],
+        "en": [
+          "Plain roasted black soybeans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:glycine_max:black:dry",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible dried black soybeans; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:soybean:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒黄豆（原味）"
+        ],
+        "en": [
+          "Plain roasted soybeans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:glycine_max:soybean:dried",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible dried soybeans; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:green_pea:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒青豆（原味）"
+        ],
+        "en": [
+          "Plain roasted green peas"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:pisum_sativum:dry",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible dried green peas; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
     {
       "id": "food:taxon:benincasa_hispida:raw",
       "kind": "ingredient",
-      "botanicalTaxonomy": { "family": "Cucurbitaceae", "genus": "Benincasa", "species": "Benincasa hispida" },
+      "botanicalTaxonomy": {
+        "family": "Cucurbitaceae",
+        "genus": "Benincasa",
+        "species": "Benincasa hispida"
+      },
       "names": {
         "zh": [
           "冬瓜"
@@ -7923,7 +10547,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "edibleRatio": 0.8,
@@ -8227,7 +10850,6 @@
         ]
       },
       "categoryTags": [
-        "food.oil",
         "food.oil.plant"
       ],
       "edibleRatio": 1,
@@ -8288,7 +10910,6 @@
         ]
       },
       "categoryTags": [
-        "food.oil",
         "food.oil.plant"
       ],
       "edibleRatio": 1,
@@ -8347,7 +10968,6 @@
         ]
       },
       "categoryTags": [
-        "food.oil",
         "food.oil.plant"
       ],
       "edibleRatio": 1,
@@ -8411,7 +11031,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -8486,7 +11105,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -8561,7 +11179,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -8636,7 +11253,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -8709,7 +11325,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -8782,7 +11397,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -8857,7 +11471,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -8929,7 +11542,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -9003,7 +11615,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -9076,7 +11687,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -9148,7 +11758,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -9222,7 +11831,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.leafy"
       ],
       "systemTags": [
@@ -9295,7 +11903,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "systemTags": [
@@ -9367,7 +11974,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "systemTags": [
@@ -9440,7 +12046,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "systemTags": [
@@ -9514,7 +12119,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.root"
       ],
       "systemTags": [
@@ -9589,7 +12193,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "systemTags": [
@@ -9663,7 +12266,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "systemTags": [
@@ -9737,7 +12339,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "systemTags": [
@@ -9811,7 +12412,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "systemTags": [
@@ -9885,7 +12485,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "systemTags": [
@@ -9960,7 +12559,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "systemTags": [
@@ -10033,7 +12631,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "systemTags": [
@@ -10107,7 +12704,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.gourd_solanaceous"
       ],
       "systemTags": [
@@ -10181,7 +12777,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fresh_legume"
       ],
       "systemTags": [
@@ -10255,7 +12850,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fresh_legume"
       ],
       "systemTags": [
@@ -10329,7 +12923,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fresh_legume"
       ],
       "systemTags": [
@@ -10402,7 +12995,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fresh_legume"
       ],
       "systemTags": [
@@ -10475,7 +13067,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fresh_legume"
       ],
       "systemTags": [
@@ -10549,7 +13140,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.flower"
       ],
       "systemTags": [
@@ -10622,7 +13212,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.flower"
       ],
       "systemTags": [
@@ -10697,7 +13286,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.flower"
       ],
       "systemTags": [
@@ -10770,7 +13358,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -10843,7 +13430,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -10917,7 +13503,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -10990,7 +13575,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -11063,7 +13647,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -11137,7 +13720,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -11209,7 +13791,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -11281,7 +13862,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -11354,7 +13934,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.fungi_algae"
       ],
       "systemTags": [
@@ -11427,7 +14006,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.aquatic"
       ],
       "systemTags": [
@@ -11500,7 +14078,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.aquatic"
       ],
       "systemTags": [
@@ -11573,7 +14150,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.aquatic"
       ],
       "systemTags": [
@@ -11645,7 +14221,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.aquatic"
       ],
       "systemTags": [
@@ -11719,7 +14294,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.aquatic"
       ],
       "systemTags": [
@@ -11791,7 +14365,6 @@
         ]
       },
       "categoryTags": [
-        "food.vegetable",
         "food.vegetable.aquatic"
       ],
       "systemTags": [
@@ -11864,7 +14437,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.grain",
         "food.staple.whole_grain"
       ],
@@ -11933,7 +14505,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "systemTags": [
@@ -11992,7 +14563,6 @@
         ]
       },
       "categoryTags": [
-        "food.staple",
         "food.staple.processed"
       ],
       "systemTags": [

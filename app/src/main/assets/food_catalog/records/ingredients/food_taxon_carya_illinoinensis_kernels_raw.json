@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:carya_illinoinensis:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "碧根果仁"
+    ],
+    "en": [
+      "Pecan kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 691,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 9.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 72,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 13.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 9.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Pecans, raw kernels; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 3
+}

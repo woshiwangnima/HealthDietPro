@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:castanea_mollissima:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "板栗仁"
+    ],
+    "en": [
+      "Chinese chestnut kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 196,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 44.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 5.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Chestnuts, raw kernels; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 3
+}

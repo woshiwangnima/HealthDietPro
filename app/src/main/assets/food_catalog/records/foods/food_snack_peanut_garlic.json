@@ -1,0 +1,60 @@
+{
+  "id": "food:snack:peanut:garlic",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒花生（蒜香）"
+    ],
+    "en": [
+      "Garlic roasted peanuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.peanut"
+  ],
+  "flavorTags": [
+    "garlic"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:arachis_hypogaea:raw",
+      "quantity": {
+        "value": 97,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:taxon:allium_sativum:raw",
+      "quantity": {
+        "value": 1,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:salt",
+      "quantity": {
+        "value": 1,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:plant_oil:generic",
+      "quantity": {
+        "value": 1,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "baked",
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Approved garlic standard: 97% kernels, 1% garlic, 1% salt, 1% oil; components total 100 g finished snack"
+    }
+  ],
+  "commonness": 3
+}

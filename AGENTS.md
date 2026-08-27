@@ -43,6 +43,14 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - `ProfilePrefs.save()` 是唯写入入口；新用户铸造 id 后自动 `setCurrentUserId`。
 - 删除用户必须级联清理：头像、`user_prefs_<uid>`、所有 `_<uid>` 后缀键。
 - 静态数据模块只读；所有写操作走存档模块。
+- 内置营养资产维护源位于 `tools/food_catalog/source/ingredients.json`、`foods.json`、`dishes.json`；Android 只读 `app/src/main/assets/food_catalog/` 的生成分片和索引，不直接将维护源作为运行时入口。
+- 营养资产修改后必须依次执行 `uv run python tools/food_catalog/catalog_tool.py validate`、`compile` 和 `verify-roundtrip`；生成的 JSON 使用 UTF-8、两空格缩进，文件名中的 `:` 必须替换为 `_`。
+- `categoryTags` 只保存最深层叶子标签；如果存在 `food.oil.animal_fat`，不得同时保存 `food.oil`。祖先筛选必须通过点号层级匹配实现。
+- `nutrients_meta.json` 是全部内置和用户自定义食品的唯一营养素 key 注册表；营养值必须保留 `unitCategory` 与 `unitId`，不得因字段重复而删除，缺失营养素表示未知而不是零。
+- 图片源位于 `tools/food_catalog/images/source/`，映射写入同目录 `mapping.json`；原始图片必须保留，构建脚本只生成 `food_catalog/images/thumb` 和 `detail` 的 WebP 派生图，不得修改或删除源图。
+- 食品图片原始文件属于开发者本地素材，可不提交版本库；`mapping.json`、图片处理脚本和生成后的 Android 图片资产需保留，便于在拥有原始素材时复现构建结果。
+- 图片构建使用 `uv run python tools/food_catalog/catalog_tool.py build-images`；列表缩略图最大边 160px、详情图最大边 640px。应用缓存清理只能清理可再生图片缓存，禁止删除用户原始图片或用户存档附件。
+- 图片映射工具使用 `uv run python tools/food_catalog/image_mapper.py`；已映射食品必须从候选列表移除，分类筛选使用一级/二级层级语义，`mapping.json` 只保存源文件名到食品稳定 ID 的映射。
 - 每用户隔离状态经 `ProfilePrefs.makeChartStateKey(baseKey)` 构造 `_<userId>` 后缀。
 - 空 `chartStateKey` 不持久化（一次性图表）。
 - 疾病与健康状况静态目录仅由 `DiseaseRepository` 读取；`diseases.json` 的 `categories`、`departments`、`sources` 为全局注册表，条目只能引用稳定 ID，不得内联重复的科室或分类对象。

@@ -1,0 +1,86 @@
+{
+  "id": "food:taxon:zea_mays:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "玉米粒",
+      "包装玉米粒",
+      "剥粒玉米"
+    ],
+    "en": [
+      "Sweet corn kernels",
+      "Packaged corn kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 112,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 22.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 2.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 52,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Sweet corn kernels, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "已剥粒的冷藏、冷冻或保鲜膜包装玉米粒。包装净含量通常就是可食重量，不再扣除玉米芯或苞叶。",
+    "en": "Pre-shelled chilled, frozen, or packaged corn kernels. Package net weight is normally edible mass; do not deduct cob or husk."
+  },
+  "commonness": 3,
+  "servings": [
+    {
+      "id": "net_100g",
+      "nutritionTableKey": "standard.100g_edible",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "净含量 100 克",
+        "en": "100 g net weight"
+      }
+    }
+  ]
+}

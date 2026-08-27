@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:triticum_aestivum:noodles:dry",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "干小麦面条"
+    ],
+    "en": [
+      "Dried wheat noodles"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 347,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 10,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 72,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 55,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Dried wheat noodles; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "干小麦面条为配方计算使用的基础食材。",
+    "en": "Dried wheat noodles is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

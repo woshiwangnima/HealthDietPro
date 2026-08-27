@@ -1,0 +1,60 @@
+{
+  "id": "food:taxon:hypophthalmichthys_nobilis:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "胖头鱼",
+      "鳙鱼",
+      "花鲢"
+    ],
+    "en": [
+      "Bighead carp"
+    ]
+  },
+  "categoryTags": [
+    "food.aquatic.fish"
+  ],
+  "edibleRatio": 0.61,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "bighead carp, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 100,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 15.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 2.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 4.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "胖头鱼（鳙鱼）是淡水养殖鱼类，头大肉多，适合剁椒鱼头等做法；可食部约占购买量的 61%。",
+    "en": "Bighead carp is a freshwater farmed fish with a large head and plenty of meat; edible portion is about 61% of purchased weight."
+  },
+  "commonness": 4
+}

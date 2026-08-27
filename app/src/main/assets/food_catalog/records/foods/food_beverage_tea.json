@@ -1,0 +1,76 @@
+{
+  "id": "food:beverage:tea",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "茶水"
+    ],
+    "en": [
+      "Tea"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.tea"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:camellia_sinensis:leaves:dried",
+      "quantity": {
+        "value": 1,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 99,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "hydrationMlPer100g": 99,
+  "densityGramsPerMl": 1,
+  "servings": [
+    {
+      "id": "per_100ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "100 毫升",
+        "en": "100 ml"
+      }
+    },
+    {
+      "id": "cup_250ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 2.5,
+      "labels": {
+        "zh": "1 杯（250 毫升）",
+        "en": "1 cup (250 ml)"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition and hydration resolved from listed components"
+    }
+  ],
+  "description": {
+    "zh": "茶水的营养与饮水量按配方组分计算。",
+    "en": "Nutrition and hydration for Tea are resolved from the listed components."
+  },
+  "commonness": 4,
+  "recipeSteps": [
+    {
+      "text": "茶叶加热水冲泡。"
+    },
+    {
+      "text": "按个人浓淡浸泡后饮用。"
+    }
+  ],
+  "techniqueId": "stewed",
+  "servesPeople": 1
+}

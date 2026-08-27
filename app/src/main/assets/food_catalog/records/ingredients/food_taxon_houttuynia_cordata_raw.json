@@ -1,0 +1,78 @@
+{
+  "id": "food:taxon:houttuynia_cordata:raw",
+  "botanicalTaxonomy": {
+    "family": "Saururaceae",
+    "genus": "Houttuynia",
+    "species": "Houttuynia cordata"
+  },
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "折耳根"
+    ],
+    "en": [
+      "Houttuynia"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable",
+    "food.seasoning.fresh_aromatic"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 39,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 8.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Houttuynia; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "折耳根为配方计算使用的基础食材。",
+    "en": "Houttuynia is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

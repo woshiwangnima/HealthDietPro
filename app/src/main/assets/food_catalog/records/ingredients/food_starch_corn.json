@@ -1,0 +1,79 @@
+{
+  "id": "food:starch:corn",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "玉米淀粉",
+      "生粉"
+    ],
+    "en": [
+      "Cornstarch",
+      "Corn flour starch"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "botanicalTaxonomy": {
+    "family": "Poaceae",
+    "genus": "Zea",
+    "species": "Zea mays"
+  },
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 381,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 91.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 70,
+      "unit": "GI",
+      "note": "Reference for isolated dry starch; preparation changes glucose response."
+    },
+    "glycemicLoadPer100g": {
+      "value": 63.9,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Cornstarch, dry; values normalized per 100 g"
+    }
+  ],
+  "description": {
+    "zh": "玉米淀粉是从玉米胚乳分离出的淀粉，主要用于增稠、上浆和烘焙；与玉米粉或玉米粒不是同一食材。",
+    "en": "Cornstarch is starch isolated from the maize endosperm. It is used for thickening, coating and baking and is distinct from whole corn flour or kernels."
+  },
+  "commonness": 4
+}

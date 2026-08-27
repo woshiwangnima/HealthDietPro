@@ -1,0 +1,68 @@
+{
+  "id": "food:taxon:nelumbo_nucifera:starch_drink",
+  "names": {
+    "zh": [
+      "藕粉"
+    ],
+    "en": [
+      "Lotus root starch drink"
+    ]
+  },
+  "commonness": 2,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 85,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 12.8,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "藕粉, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Lotus root starch drink, preparation-matched reference"
+    }
+  ],
+  "description": {
+    "zh": "藕粉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Lotus root starch drink are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "food",
+  "components": [
+    {
+      "foodId": "food:taxon:nelumbo_nucifera:starch",
+      "quantity": {
+        "value": 18,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 82,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "stewed",
+  "servesPeople": 1,
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "recipeSteps": [
+    {
+      "text": "莲藕淀粉用少量凉水调匀。"
+    },
+    {
+      "text": "冲入热水搅拌至透明。"
+    }
+  ]
+}

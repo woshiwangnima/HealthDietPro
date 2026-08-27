@@ -1,0 +1,58 @@
+{
+  "id": "food:taxon:fagopyrum_esculentum:steamed_cake",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "荞篙发粑",
+      "荞麦粑"
+    ],
+    "en": [
+      "Steamed buckwheat cake"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:fagopyrum_esculentum:flour",
+      "quantity": {
+        "value": 50.0,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 50.0,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "steamed",
+  "servesPeople": 1,
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "Buckwheat flour + water, fermented and steamed"
+    }
+  ],
+  "description": {
+    "zh": "荞篙发粑以荞麦粉发酵蒸制，口感松软带荞麦清香，为南方常见杂粮主食。",
+    "en": "A fermented steamed buckwheat cake with a soft, fragrant texture, a common whole-grain staple in southern China."
+  },
+  "recipeSteps": [
+    {
+      "text": "荞麦粉加水调成糊状，静置发酵。"
+    },
+    {
+      "text": "倒入蒸笼大火蒸熟，脱模即食。"
+    }
+  ],
+  "commonness": 2
+}

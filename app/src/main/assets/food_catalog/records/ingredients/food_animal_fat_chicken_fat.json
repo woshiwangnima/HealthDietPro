@@ -1,0 +1,62 @@
+{
+  "id": "food:animal_fat:chicken_fat",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "鸡油"
+    ],
+    "en": [
+      "Chicken fat"
+    ]
+  },
+  "categoryTags": [
+    "food.oil.animal_fat"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 900,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 100,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Chicken fat; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "鸡油为配方计算使用的基础食材。",
+    "en": "Chicken fat is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

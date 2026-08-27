@@ -1,0 +1,91 @@
+{
+  "id": "food:taxon:glycine_max:soy_milk",
+  "names": {
+    "zh": [
+      "豆浆"
+    ],
+    "en": [
+      "Soy milk"
+    ]
+  },
+  "commonness": 5,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 34,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 0.6,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "豆浆, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Soy milk, preparation-matched reference"
+    }
+  ],
+  "description": {
+    "zh": "豆浆的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Soy milk are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "food",
+  "components": [
+    {
+      "foodId": "food:taxon:glycine_max:soybean:dried",
+      "quantity": {
+        "value": 8,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 92,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "stewed",
+  "servesPeople": 1,
+  "categoryTags": [
+    "food.soy",
+    "food.beverage.soy"
+  ],
+  "recipeSteps": [
+    {
+      "text": "黄豆浸泡后加水研磨。"
+    },
+    {
+      "text": "过滤并煮沸至熟。"
+    }
+  ],
+  "hydrationMlPer100g": 92,
+  "densityGramsPerMl": 1.01,
+  "servings": [
+    {
+      "id": "per_100ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "100 毫升",
+        "en": "100 ml"
+      }
+    },
+    {
+      "id": "cup_250ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 2.5,
+      "labels": {
+        "zh": "1 杯（250 毫升）",
+        "en": "1 cup (250 ml)"
+      }
+    }
+  ]
+}

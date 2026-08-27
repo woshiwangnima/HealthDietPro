@@ -1,0 +1,65 @@
+{
+  "id": "food:water:drinking",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "饮用水",
+      "水"
+    ],
+    "en": [
+      "Drinking water",
+      "Water"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.water"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "densityGramsPerMl": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "water, per 100 g"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 0,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "饮用水用于按实际配方计入菜肴总质量，不提供能量或三大营养素。",
+    "en": "Drinking water is included for recipe mass and provides no energy or macronutrients."
+  },
+  "commonness": 5,
+  "hydrationMlPer100g": 100
+}

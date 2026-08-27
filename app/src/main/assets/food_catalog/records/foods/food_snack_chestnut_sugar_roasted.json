@@ -1,0 +1,52 @@
+{
+  "id": "food:snack:chestnut:sugar_roasted",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "糖炒板栗"
+    ],
+    "en": [
+      "Sugar-roasted chestnuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "sugar_roasted"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:castanea_mollissima:kernels:raw",
+      "quantity": {
+        "value": 88,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:sugar",
+      "quantity": {
+        "value": 10,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:plant_oil:generic",
+      "quantity": {
+        "value": 2,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "baked",
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Approved sugar-roasted standard: 88% chestnut kernels, 10% sugar, 2% oil; components total 100 g finished snack"
+    }
+  ],
+  "commonness": 3
+}

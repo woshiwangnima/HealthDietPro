@@ -1,0 +1,3267 @@
+{
+  "food:taxon:glycine_max:tofu:soft": [
+    "food:taxon:glycine_max:tofu:soft"
+  ],
+  "food_taxon_glycine_max_tofu_soft": [
+    "food:taxon:glycine_max:tofu:soft"
+  ],
+  "嫩豆腐": [
+    "food:taxon:glycine_max:tofu:soft"
+  ],
+  "南豆腐": [
+    "food:taxon:glycine_max:tofu:soft"
+  ],
+  "石膏豆腐": [
+    "food:taxon:glycine_max:tofu:soft"
+  ],
+  "softtofu": [
+    "food:taxon:glycine_max:tofu:soft"
+  ],
+  "silkentofu": [
+    "food:taxon:glycine_max:tofu:soft"
+  ],
+  "food:taxon:glycine_max:tofu_skin": [
+    "food:taxon:glycine_max:tofu_skin"
+  ],
+  "food_taxon_glycine_max_tofu_skin": [
+    "food:taxon:glycine_max:tofu_skin"
+  ],
+  "豆皮": [
+    "food:taxon:glycine_max:tofu_skin"
+  ],
+  "豆腐皮": [
+    "food:taxon:glycine_max:tofu_skin"
+  ],
+  "千张": [
+    "food:taxon:glycine_max:tofu_skin"
+  ],
+  "tofuskin": [
+    "food:taxon:glycine_max:tofu_skin"
+  ],
+  "beancurdsheet": [
+    "food:taxon:glycine_max:tofu_skin"
+  ],
+  "food:taxon:glycine_max:yuba_dried": [
+    "food:taxon:glycine_max:yuba_dried"
+  ],
+  "food_taxon_glycine_max_yuba_dried": [
+    "food:taxon:glycine_max:yuba_dried"
+  ],
+  "腐竹": [
+    "food:taxon:glycine_max:yuba_dried"
+  ],
+  "豆腐竹": [
+    "food:taxon:glycine_max:yuba_dried"
+  ],
+  "driedyuba": [
+    "food:taxon:glycine_max:yuba_dried"
+  ],
+  "driedbeancurdsticks": [
+    "food:taxon:glycine_max:yuba_dried"
+  ],
+  "food:taxon:sus_scrofa:ribs_raw": [
+    "food:taxon:sus_scrofa:ribs_raw"
+  ],
+  "food_taxon_sus_scrofa_ribs_raw": [
+    "food:taxon:sus_scrofa:ribs_raw"
+  ],
+  "猪排骨": [
+    "food:taxon:sus_scrofa:ribs_raw"
+  ],
+  "肋排": [
+    "food:taxon:sus_scrofa:ribs_raw"
+  ],
+  "porkribs": [
+    "food:taxon:sus_scrofa:ribs_raw"
+  ],
+  "rawporkribs": [
+    "food:taxon:sus_scrofa:ribs_raw"
+  ],
+  "food:taxon:sus_scrofa:trotter_raw": [
+    "food:taxon:sus_scrofa:trotter_raw"
+  ],
+  "food_taxon_sus_scrofa_trotter_raw": [
+    "food:taxon:sus_scrofa:trotter_raw"
+  ],
+  "猪蹄": [
+    "food:taxon:sus_scrofa:trotter_raw"
+  ],
+  "猪脚": [
+    "food:taxon:sus_scrofa:trotter_raw"
+  ],
+  "porktrotter": [
+    "food:taxon:sus_scrofa:trotter_raw"
+  ],
+  "pig'sfeet": [
+    "food:taxon:sus_scrofa:trotter_raw"
+  ],
+  "food:taxon:oryza_sativa:polished:raw": [
+    "food:taxon:oryza_sativa:polished:raw"
+  ],
+  "food_taxon_oryza_sativa_polished_raw": [
+    "food:taxon:oryza_sativa:polished:raw"
+  ],
+  "大米": [
+    "food:taxon:oryza_sativa:polished:raw"
+  ],
+  "白米": [
+    "food:taxon:oryza_sativa:polished:raw"
+  ],
+  "粳米": [
+    "food:taxon:oryza_sativa:polished:raw"
+  ],
+  "whiterice,raw": [
+    "food:taxon:oryza_sativa:polished:raw"
+  ],
+  "polishedrice,uncooked": [
+    "food:taxon:oryza_sativa:polished:raw"
+  ],
+  "food:taxon:avena_sativa:rolled:dry": [
+    "food:taxon:avena_sativa:rolled:dry"
+  ],
+  "food_taxon_avena_sativa_rolled_dry": [
+    "food:taxon:avena_sativa:rolled:dry"
+  ],
+  "燕麦片": [
+    "food:taxon:avena_sativa:rolled:dry"
+  ],
+  "燕麦": [
+    "food:taxon:avena_sativa:rolled:dry"
+  ],
+  "压片燕麦": [
+    "food:taxon:avena_sativa:rolled:dry"
+  ],
+  "rolledoats": [
+    "food:taxon:avena_sativa:rolled:dry"
+  ],
+  "oats": [
+    "food:taxon:avena_sativa:rolled:dry"
+  ],
+  "food:taxon:cucumis_sativus:commercial:raw": [
+    "food:taxon:cucumis_sativus:commercial:raw"
+  ],
+  "food_taxon_cucumis_sativus_commercial_raw": [
+    "food:taxon:cucumis_sativus:commercial:raw"
+  ],
+  "黄瓜": [
+    "food:taxon:cucumis_sativus:commercial:raw"
+  ],
+  "商品黄瓜": [
+    "food:taxon:cucumis_sativus:commercial:raw"
+  ],
+  "设施黄瓜": [
+    "food:taxon:cucumis_sativus:commercial:raw"
+  ],
+  "cucumber": [
+    "food:taxon:cucumis_sativus:commercial:raw"
+  ],
+  "commercialcucumber": [
+    "food:taxon:cucumis_sativus:commercial:raw"
+  ],
+  "food:taxon:cucumis_sativus:landrace:raw": [
+    "food:taxon:cucumis_sativus:landrace:raw"
+  ],
+  "food_taxon_cucumis_sativus_landrace_raw": [
+    "food:taxon:cucumis_sativus:landrace:raw"
+  ],
+  "本地黄瓜": [
+    "food:taxon:cucumis_sativus:landrace:raw"
+  ],
+  "土黄瓜": [
+    "food:taxon:cucumis_sativus:landrace:raw"
+  ],
+  "露地黄瓜": [
+    "food:taxon:cucumis_sativus:landrace:raw"
+  ],
+  "landracecucumber": [
+    "food:taxon:cucumis_sativus:landrace:raw"
+  ],
+  "fieldcucumber": [
+    "food:taxon:cucumis_sativus:landrace:raw"
+  ],
+  "food:taxon:solanum_lycopersicum:raw": [
+    "food:taxon:solanum_lycopersicum:raw"
+  ],
+  "food_taxon_solanum_lycopersicum_raw": [
+    "food:taxon:solanum_lycopersicum:raw"
+  ],
+  "番茄": [
+    "food:taxon:solanum_lycopersicum:raw"
+  ],
+  "西红柿": [
+    "food:taxon:solanum_lycopersicum:raw"
+  ],
+  "洋柿子": [
+    "food:taxon:solanum_lycopersicum:raw"
+  ],
+  "tomato": [
+    "food:taxon:solanum_lycopersicum:raw"
+  ],
+  "redtomato": [
+    "food:taxon:solanum_lycopersicum:raw"
+  ],
+  "food:taxon:brassica_oleracea:broccoli:raw": [
+    "food:taxon:brassica_oleracea:broccoli:raw"
+  ],
+  "food_taxon_brassica_oleracea_broccoli_raw": [
+    "food:taxon:brassica_oleracea:broccoli:raw"
+  ],
+  "西兰花": [
+    "food:taxon:brassica_oleracea:broccoli:raw"
+  ],
+  "绿花椰菜": [
+    "food:taxon:brassica_oleracea:broccoli:raw"
+  ],
+  "青花菜": [
+    "food:taxon:brassica_oleracea:broccoli:raw"
+  ],
+  "broccoli": [
+    "food:taxon:brassica_oleracea:broccoli:raw"
+  ],
+  "greenbroccoli": [
+    "food:taxon:brassica_oleracea:broccoli:raw"
+  ],
+  "food:taxon:malus_domestica:raw": [
+    "food:taxon:malus_domestica:raw"
+  ],
+  "food_taxon_malus_domestica_raw": [
+    "food:taxon:malus_domestica:raw"
+  ],
+  "苹果": [
+    "food:taxon:malus_domestica:raw"
+  ],
+  "鲜苹果": [
+    "food:taxon:malus_domestica:raw"
+  ],
+  "红富士苹果": [
+    "food:taxon:malus_domestica:raw"
+  ],
+  "apple": [
+    "food:taxon:malus_domestica:raw"
+  ],
+  "rawapple": [
+    "food:taxon:malus_domestica:raw"
+  ],
+  "food:taxon:musa_acuminata:ripe:raw": [
+    "food:taxon:musa_acuminata:ripe:raw"
+  ],
+  "food_taxon_musa_acuminata_ripe_raw": [
+    "food:taxon:musa_acuminata:ripe:raw"
+  ],
+  "香蕉": [
+    "food:taxon:musa_acuminata:ripe:raw"
+  ],
+  "熟香蕉": [
+    "food:taxon:musa_acuminata:ripe:raw"
+  ],
+  "甘蕉": [
+    "food:taxon:musa_acuminata:ripe:raw"
+  ],
+  "banana": [
+    "food:taxon:musa_acuminata:ripe:raw"
+  ],
+  "ripebanana": [
+    "food:taxon:musa_acuminata:ripe:raw"
+  ],
+  "food:taxon:glycine_max:tofu:firm": [
+    "food:taxon:glycine_max:tofu:firm"
+  ],
+  "food_taxon_glycine_max_tofu_firm": [
+    "food:taxon:glycine_max:tofu:firm"
+  ],
+  "北豆腐": [
+    "food:taxon:glycine_max:tofu:firm"
+  ],
+  "老豆腐": [
+    "food:taxon:glycine_max:tofu:firm"
+  ],
+  "卤水豆腐": [
+    "food:taxon:glycine_max:tofu:firm"
+  ],
+  "firmtofu": [
+    "food:taxon:glycine_max:tofu:firm"
+  ],
+  "pressedtofu": [
+    "food:taxon:glycine_max:tofu:firm"
+  ],
+  "food:taxon:gallus_gallus:egg:whole": [
+    "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "food_taxon_gallus_gallus_egg_whole": [
+    "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "鸡蛋": [
+    "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "鸡子": [
+    "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "全蛋": [
+    "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "chickenegg": [
+    "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "wholeegg": [
+    "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "food:taxon:salmo_salar:raw": [
+    "food:taxon:salmo_salar:raw"
+  ],
+  "food_taxon_salmo_salar_raw": [
+    "food:taxon:salmo_salar:raw"
+  ],
+  "三文鱼": [
+    "food:taxon:salmo_salar:raw"
+  ],
+  "大西洋鲑": [
+    "food:taxon:salmo_salar:raw"
+  ],
+  "鲑鱼": [
+    "food:taxon:salmo_salar:raw"
+  ],
+  "atlanticsalmon": [
+    "food:taxon:salmo_salar:raw"
+  ],
+  "salmon": [
+    "food:taxon:salmo_salar:raw"
+  ],
+  "food:taxon:bos_taurus:milk:whole": [
+    "food:taxon:bos_taurus:milk:whole"
+  ],
+  "food_taxon_bos_taurus_milk_whole": [
+    "food:taxon:bos_taurus:milk:whole"
+  ],
+  "全脂牛奶": [
+    "food:taxon:bos_taurus:milk:whole"
+  ],
+  "牛奶": [
+    "food:taxon:bos_taurus:milk:whole"
+  ],
+  "鲜奶": [
+    "food:taxon:bos_taurus:milk:whole"
+  ],
+  "wholemilk": [
+    "food:taxon:bos_taurus:milk:whole"
+  ],
+  "cowmilk": [
+    "food:taxon:bos_taurus:milk:whole"
+  ],
+  "food:taxon:triticum_aestivum:flour:refined": [
+    "food:taxon:triticum_aestivum:flour:refined"
+  ],
+  "food_taxon_triticum_aestivum_flour_refined": [
+    "food:taxon:triticum_aestivum:flour:refined"
+  ],
+  "小麦粉": [
+    "food:taxon:triticum_aestivum:flour:refined"
+  ],
+  "中筋面粉": [
+    "food:taxon:triticum_aestivum:flour:refined"
+  ],
+  "refinedwheatflour": [
+    "food:taxon:triticum_aestivum:flour:refined"
+  ],
+  "all-purposeflour": [
+    "food:taxon:triticum_aestivum:flour:refined"
+  ],
+  "food:water:drinking": [
+    "food:water:drinking"
+  ],
+  "food_water_drinking": [
+    "food:water:drinking"
+  ],
+  "饮用水": [
+    "food:water:drinking"
+  ],
+  "水": [
+    "food:water:drinking"
+  ],
+  "drinkingwater": [
+    "food:water:drinking"
+  ],
+  "water": [
+    "food:water:drinking"
+  ],
+  "food:taxon:triticum_aestivum:flour:cake": [
+    "food:taxon:triticum_aestivum:flour:cake"
+  ],
+  "food_taxon_triticum_aestivum_flour_cake": [
+    "food:taxon:triticum_aestivum:flour:cake"
+  ],
+  "低筋面粉": [
+    "food:taxon:triticum_aestivum:flour:cake"
+  ],
+  "蛋糕粉": [
+    "food:taxon:triticum_aestivum:flour:cake"
+  ],
+  "cakeflour": [
+    "food:taxon:triticum_aestivum:flour:cake"
+  ],
+  "low-proteinflour": [
+    "food:taxon:triticum_aestivum:flour:cake"
+  ],
+  "food:taxon:triticum_aestivum:flour:bread": [
+    "food:taxon:triticum_aestivum:flour:bread"
+  ],
+  "food_taxon_triticum_aestivum_flour_bread": [
+    "food:taxon:triticum_aestivum:flour:bread"
+  ],
+  "高筋面粉": [
+    "food:taxon:triticum_aestivum:flour:bread"
+  ],
+  "面包粉": [
+    "food:taxon:triticum_aestivum:flour:bread"
+  ],
+  "breadflour": [
+    "food:taxon:triticum_aestivum:flour:bread"
+  ],
+  "high-proteinflour": [
+    "food:taxon:triticum_aestivum:flour:bread"
+  ],
+  "food:starch:corn": [
+    "food:starch:corn"
+  ],
+  "food_starch_corn": [
+    "food:starch:corn"
+  ],
+  "玉米淀粉": [
+    "food:starch:corn"
+  ],
+  "生粉": [
+    "food:starch:corn"
+  ],
+  "cornstarch": [
+    "food:starch:corn"
+  ],
+  "cornflourstarch": [
+    "food:starch:corn"
+  ],
+  "food:starch:potato": [
+    "food:starch:potato"
+  ],
+  "food_starch_potato": [
+    "food:starch:potato"
+  ],
+  "马铃薯淀粉": [
+    "food:starch:potato"
+  ],
+  "土豆淀粉": [
+    "food:starch:potato"
+  ],
+  "potatostarch": [
+    "food:starch:potato"
+  ],
+  "food:starch:tapioca": [
+    "food:starch:tapioca"
+  ],
+  "food_starch_tapioca": [
+    "food:starch:tapioca"
+  ],
+  "木薯淀粉": [
+    "food:starch:tapioca"
+  ],
+  "木薯粉": [
+    "food:starch:tapioca"
+  ],
+  "tapiocastarch": [
+    "food:starch:tapioca"
+  ],
+  "cassavastarch": [
+    "food:starch:tapioca"
+  ],
+  "food:dairy:butter": [
+    "food:dairy:butter"
+  ],
+  "food_dairy_butter": [
+    "food:dairy:butter"
+  ],
+  "黄油": [
+    "food:dairy:butter"
+  ],
+  "乳脂黄油": [
+    "food:dairy:butter"
+  ],
+  "咸黄油": [
+    "food:dairy:butter"
+  ],
+  "saltedbutter": [
+    "food:dairy:butter"
+  ],
+  "dairybutter": [
+    "food:dairy:butter"
+  ],
+  "food:beverage:cola:sugar_free": [
+    "food:beverage:cola:sugar_free"
+  ],
+  "food_beverage_cola_sugar_free": [
+    "food:beverage:cola:sugar_free"
+  ],
+  "无糖可乐": [
+    "food:beverage:cola:sugar_free"
+  ],
+  "零糖可乐": [
+    "food:beverage:cola:sugar_free"
+  ],
+  "sugar-freecola": [
+    "food:beverage:cola:sugar_free"
+  ],
+  "dietcola": [
+    "food:beverage:cola:sugar_free"
+  ],
+  "food:taxon:solanum_melongena:raw": [
+    "food:taxon:solanum_melongena:raw"
+  ],
+  "food_taxon_solanum_melongena_raw": [
+    "food:taxon:solanum_melongena:raw"
+  ],
+  "茄子": [
+    "food:taxon:solanum_melongena:raw"
+  ],
+  "eggplant": [
+    "food:taxon:solanum_melongena:raw"
+  ],
+  "food:taxon:lactuca_sativa:raw": [
+    "food:taxon:lactuca_sativa:raw"
+  ],
+  "food_taxon_lactuca_sativa_raw": [
+    "food:taxon:lactuca_sativa:raw"
+  ],
+  "生菜": [
+    "food:taxon:lactuca_sativa:raw"
+  ],
+  "lettuce": [
+    "food:taxon:lactuca_sativa:raw"
+  ],
+  "food:taxon:daucus_carota:raw": [
+    "food:taxon:daucus_carota:raw"
+  ],
+  "food_taxon_daucus_carota_raw": [
+    "food:taxon:daucus_carota:raw"
+  ],
+  "胡萝卜": [
+    "food:taxon:daucus_carota:raw"
+  ],
+  "carrot": [
+    "food:taxon:daucus_carota:raw"
+  ],
+  "food:taxon:solanum_melongena:local_round_raw": [
+    "food:taxon:solanum_melongena:local_round_raw"
+  ],
+  "food_taxon_solanum_melongena_local_round_raw": [
+    "food:taxon:solanum_melongena:local_round_raw"
+  ],
+  "本地圆茄": [
+    "food:taxon:solanum_melongena:local_round_raw"
+  ],
+  "圆茄": [
+    "food:taxon:solanum_melongena:local_round_raw"
+  ],
+  "localroundeggplant": [
+    "food:taxon:solanum_melongena:local_round_raw"
+  ],
+  "roundeggplant": [
+    "food:taxon:solanum_melongena:local_round_raw"
+  ],
+  "food:taxon:vigna_unguiculata:raw": [
+    "food:taxon:vigna_unguiculata:raw"
+  ],
+  "food_taxon_vigna_unguiculata_raw": [
+    "food:taxon:vigna_unguiculata:raw"
+  ],
+  "豆角": [
+    "food:taxon:vigna_unguiculata:raw"
+  ],
+  "yardlongbean": [
+    "food:taxon:vigna_unguiculata:raw"
+  ],
+  "longbean": [
+    "food:taxon:vigna_unguiculata:raw"
+  ],
+  "food:taxon:phaseolus_vulgaris:raw": [
+    "food:taxon:phaseolus_vulgaris:raw"
+  ],
+  "food_taxon_phaseolus_vulgaris_raw": [
+    "food:taxon:phaseolus_vulgaris:raw"
+  ],
+  "四季豆": [
+    "food:taxon:phaseolus_vulgaris:raw"
+  ],
+  "greenbean": [
+    "food:taxon:phaseolus_vulgaris:raw"
+  ],
+  "frenchbean": [
+    "food:taxon:phaseolus_vulgaris:raw"
+  ],
+  "food:taxon:lactuca_sativa:asparagus_lettuce": [
+    "food:taxon:lactuca_sativa:asparagus_lettuce"
+  ],
+  "food_taxon_lactuca_sativa_asparagus_lettuce": [
+    "food:taxon:lactuca_sativa:asparagus_lettuce"
+  ],
+  "莴苣": [
+    "food:taxon:lactuca_sativa:asparagus_lettuce"
+  ],
+  "asparaguslettuce": [
+    "food:taxon:lactuca_sativa:asparagus_lettuce"
+  ],
+  "celtuce": [
+    "food:taxon:lactuca_sativa:asparagus_lettuce"
+  ],
+  "food:taxon:zizania_latifolia:raw": [
+    "food:taxon:zizania_latifolia:raw"
+  ],
+  "food_taxon_zizania_latifolia_raw": [
+    "food:taxon:zizania_latifolia:raw"
+  ],
+  "茭白": [
+    "food:taxon:zizania_latifolia:raw"
+  ],
+  "篙瓜": [
+    "food:taxon:zizania_latifolia:raw"
+  ],
+  "茭笋": [
+    "food:taxon:zizania_latifolia:raw"
+  ],
+  "waterbambooshoot": [
+    "food:taxon:zizania_latifolia:raw"
+  ],
+  "wildricestem": [
+    "food:taxon:zizania_latifolia:raw"
+  ],
+  "food:taxon:dioscorea_polystachya:raw": [
+    "food:taxon:dioscorea_polystachya:raw"
+  ],
+  "food_taxon_dioscorea_polystachya_raw": [
+    "food:taxon:dioscorea_polystachya:raw"
+  ],
+  "山药": [
+    "food:taxon:dioscorea_polystachya:raw"
+  ],
+  "chineseyam": [
+    "food:taxon:dioscorea_polystachya:raw"
+  ],
+  "food:taxon:apium_graveolens:raw": [
+    "food:taxon:apium_graveolens:raw"
+  ],
+  "food_taxon_apium_graveolens_raw": [
+    "food:taxon:apium_graveolens:raw"
+  ],
+  "芹菜": [
+    "food:taxon:apium_graveolens:raw"
+  ],
+  "celery": [
+    "food:taxon:apium_graveolens:raw"
+  ],
+  "food:taxon:capsicum_annuum:chili": [
+    "food:taxon:capsicum_annuum:chili"
+  ],
+  "food_taxon_capsicum_annuum_chili": [
+    "food:taxon:capsicum_annuum:chili"
+  ],
+  "小米辣": [
+    "food:taxon:capsicum_annuum:chili"
+  ],
+  "bird'seyechili": [
+    "food:taxon:capsicum_annuum:chili"
+  ],
+  "food:taxon:coriandrum_sativum:raw": [
+    "food:taxon:coriandrum_sativum:raw"
+  ],
+  "food_taxon_coriandrum_sativum_raw": [
+    "food:taxon:coriandrum_sativum:raw"
+  ],
+  "香菜": [
+    "food:taxon:coriandrum_sativum:raw"
+  ],
+  "coriander": [
+    "food:taxon:coriandrum_sativum:raw"
+  ],
+  "cilantro": [
+    "food:taxon:coriandrum_sativum:raw"
+  ],
+  "food:taxon:allium_sativum:raw": [
+    "food:taxon:allium_sativum:raw"
+  ],
+  "food_taxon_allium_sativum_raw": [
+    "food:taxon:allium_sativum:raw"
+  ],
+  "大蒜": [
+    "food:taxon:allium_sativum:raw"
+  ],
+  "garlic": [
+    "food:taxon:allium_sativum:raw"
+  ],
+  "food:taxon:zingiber_officinale:raw": [
+    "food:taxon:zingiber_officinale:raw"
+  ],
+  "food_taxon_zingiber_officinale_raw": [
+    "food:taxon:zingiber_officinale:raw"
+  ],
+  "生姜": [
+    "food:taxon:zingiber_officinale:raw"
+  ],
+  "ginger": [
+    "food:taxon:zingiber_officinale:raw"
+  ],
+  "food:taxon:solanum_lycopersicum:cherry_raw": [
+    "food:taxon:solanum_lycopersicum:cherry_raw"
+  ],
+  "food_taxon_solanum_lycopersicum_cherry_raw": [
+    "food:taxon:solanum_lycopersicum:cherry_raw"
+  ],
+  "圣女果": [
+    "food:taxon:solanum_lycopersicum:cherry_raw"
+  ],
+  "樱桃番茄": [
+    "food:taxon:solanum_lycopersicum:cherry_raw"
+  ],
+  "cherrytomato": [
+    "food:taxon:solanum_lycopersicum:cherry_raw"
+  ],
+  "food:taxon:hylocereus_undatus:raw": [
+    "food:taxon:hylocereus_undatus:raw"
+  ],
+  "food_taxon_hylocereus_undatus_raw": [
+    "food:taxon:hylocereus_undatus:raw"
+  ],
+  "火龙果": [
+    "food:taxon:hylocereus_undatus:raw"
+  ],
+  "dragonfruit": [
+    "food:taxon:hylocereus_undatus:raw"
+  ],
+  "pitaya": [
+    "food:taxon:hylocereus_undatus:raw"
+  ],
+  "food:taxon:durio_zibethinus:raw": [
+    "food:taxon:durio_zibethinus:raw"
+  ],
+  "food_taxon_durio_zibethinus_raw": [
+    "food:taxon:durio_zibethinus:raw"
+  ],
+  "榴莲": [
+    "food:taxon:durio_zibethinus:raw"
+  ],
+  "durian": [
+    "food:taxon:durio_zibethinus:raw"
+  ],
+  "food:taxon:pyrus_pyrifolia:raw": [
+    "food:taxon:pyrus_pyrifolia:raw"
+  ],
+  "food_taxon_pyrus_pyrifolia_raw": [
+    "food:taxon:pyrus_pyrifolia:raw"
+  ],
+  "梨子": [
+    "food:taxon:pyrus_pyrifolia:raw"
+  ],
+  "梨": [
+    "food:taxon:pyrus_pyrifolia:raw"
+  ],
+  "pear": [
+    "food:taxon:pyrus_pyrifolia:raw"
+  ],
+  "food:taxon:citrullus_lanatus:raw": [
+    "food:taxon:citrullus_lanatus:raw"
+  ],
+  "food_taxon_citrullus_lanatus_raw": [
+    "food:taxon:citrullus_lanatus:raw"
+  ],
+  "西瓜": [
+    "food:taxon:citrullus_lanatus:raw"
+  ],
+  "watermelon": [
+    "food:taxon:citrullus_lanatus:raw"
+  ],
+  "food:taxon:sus_scrofa:lean_raw": [
+    "food:taxon:sus_scrofa:lean_raw"
+  ],
+  "food_taxon_sus_scrofa_lean_raw": [
+    "food:taxon:sus_scrofa:lean_raw"
+  ],
+  "猪肉": [
+    "food:taxon:sus_scrofa:lean_raw"
+  ],
+  "瘦猪肉": [
+    "food:taxon:sus_scrofa:lean_raw"
+  ],
+  "leanpork": [
+    "food:taxon:sus_scrofa:lean_raw"
+  ],
+  "pork": [
+    "food:taxon:sus_scrofa:lean_raw"
+  ],
+  "food:taxon:bos_taurus:lean_raw": [
+    "food:taxon:bos_taurus:lean_raw"
+  ],
+  "food_taxon_bos_taurus_lean_raw": [
+    "food:taxon:bos_taurus:lean_raw"
+  ],
+  "牛肉": [
+    "food:taxon:bos_taurus:lean_raw"
+  ],
+  "瘦牛肉": [
+    "food:taxon:bos_taurus:lean_raw"
+  ],
+  "leanbeef": [
+    "food:taxon:bos_taurus:lean_raw"
+  ],
+  "beef": [
+    "food:taxon:bos_taurus:lean_raw"
+  ],
+  "food:taxon:ovis_aries:lean_raw": [
+    "food:taxon:ovis_aries:lean_raw"
+  ],
+  "food_taxon_ovis_aries_lean_raw": [
+    "food:taxon:ovis_aries:lean_raw"
+  ],
+  "羊肉": [
+    "food:taxon:ovis_aries:lean_raw"
+  ],
+  "瘦羊肉": [
+    "food:taxon:ovis_aries:lean_raw"
+  ],
+  "leanlamb": [
+    "food:taxon:ovis_aries:lean_raw"
+  ],
+  "lamb": [
+    "food:taxon:ovis_aries:lean_raw"
+  ],
+  "food:taxon:oryza_sativa:wholegrain:raw": [
+    "food:taxon:oryza_sativa:wholegrain:raw"
+  ],
+  "food_taxon_oryza_sativa_wholegrain_raw": [
+    "food:taxon:oryza_sativa:wholegrain:raw"
+  ],
+  "糙米": [
+    "food:taxon:oryza_sativa:wholegrain:raw",
+    "food:taxon:oryza_sativa:wholegrain:steamed"
+  ],
+  "brownrice,raw": [
+    "food:taxon:oryza_sativa:wholegrain:raw"
+  ],
+  "food:taxon:solanum_tuberosum:raw": [
+    "food:taxon:solanum_tuberosum:raw"
+  ],
+  "food_taxon_solanum_tuberosum_raw": [
+    "food:taxon:solanum_tuberosum:raw"
+  ],
+  "生土豆": [
+    "food:taxon:solanum_tuberosum:raw"
+  ],
+  "potato,raw": [
+    "food:taxon:solanum_tuberosum:raw"
+  ],
+  "food:taxon:gallus_gallus:breast:raw": [
+    "food:taxon:gallus_gallus:breast:raw"
+  ],
+  "food_taxon_gallus_gallus_breast_raw": [
+    "food:taxon:gallus_gallus:breast:raw"
+  ],
+  "生鸡胸肉": [
+    "food:taxon:gallus_gallus:breast:raw"
+  ],
+  "chickenbreast,raw": [
+    "food:taxon:gallus_gallus:breast:raw"
+  ],
+  "food:taxon:arachis_hypogaea:raw": [
+    "food:taxon:arachis_hypogaea:raw"
+  ],
+  "food_taxon_arachis_hypogaea_raw": [
+    "food:taxon:arachis_hypogaea:raw"
+  ],
+  "生花生": [
+    "food:taxon:arachis_hypogaea:raw"
+  ],
+  "peanuts,raw": [
+    "food:taxon:arachis_hypogaea:raw"
+  ],
+  "food:taxon:zea_mays:raw": [
+    "food:taxon:zea_mays:raw"
+  ],
+  "food_taxon_zea_mays_raw": [
+    "food:taxon:zea_mays:raw"
+  ],
+  "玉米": [
+    "food:taxon:zea_mays:raw",
+    "food:taxon:zea_mays:boiled"
+  ],
+  "鲜玉米": [
+    "food:taxon:zea_mays:raw"
+  ],
+  "带芯玉米": [
+    "food:taxon:zea_mays:raw"
+  ],
+  "sweetcornonthecob": [
+    "food:taxon:zea_mays:raw"
+  ],
+  "freshcorn": [
+    "food:taxon:zea_mays:raw"
+  ],
+  "food:taxon:ipomoea_batatas:raw": [
+    "food:taxon:ipomoea_batatas:raw"
+  ],
+  "food_taxon_ipomoea_batatas_raw": [
+    "food:taxon:ipomoea_batatas:raw"
+  ],
+  "生红薯": [
+    "food:taxon:ipomoea_batatas:raw"
+  ],
+  "sweetpotato,raw": [
+    "food:taxon:ipomoea_batatas:raw"
+  ],
+  "food:taxon:colocasia_esculenta:raw": [
+    "food:taxon:colocasia_esculenta:raw"
+  ],
+  "food_taxon_colocasia_esculenta_raw": [
+    "food:taxon:colocasia_esculenta:raw"
+  ],
+  "生芋头": [
+    "food:taxon:colocasia_esculenta:raw"
+  ],
+  "taro,raw": [
+    "food:taxon:colocasia_esculenta:raw"
+  ],
+  "food:taxon:panicum_miliaceum:raw": [
+    "food:taxon:panicum_miliaceum:raw"
+  ],
+  "food_taxon_panicum_miliaceum_raw": [
+    "food:taxon:panicum_miliaceum:raw"
+  ],
+  "小米": [
+    "food:taxon:panicum_miliaceum:raw"
+  ],
+  "millet,raw": [
+    "food:taxon:panicum_miliaceum:raw"
+  ],
+  "food:taxon:oryza_sativa:glutinous:raw": [
+    "food:taxon:oryza_sativa:glutinous:raw"
+  ],
+  "food_taxon_oryza_sativa_glutinous_raw": [
+    "food:taxon:oryza_sativa:glutinous:raw"
+  ],
+  "糯米": [
+    "food:taxon:oryza_sativa:glutinous:raw"
+  ],
+  "glutinousrice,raw": [
+    "food:taxon:oryza_sativa:glutinous:raw"
+  ],
+  "food:taxon:triticum_aestivum:noodles:dry": [
+    "food:taxon:triticum_aestivum:noodles:dry"
+  ],
+  "food_taxon_triticum_aestivum_noodles_dry": [
+    "food:taxon:triticum_aestivum:noodles:dry"
+  ],
+  "干小麦面条": [
+    "food:taxon:triticum_aestivum:noodles:dry"
+  ],
+  "driedwheatnoodles": [
+    "food:taxon:triticum_aestivum:noodles:dry"
+  ],
+  "food:taxon:triticum_aestivum:flour:whole": [
+    "food:taxon:triticum_aestivum:flour:whole"
+  ],
+  "food_taxon_triticum_aestivum_flour_whole": [
+    "food:taxon:triticum_aestivum:flour:whole"
+  ],
+  "全麦粉": [
+    "food:taxon:triticum_aestivum:flour:whole"
+  ],
+  "whole-wheatflour": [
+    "food:taxon:triticum_aestivum:flour:whole"
+  ],
+  "food:taxon:glycine_max:soybean:dried": [
+    "food:taxon:glycine_max:soybean:dried"
+  ],
+  "food_taxon_glycine_max_soybean_dried": [
+    "food:taxon:glycine_max:soybean:dried"
+  ],
+  "黄豆": [
+    "food:taxon:glycine_max:soybean:dried"
+  ],
+  "soybeans,dried": [
+    "food:taxon:glycine_max:soybean:dried"
+  ],
+  "food:taxon:nelumbo_nucifera:starch": [
+    "food:taxon:nelumbo_nucifera:starch"
+  ],
+  "food_taxon_nelumbo_nucifera_starch": [
+    "food:taxon:nelumbo_nucifera:starch"
+  ],
+  "莲藕淀粉": [
+    "food:taxon:nelumbo_nucifera:starch"
+  ],
+  "lotusrootstarch": [
+    "food:taxon:nelumbo_nucifera:starch"
+  ],
+  "food:plant_oil:generic": [
+    "food:plant_oil:generic"
+  ],
+  "food_plant_oil_generic": [
+    "food:plant_oil:generic"
+  ],
+  "植物油": [
+    "food:plant_oil:generic"
+  ],
+  "vegetableoil": [
+    "food:plant_oil:generic"
+  ],
+  "food:taxon:zea_mays:kernels:raw": [
+    "food:taxon:zea_mays:kernels:raw"
+  ],
+  "food_taxon_zea_mays_kernels_raw": [
+    "food:taxon:zea_mays:kernels:raw"
+  ],
+  "玉米粒": [
+    "food:taxon:zea_mays:kernels:raw"
+  ],
+  "包装玉米粒": [
+    "food:taxon:zea_mays:kernels:raw"
+  ],
+  "剥粒玉米": [
+    "food:taxon:zea_mays:kernels:raw"
+  ],
+  "sweetcornkernels": [
+    "food:taxon:zea_mays:kernels:raw"
+  ],
+  "packagedcornkernels": [
+    "food:taxon:zea_mays:kernels:raw"
+  ],
+  "food:taxon:allium_fistulosum:raw": [
+    "food:taxon:allium_fistulosum:raw"
+  ],
+  "food_taxon_allium_fistulosum_raw": [
+    "food:taxon:allium_fistulosum:raw"
+  ],
+  "大葱": [
+    "food:taxon:allium_fistulosum:raw"
+  ],
+  "welshonion": [
+    "food:taxon:allium_fistulosum:raw"
+  ],
+  "food:taxon:allium_fistulosum:scallion": [
+    "food:taxon:allium_fistulosum:scallion"
+  ],
+  "food_taxon_allium_fistulosum_scallion": [
+    "food:taxon:allium_fistulosum:scallion"
+  ],
+  "小葱": [
+    "food:taxon:allium_fistulosum:scallion"
+  ],
+  "scallion": [
+    "food:taxon:allium_fistulosum:scallion"
+  ],
+  "food:taxon:houttuynia_cordata:raw": [
+    "food:taxon:houttuynia_cordata:raw"
+  ],
+  "food_taxon_houttuynia_cordata_raw": [
+    "food:taxon:houttuynia_cordata:raw"
+  ],
+  "折耳根": [
+    "food:taxon:houttuynia_cordata:raw"
+  ],
+  "houttuynia": [
+    "food:taxon:houttuynia_cordata:raw"
+  ],
+  "food:seasoning:salt": [
+    "food:seasoning:salt"
+  ],
+  "food_seasoning_salt": [
+    "food:seasoning:salt"
+  ],
+  "食盐": [
+    "food:seasoning:salt"
+  ],
+  "tablesalt": [
+    "food:seasoning:salt"
+  ],
+  "food:seasoning:soy_sauce": [
+    "food:seasoning:soy_sauce"
+  ],
+  "food_seasoning_soy_sauce": [
+    "food:seasoning:soy_sauce"
+  ],
+  "酱油": [
+    "food:seasoning:soy_sauce"
+  ],
+  "soysauce": [
+    "food:seasoning:soy_sauce"
+  ],
+  "food:seasoning:vinegar": [
+    "food:seasoning:vinegar"
+  ],
+  "food_seasoning_vinegar": [
+    "food:seasoning:vinegar"
+  ],
+  "食醋": [
+    "food:seasoning:vinegar"
+  ],
+  "vinegar": [
+    "food:seasoning:vinegar"
+  ],
+  "food:seasoning:sugar": [
+    "food:seasoning:sugar"
+  ],
+  "food_seasoning_sugar": [
+    "food:seasoning:sugar"
+  ],
+  "白砂糖": [
+    "food:seasoning:sugar"
+  ],
+  "whitesugar": [
+    "food:seasoning:sugar"
+  ],
+  "food:seasoning:cooking_wine": [
+    "food:seasoning:cooking_wine"
+  ],
+  "food_seasoning_cooking_wine": [
+    "food:seasoning:cooking_wine"
+  ],
+  "料酒": [
+    "food:seasoning:cooking_wine"
+  ],
+  "cookingwine": [
+    "food:seasoning:cooking_wine"
+  ],
+  "food:seasoning:black_pepper": [
+    "food:seasoning:black_pepper"
+  ],
+  "food_seasoning_black_pepper": [
+    "food:seasoning:black_pepper"
+  ],
+  "黑胡椒": [
+    "food:seasoning:black_pepper"
+  ],
+  "blackpepper": [
+    "food:seasoning:black_pepper"
+  ],
+  "food:animal_fat:lard": [
+    "food:animal_fat:lard"
+  ],
+  "food_animal_fat_lard": [
+    "food:animal_fat:lard"
+  ],
+  "猪油": [
+    "food:animal_fat:lard"
+  ],
+  "lard": [
+    "food:animal_fat:lard"
+  ],
+  "food:animal_fat:beef_tallow": [
+    "food:animal_fat:beef_tallow"
+  ],
+  "food_animal_fat_beef_tallow": [
+    "food:animal_fat:beef_tallow"
+  ],
+  "牛油": [
+    "food:animal_fat:beef_tallow"
+  ],
+  "beeftallow": [
+    "food:animal_fat:beef_tallow"
+  ],
+  "food:animal_fat:chicken_fat": [
+    "food:animal_fat:chicken_fat"
+  ],
+  "food_animal_fat_chicken_fat": [
+    "food:animal_fat:chicken_fat"
+  ],
+  "鸡油": [
+    "food:animal_fat:chicken_fat"
+  ],
+  "chickenfat": [
+    "food:animal_fat:chicken_fat"
+  ],
+  "food:taxon:camellia_sinensis:leaves:dried": [
+    "food:taxon:camellia_sinensis:leaves:dried"
+  ],
+  "food_taxon_camellia_sinensis_leaves_dried": [
+    "food:taxon:camellia_sinensis:leaves:dried"
+  ],
+  "茶叶": [
+    "food:taxon:camellia_sinensis:leaves:dried"
+  ],
+  "tealeaves,dried": [
+    "food:taxon:camellia_sinensis:leaves:dried"
+  ],
+  "food:taxon:coffea_arabica:grounds": [
+    "food:taxon:coffea_arabica:grounds"
+  ],
+  "food_taxon_coffea_arabica_grounds": [
+    "food:taxon:coffea_arabica:grounds"
+  ],
+  "咖啡粉": [
+    "food:taxon:coffea_arabica:grounds"
+  ],
+  "coffeegrounds": [
+    "food:taxon:coffea_arabica:grounds"
+  ],
+  "food:taxon:citrus_limon:raw": [
+    "food:taxon:citrus_limon:raw"
+  ],
+  "food_taxon_citrus_limon_raw": [
+    "food:taxon:citrus_limon:raw"
+  ],
+  "柠檬": [
+    "food:taxon:citrus_limon:raw"
+  ],
+  "lemon": [
+    "food:taxon:citrus_limon:raw"
+  ],
+  "food:seasoning:brown_sugar": [
+    "food:seasoning:brown_sugar"
+  ],
+  "food_seasoning_brown_sugar": [
+    "food:seasoning:brown_sugar"
+  ],
+  "红糖": [
+    "food:seasoning:brown_sugar"
+  ],
+  "brownsugar": [
+    "food:seasoning:brown_sugar"
+  ],
+  "food:beverage:cola": [
+    "food:beverage:cola"
+  ],
+  "food_beverage_cola": [
+    "food:beverage:cola"
+  ],
+  "可乐": [
+    "food:beverage:cola"
+  ],
+  "cola": [
+    "food:beverage:cola"
+  ],
+  "food:beverage:fruit_juice": [
+    "food:beverage:fruit_juice"
+  ],
+  "food_beverage_fruit_juice": [
+    "food:beverage:fruit_juice"
+  ],
+  "果汁": [
+    "food:beverage:fruit_juice"
+  ],
+  "fruitjuice": [
+    "food:beverage:fruit_juice"
+  ],
+  "food:beverage:yogurt:plain": [
+    "food:beverage:yogurt:plain"
+  ],
+  "food_beverage_yogurt_plain": [
+    "food:beverage:yogurt:plain"
+  ],
+  "原味酸奶": [
+    "food:beverage:yogurt:plain"
+  ],
+  "plainyogurt": [
+    "food:beverage:yogurt:plain"
+  ],
+  "food:beverage:milk_tea": [
+    "food:beverage:milk_tea"
+  ],
+  "food_beverage_milk_tea": [
+    "food:beverage:milk_tea"
+  ],
+  "奶茶": [
+    "food:beverage:milk_tea"
+  ],
+  "milktea": [
+    "food:beverage:milk_tea"
+  ],
+  "food:taxon:helianthus_annuus:kernels:raw": [
+    "food:taxon:helianthus_annuus:kernels:raw"
+  ],
+  "food_taxon_helianthus_annuus_kernels_raw": [
+    "food:taxon:helianthus_annuus:kernels:raw"
+  ],
+  "葵花籽仁": [
+    "food:taxon:helianthus_annuus:kernels:raw"
+  ],
+  "sunflowerseedkernels": [
+    "food:taxon:helianthus_annuus:kernels:raw"
+  ],
+  "food:taxon:cucurbita_pepo:kernels:raw": [
+    "food:taxon:cucurbita_pepo:kernels:raw"
+  ],
+  "food_taxon_cucurbita_pepo_kernels_raw": [
+    "food:taxon:cucurbita_pepo:kernels:raw"
+  ],
+  "南瓜子仁": [
+    "food:taxon:cucurbita_pepo:kernels:raw"
+  ],
+  "pumpkinseedkernels": [
+    "food:taxon:cucurbita_pepo:kernels:raw"
+  ],
+  "food:taxon:citrullus_lanatus:seeds:raw": [
+    "food:taxon:citrullus_lanatus:seeds:raw"
+  ],
+  "food_taxon_citrullus_lanatus_seeds_raw": [
+    "food:taxon:citrullus_lanatus:seeds:raw"
+  ],
+  "西瓜子仁": [
+    "food:taxon:citrullus_lanatus:seeds:raw"
+  ],
+  "watermelonseedkernels": [
+    "food:taxon:citrullus_lanatus:seeds:raw"
+  ],
+  "food:taxon:trichosanthes_kirilowii:seeds:raw": [
+    "food:taxon:trichosanthes_kirilowii:seeds:raw"
+  ],
+  "food_taxon_trichosanthes_kirilowii_seeds_raw": [
+    "food:taxon:trichosanthes_kirilowii:seeds:raw"
+  ],
+  "吊瓜子仁": [
+    "food:taxon:trichosanthes_kirilowii:seeds:raw"
+  ],
+  "chinesesnakegourdseedkernels": [
+    "food:taxon:trichosanthes_kirilowii:seeds:raw"
+  ],
+  "food:taxon:benincasa_hispida:seeds:raw": [
+    "food:taxon:benincasa_hispida:seeds:raw"
+  ],
+  "food_taxon_benincasa_hispida_seeds_raw": [
+    "food:taxon:benincasa_hispida:seeds:raw"
+  ],
+  "冬瓜子仁": [
+    "food:taxon:benincasa_hispida:seeds:raw"
+  ],
+  "wintermelonseedkernels": [
+    "food:taxon:benincasa_hispida:seeds:raw"
+  ],
+  "food:taxon:juglans_regia:kernels:raw": [
+    "food:taxon:juglans_regia:kernels:raw"
+  ],
+  "food_taxon_juglans_regia_kernels_raw": [
+    "food:taxon:juglans_regia:kernels:raw"
+  ],
+  "核桃仁": [
+    "food:taxon:juglans_regia:kernels:raw"
+  ],
+  "walnutkernels": [
+    "food:taxon:juglans_regia:kernels:raw"
+  ],
+  "food:taxon:prunus_dulcis:kernels:raw": [
+    "food:taxon:prunus_dulcis:kernels:raw"
+  ],
+  "food_taxon_prunus_dulcis_kernels_raw": [
+    "food:taxon:prunus_dulcis:kernels:raw"
+  ],
+  "杏仁": [
+    "food:taxon:prunus_dulcis:kernels:raw"
+  ],
+  "巴旦木": [
+    "food:taxon:prunus_dulcis:kernels:raw"
+  ],
+  "almondkernels": [
+    "food:taxon:prunus_dulcis:kernels:raw"
+  ],
+  "almonds": [
+    "food:taxon:prunus_dulcis:kernels:raw"
+  ],
+  "food:taxon:anacardium_occidentale:kernels:raw": [
+    "food:taxon:anacardium_occidentale:kernels:raw"
+  ],
+  "food_taxon_anacardium_occidentale_kernels_raw": [
+    "food:taxon:anacardium_occidentale:kernels:raw"
+  ],
+  "腰果": [
+    "food:taxon:anacardium_occidentale:kernels:raw",
+    "food:snack:cashew:plain"
+  ],
+  "cashews": [
+    "food:taxon:anacardium_occidentale:kernels:raw"
+  ],
+  "food:taxon:pistacia_vera:kernels:raw": [
+    "food:taxon:pistacia_vera:kernels:raw"
+  ],
+  "food_taxon_pistacia_vera_kernels_raw": [
+    "food:taxon:pistacia_vera:kernels:raw"
+  ],
+  "开心果仁": [
+    "food:taxon:pistacia_vera:kernels:raw"
+  ],
+  "pistachiokernels": [
+    "food:taxon:pistacia_vera:kernels:raw"
+  ],
+  "food:taxon:carya_illinoinensis:kernels:raw": [
+    "food:taxon:carya_illinoinensis:kernels:raw"
+  ],
+  "food_taxon_carya_illinoinensis_kernels_raw": [
+    "food:taxon:carya_illinoinensis:kernels:raw"
+  ],
+  "碧根果仁": [
+    "food:taxon:carya_illinoinensis:kernels:raw"
+  ],
+  "pecankernels": [
+    "food:taxon:carya_illinoinensis:kernels:raw"
+  ],
+  "food:taxon:macadamia_integrifolia:kernels:raw": [
+    "food:taxon:macadamia_integrifolia:kernels:raw"
+  ],
+  "food_taxon_macadamia_integrifolia_kernels_raw": [
+    "food:taxon:macadamia_integrifolia:kernels:raw"
+  ],
+  "夏威夷果仁": [
+    "food:taxon:macadamia_integrifolia:kernels:raw"
+  ],
+  "macadamiakernels": [
+    "food:taxon:macadamia_integrifolia:kernels:raw"
+  ],
+  "food:taxon:pinus_koraiensis:kernels:raw": [
+    "food:taxon:pinus_koraiensis:kernels:raw"
+  ],
+  "food_taxon_pinus_koraiensis_kernels_raw": [
+    "food:taxon:pinus_koraiensis:kernels:raw"
+  ],
+  "松子仁": [
+    "food:taxon:pinus_koraiensis:kernels:raw"
+  ],
+  "pinenutkernels": [
+    "food:taxon:pinus_koraiensis:kernels:raw"
+  ],
+  "food:taxon:corylus_avellana:kernels:raw": [
+    "food:taxon:corylus_avellana:kernels:raw"
+  ],
+  "food_taxon_corylus_avellana_kernels_raw": [
+    "food:taxon:corylus_avellana:kernels:raw"
+  ],
+  "榛子仁": [
+    "food:taxon:corylus_avellana:kernels:raw"
+  ],
+  "hazelnutkernels": [
+    "food:taxon:corylus_avellana:kernels:raw"
+  ],
+  "food:taxon:castanea_mollissima:kernels:raw": [
+    "food:taxon:castanea_mollissima:kernels:raw"
+  ],
+  "food_taxon_castanea_mollissima_kernels_raw": [
+    "food:taxon:castanea_mollissima:kernels:raw"
+  ],
+  "板栗仁": [
+    "food:taxon:castanea_mollissima:kernels:raw"
+  ],
+  "chinesechestnutkernels": [
+    "food:taxon:castanea_mollissima:kernels:raw"
+  ],
+  "food:taxon:vicia_faba:dry": [
+    "food:taxon:vicia_faba:dry"
+  ],
+  "food_taxon_vicia_faba_dry": [
+    "food:taxon:vicia_faba:dry"
+  ],
+  "蚕豆": [
+    "food:taxon:vicia_faba:dry",
+    "food:taxon:vicia_faba:fresh:raw"
+  ],
+  "driedfavabeans": [
+    "food:taxon:vicia_faba:dry"
+  ],
+  "food:taxon:glycine_max:black:dry": [
+    "food:taxon:glycine_max:black:dry"
+  ],
+  "food_taxon_glycine_max_black_dry": [
+    "food:taxon:glycine_max:black:dry"
+  ],
+  "黑豆": [
+    "food:taxon:glycine_max:black:dry"
+  ],
+  "blacksoybeans": [
+    "food:taxon:glycine_max:black:dry"
+  ],
+  "food:taxon:pisum_sativum:dry": [
+    "food:taxon:pisum_sativum:dry"
+  ],
+  "food_taxon_pisum_sativum_dry": [
+    "food:taxon:pisum_sativum:dry"
+  ],
+  "青豆": [
+    "food:taxon:pisum_sativum:dry",
+    "food:taxon:glycine_max:edamame:raw"
+  ],
+  "driedgreenpeas": [
+    "food:taxon:pisum_sativum:dry"
+  ],
+  "food:taxon:carya_cathayensis:kernels:raw": [
+    "food:taxon:carya_cathayensis:kernels:raw"
+  ],
+  "food_taxon_carya_cathayensis_kernels_raw": [
+    "food:taxon:carya_cathayensis:kernels:raw"
+  ],
+  "山核桃仁": [
+    "food:taxon:carya_cathayensis:kernels:raw"
+  ],
+  "chinesehickorykernels": [
+    "food:taxon:carya_cathayensis:kernels:raw"
+  ],
+  "food:taxon:benincasa_hispida:raw": [
+    "food:taxon:benincasa_hispida:raw"
+  ],
+  "food_taxon_benincasa_hispida_raw": [
+    "food:taxon:benincasa_hispida:raw"
+  ],
+  "冬瓜": [
+    "food:taxon:benincasa_hispida:raw"
+  ],
+  "wintermelon": [
+    "food:taxon:benincasa_hispida:raw"
+  ],
+  "waxgourd": [
+    "food:taxon:benincasa_hispida:raw"
+  ],
+  "food:taxon:ctenopharyngodon_idella:raw": [
+    "food:taxon:ctenopharyngodon_idella:raw"
+  ],
+  "food_taxon_ctenopharyngodon_idella_raw": [
+    "food:taxon:ctenopharyngodon_idella:raw"
+  ],
+  "草鱼": [
+    "food:taxon:ctenopharyngodon_idella:raw"
+  ],
+  "白鲩": [
+    "food:taxon:ctenopharyngodon_idella:raw"
+  ],
+  "grasscarp": [
+    "food:taxon:ctenopharyngodon_idella:raw"
+  ],
+  "whiteamur": [
+    "food:taxon:ctenopharyngodon_idella:raw"
+  ],
+  "food:taxon:carassius_auratus:raw": [
+    "food:taxon:carassius_auratus:raw"
+  ],
+  "food_taxon_carassius_auratus_raw": [
+    "food:taxon:carassius_auratus:raw"
+  ],
+  "鲫鱼": [
+    "food:taxon:carassius_auratus:raw"
+  ],
+  "cruciancarp": [
+    "food:taxon:carassius_auratus:raw"
+  ],
+  "goldfishcarp": [
+    "food:taxon:carassius_auratus:raw"
+  ],
+  "food:taxon:culter_alburnus:raw": [
+    "food:taxon:culter_alburnus:raw"
+  ],
+  "food_taxon_culter_alburnus_raw": [
+    "food:taxon:culter_alburnus:raw"
+  ],
+  "翘嘴白": [
+    "food:taxon:culter_alburnus:raw"
+  ],
+  "翘嘴鲌": [
+    "food:taxon:culter_alburnus:raw"
+  ],
+  "白条鱼": [
+    "food:taxon:culter_alburnus:raw"
+  ],
+  "topmouthculter": [
+    "food:taxon:culter_alburnus:raw"
+  ],
+  "sharp-bellyfish": [
+    "food:taxon:culter_alburnus:raw"
+  ],
+  "food:taxon:hypophthalmichthys_nobilis:raw": [
+    "food:taxon:hypophthalmichthys_nobilis:raw"
+  ],
+  "food_taxon_hypophthalmichthys_nobilis_raw": [
+    "food:taxon:hypophthalmichthys_nobilis:raw"
+  ],
+  "胖头鱼": [
+    "food:taxon:hypophthalmichthys_nobilis:raw"
+  ],
+  "鳙鱼": [
+    "food:taxon:hypophthalmichthys_nobilis:raw"
+  ],
+  "花鲢": [
+    "food:taxon:hypophthalmichthys_nobilis:raw"
+  ],
+  "bigheadcarp": [
+    "food:taxon:hypophthalmichthys_nobilis:raw"
+  ],
+  "food:plant_oil:corn": [
+    "food:plant_oil:corn"
+  ],
+  "food_plant_oil_corn": [
+    "food:plant_oil:corn"
+  ],
+  "玉米油": [
+    "food:plant_oil:corn"
+  ],
+  "cornoil": [
+    "food:plant_oil:corn"
+  ],
+  "food:plant_oil:rapeseed": [
+    "food:plant_oil:rapeseed"
+  ],
+  "food_plant_oil_rapeseed": [
+    "food:plant_oil:rapeseed"
+  ],
+  "菜籽油": [
+    "food:plant_oil:rapeseed"
+  ],
+  "菜油": [
+    "food:plant_oil:rapeseed"
+  ],
+  "rapeseedoil": [
+    "food:plant_oil:rapeseed"
+  ],
+  "canolaoil": [
+    "food:plant_oil:rapeseed"
+  ],
+  "food:plant_oil:peanut": [
+    "food:plant_oil:peanut"
+  ],
+  "food_plant_oil_peanut": [
+    "food:plant_oil:peanut"
+  ],
+  "花生油": [
+    "food:plant_oil:peanut"
+  ],
+  "peanutoil": [
+    "food:plant_oil:peanut"
+  ],
+  "food:taxon:spinacia_oleracea:raw": [
+    "food:taxon:spinacia_oleracea:raw"
+  ],
+  "food_taxon_spinacia_oleracea_raw": [
+    "food:taxon:spinacia_oleracea:raw"
+  ],
+  "菠菜": [
+    "food:taxon:spinacia_oleracea:raw"
+  ],
+  "spinach": [
+    "food:taxon:spinacia_oleracea:raw"
+  ],
+  "food:taxon:brassica_rapa:pekinensis:raw": [
+    "food:taxon:brassica_rapa:pekinensis:raw"
+  ],
+  "food_taxon_brassica_rapa_pekinensis_raw": [
+    "food:taxon:brassica_rapa:pekinensis:raw"
+  ],
+  "大白菜": [
+    "food:taxon:brassica_rapa:pekinensis:raw"
+  ],
+  "白菜": [
+    "food:taxon:brassica_rapa:pekinensis:raw"
+  ],
+  "黄芽白": [
+    "food:taxon:brassica_rapa:pekinensis:raw"
+  ],
+  "chinesecabbage": [
+    "food:taxon:brassica_rapa:pekinensis:raw"
+  ],
+  "napacabbage": [
+    "food:taxon:brassica_rapa:pekinensis:raw"
+  ],
+  "food:taxon:brassica_rapa:chinensis:raw": [
+    "food:taxon:brassica_rapa:chinensis:raw"
+  ],
+  "food_taxon_brassica_rapa_chinensis_raw": [
+    "food:taxon:brassica_rapa:chinensis:raw"
+  ],
+  "小白菜": [
+    "food:taxon:brassica_rapa:chinensis:raw"
+  ],
+  "青菜": [
+    "food:taxon:brassica_rapa:chinensis:raw",
+    "food:taxon:brassica_rapa:oleifera:raw"
+  ],
+  "上海青": [
+    "food:taxon:brassica_rapa:chinensis:raw"
+  ],
+  "bokchoy": [
+    "food:taxon:brassica_rapa:chinensis:raw"
+  ],
+  "pakchoi": [
+    "food:taxon:brassica_rapa:chinensis:raw"
+  ],
+  "food:taxon:brassica_oleracea:capitata:raw": [
+    "food:taxon:brassica_oleracea:capitata:raw"
+  ],
+  "food_taxon_brassica_oleracea_capitata_raw": [
+    "food:taxon:brassica_oleracea:capitata:raw"
+  ],
+  "圆白菜": [
+    "food:taxon:brassica_oleracea:capitata:raw"
+  ],
+  "卷心菜": [
+    "food:taxon:brassica_oleracea:capitata:raw"
+  ],
+  "包菜": [
+    "food:taxon:brassica_oleracea:capitata:raw"
+  ],
+  "洋白菜": [
+    "food:taxon:brassica_oleracea:capitata:raw"
+  ],
+  "cabbage": [
+    "food:taxon:brassica_oleracea:capitata:raw"
+  ],
+  "food:taxon:brassica_rapa:oleifera:raw": [
+    "food:taxon:brassica_rapa:oleifera:raw"
+  ],
+  "food_taxon_brassica_rapa_oleifera_raw": [
+    "food:taxon:brassica_rapa:oleifera:raw"
+  ],
+  "油菜": [
+    "food:taxon:brassica_rapa:oleifera:raw"
+  ],
+  "rapeseedgreens": [
+    "food:taxon:brassica_rapa:oleifera:raw"
+  ],
+  "food:taxon:allium_tuberosum:raw": [
+    "food:taxon:allium_tuberosum:raw"
+  ],
+  "food_taxon_allium_tuberosum_raw": [
+    "food:taxon:allium_tuberosum:raw"
+  ],
+  "韭菜": [
+    "food:taxon:allium_tuberosum:raw"
+  ],
+  "chinesechives": [
+    "food:taxon:allium_tuberosum:raw"
+  ],
+  "garlicchives": [
+    "food:taxon:allium_tuberosum:raw"
+  ],
+  "food:taxon:ipomoea_aquatica:raw": [
+    "food:taxon:ipomoea_aquatica:raw"
+  ],
+  "food_taxon_ipomoea_aquatica_raw": [
+    "food:taxon:ipomoea_aquatica:raw"
+  ],
+  "空心菜": [
+    "food:taxon:ipomoea_aquatica:raw"
+  ],
+  "蕹菜": [
+    "food:taxon:ipomoea_aquatica:raw"
+  ],
+  "通菜": [
+    "food:taxon:ipomoea_aquatica:raw"
+  ],
+  "waterspinach": [
+    "food:taxon:ipomoea_aquatica:raw"
+  ],
+  "watermorningglory": [
+    "food:taxon:ipomoea_aquatica:raw"
+  ],
+  "food:taxon:lactuca_sativa:longifolia:raw": [
+    "food:taxon:lactuca_sativa:longifolia:raw"
+  ],
+  "food_taxon_lactuca_sativa_longifolia_raw": [
+    "food:taxon:lactuca_sativa:longifolia:raw"
+  ],
+  "油麦菜": [
+    "food:taxon:lactuca_sativa:longifolia:raw"
+  ],
+  "long-leaflettuce": [
+    "food:taxon:lactuca_sativa:longifolia:raw"
+  ],
+  "food:taxon:amaranthus_tricolor:raw": [
+    "food:taxon:amaranthus_tricolor:raw"
+  ],
+  "food_taxon_amaranthus_tricolor_raw": [
+    "food:taxon:amaranthus_tricolor:raw"
+  ],
+  "苋菜": [
+    "food:taxon:amaranthus_tricolor:raw"
+  ],
+  "红苋菜": [
+    "food:taxon:amaranthus_tricolor:raw"
+  ],
+  "amaranthgreens": [
+    "food:taxon:amaranthus_tricolor:raw"
+  ],
+  "redamaranth": [
+    "food:taxon:amaranthus_tricolor:raw"
+  ],
+  "food:taxon:glebionis_coronaria:raw": [
+    "food:taxon:glebionis_coronaria:raw"
+  ],
+  "food_taxon_glebionis_coronaria_raw": [
+    "food:taxon:glebionis_coronaria:raw"
+  ],
+  "茼蒿": [
+    "food:taxon:glebionis_coronaria:raw"
+  ],
+  "蒿子秆": [
+    "food:taxon:glebionis_coronaria:raw"
+  ],
+  "garlandchrysanthemum": [
+    "food:taxon:glebionis_coronaria:raw"
+  ],
+  "food:taxon:brassica_rapa:chinensis:baby:raw": [
+    "food:taxon:brassica_rapa:chinensis:baby:raw"
+  ],
+  "food_taxon_brassica_rapa_chinensis_baby_raw": [
+    "food:taxon:brassica_rapa:chinensis:baby:raw"
+  ],
+  "娃娃菜": [
+    "food:taxon:brassica_rapa:chinensis:baby:raw"
+  ],
+  "babybokchoy": [
+    "food:taxon:brassica_rapa:chinensis:baby:raw"
+  ],
+  "food:taxon:brassica_oleracea:alboglabra:raw": [
+    "food:taxon:brassica_oleracea:alboglabra:raw"
+  ],
+  "food_taxon_brassica_oleracea_alboglabra_raw": [
+    "food:taxon:brassica_oleracea:alboglabra:raw"
+  ],
+  "芥蓝": [
+    "food:taxon:brassica_oleracea:alboglabra:raw"
+  ],
+  "芥兰": [
+    "food:taxon:brassica_oleracea:alboglabra:raw"
+  ],
+  "chinesekale": [
+    "food:taxon:brassica_oleracea:alboglabra:raw"
+  ],
+  "chinesebroccoli": [
+    "food:taxon:brassica_oleracea:alboglabra:raw"
+  ],
+  "food:taxon:raphanus_sativus:raw": [
+    "food:taxon:raphanus_sativus:raw"
+  ],
+  "food_taxon_raphanus_sativus_raw": [
+    "food:taxon:raphanus_sativus:raw"
+  ],
+  "白萝卜": [
+    "food:taxon:raphanus_sativus:raw"
+  ],
+  "whiteradish": [
+    "food:taxon:raphanus_sativus:raw"
+  ],
+  "daikon": [
+    "food:taxon:raphanus_sativus:raw"
+  ],
+  "food:taxon:raphanus_sativus:green:raw": [
+    "food:taxon:raphanus_sativus:green:raw"
+  ],
+  "food_taxon_raphanus_sativus_green_raw": [
+    "food:taxon:raphanus_sativus:green:raw"
+  ],
+  "青萝卜": [
+    "food:taxon:raphanus_sativus:green:raw"
+  ],
+  "greenradish": [
+    "food:taxon:raphanus_sativus:green:raw"
+  ],
+  "food:taxon:allium_cepa:raw": [
+    "food:taxon:allium_cepa:raw"
+  ],
+  "food_taxon_allium_cepa_raw": [
+    "food:taxon:allium_cepa:raw"
+  ],
+  "洋葱": [
+    "food:taxon:allium_cepa:raw"
+  ],
+  "圆葱": [
+    "food:taxon:allium_cepa:raw"
+  ],
+  "onion": [
+    "food:taxon:allium_cepa:raw"
+  ],
+  "food:taxon:phyllostachys_edulis:shoot:raw": [
+    "food:taxon:phyllostachys_edulis:shoot:raw"
+  ],
+  "food_taxon_phyllostachys_edulis_shoot_raw": [
+    "food:taxon:phyllostachys_edulis:shoot:raw"
+  ],
+  "竹笋": [
+    "food:taxon:phyllostachys_edulis:shoot:raw"
+  ],
+  "冬笋": [
+    "food:taxon:phyllostachys_edulis:shoot:raw"
+  ],
+  "春笋": [
+    "food:taxon:phyllostachys_edulis:shoot:raw"
+  ],
+  "bambooshoot": [
+    "food:taxon:phyllostachys_edulis:shoot:raw"
+  ],
+  "food:taxon:luffa_aegyptiaca:raw": [
+    "food:taxon:luffa_aegyptiaca:raw"
+  ],
+  "food_taxon_luffa_aegyptiaca_raw": [
+    "food:taxon:luffa_aegyptiaca:raw"
+  ],
+  "丝瓜": [
+    "food:taxon:luffa_aegyptiaca:raw"
+  ],
+  "水瓜": [
+    "food:taxon:luffa_aegyptiaca:raw"
+  ],
+  "luffa": [
+    "food:taxon:luffa_aegyptiaca:raw"
+  ],
+  "loofah": [
+    "food:taxon:luffa_aegyptiaca:raw"
+  ],
+  "spongegourd": [
+    "food:taxon:luffa_aegyptiaca:raw"
+  ],
+  "food:taxon:momordica_charantia:raw": [
+    "food:taxon:momordica_charantia:raw"
+  ],
+  "food_taxon_momordica_charantia_raw": [
+    "food:taxon:momordica_charantia:raw"
+  ],
+  "苦瓜": [
+    "food:taxon:momordica_charantia:raw"
+  ],
+  "凉瓜": [
+    "food:taxon:momordica_charantia:raw"
+  ],
+  "bittergourd": [
+    "food:taxon:momordica_charantia:raw"
+  ],
+  "bittermelon": [
+    "food:taxon:momordica_charantia:raw"
+  ],
+  "food:taxon:cucurbita_moschata:raw": [
+    "food:taxon:cucurbita_moschata:raw"
+  ],
+  "food_taxon_cucurbita_moschata_raw": [
+    "food:taxon:cucurbita_moschata:raw"
+  ],
+  "南瓜": [
+    "food:taxon:cucurbita_moschata:raw"
+  ],
+  "倭瓜": [
+    "food:taxon:cucurbita_moschata:raw"
+  ],
+  "pumpkin": [
+    "food:taxon:cucurbita_moschata:raw"
+  ],
+  "wintersquash": [
+    "food:taxon:cucurbita_moschata:raw"
+  ],
+  "food:taxon:cucurbita_pepo:zucchini:raw": [
+    "food:taxon:cucurbita_pepo:zucchini:raw"
+  ],
+  "food_taxon_cucurbita_pepo_zucchini_raw": [
+    "food:taxon:cucurbita_pepo:zucchini:raw"
+  ],
+  "西葫芦": [
+    "food:taxon:cucurbita_pepo:zucchini:raw"
+  ],
+  "角瓜": [
+    "food:taxon:cucurbita_pepo:zucchini:raw"
+  ],
+  "zucchini": [
+    "food:taxon:cucurbita_pepo:zucchini:raw"
+  ],
+  "courgette": [
+    "food:taxon:cucurbita_pepo:zucchini:raw"
+  ],
+  "food:taxon:capsicum_annuum:bell_green:raw": [
+    "food:taxon:capsicum_annuum:bell_green:raw"
+  ],
+  "food_taxon_capsicum_annuum_bell_green_raw": [
+    "food:taxon:capsicum_annuum:bell_green:raw"
+  ],
+  "青椒": [
+    "food:taxon:capsicum_annuum:bell_green:raw"
+  ],
+  "柿子椒": [
+    "food:taxon:capsicum_annuum:bell_green:raw"
+  ],
+  "甜椒": [
+    "food:taxon:capsicum_annuum:bell_green:raw"
+  ],
+  "greenbellpepper": [
+    "food:taxon:capsicum_annuum:bell_green:raw"
+  ],
+  "food:taxon:lagenaria_siceraria:raw": [
+    "food:taxon:lagenaria_siceraria:raw"
+  ],
+  "food_taxon_lagenaria_siceraria_raw": [
+    "food:taxon:lagenaria_siceraria:raw"
+  ],
+  "瓠瓜": [
+    "food:taxon:lagenaria_siceraria:raw"
+  ],
+  "葫芦瓜": [
+    "food:taxon:lagenaria_siceraria:raw"
+  ],
+  "瓠子": [
+    "food:taxon:lagenaria_siceraria:raw"
+  ],
+  "bottlegourd": [
+    "food:taxon:lagenaria_siceraria:raw"
+  ],
+  "calabash": [
+    "food:taxon:lagenaria_siceraria:raw"
+  ],
+  "food:taxon:sechium_edule:raw": [
+    "food:taxon:sechium_edule:raw"
+  ],
+  "food_taxon_sechium_edule_raw": [
+    "food:taxon:sechium_edule:raw"
+  ],
+  "佛手瓜": [
+    "food:taxon:sechium_edule:raw"
+  ],
+  "合手瓜": [
+    "food:taxon:sechium_edule:raw"
+  ],
+  "chayote": [
+    "food:taxon:sechium_edule:raw"
+  ],
+  "food:taxon:benincasa_hispida:chieh_qua:raw": [
+    "food:taxon:benincasa_hispida:chieh_qua:raw"
+  ],
+  "food_taxon_benincasa_hispida_chieh_qua_raw": [
+    "food:taxon:benincasa_hispida:chieh_qua:raw"
+  ],
+  "节瓜": [
+    "food:taxon:benincasa_hispida:chieh_qua:raw"
+  ],
+  "毛瓜": [
+    "food:taxon:benincasa_hispida:chieh_qua:raw"
+  ],
+  "hairymelon": [
+    "food:taxon:benincasa_hispida:chieh_qua:raw"
+  ],
+  "pichay": [
+    "food:taxon:benincasa_hispida:chieh_qua:raw"
+  ],
+  "food:taxon:pisum_sativum:snap_pea:raw": [
+    "food:taxon:pisum_sativum:snap_pea:raw"
+  ],
+  "food_taxon_pisum_sativum_snap_pea_raw": [
+    "food:taxon:pisum_sativum:snap_pea:raw"
+  ],
+  "荷兰豆": [
+    "food:taxon:pisum_sativum:snap_pea:raw"
+  ],
+  "豌豆荚": [
+    "food:taxon:pisum_sativum:snap_pea:raw"
+  ],
+  "snappea": [
+    "food:taxon:pisum_sativum:snap_pea:raw"
+  ],
+  "snowpea": [
+    "food:taxon:pisum_sativum:snap_pea:raw"
+  ],
+  "food:taxon:glycine_max:edamame:raw": [
+    "food:taxon:glycine_max:edamame:raw"
+  ],
+  "food_taxon_glycine_max_edamame_raw": [
+    "food:taxon:glycine_max:edamame:raw"
+  ],
+  "毛豆": [
+    "food:taxon:glycine_max:edamame:raw"
+  ],
+  "edamame": [
+    "food:taxon:glycine_max:edamame:raw"
+  ],
+  "freshgreensoybeans": [
+    "food:taxon:glycine_max:edamame:raw"
+  ],
+  "food:taxon:vicia_faba:fresh:raw": [
+    "food:taxon:vicia_faba:fresh:raw"
+  ],
+  "food_taxon_vicia_faba_fresh_raw": [
+    "food:taxon:vicia_faba:fresh:raw"
+  ],
+  "胡豆": [
+    "food:taxon:vicia_faba:fresh:raw"
+  ],
+  "favabeans,fresh": [
+    "food:taxon:vicia_faba:fresh:raw"
+  ],
+  "broadbeans": [
+    "food:taxon:vicia_faba:fresh:raw"
+  ],
+  "food:taxon:lablab_purpureus:raw": [
+    "food:taxon:lablab_purpureus:raw"
+  ],
+  "food_taxon_lablab_purpureus_raw": [
+    "food:taxon:lablab_purpureus:raw"
+  ],
+  "扁豆": [
+    "food:taxon:lablab_purpureus:raw"
+  ],
+  "眉豆": [
+    "food:taxon:lablab_purpureus:raw"
+  ],
+  "hyacinthbean": [
+    "food:taxon:lablab_purpureus:raw"
+  ],
+  "food:taxon:pisum_sativum:fresh_peas:raw": [
+    "food:taxon:pisum_sativum:fresh_peas:raw"
+  ],
+  "food_taxon_pisum_sativum_fresh_peas_raw": [
+    "food:taxon:pisum_sativum:fresh_peas:raw"
+  ],
+  "豌豆": [
+    "food:taxon:pisum_sativum:fresh_peas:raw"
+  ],
+  "青豌豆": [
+    "food:taxon:pisum_sativum:fresh_peas:raw"
+  ],
+  "greenpeas,fresh": [
+    "food:taxon:pisum_sativum:fresh_peas:raw"
+  ],
+  "food:taxon:brassica_oleracea:cauliflower:raw": [
+    "food:taxon:brassica_oleracea:cauliflower:raw"
+  ],
+  "food_taxon_brassica_oleracea_cauliflower_raw": [
+    "food:taxon:brassica_oleracea:cauliflower:raw"
+  ],
+  "菜花": [
+    "food:taxon:brassica_oleracea:cauliflower:raw"
+  ],
+  "花椰菜": [
+    "food:taxon:brassica_oleracea:cauliflower:raw"
+  ],
+  "花菜": [
+    "food:taxon:brassica_oleracea:cauliflower:raw"
+  ],
+  "cauliflower": [
+    "food:taxon:brassica_oleracea:cauliflower:raw"
+  ],
+  "food:taxon:hemerocallis:fresh:raw": [
+    "food:taxon:hemerocallis:fresh:raw"
+  ],
+  "food_taxon_hemerocallis_fresh_raw": [
+    "food:taxon:hemerocallis:fresh:raw"
+  ],
+  "黄花菜": [
+    "food:taxon:hemerocallis:fresh:raw"
+  ],
+  "金针菜": [
+    "food:taxon:hemerocallis:fresh:raw"
+  ],
+  "daylilyflowerbuds,fresh": [
+    "food:taxon:hemerocallis:fresh:raw"
+  ],
+  "food:taxon:brassica_rapa:choy_sum:raw": [
+    "food:taxon:brassica_rapa:choy_sum:raw"
+  ],
+  "food_taxon_brassica_rapa_choy_sum_raw": [
+    "food:taxon:brassica_rapa:choy_sum:raw"
+  ],
+  "菜薹": [
+    "food:taxon:brassica_rapa:choy_sum:raw"
+  ],
+  "菜心": [
+    "food:taxon:brassica_rapa:choy_sum:raw"
+  ],
+  "广东菜心": [
+    "food:taxon:brassica_rapa:choy_sum:raw"
+  ],
+  "choysum": [
+    "food:taxon:brassica_rapa:choy_sum:raw"
+  ],
+  "floweringchinesecabbage": [
+    "food:taxon:brassica_rapa:choy_sum:raw"
+  ],
+  "food:taxon:lentinula_edodes:raw": [
+    "food:taxon:lentinula_edodes:raw"
+  ],
+  "food_taxon_lentinula_edodes_raw": [
+    "food:taxon:lentinula_edodes:raw"
+  ],
+  "香菇": [
+    "food:taxon:lentinula_edodes:raw"
+  ],
+  "冬菇": [
+    "food:taxon:lentinula_edodes:raw"
+  ],
+  "shiitakemushroom": [
+    "food:taxon:lentinula_edodes:raw"
+  ],
+  "food:taxon:pleurotus_ostreatus:raw": [
+    "food:taxon:pleurotus_ostreatus:raw"
+  ],
+  "food_taxon_pleurotus_ostreatus_raw": [
+    "food:taxon:pleurotus_ostreatus:raw"
+  ],
+  "平菇": [
+    "food:taxon:pleurotus_ostreatus:raw"
+  ],
+  "侧耳": [
+    "food:taxon:pleurotus_ostreatus:raw"
+  ],
+  "oystermushroom": [
+    "food:taxon:pleurotus_ostreatus:raw"
+  ],
+  "food:taxon:flammulina_velutipes:raw": [
+    "food:taxon:flammulina_velutipes:raw"
+  ],
+  "food_taxon_flammulina_velutipes_raw": [
+    "food:taxon:flammulina_velutipes:raw"
+  ],
+  "金针菇": [
+    "food:taxon:flammulina_velutipes:raw"
+  ],
+  "金菇": [
+    "food:taxon:flammulina_velutipes:raw"
+  ],
+  "enokimushroom": [
+    "food:taxon:flammulina_velutipes:raw"
+  ],
+  "goldenneedlemushroom": [
+    "food:taxon:flammulina_velutipes:raw"
+  ],
+  "food:taxon:pleurotus_eryngii:raw": [
+    "food:taxon:pleurotus_eryngii:raw"
+  ],
+  "food_taxon_pleurotus_eryngii_raw": [
+    "food:taxon:pleurotus_eryngii:raw"
+  ],
+  "杏鲍菇": [
+    "food:taxon:pleurotus_eryngii:raw"
+  ],
+  "刺芹侧耳": [
+    "food:taxon:pleurotus_eryngii:raw"
+  ],
+  "kingoystermushroom": [
+    "food:taxon:pleurotus_eryngii:raw"
+  ],
+  "food:taxon:auricularia_auricula:fresh:raw": [
+    "food:taxon:auricularia_auricula:fresh:raw"
+  ],
+  "food_taxon_auricularia_auricula_fresh_raw": [
+    "food:taxon:auricularia_auricula:fresh:raw"
+  ],
+  "黑木耳": [
+    "food:taxon:auricularia_auricula:fresh:raw"
+  ],
+  "木耳": [
+    "food:taxon:auricularia_auricula:fresh:raw"
+  ],
+  "woodearmushroom,fresh": [
+    "food:taxon:auricularia_auricula:fresh:raw"
+  ],
+  "food:taxon:agaricus_bisporus:raw": [
+    "food:taxon:agaricus_bisporus:raw"
+  ],
+  "food_taxon_agaricus_bisporus_raw": [
+    "food:taxon:agaricus_bisporus:raw"
+  ],
+  "白蘑菇": [
+    "food:taxon:agaricus_bisporus:raw"
+  ],
+  "口蘑": [
+    "food:taxon:agaricus_bisporus:raw"
+  ],
+  "洋蘑菇": [
+    "food:taxon:agaricus_bisporus:raw"
+  ],
+  "whitebuttonmushroom": [
+    "food:taxon:agaricus_bisporus:raw"
+  ],
+  "food:taxon:volvariella_volvacea:raw": [
+    "food:taxon:volvariella_volvacea:raw"
+  ],
+  "food_taxon_volvariella_volvacea_raw": [
+    "food:taxon:volvariella_volvacea:raw"
+  ],
+  "草菇": [
+    "food:taxon:volvariella_volvacea:raw"
+  ],
+  "strawmushroom": [
+    "food:taxon:volvariella_volvacea:raw"
+  ],
+  "food:taxon:saccharina_japonica:raw": [
+    "food:taxon:saccharina_japonica:raw"
+  ],
+  "food_taxon_saccharina_japonica_raw": [
+    "food:taxon:saccharina_japonica:raw"
+  ],
+  "海带": [
+    "food:taxon:saccharina_japonica:raw"
+  ],
+  "kelp": [
+    "food:taxon:saccharina_japonica:raw"
+  ],
+  "food:taxon:porphyra:dried:raw": [
+    "food:taxon:porphyra:dried:raw"
+  ],
+  "food_taxon_porphyra_dried_raw": [
+    "food:taxon:porphyra:dried:raw"
+  ],
+  "紫菜": [
+    "food:taxon:porphyra:dried:raw"
+  ],
+  "干紫菜": [
+    "food:taxon:porphyra:dried:raw"
+  ],
+  "driedlaver": [
+    "food:taxon:porphyra:dried:raw"
+  ],
+  "food:taxon:nelumbo_nucifera:rhizome:raw": [
+    "food:taxon:nelumbo_nucifera:rhizome:raw"
+  ],
+  "food_taxon_nelumbo_nucifera_rhizome_raw": [
+    "food:taxon:nelumbo_nucifera:rhizome:raw"
+  ],
+  "莲藕": [
+    "food:taxon:nelumbo_nucifera:rhizome:raw"
+  ],
+  "藕": [
+    "food:taxon:nelumbo_nucifera:rhizome:raw"
+  ],
+  "lotusroot": [
+    "food:taxon:nelumbo_nucifera:rhizome:raw"
+  ],
+  "food:taxon:eleocharis_dulcis:raw": [
+    "food:taxon:eleocharis_dulcis:raw"
+  ],
+  "food_taxon_eleocharis_dulcis_raw": [
+    "food:taxon:eleocharis_dulcis:raw"
+  ],
+  "荸荠": [
+    "food:taxon:eleocharis_dulcis:raw"
+  ],
+  "马蹄": [
+    "food:taxon:eleocharis_dulcis:raw"
+  ],
+  "waterchestnut": [
+    "food:taxon:eleocharis_dulcis:raw"
+  ],
+  "food:taxon:nasturtium_officinale:raw": [
+    "food:taxon:nasturtium_officinale:raw"
+  ],
+  "food_taxon_nasturtium_officinale_raw": [
+    "food:taxon:nasturtium_officinale:raw"
+  ],
+  "西洋菜": [
+    "food:taxon:nasturtium_officinale:raw"
+  ],
+  "豆瓣菜": [
+    "food:taxon:nasturtium_officinale:raw"
+  ],
+  "watercress": [
+    "food:taxon:nasturtium_officinale:raw"
+  ],
+  "food:taxon:oenanthe_javanica:raw": [
+    "food:taxon:oenanthe_javanica:raw"
+  ],
+  "food_taxon_oenanthe_javanica_raw": [
+    "food:taxon:oenanthe_javanica:raw"
+  ],
+  "水芹": [
+    "food:taxon:oenanthe_javanica:raw"
+  ],
+  "watercelery": [
+    "food:taxon:oenanthe_javanica:raw"
+  ],
+  "food:taxon:sagittaria_sagittifolia:raw": [
+    "food:taxon:sagittaria_sagittifolia:raw"
+  ],
+  "food_taxon_sagittaria_sagittifolia_raw": [
+    "food:taxon:sagittaria_sagittifolia:raw"
+  ],
+  "慈姑": [
+    "food:taxon:sagittaria_sagittifolia:raw"
+  ],
+  "茨菇": [
+    "food:taxon:sagittaria_sagittifolia:raw"
+  ],
+  "arrowhead": [
+    "food:taxon:sagittaria_sagittifolia:raw"
+  ],
+  "chinesearrowhead": [
+    "food:taxon:sagittaria_sagittifolia:raw"
+  ],
+  "food:taxon:trapa:raw": [
+    "food:taxon:trapa:raw"
+  ],
+  "food_taxon_trapa_raw": [
+    "food:taxon:trapa:raw"
+  ],
+  "菱角": [
+    "food:taxon:trapa:raw"
+  ],
+  "watercaltrop": [
+    "food:taxon:trapa:raw"
+  ],
+  "food:taxon:fagopyrum_esculentum:flour": [
+    "food:taxon:fagopyrum_esculentum:flour"
+  ],
+  "food_taxon_fagopyrum_esculentum_flour": [
+    "food:taxon:fagopyrum_esculentum:flour"
+  ],
+  "荞麦粉": [
+    "food:taxon:fagopyrum_esculentum:flour"
+  ],
+  "荞面": [
+    "food:taxon:fagopyrum_esculentum:flour"
+  ],
+  "buckwheatflour": [
+    "food:taxon:fagopyrum_esculentum:flour"
+  ],
+  "food:taxon:gallus_gallus:egg:pan_fried": [
+    "food:taxon:gallus_gallus:egg:pan_fried"
+  ],
+  "food_taxon_gallus_gallus_egg_pan_fried": [
+    "food:taxon:gallus_gallus:egg:pan_fried"
+  ],
+  "煎鸡蛋": [
+    "food:taxon:gallus_gallus:egg:pan_fried"
+  ],
+  "荷包蛋": [
+    "food:taxon:gallus_gallus:egg:pan_fried"
+  ],
+  "pan-friedegg": [
+    "food:taxon:gallus_gallus:egg:pan_fried"
+  ],
+  "friedegg": [
+    "food:taxon:gallus_gallus:egg:pan_fried"
+  ],
+  "food:taxon:oryza_sativa:polished:steamed": [
+    "food:taxon:oryza_sativa:polished:steamed"
+  ],
+  "food_taxon_oryza_sativa_polished_steamed": [
+    "food:taxon:oryza_sativa:polished:steamed"
+  ],
+  "米饭": [
+    "food:taxon:oryza_sativa:polished:steamed"
+  ],
+  "白米饭": [
+    "food:taxon:oryza_sativa:polished:steamed"
+  ],
+  "熟米饭": [
+    "food:taxon:oryza_sativa:polished:steamed"
+  ],
+  "cookedwhiterice": [
+    "food:taxon:oryza_sativa:polished:steamed"
+  ],
+  "steamedrice": [
+    "food:taxon:oryza_sativa:polished:steamed"
+  ],
+  "food:taxon:oryza_sativa:wholegrain:steamed": [
+    "food:taxon:oryza_sativa:wholegrain:steamed"
+  ],
+  "food_taxon_oryza_sativa_wholegrain_steamed": [
+    "food:taxon:oryza_sativa:wholegrain:steamed"
+  ],
+  "糙米饭": [
+    "food:taxon:oryza_sativa:wholegrain:steamed"
+  ],
+  "熟糙米": [
+    "food:taxon:oryza_sativa:wholegrain:steamed"
+  ],
+  "cookedbrownrice": [
+    "food:taxon:oryza_sativa:wholegrain:steamed"
+  ],
+  "brownrice": [
+    "food:taxon:oryza_sativa:wholegrain:steamed"
+  ],
+  "food:taxon:solanum_tuberosum:boiled": [
+    "food:taxon:solanum_tuberosum:boiled"
+  ],
+  "food_taxon_solanum_tuberosum_boiled": [
+    "food:taxon:solanum_tuberosum:boiled"
+  ],
+  "煮土豆": [
+    "food:taxon:solanum_tuberosum:boiled"
+  ],
+  "马铃薯": [
+    "food:taxon:solanum_tuberosum:boiled"
+  ],
+  "洋芋": [
+    "food:taxon:solanum_tuberosum:boiled"
+  ],
+  "boiledpotato": [
+    "food:taxon:solanum_tuberosum:boiled"
+  ],
+  "potato": [
+    "food:taxon:solanum_tuberosum:boiled"
+  ],
+  "food:taxon:gallus_gallus:breast:steamed": [
+    "food:taxon:gallus_gallus:breast:steamed"
+  ],
+  "food_taxon_gallus_gallus_breast_steamed": [
+    "food:taxon:gallus_gallus:breast:steamed"
+  ],
+  "鸡胸肉": [
+    "food:taxon:gallus_gallus:breast:steamed"
+  ],
+  "去皮鸡胸": [
+    "food:taxon:gallus_gallus:breast:steamed"
+  ],
+  "鸡脯肉": [
+    "food:taxon:gallus_gallus:breast:steamed"
+  ],
+  "cookedchickenbreast": [
+    "food:taxon:gallus_gallus:breast:steamed"
+  ],
+  "skinlesschickenbreast": [
+    "food:taxon:gallus_gallus:breast:steamed"
+  ],
+  "food:taxon:arachis_hypogaea:roasted": [
+    "food:taxon:arachis_hypogaea:roasted"
+  ],
+  "food_taxon_arachis_hypogaea_roasted": [
+    "food:taxon:arachis_hypogaea:roasted"
+  ],
+  "烤花生": [
+    "food:taxon:arachis_hypogaea:roasted",
+    "food:snack:peanut:plain"
+  ],
+  "炒花生": [
+    "food:taxon:arachis_hypogaea:roasted"
+  ],
+  "熟花生": [
+    "food:taxon:arachis_hypogaea:roasted"
+  ],
+  "roastedpeanuts": [
+    "food:taxon:arachis_hypogaea:roasted"
+  ],
+  "peanuts": [
+    "food:taxon:arachis_hypogaea:roasted"
+  ],
+  "food:taxon:triticum_aestivum:mantou": [
+    "food:taxon:triticum_aestivum:mantou"
+  ],
+  "food_taxon_triticum_aestivum_mantou": [
+    "food:taxon:triticum_aestivum:mantou"
+  ],
+  "馒头": [
+    "food:taxon:triticum_aestivum:mantou"
+  ],
+  "steamedwheatbun": [
+    "food:taxon:triticum_aestivum:mantou"
+  ],
+  "mantou": [
+    "food:taxon:triticum_aestivum:mantou"
+  ],
+  "food:taxon:triticum_aestivum:bread_white": [
+    "food:taxon:triticum_aestivum:bread_white"
+  ],
+  "food_taxon_triticum_aestivum_bread_white": [
+    "food:taxon:triticum_aestivum:bread_white"
+  ],
+  "面包": [
+    "food:taxon:triticum_aestivum:bread_white"
+  ],
+  "白面包": [
+    "food:taxon:triticum_aestivum:bread_white"
+  ],
+  "whitebread": [
+    "food:taxon:triticum_aestivum:bread_white"
+  ],
+  "bread": [
+    "food:taxon:triticum_aestivum:bread_white"
+  ],
+  "food:taxon:triticum_aestivum:bread_whole_wheat": [
+    "food:taxon:triticum_aestivum:bread_whole_wheat"
+  ],
+  "food_taxon_triticum_aestivum_bread_whole_wheat": [
+    "food:taxon:triticum_aestivum:bread_whole_wheat"
+  ],
+  "全麦面包": [
+    "food:taxon:triticum_aestivum:bread_whole_wheat"
+  ],
+  "whole-wheatbread": [
+    "food:taxon:triticum_aestivum:bread_whole_wheat"
+  ],
+  "food:taxon:zea_mays:boiled": [
+    "food:taxon:zea_mays:boiled"
+  ],
+  "food_taxon_zea_mays_boiled": [
+    "food:taxon:zea_mays:boiled"
+  ],
+  "煮玉米": [
+    "food:taxon:zea_mays:boiled"
+  ],
+  "boiledsweetcorn": [
+    "food:taxon:zea_mays:boiled"
+  ],
+  "corn": [
+    "food:taxon:zea_mays:boiled"
+  ],
+  "food:taxon:ipomoea_batatas:steamed": [
+    "food:taxon:ipomoea_batatas:steamed"
+  ],
+  "food_taxon_ipomoea_batatas_steamed": [
+    "food:taxon:ipomoea_batatas:steamed"
+  ],
+  "红薯": [
+    "food:taxon:ipomoea_batatas:steamed"
+  ],
+  "蒸红薯": [
+    "food:taxon:ipomoea_batatas:steamed"
+  ],
+  "steamedsweetpotato": [
+    "food:taxon:ipomoea_batatas:steamed"
+  ],
+  "sweetpotato": [
+    "food:taxon:ipomoea_batatas:steamed"
+  ],
+  "food:taxon:colocasia_esculenta:boiled": [
+    "food:taxon:colocasia_esculenta:boiled"
+  ],
+  "food_taxon_colocasia_esculenta_boiled": [
+    "food:taxon:colocasia_esculenta:boiled"
+  ],
+  "芋头": [
+    "food:taxon:colocasia_esculenta:boiled"
+  ],
+  "煮芋头": [
+    "food:taxon:colocasia_esculenta:boiled"
+  ],
+  "boiledtaro": [
+    "food:taxon:colocasia_esculenta:boiled"
+  ],
+  "taro": [
+    "food:taxon:colocasia_esculenta:boiled"
+  ],
+  "food:taxon:panicum_miliaceum:porridge": [
+    "food:taxon:panicum_miliaceum:porridge"
+  ],
+  "food_taxon_panicum_miliaceum_porridge": [
+    "food:taxon:panicum_miliaceum:porridge"
+  ],
+  "小米粥": [
+    "food:taxon:panicum_miliaceum:porridge"
+  ],
+  "milletporridge": [
+    "food:taxon:panicum_miliaceum:porridge"
+  ],
+  "food:taxon:oryza_sativa:porridge": [
+    "food:taxon:oryza_sativa:porridge"
+  ],
+  "food_taxon_oryza_sativa_porridge": [
+    "food:taxon:oryza_sativa:porridge"
+  ],
+  "白粥": [
+    "food:taxon:oryza_sativa:porridge"
+  ],
+  "大米粥": [
+    "food:taxon:oryza_sativa:porridge"
+  ],
+  "riceporridge": [
+    "food:taxon:oryza_sativa:porridge"
+  ],
+  "food:taxon:oryza_sativa:glutinous_steamed": [
+    "food:taxon:oryza_sativa:glutinous_steamed"
+  ],
+  "food_taxon_oryza_sativa_glutinous_steamed": [
+    "food:taxon:oryza_sativa:glutinous_steamed"
+  ],
+  "糯米饭": [
+    "food:taxon:oryza_sativa:glutinous_steamed"
+  ],
+  "steamedglutinousrice": [
+    "food:taxon:oryza_sativa:glutinous_steamed"
+  ],
+  "food:taxon:oryza_sativa:zongzi": [
+    "food:taxon:oryza_sativa:zongzi"
+  ],
+  "food_taxon_oryza_sativa_zongzi": [
+    "food:taxon:oryza_sativa:zongzi"
+  ],
+  "粽子": [
+    "food:taxon:oryza_sativa:zongzi"
+  ],
+  "ricedumpling": [
+    "food:taxon:oryza_sativa:zongzi"
+  ],
+  "zongzi": [
+    "food:taxon:oryza_sativa:zongzi"
+  ],
+  "food:taxon:oryza_sativa:rice_noodles": [
+    "food:taxon:oryza_sativa:rice_noodles"
+  ],
+  "food_taxon_oryza_sativa_rice_noodles": [
+    "food:taxon:oryza_sativa:rice_noodles"
+  ],
+  "米粉": [
+    "food:taxon:oryza_sativa:rice_noodles"
+  ],
+  "ricenoodles": [
+    "food:taxon:oryza_sativa:rice_noodles"
+  ],
+  "food:taxon:oryza_sativa:liangpi": [
+    "food:taxon:oryza_sativa:liangpi"
+  ],
+  "food_taxon_oryza_sativa_liangpi": [
+    "food:taxon:oryza_sativa:liangpi"
+  ],
+  "凉皮": [
+    "food:taxon:oryza_sativa:liangpi"
+  ],
+  "coldricenoodles": [
+    "food:taxon:oryza_sativa:liangpi"
+  ],
+  "liangpi": [
+    "food:taxon:oryza_sativa:liangpi"
+  ],
+  "food:taxon:oryza_sativa:rice_cake": [
+    "food:taxon:oryza_sativa:rice_cake"
+  ],
+  "food_taxon_oryza_sativa_rice_cake": [
+    "food:taxon:oryza_sativa:rice_cake"
+  ],
+  "年糕": [
+    "food:taxon:oryza_sativa:rice_cake"
+  ],
+  "ricecake": [
+    "food:taxon:oryza_sativa:rice_cake"
+  ],
+  "food:taxon:triticum_aestivum:noodles_boiled": [
+    "food:taxon:triticum_aestivum:noodles_boiled"
+  ],
+  "food_taxon_triticum_aestivum_noodles_boiled": [
+    "food:taxon:triticum_aestivum:noodles_boiled"
+  ],
+  "面条": [
+    "food:taxon:triticum_aestivum:noodles_boiled"
+  ],
+  "煮面条": [
+    "food:taxon:triticum_aestivum:noodles_boiled"
+  ],
+  "boiledwheatnoodles": [
+    "food:taxon:triticum_aestivum:noodles_boiled"
+  ],
+  "noodles": [
+    "food:taxon:triticum_aestivum:noodles_boiled"
+  ],
+  "food:taxon:nelumbo_nucifera:starch_drink": [
+    "food:taxon:nelumbo_nucifera:starch_drink"
+  ],
+  "food_taxon_nelumbo_nucifera_starch_drink": [
+    "food:taxon:nelumbo_nucifera:starch_drink"
+  ],
+  "藕粉": [
+    "food:taxon:nelumbo_nucifera:starch_drink"
+  ],
+  "lotusrootstarchdrink": [
+    "food:taxon:nelumbo_nucifera:starch_drink"
+  ],
+  "food:taxon:glycine_max:soy_milk": [
+    "food:taxon:glycine_max:soy_milk"
+  ],
+  "food_taxon_glycine_max_soy_milk": [
+    "food:taxon:glycine_max:soy_milk"
+  ],
+  "豆浆": [
+    "food:taxon:glycine_max:soy_milk"
+  ],
+  "soymilk": [
+    "food:taxon:glycine_max:soy_milk"
+  ],
+  "food:taxon:triticum_aestivum:youtiao": [
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "food_taxon_triticum_aestivum_youtiao": [
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "油条": [
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "chinesefrieddough": [
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "youtiao": [
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "food:taxon:triticum_aestivum:meat_bun": [
+    "food:taxon:triticum_aestivum:meat_bun"
+  ],
+  "food_taxon_triticum_aestivum_meat_bun": [
+    "food:taxon:triticum_aestivum:meat_bun"
+  ],
+  "肉包子": [
+    "food:taxon:triticum_aestivum:meat_bun"
+  ],
+  "meat-filledsteamedbun": [
+    "food:taxon:triticum_aestivum:meat_bun"
+  ],
+  "meatbun": [
+    "food:taxon:triticum_aestivum:meat_bun"
+  ],
+  "food:beverage:tea": [
+    "food:beverage:tea"
+  ],
+  "food_beverage_tea": [
+    "food:beverage:tea"
+  ],
+  "茶水": [
+    "food:beverage:tea"
+  ],
+  "tea": [
+    "food:beverage:tea"
+  ],
+  "food:beverage:coffee:black": [
+    "food:beverage:coffee:black"
+  ],
+  "food_beverage_coffee_black": [
+    "food:beverage:coffee:black"
+  ],
+  "黑咖啡": [
+    "food:beverage:coffee:black"
+  ],
+  "blackcoffee": [
+    "food:beverage:coffee:black"
+  ],
+  "food:beverage:lemon_water": [
+    "food:beverage:lemon_water"
+  ],
+  "food_beverage_lemon_water": [
+    "food:beverage:lemon_water"
+  ],
+  "柠檬水": [
+    "food:beverage:lemon_water"
+  ],
+  "lemonwater": [
+    "food:beverage:lemon_water"
+  ],
+  "food:beverage:brown_sugar_water": [
+    "food:beverage:brown_sugar_water"
+  ],
+  "food_beverage_brown_sugar_water": [
+    "food:beverage:brown_sugar_water"
+  ],
+  "红糖水": [
+    "food:beverage:brown_sugar_water"
+  ],
+  "brownsugarwater": [
+    "food:beverage:brown_sugar_water"
+  ],
+  "food:beverage:soy_milk:commercial": [
+    "food:beverage:soy_milk:commercial"
+  ],
+  "food_beverage_soy_milk_commercial": [
+    "food:beverage:soy_milk:commercial"
+  ],
+  "豆奶": [
+    "food:beverage:soy_milk:commercial"
+  ],
+  "soymilkbeverage": [
+    "food:beverage:soy_milk:commercial"
+  ],
+  "food:snack:peanut:plain": [
+    "food:snack:peanut:plain"
+  ],
+  "food_snack_peanut_plain": [
+    "food:snack:peanut:plain"
+  ],
+  "炒花生（原味）": [
+    "food:snack:peanut:plain"
+  ],
+  "plainroastedpeanuts": [
+    "food:snack:peanut:plain"
+  ],
+  "food:snack:peanut:five_spice": [
+    "food:snack:peanut:five_spice"
+  ],
+  "food_snack_peanut_five_spice": [
+    "food:snack:peanut:five_spice"
+  ],
+  "炒花生（五香）": [
+    "food:snack:peanut:five_spice"
+  ],
+  "five-spiceroastedpeanuts": [
+    "food:snack:peanut:five_spice"
+  ],
+  "food:snack:peanut:garlic": [
+    "food:snack:peanut:garlic"
+  ],
+  "food_snack_peanut_garlic": [
+    "food:snack:peanut:garlic"
+  ],
+  "炒花生（蒜香）": [
+    "food:snack:peanut:garlic"
+  ],
+  "garlicroastedpeanuts": [
+    "food:snack:peanut:garlic"
+  ],
+  "food:snack:peanut:brined": [
+    "food:snack:peanut:brined"
+  ],
+  "food_snack_peanut_brined": [
+    "food:snack:peanut:brined"
+  ],
+  "炒花生（盐水）": [
+    "food:snack:peanut:brined"
+  ],
+  "brinedroastedpeanuts": [
+    "food:snack:peanut:brined"
+  ],
+  "food:snack:sunflower_seed:plain": [
+    "food:snack:sunflower_seed:plain"
+  ],
+  "food_snack_sunflower_seed_plain": [
+    "food:snack:sunflower_seed:plain"
+  ],
+  "炒葵花籽（原味）": [
+    "food:snack:sunflower_seed:plain"
+  ],
+  "plainroastedsunflowerseeds": [
+    "food:snack:sunflower_seed:plain"
+  ],
+  "food:snack:sunflower_seed:caramel": [
+    "food:snack:sunflower_seed:caramel"
+  ],
+  "food_snack_sunflower_seed_caramel": [
+    "food:snack:sunflower_seed:caramel"
+  ],
+  "炒葵花籽（焦糖）": [
+    "food:snack:sunflower_seed:caramel"
+  ],
+  "caramelsunflowerseeds": [
+    "food:snack:sunflower_seed:caramel"
+  ],
+  "food:snack:sunflower_seed:five_spice": [
+    "food:snack:sunflower_seed:five_spice"
+  ],
+  "food_snack_sunflower_seed_five_spice": [
+    "food:snack:sunflower_seed:five_spice"
+  ],
+  "炒葵花籽（五香）": [
+    "food:snack:sunflower_seed:five_spice"
+  ],
+  "five-spicesunflowerseeds": [
+    "food:snack:sunflower_seed:five_spice"
+  ],
+  "food:snack:sunflower_seed:hickory": [
+    "food:snack:sunflower_seed:hickory"
+  ],
+  "food_snack_sunflower_seed_hickory": [
+    "food:snack:sunflower_seed:hickory"
+  ],
+  "炒葵花籽（山核桃味）": [
+    "food:snack:sunflower_seed:hickory"
+  ],
+  "hickory-flavoredsunflowerseeds": [
+    "food:snack:sunflower_seed:hickory"
+  ],
+  "food:snack:watermelon_seed:plain": [
+    "food:snack:watermelon_seed:plain"
+  ],
+  "food_snack_watermelon_seed_plain": [
+    "food:snack:watermelon_seed:plain"
+  ],
+  "炒西瓜子（原味）": [
+    "food:snack:watermelon_seed:plain"
+  ],
+  "西瓜子": [
+    "food:snack:watermelon_seed:plain"
+  ],
+  "plainroastedwatermelonseeds": [
+    "food:snack:watermelon_seed:plain"
+  ],
+  "food:snack:pumpkin_seed:plain": [
+    "food:snack:pumpkin_seed:plain"
+  ],
+  "food_snack_pumpkin_seed_plain": [
+    "food:snack:pumpkin_seed:plain"
+  ],
+  "炒南瓜子（原味）": [
+    "food:snack:pumpkin_seed:plain"
+  ],
+  "南瓜子": [
+    "food:snack:pumpkin_seed:plain"
+  ],
+  "plainroastedpumpkinseeds": [
+    "food:snack:pumpkin_seed:plain"
+  ],
+  "food:snack:snake_gourd_seed:plain": [
+    "food:snack:snake_gourd_seed:plain"
+  ],
+  "food_snack_snake_gourd_seed_plain": [
+    "food:snack:snake_gourd_seed:plain"
+  ],
+  "炒吊瓜子（原味）": [
+    "food:snack:snake_gourd_seed:plain"
+  ],
+  "吊瓜子": [
+    "food:snack:snake_gourd_seed:plain"
+  ],
+  "plainroastedchinesesnakegourdseeds": [
+    "food:snack:snake_gourd_seed:plain"
+  ],
+  "food:snack:winter_melon_seed:plain": [
+    "food:snack:winter_melon_seed:plain"
+  ],
+  "food_snack_winter_melon_seed_plain": [
+    "food:snack:winter_melon_seed:plain"
+  ],
+  "炒冬瓜子（原味）": [
+    "food:snack:winter_melon_seed:plain"
+  ],
+  "冬瓜子": [
+    "food:snack:winter_melon_seed:plain"
+  ],
+  "plainroastedwintermelonseeds": [
+    "food:snack:winter_melon_seed:plain"
+  ],
+  "food:snack:cashew:plain": [
+    "food:snack:cashew:plain"
+  ],
+  "food_snack_cashew_plain": [
+    "food:snack:cashew:plain"
+  ],
+  "炒腰果（原味）": [
+    "food:snack:cashew:plain"
+  ],
+  "plainroastedcashews": [
+    "food:snack:cashew:plain"
+  ],
+  "food:snack:almond:plain": [
+    "food:snack:almond:plain"
+  ],
+  "food_snack_almond_plain": [
+    "food:snack:almond:plain"
+  ],
+  "炒杏仁（原味）": [
+    "food:snack:almond:plain"
+  ],
+  "炒巴旦木": [
+    "food:snack:almond:plain"
+  ],
+  "plainroastedalmonds": [
+    "food:snack:almond:plain"
+  ],
+  "food:snack:pistachio:plain": [
+    "food:snack:pistachio:plain"
+  ],
+  "food_snack_pistachio_plain": [
+    "food:snack:pistachio:plain"
+  ],
+  "炒开心果（原味）": [
+    "food:snack:pistachio:plain"
+  ],
+  "开心果": [
+    "food:snack:pistachio:plain"
+  ],
+  "plainroastedpistachios": [
+    "food:snack:pistachio:plain"
+  ],
+  "food:snack:walnut:plain": [
+    "food:snack:walnut:plain"
+  ],
+  "food_snack_walnut_plain": [
+    "food:snack:walnut:plain"
+  ],
+  "炒核桃（原味）": [
+    "food:snack:walnut:plain"
+  ],
+  "核桃": [
+    "food:snack:walnut:plain"
+  ],
+  "plainroastedwalnuts": [
+    "food:snack:walnut:plain"
+  ],
+  "food:snack:pecan:plain": [
+    "food:snack:pecan:plain"
+  ],
+  "food_snack_pecan_plain": [
+    "food:snack:pecan:plain"
+  ],
+  "炒碧根果（原味）": [
+    "food:snack:pecan:plain"
+  ],
+  "碧根果": [
+    "food:snack:pecan:plain"
+  ],
+  "plainroastedpecans": [
+    "food:snack:pecan:plain"
+  ],
+  "food:snack:macadamia:plain": [
+    "food:snack:macadamia:plain"
+  ],
+  "food_snack_macadamia_plain": [
+    "food:snack:macadamia:plain"
+  ],
+  "炒夏威夷果（原味）": [
+    "food:snack:macadamia:plain"
+  ],
+  "夏威夷果": [
+    "food:snack:macadamia:plain"
+  ],
+  "plainroastedmacadamias": [
+    "food:snack:macadamia:plain"
+  ],
+  "food:snack:pine_nut:plain": [
+    "food:snack:pine_nut:plain"
+  ],
+  "food_snack_pine_nut_plain": [
+    "food:snack:pine_nut:plain"
+  ],
+  "炒松子（原味）": [
+    "food:snack:pine_nut:plain"
+  ],
+  "松子": [
+    "food:snack:pine_nut:plain"
+  ],
+  "plainroastedpinenuts": [
+    "food:snack:pine_nut:plain"
+  ],
+  "food:snack:hazelnut:plain": [
+    "food:snack:hazelnut:plain"
+  ],
+  "food_snack_hazelnut_plain": [
+    "food:snack:hazelnut:plain"
+  ],
+  "炒榛子（原味）": [
+    "food:snack:hazelnut:plain"
+  ],
+  "榛子": [
+    "food:snack:hazelnut:plain"
+  ],
+  "plainroastedhazelnuts": [
+    "food:snack:hazelnut:plain"
+  ],
+  "food:snack:chinese_hickory:plain": [
+    "food:snack:chinese_hickory:plain"
+  ],
+  "food_snack_chinese_hickory_plain": [
+    "food:snack:chinese_hickory:plain"
+  ],
+  "炒山核桃（原味）": [
+    "food:snack:chinese_hickory:plain"
+  ],
+  "山核桃": [
+    "food:snack:chinese_hickory:plain"
+  ],
+  "plainroastedchinesehickorynuts": [
+    "food:snack:chinese_hickory:plain"
+  ],
+  "food:snack:chestnut:plain": [
+    "food:snack:chestnut:plain"
+  ],
+  "food_snack_chestnut_plain": [
+    "food:snack:chestnut:plain"
+  ],
+  "炒板栗（原味）": [
+    "food:snack:chestnut:plain"
+  ],
+  "原味板栗": [
+    "food:snack:chestnut:plain"
+  ],
+  "plainroastedchestnuts": [
+    "food:snack:chestnut:plain"
+  ],
+  "food:snack:chestnut:sugar_roasted": [
+    "food:snack:chestnut:sugar_roasted"
+  ],
+  "food_snack_chestnut_sugar_roasted": [
+    "food:snack:chestnut:sugar_roasted"
+  ],
+  "糖炒板栗": [
+    "food:snack:chestnut:sugar_roasted"
+  ],
+  "sugar-roastedchestnuts": [
+    "food:snack:chestnut:sugar_roasted"
+  ],
+  "food:snack:fava_bean:plain": [
+    "food:snack:fava_bean:plain"
+  ],
+  "food_snack_fava_bean_plain": [
+    "food:snack:fava_bean:plain"
+  ],
+  "兰花豆（原味）": [
+    "food:snack:fava_bean:plain"
+  ],
+  "炒蚕豆": [
+    "food:snack:fava_bean:plain"
+  ],
+  "plainroastedfavabeans": [
+    "food:snack:fava_bean:plain"
+  ],
+  "food:snack:black_soybean:plain": [
+    "food:snack:black_soybean:plain"
+  ],
+  "food_snack_black_soybean_plain": [
+    "food:snack:black_soybean:plain"
+  ],
+  "炒黑豆（原味）": [
+    "food:snack:black_soybean:plain"
+  ],
+  "plainroastedblacksoybeans": [
+    "food:snack:black_soybean:plain"
+  ],
+  "food:snack:soybean:plain": [
+    "food:snack:soybean:plain"
+  ],
+  "food_snack_soybean_plain": [
+    "food:snack:soybean:plain"
+  ],
+  "炒黄豆（原味）": [
+    "food:snack:soybean:plain"
+  ],
+  "plainroastedsoybeans": [
+    "food:snack:soybean:plain"
+  ],
+  "food:snack:green_pea:plain": [
+    "food:snack:green_pea:plain"
+  ],
+  "food_snack_green_pea_plain": [
+    "food:snack:green_pea:plain"
+  ],
+  "炒青豆（原味）": [
+    "food:snack:green_pea:plain"
+  ],
+  "plainroastedgreenpeas": [
+    "food:snack:green_pea:plain"
+  ],
+  "food:taxon:fagopyrum_esculentum:steamed_cake": [
+    "food:taxon:fagopyrum_esculentum:steamed_cake"
+  ],
+  "food_taxon_fagopyrum_esculentum_steamed_cake": [
+    "food:taxon:fagopyrum_esculentum:steamed_cake"
+  ],
+  "荞篙发粑": [
+    "food:taxon:fagopyrum_esculentum:steamed_cake"
+  ],
+  "荞麦粑": [
+    "food:taxon:fagopyrum_esculentum:steamed_cake"
+  ],
+  "steamedbuckwheatcake": [
+    "food:taxon:fagopyrum_esculentum:steamed_cake"
+  ],
+  "food:taxon:oryza_sativa:glutinous_herb_cake": [
+    "food:taxon:oryza_sativa:glutinous_herb_cake"
+  ],
+  "food_taxon_oryza_sativa_glutinous_herb_cake": [
+    "food:taxon:oryza_sativa:glutinous_herb_cake"
+  ],
+  "糯米水萩粑": [
+    "food:taxon:oryza_sativa:glutinous_herb_cake"
+  ],
+  "水萩粑": [
+    "food:taxon:oryza_sativa:glutinous_herb_cake"
+  ],
+  "glutinousriceherbcake": [
+    "food:taxon:oryza_sativa:glutinous_herb_cake"
+  ],
+  "dish:corn_pork_rib_soup": [
+    "dish:corn_pork_rib_soup"
+  ],
+  "dish_corn_pork_rib_soup": [
+    "dish:corn_pork_rib_soup"
+  ],
+  "玉米排骨汤": [
+    "dish:corn_pork_rib_soup"
+  ],
+  "玉米炖排骨": [
+    "dish:corn_pork_rib_soup"
+  ],
+  "cornandporkribsoup": [
+    "dish:corn_pork_rib_soup"
+  ],
+  "dish:braised_pork_trotter": [
+    "dish:braised_pork_trotter"
+  ],
+  "dish_braised_pork_trotter": [
+    "dish:braised_pork_trotter"
+  ],
+  "红烧猪脚": [
+    "dish:braised_pork_trotter"
+  ],
+  "红烧猪蹄": [
+    "dish:braised_pork_trotter"
+  ],
+  "braisedporktrotter": [
+    "dish:braised_pork_trotter"
+  ]
+}

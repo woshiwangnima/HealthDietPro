@@ -1,0 +1,57 @@
+{
+  "id": "food:taxon:arachis_hypogaea:roasted",
+  "names": {
+    "zh": [
+      "烤花生",
+      "炒花生",
+      "熟花生"
+    ],
+    "en": [
+      "Roasted peanuts",
+      "Peanuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.peanut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 14,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 3,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.55,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "roasted peanuts"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "peanuts"
+    }
+  ],
+  "description": {
+    "zh": "烤花生能量密度较高，含脂肪、蛋白质和膳食纤维；食用时应控制份量并留意过敏风险。",
+    "en": "Roasted peanuts are energy-dense and provide fat, protein, and fiber; manage portions and consider allergy risk."
+  },
+  "commonness": 3,
+  "kind": "food",
+  "derivedFrom": {
+    "ingredientId": "food:taxon:arachis_hypogaea:raw",
+    "cookingMethodId": "grilled"
+  }
+}

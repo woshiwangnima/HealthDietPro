@@ -1,0 +1,82 @@
+{
+  "id": "food:taxon:glycine_max:tofu:firm",
+  "names": {
+    "zh": [
+      "北豆腐",
+      "老豆腐",
+      "卤水豆腐"
+    ],
+    "en": [
+      "Firm tofu",
+      "Pressed tofu"
+    ]
+  },
+  "categoryTags": [
+    "food.soy"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 0.6,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.4,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "firm tofu"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 81,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 8.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 3.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 4.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "北豆腐以大豆为原料，是植物蛋白来源；凝固剂和含水量会使不同产品的营养值不同。",
+    "en": "Firm tofu is a soy-based source of plant protein; coagulant choice and water content cause product-to-product variation."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

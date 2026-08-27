@@ -1,0 +1,76 @@
+{
+  "id": "food:beverage:coffee:black",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "黑咖啡"
+    ],
+    "en": [
+      "Black coffee"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.coffee"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:coffea_arabica:grounds",
+      "quantity": {
+        "value": 2,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 98,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "hydrationMlPer100g": 98,
+  "densityGramsPerMl": 1,
+  "servings": [
+    {
+      "id": "per_100ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "100 毫升",
+        "en": "100 ml"
+      }
+    },
+    {
+      "id": "cup_250ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 2.5,
+      "labels": {
+        "zh": "1 杯（250 毫升）",
+        "en": "1 cup (250 ml)"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition and hydration resolved from listed components"
+    }
+  ],
+  "description": {
+    "zh": "黑咖啡的营养与饮水量按配方组分计算。",
+    "en": "Nutrition and hydration for Black coffee are resolved from the listed components."
+  },
+  "commonness": 4,
+  "recipeSteps": [
+    {
+      "text": "咖啡粉与热水萃取。"
+    },
+    {
+      "text": "过滤后饮用。"
+    }
+  ],
+  "techniqueId": "stewed",
+  "servesPeople": 1
+}

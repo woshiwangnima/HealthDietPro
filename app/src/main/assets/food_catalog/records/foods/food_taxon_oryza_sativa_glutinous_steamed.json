@@ -1,0 +1,44 @@
+{
+  "id": "food:taxon:oryza_sativa:glutinous_steamed",
+  "names": {
+    "zh": [
+      "糯米饭"
+    ],
+    "en": [
+      "Steamed glutinous rice"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "commonness": 3,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 87,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 22,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "糯米饭, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Steamed glutinous rice, preparation-matched reference"
+    }
+  ],
+  "description": {
+    "zh": "糯米饭的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Steamed glutinous rice are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "food",
+  "derivedFrom": {
+    "ingredientId": "food:taxon:oryza_sativa:glutinous:raw",
+    "cookingMethodId": "steamed_grain"
+  }
+}

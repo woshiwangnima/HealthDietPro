@@ -1,0 +1,77 @@
+{
+  "id": "food:taxon:capsicum_annuum:chili",
+  "botanicalTaxonomy": {
+    "family": "Solanaceae",
+    "genus": "Capsicum",
+    "species": "Capsicum annuum"
+  },
+  "names": {
+    "zh": [
+      "小米辣"
+    ],
+    "en": [
+      "Bird's eye chili"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable",
+    "food.seasoning.fresh_aromatic"
+  ],
+  "commonness": 3,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 1,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "小米辣, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Bird's eye chili, preparation-matched reference"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 32,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 6.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "小米辣的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Bird's eye chili are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "ingredient"
+}

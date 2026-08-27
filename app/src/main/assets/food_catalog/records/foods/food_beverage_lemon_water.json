@@ -1,0 +1,73 @@
+{
+  "id": "food:beverage:lemon_water",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "柠檬水"
+    ],
+    "en": [
+      "Lemon water"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.mixed"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:citrus_limon:raw",
+      "quantity": {
+        "value": 5,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 95,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "hydrationMlPer100g": 95,
+  "densityGramsPerMl": 1,
+  "servings": [
+    {
+      "id": "per_100ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "100 毫升",
+        "en": "100 ml"
+      }
+    },
+    {
+      "id": "cup_250ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 2.5,
+      "labels": {
+        "zh": "1 杯（250 毫升）",
+        "en": "1 cup (250 ml)"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition and hydration resolved from listed components"
+    }
+  ],
+  "description": {
+    "zh": "柠檬水的营养与饮水量按配方组分计算。",
+    "en": "Nutrition and hydration for Lemon water are resolved from the listed components."
+  },
+  "commonness": 4,
+  "recipeSteps": [
+    {
+      "text": "柠檬切片后加入饮用水。"
+    }
+  ],
+  "techniqueId": "cold_mixed",
+  "servesPeople": 1
+}

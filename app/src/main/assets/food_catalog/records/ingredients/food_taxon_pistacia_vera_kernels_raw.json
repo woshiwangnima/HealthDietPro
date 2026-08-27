@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:pistacia_vera:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "开心果仁"
+    ],
+    "en": [
+      "Pistachio kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 560,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 20.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 45.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 27.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 10.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Pistachio kernels, raw; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 3
+}

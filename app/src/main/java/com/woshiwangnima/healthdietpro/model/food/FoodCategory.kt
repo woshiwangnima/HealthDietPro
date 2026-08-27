@@ -90,4 +90,9 @@ internal object FoodCategories {
     fun displayTags(tags: List<String>): List<Int> = tags.flatMap { tag ->
         displayTagPath(tag)
     }.distinct()
+
+    /** Stores only the deepest selected tags; ancestor queries still use isWithin. */
+    fun normalizeTags(tags: List<String>): List<String> = tags.distinct().filterNot { tag ->
+        tags.any { other -> other != tag && other.startsWith("$tag.") }
+    }
 }

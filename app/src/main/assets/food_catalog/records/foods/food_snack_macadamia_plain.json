@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:macadamia:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒夏威夷果（原味）",
+      "夏威夷果"
+    ],
+    "en": [
+      "Plain roasted macadamias"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:macadamia_integrifolia:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible macadamia kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

@@ -1,0 +1,35 @@
+{
+  "id": "food:taxon:gallus_gallus:egg:pan_fried",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "煎鸡蛋",
+      "荷包蛋"
+    ],
+    "en": [
+      "Pan-fried egg",
+      "Fried egg"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.egg"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:gallus_gallus:egg:whole",
+    "cookingMethodId": "pan_fried"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "whole chicken egg; cooking change calculated from pan-frying method"
+    }
+  ],
+  "description": {
+    "zh": "煎鸡蛋由全鸡蛋经煎制派生。模型按烹饪方式统一计入吸油和失水参数；实际值受用油量、锅具和熟度影响。",
+    "en": "Pan-fried egg is derived from whole egg. The model applies shared oil-uptake and yield parameters; actual values vary with added oil, cookware, and doneness."
+  },
+  "commonness": 3
+}

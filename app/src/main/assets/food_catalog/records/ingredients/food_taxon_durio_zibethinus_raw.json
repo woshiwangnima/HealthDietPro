@@ -1,0 +1,71 @@
+{
+  "id": "food:taxon:durio_zibethinus:raw",
+  "names": {
+    "zh": [
+      "榴莲"
+    ],
+    "en": [
+      "Durian"
+    ]
+  },
+  "categoryTags": [
+    "food.fruit"
+  ],
+  "commonness": 3,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 49,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 13.3,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "榴莲, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Durian, preparation-matched reference"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 147,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 3.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 27.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "榴莲的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Durian are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "ingredient"
+}

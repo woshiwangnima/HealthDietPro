@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:glycine_max:edamame:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Fabaceae",
+    "genus": "Glycine",
+    "species": "Glycine max"
+  },
+  "names": {
+    "zh": [
+      "毛豆",
+      "青豆"
+    ],
+    "en": [
+      "Edamame",
+      "Fresh green soybeans"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.fresh_legume"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.53,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "edamame, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 123,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 13.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 5.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 10.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 4.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "毛豆是常见的鲜豆类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Edamame is a common fresh legume. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 4
+}

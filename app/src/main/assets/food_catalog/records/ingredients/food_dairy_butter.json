@@ -1,0 +1,231 @@
+{
+  "id": "food:dairy:butter",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "黄油",
+      "乳脂黄油",
+      "咸黄油"
+    ],
+    "en": [
+      "Salted butter",
+      "Dairy butter"
+    ]
+  },
+  "categoryTags": [
+    "food.dairy",
+    "food.oil.animal_fat"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 717,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.85,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 81.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0.06,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "VITA": {
+          "value": 684,
+          "unitCategory": "weight",
+          "unitId": "μg"
+        },
+        "VITE": {
+          "value": 2.32,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "VITK": {
+          "value": 7,
+          "unitCategory": "weight",
+          "unitId": "μg"
+        },
+        "VITB1": {
+          "value": 0.005,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "VITB2": {
+          "value": 0.034,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "NIACIN": {
+          "value": 0.042,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "VITB6": {
+          "value": 0.003,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "FOLATE": {
+          "value": 3,
+          "unitCategory": "weight",
+          "unitId": "μg"
+        },
+        "VITB12": {
+          "value": 0.17,
+          "unitCategory": "weight",
+          "unitId": "μg"
+        },
+        "PANTOTHENIC": {
+          "value": 0.11,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "CHOLINE": {
+          "value": 18.8,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "CA": {
+          "value": 24,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "P": {
+          "value": 24,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "K": {
+          "value": 24,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "NA": {
+          "value": 643,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "MG": {
+          "value": 2,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "FE": {
+          "value": 0.02,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "ZN": {
+          "value": 0.09,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "SE": {
+          "value": 1,
+          "unitCategory": "weight",
+          "unitId": "μg"
+        },
+        "ALA": {
+          "value": 0.315,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "LA": {
+          "value": 2.17,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "ILE": {
+          "value": 51,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "LEU": {
+          "value": 83,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "LYS": {
+          "value": 67,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "MET": {
+          "value": 21,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "PHE": {
+          "value": 41,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "THR": {
+          "value": 38,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "TRP": {
+          "value": 12,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "VAL": {
+          "value": 57,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        },
+        "HIS": {
+          "value": 23,
+          "unitCategory": "weight",
+          "unitId": "mg"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 0,
+      "unit": "GI",
+      "note": "Not applicable as a GI test food; negligible available carbohydrate."
+    },
+    "glycemicLoadPer100g": {
+      "value": 0,
+      "unit": "GL",
+      "note": "Not applicable as a GI test food; negligible available carbohydrate."
+    }
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Butter, salted; per 100 g"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Pure fats are not assigned a meaningful GI because they contain negligible available carbohydrate."
+    }
+  ],
+  "description": {
+    "zh": "黄油是乳脂制品，主要提供脂肪和能量；纯黄油几乎不含可利用碳水，因此不能把其 GI=0 理解为进行过有效的 GI 试验。",
+    "en": "Butter is a milk-fat product providing mostly fat and energy. Pure butter has negligible available carbohydrate, so GI 0 here means not applicable rather than a clinical GI test result."
+  },
+  "commonness": 4
+}

@@ -1,0 +1,142 @@
+{
+  "id": "food:taxon:bos_taurus:milk:whole",
+  "names": {
+    "zh": [
+      "全脂牛奶",
+      "牛奶",
+      "鲜奶"
+    ],
+    "en": [
+      "Whole milk",
+      "Cow milk"
+    ]
+  },
+  "categoryTags": [
+    "food.dairy",
+    "food.beverage.dairy"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 31,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 1.1,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.05,
+      "unit": "DII"
+    }
+  },
+  "densityGramsPerMl": 1.03,
+  "servings": [
+    {
+      "id": "per_100ml",
+      "labels": {
+        "zh": "100 毫升",
+        "en": "100 ml"
+      },
+      "nutritionTableKey": "standard.100ml",
+      "ratioToTable": 1
+    },
+    {
+      "id": "cup",
+      "labels": {
+        "zh": "1 杯",
+        "en": "1 cup"
+      },
+      "nutritionTableKey": "standard.100ml",
+      "ratioToTable": 2.5
+    },
+    {
+      "id": "carton",
+      "labels": {
+        "zh": "1 盒",
+        "en": "1 carton"
+      },
+      "nutritionTableKey": "standard.100ml",
+      "ratioToTable": 2.4902912621359223
+    }
+  ],
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "whole cow milk"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "whole milk"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 54,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 3.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 3.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    },
+    "standard.100ml": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "volume",
+        "unitId": "ml"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 55.620000000000005,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 3.09,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 3.2960000000000003,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 3.502,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "全脂牛奶提供蛋白质、脂肪和乳糖；包装规格不同，杯和盒的体积仅作为常见份量估算。",
+    "en": "Whole milk provides protein, fat, and lactose; cup and carton sizes are common serving estimates and vary by package."
+  },
+  "commonness": 3,
+  "kind": "ingredient",
+  "hydrationMlPer100g": 87
+}

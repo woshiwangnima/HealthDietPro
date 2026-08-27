@@ -1,0 +1,64 @@
+{
+  "id": "food:taxon:glycine_max:tofu:soft",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "嫩豆腐",
+      "南豆腐",
+      "石膏豆腐"
+    ],
+    "en": [
+      "Soft tofu",
+      "Silken tofu"
+    ]
+  },
+  "categoryTags": [
+    "food.soy"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "tofu, soft; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "嫩豆腐为大豆磨浆、凝固后形成的高含水豆制品。与北豆腐相比含水量更高、质地更软；营养值应按具体凝固剂和配方核对。",
+    "en": "Soft tofu is a high-moisture soy product made by coagulating soy milk. Its water content and nutrient composition vary with the coagulant and formulation."
+  },
+  "commonness": 3,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 57,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 6.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 1.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  }
+}

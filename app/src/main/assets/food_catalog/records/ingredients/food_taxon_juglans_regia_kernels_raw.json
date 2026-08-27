@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:juglans_regia:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "核桃仁"
+    ],
+    "en": [
+      "Walnut kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 654,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 15.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 65.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 13.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 6.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Walnuts, raw kernels; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 4
+}

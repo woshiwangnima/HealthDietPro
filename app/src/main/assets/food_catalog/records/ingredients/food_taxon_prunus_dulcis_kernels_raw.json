@@ -1,0 +1,61 @@
+{
+  "id": "food:taxon:prunus_dulcis:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "杏仁",
+      "巴旦木"
+    ],
+    "en": [
+      "Almond kernels",
+      "Almonds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 579,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 21.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 49.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 21.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 12.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Almonds, raw kernels; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 4
+}

@@ -1135,6 +1135,7 @@
     <string name="profile_user_sort_last_active">Recent</string>
     <string name="profile_user_sort_created">Created</string>
     <string name="profile_user_sort_name">Name</string>
+    <string name="profile_user_dates_compact">Created %1$s · Active %2$s · Updated %3$s</string>
     <string name="profile_delete_user_title">Delete user</string>
     <string name="profile_delete_user_message">Delete "%1$s"? All data for this user will be cleared.</string>
     <string name="profile_delete_user_confirm">Delete</string>

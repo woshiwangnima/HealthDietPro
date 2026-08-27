@@ -1,0 +1,61 @@
+{
+  "id": "food:taxon:culter_alburnus:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "翘嘴白",
+      "翘嘴鲌",
+      "白条鱼"
+    ],
+    "en": [
+      "Topmouth culter",
+      "Sharp-belly fish"
+    ]
+  },
+  "categoryTags": [
+    "food.aquatic.fish"
+  ],
+  "edibleRatio": 0.55,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "topmouth culter, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 113,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 18.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 4.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "翘嘴白是肉质细嫩的淡水鱼，蛋白质含量较高；可食部约占购买量的 55%。",
+    "en": "Topmouth culter is a freshwater fish with fine flesh and high protein; edible portion is about 55% of purchased weight."
+  },
+  "commonness": 3
+}

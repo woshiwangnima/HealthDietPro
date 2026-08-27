@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:chestnut:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒板栗（原味）",
+      "原味板栗"
+    ],
+    "en": [
+      "Plain roasted chestnuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:castanea_mollissima:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible chestnut kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

@@ -1,0 +1,29 @@
+{
+  "id": "food:snack:green_pea:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒青豆（原味）"
+    ],
+    "en": [
+      "Plain roasted green peas"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.legume_snack"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:pisum_sativum:dry",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible dried green peas; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

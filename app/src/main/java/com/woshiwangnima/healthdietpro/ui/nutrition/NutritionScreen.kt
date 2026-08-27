@@ -86,6 +86,7 @@ import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
 import com.woshiwangnima.healthdietpro.common.ui.SearchActivityPanel
 import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
+import com.woshiwangnima.healthdietpro.common.ui.ImageVariant
 import com.woshiwangnima.healthdietpro.common.ui.FilterCollapseAxis
 import com.woshiwangnima.healthdietpro.common.ui.FilterCollapseButton
 import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
@@ -181,6 +182,10 @@ private fun systemTagPresentation(tag: String): Pair<String, androidx.compose.ui
     "recent" -> stringResource(R.string.nutrition_tag_recent) to androidx.compose.ui.graphics.Color(0xFF1565C0)
     else -> null
 }
+
+private fun FoodItem.imageKey(): String = image?.localKey
+    ?.takeUnless { it == FoodImageStore.DEFAULT_KEY }
+    ?: id
 
 @Composable
 private fun FoodImageWithSystemTags(
@@ -593,7 +598,7 @@ private fun FoodRow(
 ) {
     val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
     val energy = resolved?.nutrients?.get("ENERGY")?.value ?: 0.0
-    val image = viewModel.foodImages.image(food.image?.localKey)
+    val image = viewModel.foodImages.rememberImage(food.imageKey(), ImageVariant.THUMB)
     val categoryLabels = mutableListOf<String>()
     for (tag in food.categoryTagsOrEmpty()) {
         val pathLabels = mutableListOf<String>()
@@ -755,6 +760,7 @@ private fun FoodDetailScreen(
     val relatedDishes = remember(food.id) { viewModel.relatedDishes(food.id) }
     val isCustom = viewModel.isCustom(food.id)
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
+    val detailImage = imageStore.rememberImage(food.imageKey(), ImageVariant.DETAIL)
     val defaultServingLabel = stringResource(R.string.nutrition_serving_100g_edible)
     val cookingSuffix: String? = (food as? PreparedFood)?.let {
         it.derivedFrom?.let { derivation ->
@@ -772,7 +778,7 @@ private fun FoodDetailScreen(
         Row(modifier = Modifier.height(96.dp), verticalAlignment = Alignment.Top) {
             FoodImageWithSystemTags(
                 food = food,
-                image = imageStore.image(food.image?.localKey),
+                image = detailImage,
                 isFavorite = isFavorite,
                 isRecent = isRecent,
                 modifier = Modifier.size(96.dp).clickable { previewing = true },
@@ -895,7 +901,7 @@ private fun FoodDetailScreen(
             Text(stringResource(R.string.nutrition_detail_placeholder), modifier = Modifier.padding(top = 24.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
-    if (previewing) FoodImagePreview(imageStore.image(food.image?.localKey), onDismiss = { previewing = false })
+    if (previewing) FoodImagePreview(detailImage, onDismiss = { previewing = false })
     if (confirmingDelete) {
         AlertDialog(
             onDismissRequest = { confirmingDelete = false },

@@ -1,0 +1,90 @@
+{
+  "id": "food:taxon:cucumis_sativus:landrace:raw",
+  "botanicalTaxonomy": {
+    "family": "Cucurbitaceae",
+    "genus": "Cucumis",
+    "species": "Cucumis sativus"
+  },
+  "names": {
+    "zh": [
+      "本地黄瓜",
+      "土黄瓜",
+      "露地黄瓜"
+    ],
+    "en": [
+      "Landrace cucumber",
+      "Field cucumber"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.gourd_solanaceous"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI",
+      "note": "proxy from raw cucumber; cultivar-specific measurement unavailable"
+    },
+    "glycemicLoadPer100g": {
+      "value": 0.5,
+      "unit": "GL",
+      "note": "estimated from available carbohydrate"
+    },
+    "inflammatoryPotential": {
+      "value": -0.16,
+      "unit": "DII",
+      "note": "proxy from raw cucumber"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "raw cucumber proxy; cultivar composition varies"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 16,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 3.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "露地或地方品系黄瓜的外观和风味可能不同；营养值采用同类生黄瓜数据，品种间会有自然差异。",
+    "en": "Field or landrace cucumber may differ in appearance and flavor; values use raw cucumber data because cultivar composition naturally varies."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

@@ -1,0 +1,79 @@
+{
+  "id": "food:starch:tapioca",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "木薯淀粉",
+      "木薯粉"
+    ],
+    "en": [
+      "Tapioca starch",
+      "Cassava starch"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "botanicalTaxonomy": {
+    "family": "Euphorbiaceae",
+    "genus": "Manihot",
+    "species": "Manihot esculenta"
+  },
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 358,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 88.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 70,
+      "unit": "GI",
+      "note": "Reference for isolated dry starch; preparation changes glucose response."
+    },
+    "glycemicLoadPer100g": {
+      "value": 62.1,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Tapioca starch, dry; values normalized per 100 g"
+    }
+  ],
+  "description": {
+    "zh": "木薯淀粉来自木薯块根，常用于珍珠、勾芡和无麸质配方；木薯粉与木薯全粉的组成可能不同。",
+    "en": "Tapioca starch is extracted from cassava roots and is used in pearls, thickening and gluten-free formulations; cassava flour is a different product."
+  },
+  "commonness": 3
+}

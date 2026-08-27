@@ -1,0 +1,54 @@
+{
+  "id": "food:taxon:oryza_sativa:polished:steamed",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "米饭",
+      "白米饭",
+      "熟米饭"
+    ],
+    "en": [
+      "Cooked white rice",
+      "Steamed rice"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:oryza_sativa:polished:raw",
+    "cookingMethodId": "steamed_grain"
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 73,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 18.9,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": 0.44,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "standard food composition values"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "rice, cooked white"
+    }
+  ],
+  "description": {
+    "zh": "蒸熟的精白米主食，主要提供碳水化合物；营养由生大米经蒸饭派生（吸水约 3 倍）。实际升糖反应受品种、米饭软硬和同餐食物影响。",
+    "en": "Cooked polished rice is a carbohydrate-rich staple derived from raw rice via grain steaming (about 3x water uptake); glycemic response varies with variety, texture, and the accompanying meal."
+  },
+  "commonness": 3
+}

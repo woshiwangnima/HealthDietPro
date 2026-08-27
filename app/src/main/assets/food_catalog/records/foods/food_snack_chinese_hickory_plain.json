@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:chinese_hickory:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒山核桃（原味）",
+      "山核桃"
+    ],
+    "en": [
+      "Plain roasted Chinese hickory nuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:carya_cathayensis:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible Chinese hickory kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 2
+}

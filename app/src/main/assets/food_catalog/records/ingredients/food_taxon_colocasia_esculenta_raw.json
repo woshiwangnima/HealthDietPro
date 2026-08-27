@@ -1,0 +1,78 @@
+{
+  "id": "food:taxon:colocasia_esculenta:raw",
+  "botanicalTaxonomy": {
+    "family": "Araceae",
+    "genus": "Colocasia",
+    "species": "Colocasia esculenta"
+  },
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "生芋头"
+    ],
+    "en": [
+      "Taro, raw"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.root",
+    "food.staple.tuber"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 112,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 26.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 4.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 48,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Taro, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "生芋头为配方计算使用的基础食材。",
+    "en": "Taro, raw is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

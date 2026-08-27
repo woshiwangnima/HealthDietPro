@@ -1,0 +1,69 @@
+{
+  "id": "food:taxon:benincasa_hispida:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Cucurbitaceae",
+    "genus": "Benincasa",
+    "species": "Benincasa hispida"
+  },
+  "names": {
+    "zh": [
+      "冬瓜"
+    ],
+    "en": [
+      "Winter melon",
+      "Wax gourd"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.gourd_solanaceous"
+  ],
+  "edibleRatio": 0.8,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "wax gourd, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 11,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 1.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "冬瓜含水量高、能量密度低，适合作为低热量蔬菜搭配；可食部约占购买量的 80%。",
+    "en": "Winter melon is a high-water, low-energy vegetable; edible portion is about 80% of purchased weight."
+  },
+  "commonness": 4
+}

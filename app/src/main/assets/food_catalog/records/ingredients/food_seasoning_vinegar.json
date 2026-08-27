@@ -1,0 +1,62 @@
+{
+  "id": "food:seasoning:vinegar",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "食醋"
+    ],
+    "en": [
+      "Vinegar"
+    ]
+  },
+  "categoryTags": [
+    "food.seasoning.acid"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 31,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 2.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Vinegar; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "食醋为配方计算使用的基础食材。",
+    "en": "Vinegar is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

@@ -1,0 +1,63 @@
+{
+  "id": "food:taxon:sus_scrofa:trotter_raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "猪蹄",
+      "猪脚"
+    ],
+    "en": [
+      "Pork trotter",
+      "Pig's feet"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.livestock"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.52,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "pork trotter, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "猪蹄来自家猪（Sus scrofa domesticus）的足部，富含结缔组织，同时脂肪含量不低。骨、皮、肉比例会影响可食部和实际营养摄入。",
+    "en": "Pork trotter is the foot of domestic pig (Sus scrofa domesticus). It contains substantial connective tissue as well as fat; edible yield varies with bone, skin, and meat proportions."
+  },
+  "commonness": 3,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 260,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 23.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 18.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  }
+}

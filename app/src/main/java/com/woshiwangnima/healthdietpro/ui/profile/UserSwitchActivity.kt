@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
@@ -38,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -50,7 +54,6 @@ import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserMetadata
-import java.io.File
 import com.woshiwangnima.healthdietpro.model.archive.resolveAvatarFile
 import kotlin.math.abs
 import java.time.Instant
@@ -135,18 +138,12 @@ private fun UserSwitchScreen(
     onDeleteUser: (UserMetadata) -> Unit,
 ) {
     var sortMode by remember { mutableStateOf(UserSortMode.LAST_ACTIVE) }
-    val currentUser = users.firstOrNull { it.id == currentUserId }
-    val otherUsers = users.filterNot { it.id == currentUserId }.sortedWith(sortMode.comparator)
+    val displayUsers = users.sortedWith(
+        compareByDescending<UserMetadata> { it.id == currentUserId }
+            .then(sortMode.comparator),
+    )
     Column(Modifier.fillMaxSize().padding(contentPadding)) {
-        currentUser?.let { user ->
-            UserSwitchRow(
-                user = user,
-                isCurrent = true,
-                onSelect = {},
-                onDelete = { onDeleteUser(user) },
-            )
-        }
-        if (otherUsers.isNotEmpty()) {
+        if (displayUsers.size > 1) {
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
                 UserSortMode.entries.forEachIndexed { index, mode ->
                     SegmentedButton(
@@ -163,11 +160,16 @@ private fun UserSwitchScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (currentUser == null && otherUsers.isEmpty()) {
+            if (displayUsers.isEmpty()) {
                 item { Text(stringResource(R.string.profile_no_users), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             } else {
-                items(otherUsers, key = { it.id }) { user ->
-                    UserSwitchRow(user, isCurrent = false, onSelect = { onSelectUser(user) }, onDelete = { onDeleteUser(user) })
+                items(displayUsers, key = { it.id }) { user ->
+                    UserSwitchRow(
+                        user,
+                        isCurrent = user.id == currentUserId,
+                        onSelect = { if (user.id != currentUserId) onSelectUser(user) },
+                        onDelete = { onDeleteUser(user) },
+                    )
                 }
             }
         }
@@ -198,21 +200,32 @@ private fun UserSwitchRow(user: UserMetadata, isCurrent: Boolean, onSelect: () -
         ?.let { android.graphics.BitmapFactory.decodeFile(it.absolutePath) }
     val background = if (isCurrent) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f) else Color.Transparent
     androidx.compose.foundation.layout.Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(background).clickable(onClick = onSelect).padding(horizontal = 8.dp, vertical = 10.dp),
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(background).padding(horizontal = 8.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(48.dp).clip(CircleShape).background(avatarColorFor(user.id)), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(48.dp).clip(CircleShape).background(avatarColorFor(user.id)).clickable(onClick = onSelect), contentAlignment = Alignment.Center) {
             if (avatar != null) Image(avatar.asImageBitmap(), null, Modifier.size(48.dp).clip(CircleShape))
             else Text(name.firstOrNull()?.toString() ?: "?", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
         }
         Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(name, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Column(Modifier.weight(1f).clickable(onClick = onSelect)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(name, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                if (isCurrent) Text(stringResource(R.string.profile_current_user_marker), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(start = 4.dp))
+            }
             Text(user.gender.displayText(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             UserMetadataDateRows(user)
         }
-        if (isCurrent) Text(stringResource(R.string.profile_current_user_marker), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 8.dp))
-        AppDestructiveTextButton(stringResource(R.string.profile_delete_user_confirm), onDelete)
+        IconButton(
+            onClick = onDelete,
+            modifier = Modifier.size(40.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_delete),
+                contentDescription = stringResource(R.string.profile_delete_user_confirm),
+                tint = MaterialTheme.colorScheme.error,
+            )
+        }
     }
 }
 
@@ -221,23 +234,13 @@ private fun UserMetadataDateRows(user: UserMetadata) {
     val created = formatMetadataDate(user.createdAtMillis)
     val lastActive = formatMetadataDate(user.lastActiveAtMillis)
     val updated = formatMetadataDate(user.updatedAtMillis)
-    Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-        Text(
-            text = stringResource(R.string.profile_user_created_at, created),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(
-            text = stringResource(R.string.profile_user_last_active_at, lastActive),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(
-            text = stringResource(R.string.profile_user_updated_at, updated),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
+    Text(
+        text = stringResource(R.string.profile_user_dates_compact, created, lastActive, updated),
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
 
 @Composable

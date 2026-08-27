@@ -1,0 +1,70 @@
+{
+  "id": "dish:corn_pork_rib_soup",
+  "kind": "dish",
+  "names": {
+    "zh": [
+      "玉米排骨汤",
+      "玉米炖排骨"
+    ],
+    "en": [
+      "Corn and pork rib soup"
+    ]
+  },
+  "components": [
+    {
+      "foodId": "food:taxon:sus_scrofa:ribs_raw",
+      "quantity": {
+        "value": 300,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:taxon:zea_mays:boiled",
+      "quantity": {
+        "value": 200,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "cuisine": "cuisine.chinese",
+  "dishCategories": [
+    "dishcat.soup"
+  ],
+  "tastes": [
+    "taste.light",
+    "taste.umami"
+  ],
+  "techniqueId": "stewed",
+  "difficulty": 3,
+  "servesPeople": 3,
+  "recipeSteps": [
+    {
+      "text": "排骨焯水后洗净。",
+      "minutes": 5
+    },
+    {
+      "text": "加水炖煮至排骨变软。",
+      "minutes": 60
+    },
+    {
+      "text": "加入玉米继续炖煮，按需要调味。",
+      "minutes": 20
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition is resolved from listed ingredients; water and optional seasonings are not included"
+    }
+  ],
+  "description": {
+    "zh": "玉米排骨汤的营养由列出的排骨和玉米按用量实时求和。汤水、盐和其他未列调味料不计入总量，食用时应按实际可食量记录。",
+    "en": "Nutrition is resolved from the listed ribs and corn. Broth, salt, and unlisted seasonings are excluded; record the actual edible portion consumed."
+  },
+  "commonness": 3
+}

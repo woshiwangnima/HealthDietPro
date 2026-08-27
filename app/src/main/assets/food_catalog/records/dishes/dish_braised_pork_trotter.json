@@ -1,0 +1,62 @@
+{
+  "id": "dish:braised_pork_trotter",
+  "kind": "dish",
+  "names": {
+    "zh": [
+      "红烧猪脚",
+      "红烧猪蹄"
+    ],
+    "en": [
+      "Braised pork trotter"
+    ]
+  },
+  "components": [
+    {
+      "foodId": "food:taxon:sus_scrofa:trotter_raw",
+      "quantity": {
+        "value": 500,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "cuisine": "cuisine.chinese",
+  "dishCategories": [
+    "dishcat.home"
+  ],
+  "tastes": [
+    "taste.salty",
+    "taste.umami"
+  ],
+  "techniqueId": "braised",
+  "difficulty": 5,
+  "servesPeople": 3,
+  "recipeSteps": [
+    {
+      "text": "猪蹄焯水后洗净，去除浮沫。",
+      "minutes": 8
+    },
+    {
+      "text": "加水和常用香辛料小火焖煮至软烂。",
+      "minutes": 90
+    },
+    {
+      "text": "收汁并按实际用量加入调味料。",
+      "minutes": 15
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition is resolved from listed pork trotter; sugar, oil, soy sauce, and aromatics are not included"
+    }
+  ],
+  "description": {
+    "zh": "红烧猪脚的基础营养由列出的猪蹄实时求和。糖、油、酱油和香辛料尚未列入组分，使用这些配料时应补充记录或建立完整自定义菜谱。",
+    "en": "Base nutrition is resolved from the listed pork trotter. Sugar, oil, soy sauce, and aromatics are not yet components; add them when recording a full recipe."
+  },
+  "commonness": 3
+}

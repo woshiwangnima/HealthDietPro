@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "images": {
+    "food:taxon:allium_sativum:raw": {
+      "thumb": "images/thumb/food_taxon_allium_sativum_raw.webp",
+      "detail": "images/detail/food_taxon_allium_sativum_raw.webp"
+    },
+    "food:taxon:cucurbita_moschata:raw": {
+      "thumb": "images/thumb/food_taxon_cucurbita_moschata_raw.webp",
+      "detail": "images/detail/food_taxon_cucurbita_moschata_raw.webp"
+    },
+    "food:taxon:brassica_rapa:pekinensis:raw": {
+      "thumb": "images/thumb/food_taxon_brassica_rapa_pekinensis_raw.webp",
+      "detail": "images/detail/food_taxon_brassica_rapa_pekinensis_raw.webp"
+    },
+    "food:taxon:cucumis_sativus:landrace:raw": {
+      "thumb": "images/thumb/food_taxon_cucumis_sativus_landrace_raw.webp",
+      "detail": "images/detail/food_taxon_cucumis_sativus_landrace_raw.webp"
+    }
+  }
+}

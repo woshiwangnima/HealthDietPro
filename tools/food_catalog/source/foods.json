@@ -1,0 +1,3002 @@
+{
+  "foods": [
+    {
+      "id": "food:taxon:gallus_gallus:egg:pan_fried",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "煎鸡蛋",
+          "荷包蛋"
+        ],
+        "en": [
+          "Pan-fried egg",
+          "Fried egg"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg.egg"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:gallus_gallus:egg:whole",
+        "cookingMethodId": "pan_fried"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "whole chicken egg; cooking change calculated from pan-frying method"
+        }
+      ],
+      "description": {
+        "zh": "煎鸡蛋由全鸡蛋经煎制派生。模型按烹饪方式统一计入吸油和失水参数；实际值受用油量、锅具和熟度影响。",
+        "en": "Pan-fried egg is derived from whole egg. The model applies shared oil-uptake and yield parameters; actual values vary with added oil, cookware, and doneness."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:oryza_sativa:polished:steamed",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "米饭",
+          "白米饭",
+          "熟米饭"
+        ],
+        "en": [
+          "Cooked white rice",
+          "Steamed rice"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:oryza_sativa:polished:raw",
+        "cookingMethodId": "steamed_grain"
+      },
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 73,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 18.9,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": 0.44,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "standard food composition values"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "rice, cooked white"
+        }
+      ],
+      "description": {
+        "zh": "蒸熟的精白米主食，主要提供碳水化合物；营养由生大米经蒸饭派生（吸水约 3 倍）。实际升糖反应受品种、米饭软硬和同餐食物影响。",
+        "en": "Cooked polished rice is a carbohydrate-rich staple derived from raw rice via grain steaming (about 3x water uptake); glycemic response varies with variety, texture, and the accompanying meal."
+      },
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:oryza_sativa:wholegrain:steamed",
+      "names": {
+        "zh": [
+          "糙米饭",
+          "糙米",
+          "熟糙米"
+        ],
+        "en": [
+          "Cooked brown rice",
+          "Brown rice"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain",
+        "food.staple.whole_grain"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 50,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 11.5,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.19,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "standard food composition values"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "brown rice, cooked"
+        }
+      ],
+      "description": {
+        "zh": "保留麸皮和胚芽的熟糙米，膳食纤维通常高于精白米；烹调软硬会影响消化速度。",
+        "en": "Cooked brown rice retains bran and germ and typically provides more dietary fiber than polished rice; cooking texture affects digestion."
+      },
+      "commonness": 3,
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:oryza_sativa:wholegrain:raw",
+        "cookingMethodId": "steamed_grain"
+      }
+    },
+    {
+      "id": "food:taxon:solanum_tuberosum:boiled",
+      "botanicalTaxonomy": {
+        "family": "Solanaceae",
+        "genus": "Solanum",
+        "species": "Solanum tuberosum"
+      },
+      "names": {
+        "zh": [
+          "煮土豆",
+          "马铃薯",
+          "洋芋"
+        ],
+        "en": [
+          "Boiled potato",
+          "Potato"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.tuber",
+        "food.vegetable.root"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 78,
+          "unit": "GI",
+          "note": "boiled; variety and cooling change GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 13.9,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.08,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "standard food composition values"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "potato, boiled"
+        }
+      ],
+      "description": {
+        "zh": "煮马铃薯是富含淀粉的薯类食物；品种、熟化程度及冷却后再食用都会影响血糖反应。",
+        "en": "Boiled potato is a starchy tuber; variety, doneness, and cooling before eating affect glycemic response."
+      },
+      "commonness": 3,
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:solanum_tuberosum:raw",
+        "cookingMethodId": "boiled"
+      }
+    },
+    {
+      "id": "food:taxon:gallus_gallus:breast:steamed",
+      "names": {
+        "zh": [
+          "鸡胸肉",
+          "去皮鸡胸",
+          "鸡脯肉"
+        ],
+        "en": [
+          "Cooked chicken breast",
+          "Skinless chicken breast"
+        ]
+      },
+      "categoryTags": [
+        "food.meat_egg.poultry"
+      ],
+      "healthMetrics": {
+        "inflammatoryPotential": {
+          "value": 0.02,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "chicken breast, cooked"
+        }
+      ],
+      "description": {
+        "zh": "去皮熟鸡胸肉是高蛋白、低碳水的禽肉选择；数据不包含额外烹调用油或酱料。",
+        "en": "Cooked skinless chicken breast is a high-protein, low-carbohydrate poultry option; values exclude added oil and sauces."
+      },
+      "commonness": 3,
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:gallus_gallus:breast:raw",
+        "cookingMethodId": "steamed"
+      }
+    },
+    {
+      "id": "food:taxon:arachis_hypogaea:roasted",
+      "names": {
+        "zh": [
+          "烤花生",
+          "炒花生",
+          "熟花生"
+        ],
+        "en": [
+          "Roasted peanuts",
+          "Peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 14,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 3,
+          "unit": "GL"
+        },
+        "inflammatoryPotential": {
+          "value": -0.55,
+          "unit": "DII"
+        }
+      },
+      "image": {
+        "attribution": "Wikimedia Commons"
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "roasted peanuts"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index",
+          "reference": "peanuts"
+        }
+      ],
+      "description": {
+        "zh": "烤花生能量密度较高，含脂肪、蛋白质和膳食纤维；食用时应控制份量并留意过敏风险。",
+        "en": "Roasted peanuts are energy-dense and provide fat, protein, and fiber; manage portions and consider allergy risk."
+      },
+      "commonness": 3,
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:arachis_hypogaea:raw",
+        "cookingMethodId": "grilled"
+      }
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:mantou",
+      "names": {
+        "zh": [
+          "馒头"
+        ],
+        "en": [
+          "Steamed wheat bun",
+          "Mantou"
+        ]
+      },
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 88,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 41.4,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "馒头, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Steamed wheat bun, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "馒头的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Steamed wheat bun are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:refined",
+          "quantity": {
+            "value": 58,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 42,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "面粉加水揉成面团并醒发。"
+        },
+        {
+          "text": "分剂整形后蒸熟。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:bread_white",
+      "names": {
+        "zh": [
+          "面包",
+          "白面包"
+        ],
+        "en": [
+          "White bread",
+          "Bread"
+        ]
+      },
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 75,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 37,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "面包, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "White bread, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "面包的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for White bread are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:refined",
+          "quantity": {
+            "value": 57,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 29,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:gallus_gallus:egg:whole",
+          "quantity": {
+            "value": 8,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:bos_taurus:milk:whole",
+          "quantity": {
+            "value": 6,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "混合原料揉成面团并醒发。"
+        },
+        {
+          "text": "整形后烘烤至熟。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:bread_whole_wheat",
+      "names": {
+        "zh": [
+          "全麦面包"
+        ],
+        "en": [
+          "Whole-wheat bread"
+        ]
+      },
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 64,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 27.5,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "全麦面包, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Whole-wheat bread, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "全麦面包的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Whole-wheat bread are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:whole",
+          "quantity": {
+            "value": 62,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 28,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:gallus_gallus:egg:whole",
+          "quantity": {
+            "value": 5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:bos_taurus:milk:whole",
+          "quantity": {
+            "value": 5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.whole_grain"
+      ],
+      "recipeSteps": [
+        {
+          "text": "混合全麦粉和液体揉成面团并醒发。"
+        },
+        {
+          "text": "整形后烘烤至熟。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:zea_mays:boiled",
+      "names": {
+        "zh": [
+          "煮玉米",
+          "玉米"
+        ],
+        "en": [
+          "Boiled sweet corn",
+          "Corn"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 52,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 11.9,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "煮玉米, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Boiled sweet corn, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "煮玉米的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Boiled sweet corn are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:zea_mays:raw",
+        "cookingMethodId": "boiled"
+      }
+    },
+    {
+      "id": "food:taxon:ipomoea_batatas:steamed",
+      "botanicalTaxonomy": {
+        "family": "Convolvulaceae",
+        "genus": "Ipomoea",
+        "species": "Ipomoea batatas"
+      },
+      "names": {
+        "zh": [
+          "红薯",
+          "蒸红薯"
+        ],
+        "en": [
+          "Steamed sweet potato",
+          "Sweet potato"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.tuber"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 63,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 15.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "红薯, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Steamed sweet potato, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "红薯的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Steamed sweet potato are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:ipomoea_batatas:raw",
+        "cookingMethodId": "steamed"
+      }
+    },
+    {
+      "id": "food:taxon:colocasia_esculenta:boiled",
+      "botanicalTaxonomy": {
+        "family": "Araceae",
+        "genus": "Colocasia",
+        "species": "Colocasia esculenta"
+      },
+      "names": {
+        "zh": [
+          "芋头",
+          "煮芋头"
+        ],
+        "en": [
+          "Boiled taro",
+          "Taro"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.tuber"
+      ],
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 54,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 10.7,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "芋头, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Boiled taro, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "芋头的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Boiled taro are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:colocasia_esculenta:raw",
+        "cookingMethodId": "boiled"
+      }
+    },
+    {
+      "id": "food:taxon:panicum_miliaceum:porridge",
+      "names": {
+        "zh": [
+          "小米粥"
+        ],
+        "en": [
+          "Millet porridge"
+        ]
+      },
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 62,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 6.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "小米粥, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Millet porridge, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "小米粥的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Millet porridge are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:panicum_miliaceum:raw",
+          "quantity": {
+            "value": 13,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 87,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.grain"
+      ],
+      "recipeSteps": [
+        {
+          "text": "小米淘洗后加水。"
+        },
+        {
+          "text": "煮至米粒软烂成粥。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:oryza_sativa:porridge",
+      "names": {
+        "zh": [
+          "白粥",
+          "大米粥"
+        ],
+        "en": [
+          "Rice porridge"
+        ]
+      },
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 69,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 7.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "白粥, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Rice porridge, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "白粥的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Rice porridge are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:polished:raw",
+          "quantity": {
+            "value": 13,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 87,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.grain"
+      ],
+      "recipeSteps": [
+        {
+          "text": "大米淘洗后加水。"
+        },
+        {
+          "text": "煮至米粒软烂成粥。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:oryza_sativa:glutinous_steamed",
+      "names": {
+        "zh": [
+          "糯米饭"
+        ],
+        "en": [
+          "Steamed glutinous rice"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.grain"
+      ],
+      "commonness": 3,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 87,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 22,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "糯米饭, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Steamed glutinous rice, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "糯米饭的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Steamed glutinous rice are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:oryza_sativa:glutinous:raw",
+        "cookingMethodId": "steamed_grain"
+      }
+    },
+    {
+      "id": "food:taxon:oryza_sativa:zongzi",
+      "names": {
+        "zh": [
+          "粽子"
+        ],
+        "en": [
+          "Rice dumpling",
+          "Zongzi"
+        ]
+      },
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 87,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 31.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "粽子, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Rice dumpling, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "粽子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Rice dumpling are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:glutinous:raw",
+          "quantity": {
+            "value": 48,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:sus_scrofa:lean_raw",
+          "quantity": {
+            "value": 12,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 40,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "boiled",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "糯米浸泡，准备馅料。"
+        },
+        {
+          "text": "包制后加水煮熟。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:oryza_sativa:rice_noodles",
+      "names": {
+        "zh": [
+          "米粉"
+        ],
+        "en": [
+          "Rice noodles"
+        ]
+      },
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 61,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 14.3,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "米粉, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Rice noodles, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "米粉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Rice noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:polished:raw",
+          "quantity": {
+            "value": 31,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 69,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "boiled",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "米浆制成米粉。"
+        },
+        {
+          "text": "入沸水煮熟。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:oryza_sativa:liangpi",
+      "names": {
+        "zh": [
+          "凉皮"
+        ],
+        "en": [
+          "Cold rice noodles",
+          "Liangpi"
+        ]
+      },
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 55,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 11,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "凉皮, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Cold rice noodles, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "凉皮的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Cold rice noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:polished:raw",
+          "quantity": {
+            "value": 27,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 65,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:glycine_max:tofu:soft",
+          "quantity": {
+            "value": 8,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "cold_mixed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "米浆蒸制定型后切条。"
+        },
+        {
+          "text": "与配料拌匀食用。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:oryza_sativa:rice_cake",
+      "names": {
+        "zh": [
+          "年糕"
+        ],
+        "en": [
+          "Rice cake"
+        ]
+      },
+      "commonness": 3,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 83,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 34.9,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "年糕, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Rice cake, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "年糕的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Rice cake are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:glutinous:raw",
+          "quantity": {
+            "value": 54,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 46,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "糯米浸泡并磨制。"
+        },
+        {
+          "text": "蒸熟并压制成型。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:noodles_boiled",
+      "names": {
+        "zh": [
+          "面条",
+          "煮面条"
+        ],
+        "en": [
+          "Boiled wheat noodles",
+          "Noodles"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 55,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 13.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "面条, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Boiled wheat noodles, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "面条的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Boiled wheat noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "derivedFrom": {
+        "ingredientId": "food:taxon:triticum_aestivum:noodles:dry",
+        "cookingMethodId": "boiled"
+      }
+    },
+    {
+      "id": "food:taxon:nelumbo_nucifera:starch_drink",
+      "names": {
+        "zh": [
+          "藕粉"
+        ],
+        "en": [
+          "Lotus root starch drink"
+        ]
+      },
+      "commonness": 2,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 85,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 12.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "藕粉, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Lotus root starch drink, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "藕粉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Lotus root starch drink are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:nelumbo_nucifera:starch",
+          "quantity": {
+            "value": 18,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 82,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "莲藕淀粉用少量凉水调匀。"
+        },
+        {
+          "text": "冲入热水搅拌至透明。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:glycine_max:soy_milk",
+      "names": {
+        "zh": [
+          "豆浆"
+        ],
+        "en": [
+          "Soy milk"
+        ]
+      },
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 34,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 0.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "豆浆, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Soy milk, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "豆浆的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Soy milk are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:glycine_max:soybean:dried",
+          "quantity": {
+            "value": 8,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 92,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.soy",
+        "food.beverage.soy"
+      ],
+      "recipeSteps": [
+        {
+          "text": "黄豆浸泡后加水研磨。"
+        },
+        {
+          "text": "过滤并煮沸至熟。"
+        }
+      ],
+      "hydrationMlPer100g": 92,
+      "densityGramsPerMl": 1.01,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:youtiao",
+      "names": {
+        "zh": [
+          "油条"
+        ],
+        "en": [
+          "Chinese fried dough",
+          "Youtiao"
+        ]
+      },
+      "commonness": 4,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 75,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 33.8,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "油条, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Chinese fried dough, preparation-matched reference"
+        }
+      ],
+      "description": {
+        "zh": "油条的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Chinese fried dough are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "kind": "food",
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:refined",
+          "quantity": {
+            "value": 54,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 26,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:gallus_gallus:egg:whole",
+          "quantity": {
+            "value": 13,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:plant_oil:generic",
+          "quantity": {
+            "value": 7,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "deep_fried",
+      "servesPeople": 1,
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "recipeSteps": [
+        {
+          "text": "调制面团并醒发。"
+        },
+        {
+          "text": "整形后油炸至金黄。"
+        }
+      ]
+    },
+    {
+      "id": "food:taxon:triticum_aestivum:meat_bun",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "肉包子"
+        ],
+        "en": [
+          "Meat-filled steamed bun",
+          "Meat bun"
+        ]
+      },
+      "commonness": 5,
+      "healthMetrics": {
+        "glycemicIndex": {
+          "value": 72,
+          "unit": "GI"
+        },
+        "glycemicLoadPer100g": {
+          "value": 21.6,
+          "unit": "GL"
+        }
+      },
+      "sources": [
+        {
+          "dataset": "China Food Composition Tables",
+          "reference": "肉包子, per 100 g edible portion"
+        },
+        {
+          "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+          "reference": "Meat-filled steamed bun, preparation-matched reference"
+        }
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:triticum_aestivum:flour:refined",
+          "quantity": {
+            "value": 45,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:sus_scrofa:lean_raw",
+          "quantity": {
+            "value": 28,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 27,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "recipeSteps": [
+        {
+          "text": "面粉加水和面并醒发。"
+        },
+        {
+          "text": "调制肉馅，包入面皮。"
+        },
+        {
+          "text": "上锅蒸熟。"
+        }
+      ],
+      "description": {
+        "zh": "肉包子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+        "en": "Values for Meat-filled steamed bun are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+      },
+      "categoryTags": [
+        "food.staple.processed"
+      ]
+    },
+    {
+      "id": "food:beverage:tea",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "茶水"
+        ],
+        "en": [
+          "Tea"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage.tea"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:camellia_sinensis:leaves:dried",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 99,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 99,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "茶水的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Tea are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "茶叶加热水冲泡。"
+        },
+        {
+          "text": "按个人浓淡浸泡后饮用。"
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:beverage:coffee:black",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "黑咖啡"
+        ],
+        "en": [
+          "Black coffee"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage.coffee"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:coffea_arabica:grounds",
+          "quantity": {
+            "value": 2,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 98,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 98,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "黑咖啡的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Black coffee are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "咖啡粉与热水萃取。"
+        },
+        {
+          "text": "过滤后饮用。"
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:beverage:lemon_water",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "柠檬水"
+        ],
+        "en": [
+          "Lemon water"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage.mixed"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:citrus_limon:raw",
+          "quantity": {
+            "value": 5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 95,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 95,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "柠檬水的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Lemon water are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "柠檬切片后加入饮用水。"
+        }
+      ],
+      "techniqueId": "cold_mixed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:beverage:brown_sugar_water",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "红糖水"
+        ],
+        "en": [
+          "Brown sugar water"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage.mixed"
+      ],
+      "components": [
+        {
+          "foodId": "food:seasoning:brown_sugar",
+          "quantity": {
+            "value": 8,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 92,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 92,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "红糖水的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Brown sugar water are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "红糖加入热水搅拌至溶解。"
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:beverage:soy_milk:commercial",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "豆奶"
+        ],
+        "en": [
+          "Soy milk beverage"
+        ]
+      },
+      "categoryTags": [
+        "food.beverage.soy"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:glycine_max:soybean:dried",
+          "quantity": {
+            "value": 5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:sugar",
+          "quantity": {
+            "value": 4,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 91,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "hydrationMlPer100g": 91,
+      "densityGramsPerMl": 1,
+      "servings": [
+        {
+          "id": "per_100ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 1,
+          "labels": {
+            "zh": "100 毫升",
+            "en": "100 ml"
+          }
+        },
+        {
+          "id": "cup_250ml",
+          "nutritionTableKey": "whole_food",
+          "ratioToTable": 2.5,
+          "labels": {
+            "zh": "1 杯（250 毫升）",
+            "en": "1 cup (250 ml)"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "nutrition and hydration resolved from listed components"
+        }
+      ],
+      "description": {
+        "zh": "豆奶的营养与饮水量按配方组分计算。",
+        "en": "Nutrition and hydration for Soy milk beverage are resolved from the listed components."
+      },
+      "commonness": 4,
+      "recipeSteps": [
+        {
+          "text": "黄豆提取液与水、糖调配。"
+        },
+        {
+          "text": "均质并加热灭菌。"
+        }
+      ],
+      "techniqueId": "stewed",
+      "servesPeople": 1
+    },
+    {
+      "id": "food:snack:peanut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒花生（原味）",
+          "烤花生"
+        ],
+        "en": [
+          "Plain roasted peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:arachis_hypogaea:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible peanut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:snack:peanut:five_spice",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒花生（五香）"
+        ],
+        "en": [
+          "Five-spice roasted peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "five_spice"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:arachis_hypogaea:raw",
+          "quantity": {
+            "value": 98,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:black_pepper",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved five-spice standard: 98% kernels, 1% salt, 1% dry spice; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:peanut:garlic",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒花生（蒜香）"
+        ],
+        "en": [
+          "Garlic roasted peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "garlic"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:arachis_hypogaea:raw",
+          "quantity": {
+            "value": 97,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:taxon:allium_sativum:raw",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:plant_oil:generic",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved garlic standard: 97% kernels, 1% garlic, 1% salt, 1% oil; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:peanut:brined",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒花生（盐水）"
+        ],
+        "en": [
+          "Brined roasted peanuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.peanut"
+      ],
+      "flavorTags": [
+        "brined"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:arachis_hypogaea:raw",
+          "quantity": {
+            "value": 98.5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1.5,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved brined standard: 98.5% kernels, 1.5% salt; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:sunflower_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒葵花籽（原味）"
+        ],
+        "en": [
+          "Plain roasted sunflower seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:helianthus_annuus:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible sunflower seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:snack:sunflower_seed:caramel",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒葵花籽（焦糖）"
+        ],
+        "en": [
+          "Caramel sunflower seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "caramel"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:helianthus_annuus:kernels:raw",
+          "quantity": {
+            "value": 88,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:sugar",
+          "quantity": {
+            "value": 10,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:plant_oil:generic",
+          "quantity": {
+            "value": 2,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved caramel standard: 88% kernels, 10% sugar, 2% oil; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:sunflower_seed:five_spice",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒葵花籽（五香）"
+        ],
+        "en": [
+          "Five-spice sunflower seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "five_spice"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:helianthus_annuus:kernels:raw",
+          "quantity": {
+            "value": 98,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:black_pepper",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved five-spice standard: 98% kernels, 1% salt, 1% dry spice; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:sunflower_seed:hickory",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒葵花籽（山核桃味）"
+        ],
+        "en": [
+          "Hickory-flavored sunflower seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "hickory"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:helianthus_annuus:kernels:raw",
+          "quantity": {
+            "value": 96,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:sugar",
+          "quantity": {
+            "value": 2,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:salt",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:black_pepper",
+          "quantity": {
+            "value": 1,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved hickory-flavor standard: 96% kernels, 2% sugar, 1% salt, 1% dry spice; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:watermelon_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒西瓜子（原味）",
+          "西瓜子"
+        ],
+        "en": [
+          "Plain roasted watermelon seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:citrullus_lanatus:seeds:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible watermelon seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:pumpkin_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒南瓜子（原味）",
+          "南瓜子"
+        ],
+        "en": [
+          "Plain roasted pumpkin seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:cucurbita_pepo:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible pumpkin seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:snake_gourd_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒吊瓜子（原味）",
+          "吊瓜子"
+        ],
+        "en": [
+          "Plain roasted Chinese snake gourd seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:trichosanthes_kirilowii:seeds:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible Chinese snake gourd seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:winter_melon_seed:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒冬瓜子（原味）",
+          "冬瓜子"
+        ],
+        "en": [
+          "Plain roasted winter melon seeds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.seed"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:benincasa_hispida:seeds:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible winter melon seed kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:cashew:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒腰果（原味）",
+          "腰果"
+        ],
+        "en": [
+          "Plain roasted cashews"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:anacardium_occidentale:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible cashew kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:snack:almond:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒杏仁（原味）",
+          "炒巴旦木"
+        ],
+        "en": [
+          "Plain roasted almonds"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:prunus_dulcis:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible almond kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 4
+    },
+    {
+      "id": "food:snack:pistachio:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒开心果（原味）",
+          "开心果"
+        ],
+        "en": [
+          "Plain roasted pistachios"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:pistacia_vera:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible pistachio kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:walnut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒核桃（原味）",
+          "核桃"
+        ],
+        "en": [
+          "Plain roasted walnuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:juglans_regia:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible walnut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:pecan:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒碧根果（原味）",
+          "碧根果"
+        ],
+        "en": [
+          "Plain roasted pecans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:carya_illinoinensis:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible pecan kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:macadamia:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒夏威夷果（原味）",
+          "夏威夷果"
+        ],
+        "en": [
+          "Plain roasted macadamias"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:macadamia_integrifolia:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible macadamia kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:pine_nut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒松子（原味）",
+          "松子"
+        ],
+        "en": [
+          "Plain roasted pine nuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:pinus_koraiensis:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible pine nut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:hazelnut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒榛子（原味）",
+          "榛子"
+        ],
+        "en": [
+          "Plain roasted hazelnuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:corylus_avellana:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible hazelnut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:chinese_hickory:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒山核桃（原味）",
+          "山核桃"
+        ],
+        "en": [
+          "Plain roasted Chinese hickory nuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:carya_cathayensis:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible Chinese hickory kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:snack:chestnut:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒板栗（原味）",
+          "原味板栗"
+        ],
+        "en": [
+          "Plain roasted chestnuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:castanea_mollissima:kernels:raw",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible chestnut kernels; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:chestnut:sugar_roasted",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "糖炒板栗"
+        ],
+        "en": [
+          "Sugar-roasted chestnuts"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.tree_nut"
+      ],
+      "flavorTags": [
+        "sugar_roasted"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:castanea_mollissima:kernels:raw",
+          "quantity": {
+            "value": 88,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:seasoning:sugar",
+          "quantity": {
+            "value": 10,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:plant_oil:generic",
+          "quantity": {
+            "value": 2,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "baked",
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Approved sugar-roasted standard: 88% chestnut kernels, 10% sugar, 2% oil; components total 100 g finished snack"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:fava_bean:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "兰花豆（原味）",
+          "炒蚕豆"
+        ],
+        "en": [
+          "Plain roasted fava beans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:vicia_faba:dry",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible dried fava beans; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:black_soybean:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒黑豆（原味）"
+        ],
+        "en": [
+          "Plain roasted black soybeans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:glycine_max:black:dry",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible dried black soybeans; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:soybean:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒黄豆（原味）"
+        ],
+        "en": [
+          "Plain roasted soybeans"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:glycine_max:soybean:dried",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible dried soybeans; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:snack:green_pea:plain",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "炒青豆（原味）"
+        ],
+        "en": [
+          "Plain roasted green peas"
+        ]
+      },
+      "categoryTags": [
+        "food.nut.legume_snack"
+      ],
+      "flavorTags": [
+        "plain"
+      ],
+      "derivedFrom": {
+        "ingredientId": "food:taxon:pisum_sativum:dry",
+        "cookingMethodId": "baked"
+      },
+      "sources": [
+        {
+          "dataset": "HealthDietPro standard snack formulation",
+          "reference": "Plain roasted snack: 100% edible dried green peas; nutrient calculation uses baked derivation"
+        }
+      ],
+      "commonness": 3
+    },
+    {
+      "id": "food:taxon:fagopyrum_esculentum:steamed_cake",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "荞篙发粑",
+          "荞麦粑"
+        ],
+        "en": [
+          "Steamed buckwheat cake"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:fagopyrum_esculentum:flour",
+          "quantity": {
+            "value": 50.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 50.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "Buckwheat flour + water, fermented and steamed"
+        }
+      ],
+      "description": {
+        "zh": "荞篙发粑以荞麦粉发酵蒸制，口感松软带荞麦清香，为南方常见杂粮主食。",
+        "en": "A fermented steamed buckwheat cake with a soft, fragrant texture, a common whole-grain staple in southern China."
+      },
+      "recipeSteps": [
+        {
+          "text": "荞麦粉加水调成糊状，静置发酵。"
+        },
+        {
+          "text": "倒入蒸笼大火蒸熟，脱模即食。"
+        }
+      ],
+      "commonness": 2
+    },
+    {
+      "id": "food:taxon:oryza_sativa:glutinous_herb_cake",
+      "kind": "food",
+      "names": {
+        "zh": [
+          "糯米水萩粑",
+          "水萩粑"
+        ],
+        "en": [
+          "Glutinous rice herb cake"
+        ]
+      },
+      "categoryTags": [
+        "food.staple.processed"
+      ],
+      "systemTags": [
+        "common"
+      ],
+      "components": [
+        {
+          "foodId": "food:taxon:oryza_sativa:glutinous:raw",
+          "quantity": {
+            "value": 56.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        },
+        {
+          "foodId": "food:water:drinking",
+          "quantity": {
+            "value": 44.0,
+            "unitCategory": "weight",
+            "unitId": "g"
+          }
+        }
+      ],
+      "techniqueId": "steamed",
+      "servesPeople": 1,
+      "sources": [
+        {
+          "dataset": "Recipe composition model",
+          "reference": "Glutinous rice + water + cudweed herb, steamed"
+        }
+      ],
+      "description": {
+        "zh": "糯米水萩粑将浸泡磨浆的糯米拌入剁碎的水萩（鼠曲草）蒸制而成，色泽青绿、软糯清香，多作春季时令主食。",
+        "en": "A springtime steamed cake made from soaked glutinous rice mixed with chopped cudweed herb, soft, green-tinted and aromatic."
+      },
+      "recipeSteps": [
+        {
+          "text": "糯米浸泡后磨浆，拌入洗净剁碎的水萩（鼠曲草）。"
+        },
+        {
+          "text": "蒸熟后整形压制成粑。"
+        }
+      ],
+      "commonness": 2
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "food:plant_oil:generic",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "植物油"
+    ],
+    "en": [
+      "Vegetable oil"
+    ]
+  },
+  "categoryTags": [
+    "food.oil.plant"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 900,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 100,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Vegetable oil; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "植物油为配方计算使用的基础食材。",
+    "en": "Vegetable oil is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

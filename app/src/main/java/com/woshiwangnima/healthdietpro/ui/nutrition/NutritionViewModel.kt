@@ -316,9 +316,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     /** Persist a custom food (create or edit) and rebuild the merged index. */
     fun saveCustomFood(dto: FoodDto) {
         val targetCustom = customRepository
-        val previousImageKey = targetCustom.load().firstOrNull { it.id == dto.id }?.image?.localKey
         val updated = targetCustom.upsert(dto)
-        if (previousImageKey != dto.image?.localKey) deleteCustomImage(previousImageKey)
         rebuild(updated.map { it.toDomain() })
         val collections = foodCollections.load(foodsById.keys)
         _state.value = _state.value.copy(
@@ -346,9 +344,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
 
     fun deleteCustomFood(id: String) {
         val targetCustom = customRepository
-        val imageKey = targetCustom.load().firstOrNull { it.id == id }?.image?.localKey
         val updated = targetCustom.delete(id)
-        deleteCustomImage(imageKey)
         rebuild(updated.map { it.toDomain() })
         val collections = foodCollections.load(foodsById.keys)
         _state.value = _state.value.copy(
@@ -379,14 +375,6 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
             }
             savedKey?.let(onSaved)
         }
-    }
-
-    private fun deleteCustomImage(key: String?) {
-        if (key == null || !key.startsWith("user:")) return
-        val relativePath = key.removePrefix("user:")
-        val root = getApplication<Application>().filesDir.canonicalFile
-        val imageFile = java.io.File(root, relativePath).canonicalFile
-        if (imageFile.path.startsWith(root.path + java.io.File.separator)) imageFile.delete()
     }
 
     fun isCustom(id: String): Boolean = UserCustomFoodRepository.isCustom(id)

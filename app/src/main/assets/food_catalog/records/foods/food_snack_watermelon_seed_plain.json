@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:watermelon_seed:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒西瓜子（原味）",
+      "西瓜子"
+    ],
+    "en": [
+      "Plain roasted watermelon seeds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:citrullus_lanatus:seeds:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible watermelon seed kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

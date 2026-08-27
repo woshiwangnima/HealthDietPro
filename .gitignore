@@ -81,6 +81,7 @@ docs/*
 !docs/APP_DATA_TABLE_REORDER_DESIGN.md
 !docs/SLEEP_RECORD_DESIGN.md
 !docs/BLOOD_GLUCOSE_CHART_REFACTOR.md
+!docs/FOOD_CATALOG_ASSET_DESIGN.md
 
 # Hidden directories
 .*/
@@ -90,3 +91,18 @@ docs/*
 tools/agp_pdf/input/*
 !tools/agp_pdf/input/.gitkeep
 tools/agp_pdf/output/
+
+# Food catalog tooling
+# Source JSON, image mappings, original images, and generated runtime catalog
+# are intentional project inputs/outputs and must remain trackable.
+tools/food_catalog/__pycache__/
+tools/food_catalog/images/source/*.json.tmp
+tools/food_catalog/images/source/*.tmp
+# Developer-only original food images are not required in the repository.
+# Keep mapping.json so the generated APK assets remain reproducible when the
+# original image set is available locally.
+tools/food_catalog/images/source/*.[jJ][pP][gG]
+tools/food_catalog/images/source/*.[jJ][pP][eE][gG]
+tools/food_catalog/images/source/*.[pP][nN][gG]
+tools/food_catalog/images/source/*.[wW][eE][bB][pP]
+tools/food_catalog/images/source/*.[bB][mM][pP]

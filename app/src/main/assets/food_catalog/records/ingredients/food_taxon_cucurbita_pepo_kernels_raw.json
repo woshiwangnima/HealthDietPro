@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:cucurbita_pepo:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "南瓜子仁"
+    ],
+    "en": [
+      "Pumpkin seed kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 559,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 30.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 49.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 10.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Pumpkin seed kernels, raw; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 4
+}

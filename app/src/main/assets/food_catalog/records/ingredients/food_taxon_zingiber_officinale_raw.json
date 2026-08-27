@@ -1,0 +1,77 @@
+{
+  "id": "food:taxon:zingiber_officinale:raw",
+  "botanicalTaxonomy": {
+    "family": "Zingiberaceae",
+    "genus": "Zingiber",
+    "species": "Zingiber officinale"
+  },
+  "names": {
+    "zh": [
+      "生姜"
+    ],
+    "en": [
+      "Ginger"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable",
+    "food.seasoning.fresh_aromatic"
+  ],
+  "commonness": 5,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 1.1,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "生姜, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Ginger, preparation-matched reference"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 41,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 7.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "生姜的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Ginger are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "ingredient"
+}

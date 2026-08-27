@@ -1,0 +1,52 @@
+{
+  "id": "food:snack:sunflower_seed:caramel",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒葵花籽（焦糖）"
+    ],
+    "en": [
+      "Caramel sunflower seeds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "flavorTags": [
+    "caramel"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:helianthus_annuus:kernels:raw",
+      "quantity": {
+        "value": 88,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:sugar",
+      "quantity": {
+        "value": 10,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:plant_oil:generic",
+      "quantity": {
+        "value": 2,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "baked",
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Approved caramel standard: 88% kernels, 10% sugar, 2% oil; components total 100 g finished snack"
+    }
+  ],
+  "commonness": 3
+}

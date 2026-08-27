@@ -1,0 +1,61 @@
+{
+  "id": "food:taxon:solanum_tuberosum:boiled",
+  "botanicalTaxonomy": {
+    "family": "Solanaceae",
+    "genus": "Solanum",
+    "species": "Solanum tuberosum"
+  },
+  "names": {
+    "zh": [
+      "煮土豆",
+      "马铃薯",
+      "洋芋"
+    ],
+    "en": [
+      "Boiled potato",
+      "Potato"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.tuber",
+    "food.vegetable.root"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 78,
+      "unit": "GI",
+      "note": "boiled; variety and cooling change GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 13.9,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.08,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "standard food composition values"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "potato, boiled"
+    }
+  ],
+  "description": {
+    "zh": "煮马铃薯是富含淀粉的薯类食物；品种、熟化程度及冷却后再食用都会影响血糖反应。",
+    "en": "Boiled potato is a starchy tuber; variety, doneness, and cooling before eating affect glycemic response."
+  },
+  "commonness": 3,
+  "kind": "food",
+  "derivedFrom": {
+    "ingredientId": "food:taxon:solanum_tuberosum:raw",
+    "cookingMethodId": "boiled"
+  }
+}

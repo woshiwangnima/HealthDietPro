@@ -1,0 +1,71 @@
+{
+  "id": "food:taxon:spinacia_oleracea:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Amaranthaceae",
+    "genus": "Spinacia",
+    "species": "Spinacia oleracea"
+  },
+  "names": {
+    "zh": [
+      "菠菜"
+    ],
+    "en": [
+      "Spinach"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.leafy"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.89,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "spinach, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 24,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 4.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "菠菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Spinach is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 5
+}

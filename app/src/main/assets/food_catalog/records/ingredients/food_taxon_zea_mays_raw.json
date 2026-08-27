@@ -1,0 +1,95 @@
+{
+  "id": "food:taxon:zea_mays:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "玉米",
+      "鲜玉米",
+      "带芯玉米"
+    ],
+    "en": [
+      "Sweet corn on the cob",
+      "Fresh corn"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.46,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 112,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 22.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 2.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 52,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Sweet corn kernels, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "菜市场购买的带苞叶、玉米芯的鲜玉米。营养表按玉米粒每 100 克可食部计；购买重量记录时，先按约 46% 换算为可食玉米粒。",
+    "en": "Fresh market corn sold with husk and cob. Nutrition is per 100 g edible kernels; convert purchased mass using an edible ratio of about 46%."
+  },
+  "commonness": 3,
+  "servings": [
+    {
+      "id": "edible_100g",
+      "nutritionTableKey": "standard.100g_edible",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "可食 100 克",
+        "en": "100 g edible kernels"
+      }
+    },
+    {
+      "id": "purchased_100g",
+      "nutritionTableKey": "standard.100g_edible",
+      "ratioToTable": 0.46,
+      "labels": {
+        "zh": "购买 100 克（约 46 克可食）",
+        "en": "100 g purchased (about 46 g edible)"
+      }
+    }
+  ]
+}

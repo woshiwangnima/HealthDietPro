@@ -41,7 +41,7 @@ internal data class FoodDto(
         "food" -> PreparedFood(
             id = id,
             names = names,
-            categoryTags = categoryTags,
+            categoryTags = FoodCategories.normalizeTags(categoryTags),
             flavorTags = flavorTags,
             derivedFrom = derivedFrom?.toDomain(),
             components = components.map { it.toDomain() },
@@ -84,7 +84,7 @@ internal data class FoodDto(
         else -> Ingredient(
             id = id,
             names = names,
-            categoryTags = categoryTags,
+            categoryTags = FoodCategories.normalizeTags(categoryTags),
             flavorTags = flavorTags,
             nutritionTables = resolveTables(),
             edibleRatio = edibleRatio,

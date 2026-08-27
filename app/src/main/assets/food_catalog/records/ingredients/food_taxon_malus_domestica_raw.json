@@ -1,0 +1,124 @@
+{
+  "id": "food:taxon:malus_domestica:raw",
+  "names": {
+    "zh": [
+      "苹果",
+      "鲜苹果",
+      "红富士苹果"
+    ],
+    "en": [
+      "Apple",
+      "Raw apple"
+    ]
+  },
+  "categoryTags": [
+    "food.fruit"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 36,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 4.9,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.32,
+      "unit": "DII"
+    }
+  },
+  "servings": [
+    {
+      "id": "per_100g",
+      "labels": {
+        "zh": "100 克",
+        "en": "100 g"
+      },
+      "nutritionTableKey": "standard.100g",
+      "ratioToTable": 1
+    },
+    {
+      "id": "small",
+      "labels": {
+        "zh": "1 小个",
+        "en": "1 small"
+      },
+      "nutritionTableKey": "standard.100g",
+      "ratioToTable": 1.3
+    },
+    {
+      "id": "medium",
+      "labels": {
+        "zh": "1 中个",
+        "en": "1 medium"
+      },
+      "nutritionTableKey": "standard.100g",
+      "ratioToTable": 1.8
+    },
+    {
+      "id": "large",
+      "labels": {
+        "zh": "1 大个",
+        "en": "1 large"
+      },
+      "nutritionTableKey": "standard.100g",
+      "ratioToTable": 2.5
+    }
+  ],
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "apple, raw"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "apple"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 53,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 13.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "带皮鲜苹果提供水分和膳食纤维；大小、品种和可食比例不同，单个重量仅为估算。",
+    "en": "Raw apple with peel provides water and dietary fiber; fruit size, cultivar, and edible yield vary, so per-fruit portions are estimates."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

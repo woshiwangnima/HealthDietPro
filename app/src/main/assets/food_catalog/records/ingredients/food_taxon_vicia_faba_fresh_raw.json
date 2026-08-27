@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:vicia_faba:fresh:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Fabaceae",
+    "genus": "Vicia",
+    "species": "Vicia faba"
+  },
+  "names": {
+    "zh": [
+      "蚕豆",
+      "胡豆"
+    ],
+    "en": [
+      "Fava beans, fresh",
+      "Broad beans"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.fresh_legume"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.32,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "fresh fava beans, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 104,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 8.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 16.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 3.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "蚕豆是常见的鲜豆类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Fava beans, fresh is a common fresh legume. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 3
+}

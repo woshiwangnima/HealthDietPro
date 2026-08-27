@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:panicum_miliaceum:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "小米"
+    ],
+    "en": [
+      "Millet, raw"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 358,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 3.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 73.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 71,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Millet, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "小米为配方计算使用的基础食材。",
+    "en": "Millet, raw is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

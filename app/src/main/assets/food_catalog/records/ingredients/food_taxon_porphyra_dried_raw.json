@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:porphyra:dried:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Bangiaceae",
+    "genus": "Porphyra",
+    "species": "Porphyra spp."
+  },
+  "names": {
+    "zh": [
+      "紫菜",
+      "干紫菜"
+    ],
+    "en": [
+      "Dried laver"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.fungi_algae"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1.0,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "dried laver, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 250,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 26.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 44.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 21.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "紫菜是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Dried laver is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 3
+}

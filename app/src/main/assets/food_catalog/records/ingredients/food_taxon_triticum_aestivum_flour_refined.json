@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:triticum_aestivum:flour:refined",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "小麦粉",
+      "中筋面粉"
+    ],
+    "en": [
+      "Refined wheat flour",
+      "All-purpose flour"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "wheat flour, refined; per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 344,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 11.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 71.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 85,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 60.8,
+      "unit": "GL"
+    }
+  },
+  "description": {
+    "zh": "精制小麦粉是面点的基础食材，营养表按干粉每 100 克可食部计。",
+    "en": "Refined wheat flour is a basic dough ingredient. Values are per 100 g dry edible flour."
+  },
+  "commonness": 5
+}

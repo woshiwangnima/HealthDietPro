@@ -1,0 +1,71 @@
+{
+  "id": "food:taxon:brassica_rapa:chinensis:baby:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Brassicaceae",
+    "genus": "Brassica",
+    "species": "Brassica rapa subsp. chinensis"
+  },
+  "names": {
+    "zh": [
+      "娃娃菜"
+    ],
+    "en": [
+      "Baby bok choy"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.leafy"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.9,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "baby bok choy, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 12,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 1.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "娃娃菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Baby bok choy is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 4
+}

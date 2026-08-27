@@ -1,0 +1,74 @@
+{
+  "id": "food:taxon:brassica_oleracea:capitata:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Brassicaceae",
+    "genus": "Brassica",
+    "species": "Brassica oleracea var. capitata"
+  },
+  "names": {
+    "zh": [
+      "圆白菜",
+      "卷心菜",
+      "包菜",
+      "洋白菜"
+    ],
+    "en": [
+      "Cabbage"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.leafy"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.86,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "cabbage, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 24,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 4.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "圆白菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Cabbage is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 4
+}

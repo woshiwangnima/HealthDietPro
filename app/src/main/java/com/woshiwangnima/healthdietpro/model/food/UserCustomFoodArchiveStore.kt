@@ -73,6 +73,23 @@ internal class UserCustomFoodArchiveStore(
         val tagIds = archive.tags.map(UserFoodTag::id)
         require(tagIds.all { it.isNotBlank() }) { "User food tag id is blank" }
         require(tagIds.distinct().size == tagIds.size) { "Duplicate user food tag id" }
+        require(archive.foods.all { food ->
+            val tags = food.categoryTags
+            FoodCategories.normalizeTags(tags) == tags
+        }) { "Custom food category tags must contain leaf tags only" }
+
+        val allowedNutrients = NutrientMetaRepository.fromContext(context).nutrients()
+            .mapTo(mutableSetOf(), NutrientMeta::code)
+        archive.foods.forEach { food ->
+            val codes = buildSet {
+                addAll(food.nutrients.keys)
+                food.nutritionTables.values.forEach { addAll(it.nutrients.keys) }
+                food.derivedFrom?.nutrientOverrides?.keys?.let(::addAll)
+            }
+            require(codes.all(allowedNutrients::contains)) {
+                "Custom food contains an unknown nutrient: ${food.id}"
+            }
+        }
     }
 
     private fun file(): File = File(context.filesDir, "user_archives/${safeId(userId)}/custom_foods.json")

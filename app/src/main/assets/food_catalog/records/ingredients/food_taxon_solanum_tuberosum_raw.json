@@ -1,0 +1,78 @@
+{
+  "id": "food:taxon:solanum_tuberosum:raw",
+  "botanicalTaxonomy": {
+    "family": "Solanaceae",
+    "genus": "Solanum",
+    "species": "Solanum tuberosum"
+  },
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "生土豆"
+    ],
+    "en": [
+      "Potato, raw"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.tuber",
+    "food.vegetable.root"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 77,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 17.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 2.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 56,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Potato, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "生土豆为配方计算使用的基础食材。",
+    "en": "Potato, raw is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:snake_gourd_seed:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒吊瓜子（原味）",
+      "吊瓜子"
+    ],
+    "en": [
+      "Plain roasted Chinese snake gourd seeds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:trichosanthes_kirilowii:seeds:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible Chinese snake gourd seed kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 2
+}

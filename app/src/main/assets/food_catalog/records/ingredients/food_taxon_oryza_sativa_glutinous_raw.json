@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:oryza_sativa:glutinous:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "糯米"
+    ],
+    "en": [
+      "Glutinous rice, raw"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 348,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 7.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 77,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 87,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Glutinous rice, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "糯米为配方计算使用的基础食材。",
+    "en": "Glutinous rice, raw is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

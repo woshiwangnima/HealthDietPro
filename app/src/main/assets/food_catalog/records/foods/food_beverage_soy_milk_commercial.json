@@ -1,0 +1,84 @@
+{
+  "id": "food:beverage:soy_milk:commercial",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "豆奶"
+    ],
+    "en": [
+      "Soy milk beverage"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.soy"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:glycine_max:soybean:dried",
+      "quantity": {
+        "value": 5,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:sugar",
+      "quantity": {
+        "value": 4,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 91,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "hydrationMlPer100g": 91,
+  "densityGramsPerMl": 1,
+  "servings": [
+    {
+      "id": "per_100ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "100 毫升",
+        "en": "100 ml"
+      }
+    },
+    {
+      "id": "cup_250ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 2.5,
+      "labels": {
+        "zh": "1 杯（250 毫升）",
+        "en": "1 cup (250 ml)"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition and hydration resolved from listed components"
+    }
+  ],
+  "description": {
+    "zh": "豆奶的营养与饮水量按配方组分计算。",
+    "en": "Nutrition and hydration for Soy milk beverage are resolved from the listed components."
+  },
+  "commonness": 4,
+  "recipeSteps": [
+    {
+      "text": "黄豆提取液与水、糖调配。"
+    },
+    {
+      "text": "均质并加热灭菌。"
+    }
+  ],
+  "techniqueId": "stewed",
+  "servesPeople": 1
+}

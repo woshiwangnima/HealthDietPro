@@ -1,0 +1,78 @@
+{
+  "id": "food:taxon:allium_fistulosum:scallion",
+  "botanicalTaxonomy": {
+    "family": "Amaryllidaceae",
+    "genus": "Allium",
+    "species": "Allium fistulosum"
+  },
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "小葱"
+    ],
+    "en": [
+      "Scallion"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable",
+    "food.seasoning.fresh_aromatic"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 32,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 2.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Scallion; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "小葱为配方计算使用的基础食材。",
+    "en": "Scallion is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

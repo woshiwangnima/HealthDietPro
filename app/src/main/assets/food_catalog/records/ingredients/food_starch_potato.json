@@ -1,0 +1,78 @@
+{
+  "id": "food:starch:potato",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "马铃薯淀粉",
+      "土豆淀粉"
+    ],
+    "en": [
+      "Potato starch"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "botanicalTaxonomy": {
+    "family": "Solanaceae",
+    "genus": "Solanum",
+    "species": "Solanum tuberosum"
+  },
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 357,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 88.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 70,
+      "unit": "GI",
+      "note": "Reference for isolated dry starch; preparation changes glucose response."
+    },
+    "glycemicLoadPer100g": {
+      "value": 61.7,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Potato starch, dry; values normalized per 100 g"
+    }
+  ],
+  "description": {
+    "zh": "马铃薯淀粉是从马铃薯块茎中提取的纯淀粉，糊化后黏度和透明度与玉米淀粉不同。",
+    "en": "Potato starch is purified starch extracted from potato tubers; its gelatinization and viscosity differ from cornstarch."
+  },
+  "commonness": 3
+}

@@ -19,6 +19,8 @@ import java.lang.reflect.Type
 
 object ProfilePrefs {
     private const val PREFS_NAME = "health_diet_prefs"
+    private const val KEY_LEGACY_PROFILE = "user_profile"
+    private const val KEY_LEGACY_ALL_USERS = "all_users"
     private const val KEY_USER_ARCHIVE_IDS = "user_archive_ids_v1"
     private const val KEY_USER_METADATA_INDEX = "user_metadata_index_v1"
     private const val KEY_CURRENT_USER_ID = "current_user_id"
@@ -52,6 +54,27 @@ object ProfilePrefs {
             },
         )
         .create()
+    private val legacyProfileGson = GsonBuilder()
+        .registerTypeAdapter(
+            ArchiveSchemaVersion::class.java,
+            JsonDeserializer<ArchiveSchemaVersion> { source, _, _ ->
+                when {
+                    source.isJsonNull -> ArchiveSchemaVersion(0, 0, 0)
+                    source.isJsonPrimitive -> ArchiveSchemaVersion(
+                        major = 0,
+                        minor = 0,
+                        patch = source.asInt,
+                    )
+                    source.isJsonObject -> ArchiveSchemaVersion(
+                        major = source.asJsonObject.get("major")?.asInt ?: 0,
+                        minor = source.asJsonObject.get("minor")?.asInt ?: 0,
+                        patch = source.asJsonObject.get("patch")?.asInt ?: 0,
+                    )
+                    else -> null
+                }
+            },
+        )
+        .create()
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -79,6 +102,75 @@ object ProfilePrefs {
         }
         if (normalized != parsed) saveUserMetadata(context, normalized)
         return normalized
+    }
+
+    /** Migrates the pre-6b8 SharedPreferences profile list before the new index is read. */
+    private fun ensureLegacyUsersMigrated(context: Context) {
+        val preferences = prefs(context)
+        val type = object : TypeToken<List<UserProfile>>() {}.type
+        val legacyUsers = mutableListOf<UserProfile>()
+        preferences.getString(KEY_LEGACY_ALL_USERS, null)?.let { raw ->
+            runCatching { legacyProfileGson.fromJson<List<UserProfile>>(raw, type).orEmpty() }
+                .onSuccess { legacyUsers += it }
+                .onFailure {
+                    // Keep valid profiles when one legacy record has an incompatible field.
+                    runCatching {
+                        com.google.gson.JsonParser.parseString(raw).asJsonArray.forEach { element ->
+                            runCatching {
+                                legacyProfileGson.fromJson(element, UserProfile::class.java)
+                            }.getOrNull()?.let { legacyUsers += it }
+                        }
+                    }
+                }
+        }
+        preferences.getString(KEY_LEGACY_PROFILE, null)?.let { raw ->
+            runCatching { legacyProfileGson.fromJson<UserProfile>(raw, UserProfile::class.java) }
+                .getOrNull()
+                ?.let { legacyUsers += it }
+        }
+        if (legacyUsers.isEmpty()) return
+
+        val existingIds = preferences.getStringSet(KEY_USER_ARCHIVE_IDS, emptySet()).orEmpty()
+        val existingUsers = existingIds.mapNotNull { readArchiveUser(context, it) }
+        val knownIds = (existingIds + existingUsers.map(UserProfile::id)).toMutableSet()
+
+        val migratedLegacy = legacyUsers.mapIndexedNotNull { index, profile ->
+            val baseId = profile.id.ifBlank { "legacy_$index" }
+            var id = baseId
+            var suffix = 1
+            while (id in knownIds) {
+                if (existingUsers.any { it.id == id && it.name == profile.name }) return@mapIndexedNotNull null
+                id = "${baseId}_$suffix"
+                suffix++
+            }
+            knownIds += id
+            val normalized = profile.copy(
+                id = id,
+                archiveSchemaVersion = ArchiveSchemaVersion.Current,
+                archiveAppVersion = appVersion(context),
+            )
+            writeArchiveUser(context, normalized)
+            BodyMetricsRepository.forUser(context, id).replace(
+                BodyMetrics(
+                    heightRecords = normalized.heightRecords,
+                    weightRecords = normalized.weightRecords,
+                    circumferenceRecords = normalized.circumferenceRecords,
+                ),
+            )
+            normalized
+        }
+        val migrated = (existingUsers + migratedLegacy).distinctBy(UserProfile::id)
+        val current = preferences.getString(KEY_CURRENT_USER_ID, null)
+        preferences.edit()
+            .putStringSet(KEY_USER_ARCHIVE_IDS, migrated.map { it.id }.toSet())
+            .remove(KEY_LEGACY_PROFILE)
+            .remove(KEY_LEGACY_ALL_USERS)
+            .apply()
+        val now = System.currentTimeMillis()
+        saveUserMetadata(context, migrated.map { it.toMetadata(now, now, now) })
+        if (current.isNullOrBlank() || migrated.none { it.id == current }) {
+            preferences.edit().putString(KEY_CURRENT_USER_ID, migrated.first().id).apply()
+        }
     }
 
     private fun saveUserMetadata(context: Context, users: List<UserMetadata>) {
@@ -111,7 +203,13 @@ object ProfilePrefs {
 
     /** Rebuilds missing public index entries from profile archives without reading any domain data. */
     private fun repairUserMetadataIndex(context: Context) {
-        val archiveIds = prefs(context).getStringSet(KEY_USER_ARCHIVE_IDS, emptySet()).orEmpty()
+        val storedIds = prefs(context).getStringSet(KEY_USER_ARCHIVE_IDS, emptySet()).orEmpty()
+        val archiveRoot = File(context.filesDir, "user_archives")
+        val discoveredIds = archiveRoot.listFiles()
+            .orEmpty()
+            .filter { it.isDirectory && File(it, "profile.json").isFile }
+            .map { it.name }
+        val archiveIds = (storedIds + discoveredIds).toSet()
         val existing = readUserMetadata(context).associateBy(UserMetadata::id)
         val repaired = archiveIds.mapNotNull { userId ->
             val profile = readArchiveUser(context, userId) ?: return@mapNotNull existing[userId]
@@ -122,6 +220,9 @@ object ProfilePrefs {
                 lastActiveAtMillis = prior?.lastActiveAtMillis ?: fallbackTime,
                 updatedAtMillis = prior?.updatedAtMillis ?: fallbackTime,
             )
+        }
+        if (archiveIds != storedIds) {
+            prefs(context).edit().putStringSet(KEY_USER_ARCHIVE_IDS, archiveIds).apply()
         }
         if (repaired.associateBy(UserMetadata::id) != existing) saveUserMetadata(context, repaired)
     }
@@ -142,6 +243,7 @@ object ProfilePrefs {
     }
 
     fun getAllUserMetadata(context: Context): List<UserMetadata> {
+        ensureLegacyUsersMigrated(context)
         repairUserMetadataIndex(context)
         return readUserMetadata(context).sortedByDescending { it.updatedAtMillis }
     }
@@ -151,6 +253,7 @@ object ProfilePrefs {
     }
 
     fun getCurrentUserId(context: Context): String {
+        ensureLegacyUsersMigrated(context)
         val id = prefs(context).getString(KEY_CURRENT_USER_ID, null)
         if (!id.isNullOrEmpty()) return id
         val users = getAllUserMetadata(context)
@@ -167,6 +270,7 @@ object ProfilePrefs {
     }
 
     fun setCurrentUserId(context: Context, id: String) {
+        ensureLegacyUsersMigrated(context)
         val users = readUserMetadata(context)
         require(id.isEmpty() || users.any { it.id == id }) { "Unknown user id" }
         updateUserActivity(context, id, users, force = true)
@@ -211,6 +315,7 @@ object ProfilePrefs {
     }
 
     fun getProfile(context: Context, userId: String): UserProfile? {
+        ensureLegacyUsersMigrated(context)
         return readArchiveUser(context, userId)
     }
 

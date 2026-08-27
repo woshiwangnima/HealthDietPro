@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:pisum_sativum:dry",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "青豆"
+    ],
+    "en": [
+      "Dried green peas"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.legume_snack"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 341,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 24.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 60,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 25,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Peas, split, mature seeds, dry; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 3
+}

@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:pyrus_pyrifolia:raw",
+  "names": {
+    "zh": [
+      "梨子",
+      "梨"
+    ],
+    "en": [
+      "Pear"
+    ]
+  },
+  "categoryTags": [
+    "food.fruit"
+  ],
+  "commonness": 5,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 38,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 4.1,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "梨子, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Pear, preparation-matched reference"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 44,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 10.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "梨子的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Pear are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "ingredient"
+}

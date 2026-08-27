@@ -1,0 +1,68 @@
+{
+  "id": "food:taxon:coffea_arabica:grounds",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "咖啡粉"
+    ],
+    "en": [
+      "Coffee grounds"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.coffee"
+  ],
+  "systemTags": [
+    "common",
+    "beverage_brew_base"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 430,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 14,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 15,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 52,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 22,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Coffee grounds; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "咖啡粉为配方计算使用的基础食材。",
+    "en": "Coffee grounds is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

@@ -1,0 +1,29 @@
+{
+  "id": "food:snack:soybean:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒黄豆（原味）"
+    ],
+    "en": [
+      "Plain roasted soybeans"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.legume_snack"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:glycine_max:soybean:dried",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible dried soybeans; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

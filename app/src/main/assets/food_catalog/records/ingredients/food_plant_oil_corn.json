@@ -1,0 +1,58 @@
+{
+  "id": "food:plant_oil:corn",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "玉米油"
+    ],
+    "en": [
+      "Corn oil"
+    ]
+  },
+  "categoryTags": [
+    "food.oil.plant"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 899,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 99.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "corn oil; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "玉米油是常见植物食用油，以不饱和脂肪酸为主。",
+    "en": "Corn oil is a common plant cooking oil rich in unsaturated fatty acids."
+  },
+  "commonness": 4
+}

@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:arachis_hypogaea:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "生花生"
+    ],
+    "en": [
+      "Peanuts, raw"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.peanut"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 567,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 25,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 47,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 21.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 8.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 14,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Peanuts, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "生花生为配方计算使用的基础食材。",
+    "en": "Peanuts, raw is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

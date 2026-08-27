@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:eleocharis_dulcis:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Cyperaceae",
+    "genus": "Eleocharis",
+    "species": "Eleocharis dulcis"
+  },
+  "names": {
+    "zh": [
+      "荸荠",
+      "马蹄"
+    ],
+    "en": [
+      "Water chestnut"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.aquatic"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.78,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "water chestnut, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 61,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 13.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "荸荠是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Water chestnut is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 4
+}
