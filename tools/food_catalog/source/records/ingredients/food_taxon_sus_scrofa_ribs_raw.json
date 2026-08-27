@@ -1,0 +1,63 @@
+{
+  "id": "food:taxon:sus_scrofa:ribs_raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "猪排骨",
+      "肋排"
+    ],
+    "en": [
+      "Pork ribs",
+      "Raw pork ribs"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.livestock"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.68,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "pork ribs, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "猪排骨来自家猪（Sus scrofa domesticus）的肋骨部位，含骨比例和可见脂肪差异较大。营养表按可食肉部分计，不等同于带骨购买重量。",
+    "en": "Pork ribs are from the rib region of domestic pig (Sus scrofa domesticus). Bone and visible-fat proportions vary; values are for edible meat rather than purchase weight."
+  },
+  "commonness": 3,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 264,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 18.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 20.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  }
+}

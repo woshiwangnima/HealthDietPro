@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:triticum_aestivum:flour:whole",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "全麦粉"
+    ],
+    "en": [
+      "Whole-wheat flour"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain",
+    "food.staple.whole_grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 340,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 13.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 2.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 66,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 10.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 69,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Whole-wheat flour; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "全麦粉为配方计算使用的基础食材。",
+    "en": "Whole-wheat flour is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

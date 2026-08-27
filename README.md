@@ -91,7 +91,7 @@
 | `regions.json` | ~136 行市/区质心（无省级） |
 | `chart_time_config.json` | 时间范围 / 间隔 / 自动间隔阈值规则 |
 | `res/raw/bmi_classification.json` | 4 档 BMI 分带（中国标准） |
-| `food_nutrition.json` | 食物营养迁移/比对快照；维护源位于 `tools/food_catalog/source/`，构建生成的 `food_catalog/` 分片和索引供运行时读取 |
+| `food_catalog/` | 食物营养运行资产；维护源位于 `tools/food_catalog/source/records/` 的逐条分片，构建生成索引与 Android 运行资产 |
 | `nutrient_reference.json`（待建） | 营养素参考摄入（DRIs） |
 
 Repository 模式：按需求懒加载、内存缓存，查找通过预建索引（`byCode`、`citiesByProvince`、`districtsByCity`）。统一构造入口 `fromContext(context)`（运行时）与 `fromAsset(path)`（测试/离线）。**只读**：所有写操作走存档模块。

@@ -1,0 +1,60 @@
+{
+  "id": "food:taxon:sus_scrofa:fat_raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "猪肉-肥",
+      "猪肥肉"
+    ],
+    "en": [
+      "Pork fat",
+      "Separable pork fat, raw"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.livestock"
+  ],
+  "commonness": 3,
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Pork, separable fat, raw; per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 632,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 5.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 68.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "猪肉-肥按 USDA FoodData Central 的可分离生猪脂肪参考口径整理；不等同于经过熬制的猪油。",
+    "en": "Pork fat is represented using a USDA FoodData Central raw separable-pork-fat reference and is not the same as rendered lard."
+  }
+}

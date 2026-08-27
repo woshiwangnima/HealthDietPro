@@ -1,0 +1,60 @@
+{
+  "id": "food:snack:sunflower_seed:hickory",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒葵花籽（山核桃味）"
+    ],
+    "en": [
+      "Hickory-flavored sunflower seeds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "flavorTags": [
+    "hickory"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:helianthus_annuus:kernels:raw",
+      "quantity": {
+        "value": 96,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:sugar",
+      "quantity": {
+        "value": 2,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:salt",
+      "quantity": {
+        "value": 1,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:black_pepper",
+      "quantity": {
+        "value": 1,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "baked",
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Approved hickory-flavor standard: 96% kernels, 2% sugar, 1% salt, 1% dry spice; components total 100 g finished snack"
+    }
+  ],
+  "commonness": 3
+}

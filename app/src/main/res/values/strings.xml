@@ -1433,6 +1433,7 @@
     <string name="diet_add">Add Meal</string>
     <string name="diet_edit">Edit Meal</string>
     <string name="diet_tab_statistics">Statistics</string>
+    <string name="diet_tab_trend">Trend</string>
     <string name="diet_tab_records">Records</string>
     <string name="diet_settings_title">Diet settings</string>
     <string name="diet_meal_start">Meal start time</string>
@@ -1513,6 +1514,15 @@
     <string name="diet_food_source_custom">Custom</string>
     <string name="diet_food_source_all">All</string>
     <string name="diet_today_summary">Day intake</string>
+    <string name="diet_show_nutrient_details">View detailed nutrients</string>
+    <string name="diet_nutrient_category_energy">Energy</string>
+    <string name="diet_nutrient_category_protein">Protein and amino acids</string>
+    <string name="diet_nutrient_category_fat">Fat and fatty acids</string>
+    <string name="diet_nutrient_category_carbohydrate">Carbohydrates and fiber</string>
+    <string name="diet_nutrient_category_vitamin">Vitamins</string>
+    <string name="diet_nutrient_category_mineral">Minerals</string>
+    <string name="diet_nutrient_category_water">Water</string>
+    <string name="diet_nutrient_category_other">Other nutrients</string>
     <string name="diet_summary_energy">Energy</string>
     <string name="diet_summary_protein">Protein</string>
     <string name="diet_summary_fat">Fat</string>

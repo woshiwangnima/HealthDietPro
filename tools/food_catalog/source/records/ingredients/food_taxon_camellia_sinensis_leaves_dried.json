@@ -1,0 +1,68 @@
+{
+  "id": "food:taxon:camellia_sinensis:leaves:dried",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "茶叶"
+    ],
+    "en": [
+      "Tea leaves, dried"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.tea"
+  ],
+  "systemTags": [
+    "common",
+    "beverage_brew_base"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 311,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 20,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 47,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 30,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Tea leaves, dried; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "茶叶为配方计算使用的基础食材。",
+    "en": "Tea leaves, dried is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

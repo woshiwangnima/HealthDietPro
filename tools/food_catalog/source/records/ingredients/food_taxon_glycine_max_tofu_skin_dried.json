@@ -1,0 +1,32 @@
+{
+  "id": "food:taxon:glycine_max:tofu_skin:dried",
+  "kind": "ingredient",
+  "names": {
+    "zh": ["干豆皮", "豆腐皮（干）", "腐皮"],
+    "en": ["Tofu skin, dried", "Dried yuba"]
+  },
+  "categoryTags": ["food.soy"],
+  "systemTags": ["common", "dried"],
+  "edibleRatio": 1.0,
+  "sources": [{
+    "dataset": "USDA FoodData Central",
+    "reference": "dried tofu skin, per 100 g edible portion, FDC SR Legacy"
+  }],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {"value": 100, "unitCategory": "weight", "unitId": "g"},
+      "nutrients": {
+        "ENERGY": {"value": 489, "unitCategory": "energy", "unitId": "kcal"},
+        "PROTEIN": {"value": 52.0, "unitCategory": "weight", "unitId": "g"},
+        "FAT": {"value": 26.0, "unitCategory": "weight", "unitId": "g"},
+        "CHO": {"value": 12.0, "unitCategory": "weight", "unitId": "g"},
+        "FIBER": {"value": 5.0, "unitCategory": "weight", "unitId": "g"}
+      }
+    }
+  },
+  "description": {
+    "zh": "干豆皮是豆浆表皮脱水后的干制品，营养值按每 100 克干品计算；泡发后的重量和营养密度不同。",
+    "en": "Dried tofu skin is a dehydrated soy-milk skin product. Values are per 100 g dry product; soaked weight and nutrient density differ."
+  },
+  "commonness": 5
+}

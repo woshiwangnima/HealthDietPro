@@ -1,0 +1,69 @@
+{
+  "id": "food:taxon:salmo_salar:raw",
+  "names": {
+    "zh": [
+      "三文鱼",
+      "大西洋鲑",
+      "鲑鱼"
+    ],
+    "en": [
+      "Atlantic salmon",
+      "Salmon"
+    ]
+  },
+  "categoryTags": [
+    "food.aquatic.fish"
+  ],
+  "healthMetrics": {
+    "inflammatoryPotential": {
+      "value": -0.32,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Atlantic salmon, raw"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 139,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 17.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 7.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "大西洋鲑是脂肪鱼，含蛋白质和不饱和脂肪；生食应符合食品安全和冷链要求。",
+    "en": "Atlantic salmon is an oily fish with protein and unsaturated fat; raw consumption requires appropriate food-safety and cold-chain controls."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

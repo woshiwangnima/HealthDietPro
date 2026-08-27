@@ -1,0 +1,55 @@
+{
+  "id": "food:taxon:oryza_sativa:wholegrain:steamed",
+  "names": {
+    "zh": [
+      "糙米饭",
+      "糙米",
+      "熟糙米"
+    ],
+    "en": [
+      "Cooked brown rice",
+      "Brown rice"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain",
+    "food.staple.whole_grain"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 50,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 11.5,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.19,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "standard food composition values"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "brown rice, cooked"
+    }
+  ],
+  "description": {
+    "zh": "保留麸皮和胚芽的熟糙米，膳食纤维通常高于精白米；烹调软硬会影响消化速度。",
+    "en": "Cooked brown rice retains bran and germ and typically provides more dietary fiber than polished rice; cooking texture affects digestion."
+  },
+  "commonness": 3,
+  "kind": "food",
+  "derivedFrom": {
+    "ingredientId": "food:taxon:oryza_sativa:wholegrain:raw",
+    "cookingMethodId": "steamed_grain"
+  }
+}

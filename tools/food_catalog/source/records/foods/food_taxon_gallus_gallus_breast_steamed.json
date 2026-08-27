@@ -1,0 +1,42 @@
+{
+  "id": "food:taxon:gallus_gallus:breast:steamed",
+  "names": {
+    "zh": [
+      "鸡胸肉",
+      "去皮鸡胸",
+      "鸡脯肉"
+    ],
+    "en": [
+      "Cooked chicken breast",
+      "Skinless chicken breast"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.poultry"
+  ],
+  "healthMetrics": {
+    "inflammatoryPotential": {
+      "value": 0.02,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "chicken breast, cooked"
+    }
+  ],
+  "description": {
+    "zh": "去皮熟鸡胸肉是高蛋白、低碳水的禽肉选择；数据不包含额外烹调用油或酱料。",
+    "en": "Cooked skinless chicken breast is a high-protein, low-carbohydrate poultry option; values exclude added oil and sauces."
+  },
+  "commonness": 3,
+  "kind": "food",
+  "derivedFrom": {
+    "ingredientId": "food:taxon:gallus_gallus:breast:raw",
+    "cookingMethodId": "steamed"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:nasturtium_officinale:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Brassicaceae",
+    "genus": "Nasturtium",
+    "species": "Nasturtium officinale"
+  },
+  "names": {
+    "zh": [
+      "西洋菜",
+      "豆瓣菜"
+    ],
+    "en": [
+      "Watercress"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.aquatic"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.85,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "watercress, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 19,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 1.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "西洋菜是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Watercress is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 3
+}

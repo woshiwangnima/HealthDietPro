@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:vicia_faba:dry",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "蚕豆"
+    ],
+    "en": [
+      "Dried fava beans"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.legume_snack"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 341,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 26.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 58.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 25,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Fava beans, mature seeds, dry; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 3
+}

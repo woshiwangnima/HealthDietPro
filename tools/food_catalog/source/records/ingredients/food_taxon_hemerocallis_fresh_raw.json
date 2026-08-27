@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:hemerocallis:fresh:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Asphodelaceae",
+    "genus": "Hemerocallis",
+    "species": "Hemerocallis fulva"
+  },
+  "names": {
+    "zh": [
+      "黄花菜",
+      "金针菜"
+    ],
+    "en": [
+      "Day lily flower buds, fresh"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.flower"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.98,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "fresh day lily buds, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 27,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 12.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 4.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "黄花菜是常见的花菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Day lily flower buds, fresh is a common flower vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 2
+}

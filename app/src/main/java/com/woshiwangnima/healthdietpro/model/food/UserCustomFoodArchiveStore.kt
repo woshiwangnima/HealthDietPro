@@ -89,7 +89,22 @@ internal class UserCustomFoodArchiveStore(
             require(codes.all(allowedNutrients::contains)) {
                 "Custom food contains an unknown nutrient: ${food.id}"
             }
+            val references = buildList {
+                food.derivedFrom?.ingredientId?.let(::add)
+                food.components.forEach { add(it.foodId) }
+            }
+            require(references.all { it in builtInFoodIds }) {
+                "Custom food may reference built-in foods only: ${food.id}"
+            }
         }
+    }
+
+    private val builtInFoodIds: Set<String> by lazy {
+        runCatching {
+            val raw = context.assets.open("food_catalog/manifest.json").bufferedReader().use { it.readText() }
+            val manifest = json.decodeFromString<CustomFoodCatalogManifest>(raw)
+            manifest.records.keys
+        }.getOrDefault(emptySet())
     }
 
     private fun file(): File = File(context.filesDir, "user_archives/${safeId(userId)}/custom_foods.json")
@@ -105,3 +120,6 @@ internal class UserCustomFoodArchiveStore(
             UserCustomFoodArchiveStore(context.applicationContext, userId)
     }
 }
+
+@Serializable
+private data class CustomFoodCatalogManifest(val records: Map<String, String> = emptyMap())

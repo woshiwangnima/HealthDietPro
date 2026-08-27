@@ -1,0 +1,58 @@
+{
+  "id": "food:plant_oil:peanut",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "花生油"
+    ],
+    "en": [
+      "Peanut oil"
+    ]
+  },
+  "categoryTags": [
+    "food.oil.plant"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 899,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 99.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "peanut oil; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "花生油是中式烹调常用食用油，具有较高的烟点，适合炒菜。",
+    "en": "Peanut oil is a common cooking oil in Chinese cuisine with a high smoke point, suitable for stir-frying."
+  },
+  "commonness": 4
+}

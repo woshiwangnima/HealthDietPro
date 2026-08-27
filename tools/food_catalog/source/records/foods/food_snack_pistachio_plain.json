@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:pistachio:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒开心果（原味）",
+      "开心果"
+    ],
+    "en": [
+      "Plain roasted pistachios"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:pistacia_vera:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible pistachio kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

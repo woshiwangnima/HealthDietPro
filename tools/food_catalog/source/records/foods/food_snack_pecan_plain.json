@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:pecan:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒碧根果（原味）",
+      "碧根果"
+    ],
+    "en": [
+      "Plain roasted pecans"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:carya_illinoinensis:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible pecan kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

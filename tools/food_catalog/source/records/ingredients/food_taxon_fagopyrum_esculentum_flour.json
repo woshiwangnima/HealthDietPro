@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:fagopyrum_esculentum:flour",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Polygonaceae",
+    "genus": "Fagopyrum",
+    "species": "Fagopyrum esculentum"
+  },
+  "names": {
+    "zh": [
+      "荞麦粉",
+      "荞面"
+    ],
+    "en": [
+      "Buckwheat flour"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain",
+    "food.staple.whole_grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1.0,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Buckwheat flour, whole-groat, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100.0,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 335,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 12.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 3.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 70.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 10.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "荞麦粉由荞麦磨制而成，含完整麸皮，是全谷物主食原料。",
+    "en": "Buckwheat flour is milled from whole buckwheat groats and keeps the full bran as a whole-grain staple."
+  },
+  "commonness": 3
+}

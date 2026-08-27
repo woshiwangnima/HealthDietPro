@@ -11,11 +11,12 @@ debuggability and reliable round trips over a custom binary format.
 
 ## Source and Generated Assets
 
-The maintained source is split by kind under
-`tools/food_catalog/source/{ingredients,foods,dishes}.json`. The original
-`app/src/main/assets/food_nutrition.json` is retained as a migration/comparison
-snapshot and is accepted as a one-time input by `split`.
-`tools/food_catalog/catalog_tool.py compile` generates:
+The maintained source is one stable-ID JSON file per record under
+`tools/food_catalog/source/records/{ingredients,foods,dishes}/`. Its relative
+directory structure matches the generated Android record structure.
+`tools/food_catalog/catalog_tool.py initialize` only creates missing source
+records and never overwrites an existing source file. The `compile` command
+generates:
 
 ```text
 app/src/main/assets/food_catalog/
@@ -95,7 +96,7 @@ Run all catalog commands through the repository virtual environment:
 
 ```text
 uv run python tools/food_catalog/catalog_tool.py validate
-uv run python tools/food_catalog/catalog_tool.py split
+uv run python tools/food_catalog/catalog_tool.py initialize
 uv run python tools/food_catalog/catalog_tool.py compile
 uv run python tools/food_catalog/catalog_tool.py export
 uv run python tools/food_catalog/catalog_tool.py inspect
@@ -109,6 +110,9 @@ generated filename collisions, and search/category/related-dish indexes.
 `food.oil.animal_fat` must not also store `food.oil`; ancestor filtering remains
 supported by the dotted-tag `isWithin` rule. Run `normalize` once when importing
 older source data; later redundant parent tags are rejected by `validate`.
+
+Source records are the only maintained catalog data. The old monolithic asset
+is intentionally absent, so there is no second editable snapshot that can drift.
 
 The generated catalog is checked in as an Android asset because the project is
 currently in local testing. Re-run `compile` after changing the source JSON;

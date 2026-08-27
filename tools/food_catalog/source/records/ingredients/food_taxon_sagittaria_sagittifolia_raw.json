@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:sagittaria_sagittifolia:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Alismataceae",
+    "genus": "Sagittaria",
+    "species": "Sagittaria sagittifolia"
+  },
+  "names": {
+    "zh": [
+      "慈姑",
+      "茨菇"
+    ],
+    "en": [
+      "Arrowhead",
+      "Chinese arrowhead"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.aquatic"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.82,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "arrowhead corm, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 94,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 4.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 19.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "慈姑是常见的水生蔬菜。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Arrowhead is a common aquatic vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 2
+}

@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:brassica_oleracea:cauliflower:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Brassicaceae",
+    "genus": "Brassica",
+    "species": "Brassica oleracea var. botrytis"
+  },
+  "names": {
+    "zh": [
+      "菜花",
+      "花椰菜",
+      "花菜"
+    ],
+    "en": [
+      "Cauliflower"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.flower"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.82,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "cauliflower, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 22,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 4.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "菜花是常见的花菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Cauliflower is a common flower vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 4
+}

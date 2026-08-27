@@ -9,21 +9,13 @@ from tkinter import messagebox, ttk
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_DIR = ROOT / "tools/food_catalog/images/source"
 MAPPING_FILE = SOURCE_DIR / "mapping.json"
-SOURCE_FILES = (
-    ROOT / "tools/food_catalog/source/ingredients.json",
-    ROOT / "tools/food_catalog/source/foods.json",
-    ROOT / "tools/food_catalog/source/dishes.json",
-)
+SOURCE_RECORDS = ROOT / "tools/food_catalog/source/records"
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 KIND_LABELS = {"ingredient": "食材", "food": "食物", "dish": "菜肴"}
 
 
 def load_foods():
-    foods = []
-    for path in SOURCE_FILES:
-        asset = json.loads(path.read_text(encoding="utf-8"))
-        foods.extend(asset.get("foods", []))
-    return foods
+    return [json.loads(path.read_text(encoding="utf-8")) for path in sorted(SOURCE_RECORDS.glob("*/*.json"))]
 
 
 def load_mapping():

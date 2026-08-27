@@ -1,0 +1,62 @@
+{
+  "id": "food:seasoning:cooking_wine",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "料酒"
+    ],
+    "en": [
+      "Cooking wine"
+    ]
+  },
+  "categoryTags": [
+    "food.seasoning.cooking_alcohol"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 105,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Cooking wine; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "料酒为配方计算使用的基础食材。",
+    "en": "Cooking wine is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

@@ -1,0 +1,60 @@
+{
+  "id": "food:taxon:sus_scrofa:fat_lean_raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "猪肉-肥瘦",
+      "肥瘦猪肉"
+    ],
+    "en": [
+      "Ground pork, 72% lean",
+      "Pork, 72% lean and 28% fat"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.livestock"
+  ],
+  "commonness": 4,
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Ground pork, 72% lean / 28% fat, raw; per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 331,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 14.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 30.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "猪肉-肥瘦按 USDA FoodData Central 的生猪绞肉参考口径整理，明确为约 72% 瘦肉、28% 脂肪；实际商品比例可能不同。",
+    "en": "Pork, 72% lean and 28% fat, is represented per 100 g using a USDA FoodData Central raw ground-pork reference; actual products may vary."
+  }
+}

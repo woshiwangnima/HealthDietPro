@@ -1,0 +1,73 @@
+{
+  "id": "food:beverage:brown_sugar_water",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "红糖水"
+    ],
+    "en": [
+      "Brown sugar water"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.mixed"
+  ],
+  "components": [
+    {
+      "foodId": "food:seasoning:brown_sugar",
+      "quantity": {
+        "value": 8,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 92,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "hydrationMlPer100g": 92,
+  "densityGramsPerMl": 1,
+  "servings": [
+    {
+      "id": "per_100ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 1,
+      "labels": {
+        "zh": "100 毫升",
+        "en": "100 ml"
+      }
+    },
+    {
+      "id": "cup_250ml",
+      "nutritionTableKey": "whole_food",
+      "ratioToTable": 2.5,
+      "labels": {
+        "zh": "1 杯（250 毫升）",
+        "en": "1 cup (250 ml)"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition and hydration resolved from listed components"
+    }
+  ],
+  "description": {
+    "zh": "红糖水的营养与饮水量按配方组分计算。",
+    "en": "Nutrition and hydration for Brown sugar water are resolved from the listed components."
+  },
+  "commonness": 4,
+  "recipeSteps": [
+    {
+      "text": "红糖加入热水搅拌至溶解。"
+    }
+  ],
+  "techniqueId": "stewed",
+  "servesPeople": 1
+}

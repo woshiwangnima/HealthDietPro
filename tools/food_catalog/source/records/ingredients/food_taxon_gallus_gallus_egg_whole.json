@@ -1,0 +1,77 @@
+{
+  "id": "food:taxon:gallus_gallus:egg:whole",
+  "names": {
+    "zh": [
+      "鸡蛋",
+      "鸡子",
+      "全蛋"
+    ],
+    "en": [
+      "Chicken egg",
+      "Whole egg"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.egg"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 0,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 0,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": 0.16,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "chicken egg, whole"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 144,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 13.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 8.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 2.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "全鸡蛋提供优质蛋白质和脂溶性营养素；烹调用油和调味会显著改变实际摄入。",
+    "en": "Whole egg provides high-quality protein and fat-soluble nutrients; cooking oil and seasoning substantially change intake."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

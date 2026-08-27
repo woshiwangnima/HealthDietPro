@@ -1,0 +1,68 @@
+{
+  "id": "food:taxon:oryza_sativa:rice_cake",
+  "names": {
+    "zh": [
+      "年糕"
+    ],
+    "en": [
+      "Rice cake"
+    ]
+  },
+  "commonness": 3,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 83,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 34.9,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "年糕, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Rice cake, preparation-matched reference"
+    }
+  ],
+  "description": {
+    "zh": "年糕的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Rice cake are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "food",
+  "components": [
+    {
+      "foodId": "food:taxon:oryza_sativa:glutinous:raw",
+      "quantity": {
+        "value": 54,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 46,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "steamed",
+  "servesPeople": 1,
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "recipeSteps": [
+    {
+      "text": "糯米浸泡并磨制。"
+    },
+    {
+      "text": "蒸熟并压制成型。"
+    }
+  ]
+}

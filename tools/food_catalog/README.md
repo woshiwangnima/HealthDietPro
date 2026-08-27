@@ -1,21 +1,23 @@
 # Food Catalog Tool
 
-The maintained catalog source is split by kind under `source/`:
+The maintained catalog source is split by kind and stable ID under `source/`:
 
 ```text
-source/ingredients.json
-source/foods.json
-source/dishes.json
+source/records/
+├── ingredients/<safe-id>.json
+├── foods/<safe-id>.json
+└── dishes/<safe-id>.json
 ```
 
-The old `app/src/main/assets/food_nutrition.json` is retained as a migration
-and comparison snapshot. It is accepted only as the input to `split`. Compile
-the maintained source into runtime shards with:
+Each source record uses the same relative `records/` path and two-space JSON
+format as the generated Android catalog. `initialize` only creates missing
+records and never overwrites an existing source file. Compile source records
+into runtime shards with:
 
 ```text
 uv run python tools/food_catalog/catalog_tool.py validate
 uv run python tools/food_catalog/catalog_tool.py normalize
-uv run python tools/food_catalog/catalog_tool.py split
+uv run python tools/food_catalog/catalog_tool.py initialize
 uv run python tools/food_catalog/catalog_tool.py compile
 uv run python tools/food_catalog/catalog_tool.py verify-roundtrip
 uv run python tools/food_catalog/catalog_tool.py inspect

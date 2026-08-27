@@ -1,0 +1,29 @@
+{
+  "id": "food:snack:black_soybean:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒黑豆（原味）"
+    ],
+    "en": [
+      "Plain roasted black soybeans"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.legume_snack"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:glycine_max:black:dry",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible dried black soybeans; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

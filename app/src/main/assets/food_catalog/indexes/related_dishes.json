@@ -1,79 +1,37 @@
 {
-  "food:taxon:triticum_aestivum:flour:refined": [
-    "food:taxon:triticum_aestivum:mantou",
-    "food:taxon:triticum_aestivum:bread_white",
-    "food:taxon:triticum_aestivum:youtiao",
-    "food:taxon:triticum_aestivum:meat_bun"
+  "food:taxon:sus_scrofa:trotter_raw": [
+    "dish:braised_pork_trotter"
+  ],
+  "food:taxon:sus_scrofa:ribs_raw": [
+    "dish:corn_pork_rib_soup"
+  ],
+  "food:taxon:zea_mays:boiled": [
+    "dish:corn_pork_rib_soup"
+  ],
+  "food:seasoning:brown_sugar": [
+    "food:beverage:brown_sugar_water"
   ],
   "food:water:drinking": [
-    "food:taxon:triticum_aestivum:mantou",
-    "food:taxon:triticum_aestivum:bread_white",
-    "food:taxon:triticum_aestivum:bread_whole_wheat",
-    "food:taxon:panicum_miliaceum:porridge",
-    "food:taxon:oryza_sativa:porridge",
-    "food:taxon:oryza_sativa:zongzi",
-    "food:taxon:oryza_sativa:rice_noodles",
-    "food:taxon:oryza_sativa:liangpi",
-    "food:taxon:oryza_sativa:rice_cake",
-    "food:taxon:nelumbo_nucifera:starch_drink",
-    "food:taxon:glycine_max:soy_milk",
-    "food:taxon:triticum_aestivum:youtiao",
-    "food:taxon:triticum_aestivum:meat_bun",
-    "food:beverage:tea",
+    "food:beverage:brown_sugar_water",
     "food:beverage:coffee:black",
     "food:beverage:lemon_water",
-    "food:beverage:brown_sugar_water",
     "food:beverage:soy_milk:commercial",
+    "food:beverage:tea",
     "food:taxon:fagopyrum_esculentum:steamed_cake",
-    "food:taxon:oryza_sativa:glutinous_herb_cake"
-  ],
-  "food:taxon:gallus_gallus:egg:whole": [
+    "food:taxon:glycine_max:soy_milk",
+    "food:taxon:nelumbo_nucifera:starch_drink",
+    "food:taxon:oryza_sativa:glutinous_herb_cake",
+    "food:taxon:oryza_sativa:liangpi",
+    "food:taxon:oryza_sativa:porridge",
+    "food:taxon:oryza_sativa:rice_cake",
+    "food:taxon:oryza_sativa:rice_noodles",
+    "food:taxon:oryza_sativa:zongzi",
+    "food:taxon:panicum_miliaceum:porridge",
     "food:taxon:triticum_aestivum:bread_white",
     "food:taxon:triticum_aestivum:bread_whole_wheat",
+    "food:taxon:triticum_aestivum:mantou",
+    "food:taxon:triticum_aestivum:meat_bun",
     "food:taxon:triticum_aestivum:youtiao"
-  ],
-  "food:taxon:bos_taurus:milk:whole": [
-    "food:taxon:triticum_aestivum:bread_white",
-    "food:taxon:triticum_aestivum:bread_whole_wheat"
-  ],
-  "food:taxon:triticum_aestivum:flour:whole": [
-    "food:taxon:triticum_aestivum:bread_whole_wheat"
-  ],
-  "food:taxon:panicum_miliaceum:raw": [
-    "food:taxon:panicum_miliaceum:porridge"
-  ],
-  "food:taxon:oryza_sativa:polished:raw": [
-    "food:taxon:oryza_sativa:porridge",
-    "food:taxon:oryza_sativa:rice_noodles",
-    "food:taxon:oryza_sativa:liangpi"
-  ],
-  "food:taxon:oryza_sativa:glutinous:raw": [
-    "food:taxon:oryza_sativa:zongzi",
-    "food:taxon:oryza_sativa:rice_cake",
-    "food:taxon:oryza_sativa:glutinous_herb_cake"
-  ],
-  "food:taxon:sus_scrofa:lean_raw": [
-    "food:taxon:oryza_sativa:zongzi",
-    "food:taxon:triticum_aestivum:meat_bun"
-  ],
-  "food:taxon:glycine_max:tofu:soft": [
-    "food:taxon:oryza_sativa:liangpi"
-  ],
-  "food:taxon:nelumbo_nucifera:starch": [
-    "food:taxon:nelumbo_nucifera:starch_drink"
-  ],
-  "food:taxon:glycine_max:soybean:dried": [
-    "food:taxon:glycine_max:soy_milk",
-    "food:beverage:soy_milk:commercial"
-  ],
-  "food:plant_oil:generic": [
-    "food:taxon:triticum_aestivum:youtiao",
-    "food:snack:peanut:garlic",
-    "food:snack:sunflower_seed:caramel",
-    "food:snack:chestnut:sugar_roasted"
-  ],
-  "food:taxon:camellia_sinensis:leaves:dried": [
-    "food:beverage:tea"
   ],
   "food:taxon:coffea_arabica:grounds": [
     "food:beverage:coffee:black"
@@ -81,24 +39,37 @@
   "food:taxon:citrus_limon:raw": [
     "food:beverage:lemon_water"
   ],
-  "food:seasoning:brown_sugar": [
-    "food:beverage:brown_sugar_water"
+  "food:taxon:glycine_max:soybean:dried": [
+    "food:beverage:soy_milk:commercial",
+    "food:taxon:glycine_max:soy_milk"
   ],
   "food:seasoning:sugar": [
     "food:beverage:soy_milk:commercial",
+    "food:snack:chestnut:sugar_roasted",
     "food:snack:sunflower_seed:caramel",
-    "food:snack:sunflower_seed:hickory",
+    "food:snack:sunflower_seed:hickory"
+  ],
+  "food:taxon:camellia_sinensis:leaves:dried": [
+    "food:beverage:tea"
+  ],
+  "food:taxon:castanea_mollissima:kernels:raw": [
     "food:snack:chestnut:sugar_roasted"
   ],
-  "food:taxon:arachis_hypogaea:raw": [
-    "food:snack:peanut:five_spice",
+  "food:plant_oil:generic": [
+    "food:snack:chestnut:sugar_roasted",
     "food:snack:peanut:garlic",
-    "food:snack:peanut:brined"
+    "food:snack:sunflower_seed:caramel",
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "food:taxon:arachis_hypogaea:raw": [
+    "food:snack:peanut:brined",
+    "food:snack:peanut:five_spice",
+    "food:snack:peanut:garlic"
   ],
   "food:seasoning:salt": [
+    "food:snack:peanut:brined",
     "food:snack:peanut:five_spice",
     "food:snack:peanut:garlic",
-    "food:snack:peanut:brined",
     "food:snack:sunflower_seed:five_spice",
     "food:snack:sunflower_seed:hickory"
   ],
@@ -115,19 +86,48 @@
     "food:snack:sunflower_seed:five_spice",
     "food:snack:sunflower_seed:hickory"
   ],
-  "food:taxon:castanea_mollissima:kernels:raw": [
-    "food:snack:chestnut:sugar_roasted"
-  ],
   "food:taxon:fagopyrum_esculentum:flour": [
     "food:taxon:fagopyrum_esculentum:steamed_cake"
   ],
-  "food:taxon:sus_scrofa:ribs_raw": [
-    "dish:corn_pork_rib_soup"
+  "food:taxon:nelumbo_nucifera:starch": [
+    "food:taxon:nelumbo_nucifera:starch_drink"
   ],
-  "food:taxon:zea_mays:boiled": [
-    "dish:corn_pork_rib_soup"
+  "food:taxon:oryza_sativa:glutinous:raw": [
+    "food:taxon:oryza_sativa:glutinous_herb_cake",
+    "food:taxon:oryza_sativa:rice_cake",
+    "food:taxon:oryza_sativa:zongzi"
   ],
-  "food:taxon:sus_scrofa:trotter_raw": [
-    "dish:braised_pork_trotter"
+  "food:taxon:oryza_sativa:polished:raw": [
+    "food:taxon:oryza_sativa:liangpi",
+    "food:taxon:oryza_sativa:porridge",
+    "food:taxon:oryza_sativa:rice_noodles"
+  ],
+  "food:taxon:glycine_max:tofu:soft": [
+    "food:taxon:oryza_sativa:liangpi"
+  ],
+  "food:taxon:sus_scrofa:minced_raw": [
+    "food:taxon:oryza_sativa:zongzi",
+    "food:taxon:triticum_aestivum:meat_bun"
+  ],
+  "food:taxon:panicum_miliaceum:raw": [
+    "food:taxon:panicum_miliaceum:porridge"
+  ],
+  "food:taxon:triticum_aestivum:flour:refined": [
+    "food:taxon:triticum_aestivum:bread_white",
+    "food:taxon:triticum_aestivum:mantou",
+    "food:taxon:triticum_aestivum:meat_bun",
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "food:taxon:gallus_gallus:egg:whole": [
+    "food:taxon:triticum_aestivum:bread_white",
+    "food:taxon:triticum_aestivum:bread_whole_wheat",
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "food:taxon:bos_taurus:milk:whole": [
+    "food:taxon:triticum_aestivum:bread_white",
+    "food:taxon:triticum_aestivum:bread_whole_wheat"
+  ],
+  "food:taxon:triticum_aestivum:flour:whole": [
+    "food:taxon:triticum_aestivum:bread_whole_wheat"
   ]
 }

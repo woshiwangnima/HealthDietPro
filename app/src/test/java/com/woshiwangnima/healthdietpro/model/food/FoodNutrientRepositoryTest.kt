@@ -5,7 +5,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FoodNutrientRepositoryTest {
-    private fun foods() = FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json").foods()
+    private fun foods() = FoodNutrientRepository.fromCatalogAsset("src/main/assets/food_catalog").foods()
 
     @Test
     fun foodAssetLoadsNamesTagsAmountsAndCoreHealthMetrics() {
@@ -259,7 +259,7 @@ class FoodNutrientRepositoryTest {
 
     @Test
     fun categoryCatalogRegistersEveryAssetTagAndProvidesSubcategories() {
-        val repository = FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json")
+        val repository = FoodNutrientRepository.fromCatalogAsset("src/main/assets/food_catalog")
         val catalogTags = repository.categoryTree().mapTo(mutableSetOf()) { it.tag }
         val assetTags = repository.foods().filterIsInstance<CategorizedFood>()
             .flatMapTo(mutableSetOf()) { it.categoryTags }
@@ -312,7 +312,7 @@ class FoodNutrientRepositoryTest {
             (foods.getValue("food:beverage:yogurt:plain") as CategorizedFood).categoryTags,
         )
         assertTrue(
-            FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json")
+            FoodNutrientRepository.fromCatalogAsset("src/main/assets/food_catalog")
                 .hasCategory((foods.getValue("food:beverage:coffee:black") as CategorizedFood).categoryTags, "food.beverage"),
         )
     }

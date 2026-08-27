@@ -12,9 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -26,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -33,6 +39,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Search
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.recordDateStartMillis
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
@@ -56,8 +63,10 @@ import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarEntry
 import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarReferenceLine
 import com.woshiwangnima.healthdietpro.common.ui.chart.DateStackedBarSegment
 import com.woshiwangnima.healthdietpro.model.diet.DietGoalsPrefs
+import com.woshiwangnima.healthdietpro.model.diet.DietNutrientAmount
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
+import com.woshiwangnima.healthdietpro.model.food.NutrientMeta
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -69,7 +78,10 @@ internal data class DayNutrients(
     val fat: Double = 0.0,
     val carbs: Double = 0.0,
     val energyByNutrient: Map<String, Double> = emptyMap(),
+    val nutrients: Map<String, DietNutrientAmount> = emptyMap(),
 )
+
+private fun DayNutrients.amount(code: String): DietNutrientAmount? = nutrients[code]
 
 internal enum class NutrientMetric(val id: String, val labelRes: Int, val unit: String) {
     ENERGY("ENERGY", R.string.diet_summary_energy, "kcal"),
@@ -89,15 +101,19 @@ internal fun DayNutrients.value(metric: NutrientMetric): Double = when (metric) 
 internal fun DietStatisticsTab(
     records: List<DietRecord>,
     goals: DietGoalsPrefs,
+    nutrientMetas: List<NutrientMeta>,
     onOpenMeal: (DietRecord) -> Unit,
+    trendOnly: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val zone = remember { ZoneId.systemDefault() }
+    val language = LocalConfiguration.current.locales[0]?.language ?: "en"
     var trendDays by rememberSaveable { mutableIntStateOf(7) }
     var selectedDay by rememberSaveable { mutableStateOf(LocalDate.now(zone)) }
     var pickingDay by rememberSaveable { mutableStateOf(false) }
     var donutMetric by rememberSaveable { mutableStateOf(NutrientMetric.ENERGY) }
     var trendMetric by rememberSaveable { mutableStateOf(NutrientMetric.ENERGY) }
+    var showNutrientDetails by rememberSaveable { mutableStateOf(false) }
     val selectedStart = remember(selectedDay, zone) { recordDateStartMillis(selectedDay, zone) }
     val selectedEnd = remember(selectedDay, zone) { selectedDay.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() }
     val dayRecords = remember(records, selectedStart, selectedEnd) {
@@ -172,16 +188,24 @@ internal fun DietStatisticsTab(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
+        if (!trendOnly) item {
             DayDatePicker(selectedDay, onPick = { pickingDay = true })
         }
-        item {
+        if (!trendOnly) item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 SectionTitle(R.drawable.ic_diet, stringResource(R.string.diet_today_summary))
                 NutrientSummaryVisuals(dayTotals, goals)
+                OutlinedButton(
+                    onClick = { showNutrientDetails = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Filled.Search, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.diet_show_nutrient_details))
+                }
             }
         }
-        item {
+        if (!trendOnly) item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 SectionTitle(R.drawable.ic_energy_distribution, stringResource(R.string.diet_meal_distribution))
                 NutrientToggleRow(donutMetric) { donutMetric = it }
@@ -209,7 +233,7 @@ internal fun DietStatisticsTab(
                 }
             }
         }
-        item {
+        if (trendOnly) item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 SectionTitle(R.drawable.ic_nutrients, stringResource(R.string.diet_trend))
                 SingleChoiceSegmentedSelector(
@@ -279,7 +303,71 @@ internal fun DietStatisticsTab(
             allowNoDataSelection = true,
         )
     }
+    if (!trendOnly && showNutrientDetails) NutrientDetailsDialog(dayTotals, nutrientMetas, language) { showNutrientDetails = false }
 }
+
+@Composable
+private fun NutrientDetailsDialog(
+    totals: DayNutrients,
+    nutrientMetas: List<NutrientMeta>,
+    language: String,
+    onDismiss: () -> Unit,
+) {
+    val groups = remember(nutrientMetas) {
+        nutrientMetas.groupBy { meta ->
+            when (meta.category.substringBefore('.')) {
+                "fiber" -> "carbohydrate"
+                else -> meta.category.substringBefore('.')
+            }
+        }
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.diet_show_nutrient_details)) },
+        text = {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                groups.forEach { (category, metas) ->
+                    item(key = category) {
+                        Text(
+                            text = nutrientCategoryName(category),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
+                        )
+                    }
+                    items(metas, key = NutrientMeta::code) { meta ->
+                        val rowIndex = metas.indexOf(meta)
+                        Surface(
+                            color = if (rowIndex % 2 == 0) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f) else MaterialTheme.colorScheme.surface,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Row(Modifier.padding(horizontal = 10.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(meta.displayName(language), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                                Text(totals.amount(meta.code)?.let { "${formatCalories(it.value)} ${it.unitId}" } ?: "-", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } },
+    )
+}
+
+@Composable
+private fun nutrientCategoryName(category: String): String = stringResource(
+    when (category.substringBefore('.')) {
+        "energy" -> R.string.diet_nutrient_category_energy
+        "protein" -> R.string.diet_nutrient_category_protein
+        "fat" -> R.string.diet_nutrient_category_fat
+        "carbohydrate", "fiber" -> R.string.diet_nutrient_category_carbohydrate
+        "vitamin" -> R.string.diet_nutrient_category_vitamin
+        "mineral" -> R.string.diet_nutrient_category_mineral
+        "water" -> R.string.diet_nutrient_category_water
+        else -> R.string.diet_nutrient_category_other
+    },
+)
 
 @Composable
 private fun DayDatePicker(selectedDay: LocalDate, onPick: () -> Unit) {
@@ -377,6 +465,37 @@ internal fun NutrientSummaryVisuals(totals: DayNutrients, goals: DietGoalsPrefs)
         }
     }
     NutrientEnergyDonut(totals)
+}
+
+@Composable
+internal fun CompleteNutrientSummary(
+    totals: DayNutrients,
+    nutrientMetas: List<NutrientMeta>,
+    language: String,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
+        nutrientMetas.forEach { meta ->
+            val amount = totals.amount(meta.code)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextOverflowText(
+                    text = meta.displayName(language),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f),
+                )
+                TextOverflowText(
+                    text = amount?.let { "${formatCalories(it.value)} ${it.unitId}" } ?: "-",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -610,6 +729,14 @@ internal fun sumNutrients(records: List<DietRecord>): DayNutrients = records.fol
             fat = acc.fat + (nutrients["FAT"]?.value ?: 0.0),
             carbs = acc.carbs + (nutrients["CHO"]?.value ?: 0.0),
             energyByNutrient = energyByNutrient,
+            nutrients = nutrients.entries.fold(acc.nutrients) { map, (code, amount) ->
+                val previous = map[code]
+                map + (code to if (previous == null) {
+                    DietNutrientAmount(amount.value, amount.unitCategory, amount.unitId)
+                } else {
+                    previous.copy(value = previous.value + amount.value)
+                })
+            },
         )
     }
 }

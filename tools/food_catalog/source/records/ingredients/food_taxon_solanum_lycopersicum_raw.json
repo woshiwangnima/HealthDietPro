@@ -1,0 +1,92 @@
+{
+  "id": "food:taxon:solanum_lycopersicum:raw",
+  "botanicalTaxonomy": {
+    "family": "Solanaceae",
+    "genus": "Solanum",
+    "species": "Solanum lycopersicum"
+  },
+  "names": {
+    "zh": [
+      "番茄",
+      "西红柿",
+      "洋柿子"
+    ],
+    "en": [
+      "Tomato",
+      "Red tomato"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.gourd_solanaceous",
+    "food.fruit"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 0.6,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.36,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "tomato, raw"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "tomato"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 20,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "生番茄可同时作为蔬菜或水果食用，含有类胡萝卜素等植物化学物；成熟度和加工方式会影响成分利用。",
+    "en": "Raw tomato may be eaten as a vegetable or fruit and contains carotenoids; ripeness and processing affect nutrient availability."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

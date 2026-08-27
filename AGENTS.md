@@ -43,8 +43,8 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - `ProfilePrefs.save()` 是唯写入入口；新用户铸造 id 后自动 `setCurrentUserId`。
 - 删除用户必须级联清理：头像、`user_prefs_<uid>`、所有 `_<uid>` 后缀键。
 - 静态数据模块只读；所有写操作走存档模块。
-- 内置营养资产维护源位于 `tools/food_catalog/source/ingredients.json`、`foods.json`、`dishes.json`；Android 只读 `app/src/main/assets/food_catalog/` 的生成分片和索引，不直接将维护源作为运行时入口。
-- 营养资产修改后必须依次执行 `uv run python tools/food_catalog/catalog_tool.py validate`、`compile` 和 `verify-roundtrip`；生成的 JSON 使用 UTF-8、两空格缩进，文件名中的 `:` 必须替换为 `_`。
+- 内置营养资产维护源位于 `tools/food_catalog/source/records/{ingredients,foods,dishes}/` 的逐条 JSON；目录结构与 Android `app/src/main/assets/food_catalog/records/` 一致。Android 只读生成分片和索引，不直接将维护源作为运行时入口。
+- `catalog_tool.py initialize` 仅创建缺失的维护源记录，绝不覆盖已有源文件；人工修改逐条源 JSON 后必须依次执行 `uv run python tools/food_catalog/catalog_tool.py validate`、`compile`、`verify-roundtrip`。生成的 JSON 使用 UTF-8、两空格缩进，文件名中的 `:` 必须替换为 `_`。
 - `categoryTags` 只保存最深层叶子标签；如果存在 `food.oil.animal_fat`，不得同时保存 `food.oil`。祖先筛选必须通过点号层级匹配实现。
 - `nutrients_meta.json` 是全部内置和用户自定义食品的唯一营养素 key 注册表；营养值必须保留 `unitCategory` 与 `unitId`，不得因字段重复而删除，缺失营养素表示未知而不是零。
 - 图片源位于 `tools/food_catalog/images/source/`，映射写入同目录 `mapping.json`；原始图片必须保留，构建脚本只生成 `food_catalog/images/thumb` 和 `detail` 的 WebP 派生图，不得修改或删除源图。

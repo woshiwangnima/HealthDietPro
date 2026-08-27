@@ -1,0 +1,67 @@
+{
+  "id": "food:seasoning:sugar",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "白砂糖"
+    ],
+    "en": [
+      "White sugar"
+    ]
+  },
+  "categoryTags": [
+    "food.seasoning.sweetener"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 400,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 100,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 65,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "White sugar; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "白砂糖为配方计算使用的基础食材。",
+    "en": "White sugar is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

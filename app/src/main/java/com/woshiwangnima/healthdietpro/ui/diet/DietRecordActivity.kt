@@ -12,6 +12,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
+import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
+import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -118,6 +123,9 @@ private fun DietRoute(
     }
     var editingRecord by remember { mutableStateOf(pendingDraft?.record?.takeIf { it.id.isNotBlank() }) }
     var viewingRecord by remember { mutableStateOf<DietRecord?>(null) }
+    val recordFilterPeriod = remember { mutableStateOf<MealPeriod?>(null) }
+    val recordTimeSelection = remember { mutableStateOf<RecordTimeRangeSelection>(RecordTimeRangeSelection.Preset(RecordTimeRangePreset.TODAY)) }
+    val recordListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         if (pendingDraft != null && route == DietRoute.HOME) route = DietRoute.EDITOR
@@ -145,6 +153,9 @@ private fun DietRoute(
             onDelete = viewModel::delete,
             onSettings = { route = DietRoute.SETTINGS },
             onBack = onFinish,
+            recordFilterPeriod = recordFilterPeriod,
+            recordTimeSelection = recordTimeSelection,
+            recordListState = recordListState,
             modifier = Modifier,
         )
         DietRoute.DETAIL -> {

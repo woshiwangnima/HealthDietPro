@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:cashew:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒腰果（原味）",
+      "腰果"
+    ],
+    "en": [
+      "Plain roasted cashews"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:anacardium_occidentale:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible cashew kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 4
+}

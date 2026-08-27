@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:peanut:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒花生（原味）",
+      "烤花生"
+    ],
+    "en": [
+      "Plain roasted peanuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.peanut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:arachis_hypogaea:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible peanut kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 4
+}

@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:winter_melon_seed:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒冬瓜子（原味）",
+      "冬瓜子"
+    ],
+    "en": [
+      "Plain roasted winter melon seeds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:benincasa_hispida:seeds:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible winter melon seed kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 2
+}

@@ -1,0 +1,62 @@
+{
+  "id": "food:seasoning:soy_sauce",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "酱油"
+    ],
+    "en": [
+      "Soy sauce"
+    ]
+  },
+  "categoryTags": [
+    "food.seasoning.savory_sauce"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 63,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 5.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 8.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Soy sauce; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "酱油为配方计算使用的基础食材。",
+    "en": "Soy sauce is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

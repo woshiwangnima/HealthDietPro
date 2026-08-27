@@ -1,0 +1,78 @@
+{
+  "id": "food:taxon:allium_fistulosum:raw",
+  "botanicalTaxonomy": {
+    "family": "Amaryllidaceae",
+    "genus": "Allium",
+    "species": "Allium fistulosum"
+  },
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "大葱"
+    ],
+    "en": [
+      "Welsh onion"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable",
+    "food.seasoning.fresh_aromatic"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 30,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 6.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Welsh onion; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "大葱为配方计算使用的基础食材。",
+    "en": "Welsh onion is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

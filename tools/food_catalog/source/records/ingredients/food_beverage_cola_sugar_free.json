@@ -1,0 +1,76 @@
+{
+  "id": "food:beverage:cola:sugar_free",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "无糖可乐",
+      "零糖可乐"
+    ],
+    "en": [
+      "Sugar-free cola",
+      "Diet cola"
+    ]
+  },
+  "categoryTags": [
+    "food.beverage.carbonated"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "hydrationMlPer100g": 99.8,
+  "densityGramsPerMl": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 0,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 0,
+      "unit": "GI",
+      "note": "No available carbohydrate in the reference formulation; product labels vary."
+    },
+    "glycemicLoadPer100g": {
+      "value": 0,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Carbonated beverage, cola, diet; verify against the product label"
+    }
+  ],
+  "description": {
+    "zh": "无糖可乐通常用高强度甜味剂替代蔗糖，具体能量、碳水和咖啡因含量随品牌配方变化；记录时应以包装营养标签为准。",
+    "en": "Sugar-free cola generally replaces sugar with high-intensity sweeteners. Energy, carbohydrate and caffeine vary by brand; use the package label for the consumed product."
+  },
+  "commonness": 4
+}

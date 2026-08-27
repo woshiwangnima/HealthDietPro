@@ -1,0 +1,68 @@
+{
+  "id": "food:taxon:oryza_sativa:rice_noodles",
+  "names": {
+    "zh": [
+      "米粉"
+    ],
+    "en": [
+      "Rice noodles"
+    ]
+  },
+  "commonness": 4,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 61,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 14.3,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "米粉, per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Rice noodles, preparation-matched reference"
+    }
+  ],
+  "description": {
+    "zh": "米粉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
+    "en": "Values for Rice noodles are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+  },
+  "kind": "food",
+  "components": [
+    {
+      "foodId": "food:taxon:oryza_sativa:polished:raw",
+      "quantity": {
+        "value": 31,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 69,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "boiled",
+  "servesPeople": 1,
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "recipeSteps": [
+    {
+      "text": "米浆制成米粉。"
+    },
+    {
+      "text": "入沸水煮熟。"
+    }
+  ]
+}

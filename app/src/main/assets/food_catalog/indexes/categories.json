@@ -1,221 +1,196 @@
 {
-  "food.soy": [
-    "food:taxon:glycine_max:tofu:soft",
-    "food:taxon:glycine_max:tofu_skin",
-    "food:taxon:glycine_max:yuba_dried",
-    "food:taxon:glycine_max:tofu:firm",
-    "food:taxon:glycine_max:soybean:dried",
+  "food.beverage.mixed": [
+    "food:beverage:brown_sugar_water",
+    "food:beverage:lemon_water",
+    "food:beverage:milk_tea"
+  ],
+  "food.beverage.coffee": [
+    "food:beverage:coffee:black",
+    "food:taxon:coffea_arabica:grounds"
+  ],
+  "food.beverage.soy": [
+    "food:beverage:soy_milk:commercial",
     "food:taxon:glycine_max:soy_milk"
   ],
-  "food.meat_egg.livestock": [
-    "food:taxon:sus_scrofa:ribs_raw",
-    "food:taxon:sus_scrofa:trotter_raw",
-    "food:taxon:sus_scrofa:lean_raw",
-    "food:taxon:bos_taurus:lean_raw",
-    "food:taxon:ovis_aries:lean_raw"
+  "food.beverage.tea": [
+    "food:beverage:tea",
+    "food:taxon:camellia_sinensis:leaves:dried"
   ],
-  "food.staple.grain": [
-    "food:taxon:oryza_sativa:polished:raw",
-    "food:taxon:avena_sativa:rolled:dry",
-    "food:taxon:triticum_aestivum:flour:refined",
-    "food:taxon:triticum_aestivum:flour:cake",
-    "food:taxon:triticum_aestivum:flour:bread",
-    "food:taxon:oryza_sativa:wholegrain:raw",
-    "food:taxon:zea_mays:raw",
-    "food:taxon:panicum_miliaceum:raw",
-    "food:taxon:oryza_sativa:glutinous:raw",
-    "food:taxon:triticum_aestivum:flour:whole",
-    "food:taxon:zea_mays:kernels:raw",
-    "food:taxon:fagopyrum_esculentum:flour",
-    "food:taxon:oryza_sativa:polished:steamed",
-    "food:taxon:oryza_sativa:wholegrain:steamed",
-    "food:taxon:zea_mays:boiled",
-    "food:taxon:panicum_miliaceum:porridge",
-    "food:taxon:oryza_sativa:porridge",
-    "food:taxon:oryza_sativa:glutinous_steamed"
+  "food.nut.tree_nut": [
+    "food:snack:almond:plain",
+    "food:snack:cashew:plain",
+    "food:snack:chestnut:plain",
+    "food:snack:chestnut:sugar_roasted",
+    "food:snack:chinese_hickory:plain",
+    "food:snack:hazelnut:plain",
+    "food:snack:macadamia:plain",
+    "food:snack:pecan:plain",
+    "food:snack:pine_nut:plain",
+    "food:snack:pistachio:plain",
+    "food:snack:walnut:plain",
+    "food:taxon:anacardium_occidentale:kernels:raw",
+    "food:taxon:carya_cathayensis:kernels:raw",
+    "food:taxon:carya_illinoinensis:kernels:raw",
+    "food:taxon:castanea_mollissima:kernels:raw",
+    "food:taxon:corylus_avellana:kernels:raw",
+    "food:taxon:juglans_regia:kernels:raw",
+    "food:taxon:macadamia_integrifolia:kernels:raw",
+    "food:taxon:pinus_koraiensis:kernels:raw",
+    "food:taxon:pistacia_vera:kernels:raw",
+    "food:taxon:prunus_dulcis:kernels:raw"
   ],
-  "food.staple.whole_grain": [
-    "food:taxon:avena_sativa:rolled:dry",
-    "food:taxon:oryza_sativa:wholegrain:raw",
-    "food:taxon:triticum_aestivum:flour:whole",
-    "food:taxon:fagopyrum_esculentum:flour",
-    "food:taxon:oryza_sativa:wholegrain:steamed",
-    "food:taxon:triticum_aestivum:bread_whole_wheat"
+  "food.nut.legume_snack": [
+    "food:snack:black_soybean:plain",
+    "food:snack:fava_bean:plain",
+    "food:snack:green_pea:plain",
+    "food:snack:soybean:plain",
+    "food:taxon:glycine_max:black:dry",
+    "food:taxon:pisum_sativum:dry",
+    "food:taxon:vicia_faba:dry"
   ],
-  "food.vegetable.gourd_solanaceous": [
-    "food:taxon:cucumis_sativus:commercial:raw",
-    "food:taxon:cucumis_sativus:landrace:raw",
-    "food:taxon:solanum_lycopersicum:raw",
-    "food:taxon:solanum_melongena:raw",
-    "food:taxon:solanum_melongena:local_round_raw",
-    "food:taxon:solanum_lycopersicum:cherry_raw",
-    "food:taxon:benincasa_hispida:raw",
-    "food:taxon:luffa_aegyptiaca:raw",
-    "food:taxon:momordica_charantia:raw",
-    "food:taxon:cucurbita_moschata:raw",
-    "food:taxon:cucurbita_pepo:zucchini:raw",
-    "food:taxon:capsicum_annuum:bell_green:raw",
-    "food:taxon:lagenaria_siceraria:raw",
-    "food:taxon:sechium_edule:raw",
-    "food:taxon:benincasa_hispida:chieh_qua:raw"
+  "food.nut.peanut": [
+    "food:snack:peanut:brined",
+    "food:snack:peanut:five_spice",
+    "food:snack:peanut:garlic",
+    "food:snack:peanut:plain",
+    "food:taxon:arachis_hypogaea:roasted",
+    "food:taxon:arachis_hypogaea:raw"
   ],
-  "food.fruit": [
-    "food:taxon:solanum_lycopersicum:raw",
-    "food:taxon:malus_domestica:raw",
-    "food:taxon:musa_acuminata:ripe:raw",
-    "food:taxon:solanum_lycopersicum:cherry_raw",
-    "food:taxon:hylocereus_undatus:raw",
-    "food:taxon:durio_zibethinus:raw",
-    "food:taxon:pyrus_pyrifolia:raw",
-    "food:taxon:citrullus_lanatus:raw",
-    "food:taxon:citrus_limon:raw"
+  "food.nut.seed": [
+    "food:snack:pumpkin_seed:plain",
+    "food:snack:snake_gourd_seed:plain",
+    "food:snack:sunflower_seed:caramel",
+    "food:snack:sunflower_seed:five_spice",
+    "food:snack:sunflower_seed:hickory",
+    "food:snack:sunflower_seed:plain",
+    "food:snack:watermelon_seed:plain",
+    "food:snack:winter_melon_seed:plain",
+    "food:taxon:benincasa_hispida:seeds:raw",
+    "food:taxon:citrullus_lanatus:seeds:raw",
+    "food:taxon:cucurbita_pepo:kernels:raw",
+    "food:taxon:helianthus_annuus:kernels:raw",
+    "food:taxon:trichosanthes_kirilowii:seeds:raw"
   ],
-  "food.vegetable.flower": [
-    "food:taxon:brassica_oleracea:broccoli:raw",
-    "food:taxon:brassica_oleracea:cauliflower:raw",
-    "food:taxon:hemerocallis:fresh:raw",
-    "food:taxon:brassica_rapa:choy_sum:raw"
-  ],
-  "food.meat_egg.egg": [
-    "food:taxon:gallus_gallus:egg:whole",
-    "food:taxon:gallus_gallus:egg:pan_fried"
-  ],
-  "food.aquatic.fish": [
-    "food:taxon:salmo_salar:raw",
-    "food:taxon:ctenopharyngodon_idella:raw",
-    "food:taxon:carassius_auratus:raw",
-    "food:taxon:culter_alburnus:raw",
-    "food:taxon:hypophthalmichthys_nobilis:raw"
-  ],
-  "food.dairy": [
-    "food:taxon:bos_taurus:milk:whole",
-    "food:dairy:butter"
-  ],
-  "food.beverage.dairy": [
-    "food:taxon:bos_taurus:milk:whole"
-  ],
-  "food.beverage.water": [
-    "food:water:drinking"
+  "food.staple.tuber": [
+    "food:taxon:colocasia_esculenta:boiled",
+    "food:taxon:ipomoea_batatas:steamed",
+    "food:taxon:solanum_tuberosum:boiled",
+    "food:taxon:colocasia_esculenta:raw",
+    "food:taxon:ipomoea_batatas:raw",
+    "food:taxon:solanum_tuberosum:raw"
   ],
   "food.staple.processed": [
+    "food:taxon:fagopyrum_esculentum:steamed_cake",
+    "food:taxon:nelumbo_nucifera:starch_drink",
+    "food:taxon:oryza_sativa:glutinous_herb_cake",
+    "food:taxon:oryza_sativa:liangpi",
+    "food:taxon:oryza_sativa:rice_cake",
+    "food:taxon:oryza_sativa:rice_noodles",
+    "food:taxon:oryza_sativa:zongzi",
+    "food:taxon:triticum_aestivum:bread_white",
+    "food:taxon:triticum_aestivum:mantou",
+    "food:taxon:triticum_aestivum:meat_bun",
+    "food:taxon:triticum_aestivum:noodles_boiled",
+    "food:taxon:triticum_aestivum:youtiao",
     "food:starch:corn",
     "food:starch:potato",
     "food:starch:tapioca",
-    "food:taxon:triticum_aestivum:noodles:dry",
     "food:taxon:nelumbo_nucifera:starch",
-    "food:taxon:triticum_aestivum:mantou",
-    "food:taxon:triticum_aestivum:bread_white",
-    "food:taxon:oryza_sativa:zongzi",
-    "food:taxon:oryza_sativa:rice_noodles",
-    "food:taxon:oryza_sativa:liangpi",
-    "food:taxon:oryza_sativa:rice_cake",
-    "food:taxon:triticum_aestivum:noodles_boiled",
-    "food:taxon:nelumbo_nucifera:starch_drink",
-    "food:taxon:triticum_aestivum:youtiao",
-    "food:taxon:triticum_aestivum:meat_bun",
-    "food:taxon:fagopyrum_esculentum:steamed_cake",
-    "food:taxon:oryza_sativa:glutinous_herb_cake"
-  ],
-  "food.oil.animal_fat": [
-    "food:dairy:butter",
-    "food:animal_fat:lard",
-    "food:animal_fat:beef_tallow",
-    "food:animal_fat:chicken_fat"
-  ],
-  "food.beverage.carbonated": [
-    "food:beverage:cola:sugar_free",
-    "food:beverage:cola"
-  ],
-  "food.vegetable.leafy": [
-    "food:taxon:lactuca_sativa:raw",
-    "food:taxon:apium_graveolens:raw",
-    "food:taxon:spinacia_oleracea:raw",
-    "food:taxon:brassica_rapa:pekinensis:raw",
-    "food:taxon:brassica_rapa:chinensis:raw",
-    "food:taxon:brassica_oleracea:capitata:raw",
-    "food:taxon:brassica_rapa:oleifera:raw",
-    "food:taxon:allium_tuberosum:raw",
-    "food:taxon:ipomoea_aquatica:raw",
-    "food:taxon:lactuca_sativa:longifolia:raw",
-    "food:taxon:amaranthus_tricolor:raw",
-    "food:taxon:glebionis_coronaria:raw",
-    "food:taxon:brassica_rapa:chinensis:baby:raw",
-    "food:taxon:brassica_oleracea:alboglabra:raw"
-  ],
-  "food.vegetable.root": [
-    "food:taxon:daucus_carota:raw",
-    "food:taxon:lactuca_sativa:asparagus_lettuce",
-    "food:taxon:dioscorea_polystachya:raw",
-    "food:taxon:solanum_tuberosum:raw",
-    "food:taxon:ipomoea_batatas:raw",
-    "food:taxon:colocasia_esculenta:raw",
-    "food:taxon:raphanus_sativus:raw",
-    "food:taxon:raphanus_sativus:green:raw",
-    "food:taxon:allium_cepa:raw",
-    "food:taxon:phyllostachys_edulis:shoot:raw",
-    "food:taxon:solanum_tuberosum:boiled"
-  ],
-  "food.vegetable.fresh_legume": [
-    "food:taxon:vigna_unguiculata:raw",
-    "food:taxon:phaseolus_vulgaris:raw",
-    "food:taxon:pisum_sativum:snap_pea:raw",
-    "food:taxon:glycine_max:edamame:raw",
-    "food:taxon:vicia_faba:fresh:raw",
-    "food:taxon:lablab_purpureus:raw",
-    "food:taxon:pisum_sativum:fresh_peas:raw"
-  ],
-  "food.vegetable.aquatic": [
-    "food:taxon:zizania_latifolia:raw",
-    "food:taxon:nelumbo_nucifera:rhizome:raw",
-    "food:taxon:eleocharis_dulcis:raw",
-    "food:taxon:nasturtium_officinale:raw",
-    "food:taxon:oenanthe_javanica:raw",
-    "food:taxon:sagittaria_sagittifolia:raw",
-    "food:taxon:trapa:raw"
-  ],
-  "food.vegetable": [
-    "food:taxon:capsicum_annuum:chili",
-    "food:taxon:coriandrum_sativum:raw",
-    "food:taxon:allium_sativum:raw",
-    "food:taxon:zingiber_officinale:raw",
-    "food:taxon:allium_fistulosum:raw",
-    "food:taxon:allium_fistulosum:scallion",
-    "food:taxon:houttuynia_cordata:raw"
-  ],
-  "food.seasoning.fresh_aromatic": [
-    "food:taxon:capsicum_annuum:chili",
-    "food:taxon:coriandrum_sativum:raw",
-    "food:taxon:allium_sativum:raw",
-    "food:taxon:zingiber_officinale:raw",
-    "food:taxon:allium_fistulosum:raw",
-    "food:taxon:allium_fistulosum:scallion",
-    "food:taxon:houttuynia_cordata:raw"
-  ],
-  "food.staple.tuber": [
-    "food:taxon:solanum_tuberosum:raw",
-    "food:taxon:ipomoea_batatas:raw",
-    "food:taxon:colocasia_esculenta:raw",
-    "food:taxon:solanum_tuberosum:boiled",
-    "food:taxon:ipomoea_batatas:steamed",
-    "food:taxon:colocasia_esculenta:boiled"
+    "food:taxon:triticum_aestivum:noodles:dry"
   ],
   "food.meat_egg.poultry": [
-    "food:taxon:gallus_gallus:breast:raw",
-    "food:taxon:gallus_gallus:breast:steamed"
+    "food:taxon:gallus_gallus:breast:steamed",
+    "food:taxon:gallus_gallus:breast:raw"
   ],
-  "food.nut.peanut": [
-    "food:taxon:arachis_hypogaea:raw",
-    "food:taxon:arachis_hypogaea:roasted",
-    "food:snack:peanut:plain",
-    "food:snack:peanut:five_spice",
-    "food:snack:peanut:garlic",
-    "food:snack:peanut:brined"
+  "food.meat_egg.egg": [
+    "food:taxon:gallus_gallus:egg:pan_fried",
+    "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "food.soy": [
+    "food:taxon:glycine_max:soy_milk",
+    "food:taxon:glycine_max:soybean:dried",
+    "food:taxon:glycine_max:tofu:firm",
+    "food:taxon:glycine_max:tofu_skin:fresh",
+    "food:taxon:glycine_max:tofu_skin:dried",
+    "food:taxon:glycine_max:tofu:soft",
+    "food:taxon:glycine_max:yuba_dried"
+  ],
+  "food.staple.grain": [
+    "food:taxon:oryza_sativa:glutinous_steamed",
+    "food:taxon:oryza_sativa:polished:steamed",
+    "food:taxon:oryza_sativa:porridge",
+    "food:taxon:oryza_sativa:wholegrain:steamed",
+    "food:taxon:panicum_miliaceum:porridge",
+    "food:taxon:zea_mays:boiled",
+    "food:taxon:avena_sativa:rolled:dry",
+    "food:taxon:fagopyrum_esculentum:flour",
+    "food:taxon:oryza_sativa:glutinous:raw",
+    "food:taxon:oryza_sativa:polished:raw",
+    "food:taxon:oryza_sativa:wholegrain:raw",
+    "food:taxon:panicum_miliaceum:raw",
+    "food:taxon:triticum_aestivum:flour:bread",
+    "food:taxon:triticum_aestivum:flour:cake",
+    "food:taxon:triticum_aestivum:flour:refined",
+    "food:taxon:triticum_aestivum:flour:whole",
+    "food:taxon:zea_mays:kernels:raw",
+    "food:taxon:zea_mays:raw"
+  ],
+  "food.staple.whole_grain": [
+    "food:taxon:oryza_sativa:wholegrain:steamed",
+    "food:taxon:triticum_aestivum:bread_whole_wheat",
+    "food:taxon:avena_sativa:rolled:dry",
+    "food:taxon:fagopyrum_esculentum:flour",
+    "food:taxon:oryza_sativa:wholegrain:raw",
+    "food:taxon:triticum_aestivum:flour:whole"
+  ],
+  "food.vegetable.root": [
+    "food:taxon:solanum_tuberosum:boiled",
+    "food:taxon:allium_cepa:raw",
+    "food:taxon:colocasia_esculenta:raw",
+    "food:taxon:daucus_carota:raw",
+    "food:taxon:dioscorea_polystachya:raw",
+    "food:taxon:ipomoea_batatas:raw",
+    "food:taxon:lactuca_sativa:asparagus_lettuce",
+    "food:taxon:phyllostachys_edulis:shoot:raw",
+    "food:taxon:raphanus_sativus:green:raw",
+    "food:taxon:raphanus_sativus:raw",
+    "food:taxon:solanum_tuberosum:raw"
+  ],
+  "food.oil.animal_fat": [
+    "food:animal_fat:beef_tallow",
+    "food:animal_fat:chicken_fat",
+    "food:animal_fat:lard",
+    "food:dairy:butter"
+  ],
+  "food.beverage.carbonated": [
+    "food:beverage:cola",
+    "food:beverage:cola:sugar_free"
+  ],
+  "food.beverage.juice": [
+    "food:beverage:fruit_juice"
+  ],
+  "food.dairy.fermented": [
+    "food:beverage:yogurt:plain"
+  ],
+  "food.dairy": [
+    "food:dairy:butter",
+    "food:taxon:bos_taurus:milk:whole"
   ],
   "food.oil.plant": [
-    "food:plant_oil:generic",
     "food:plant_oil:corn",
-    "food:plant_oil:rapeseed",
-    "food:plant_oil:peanut"
+    "food:plant_oil:generic",
+    "food:plant_oil:peanut",
+    "food:plant_oil:rapeseed"
+  ],
+  "food.seasoning.dry_spice": [
+    "food:seasoning:black_pepper"
+  ],
+  "food.seasoning.sweetener": [
+    "food:seasoning:brown_sugar",
+    "food:seasoning:sugar"
+  ],
+  "food.seasoning.cooking_alcohol": [
+    "food:seasoning:cooking_wine"
   ],
   "food.seasoning.salt": [
     "food:seasoning:salt"
@@ -226,95 +201,130 @@
   "food.seasoning.acid": [
     "food:seasoning:vinegar"
   ],
-  "food.seasoning.sweetener": [
-    "food:seasoning:sugar",
-    "food:seasoning:brown_sugar"
-  ],
-  "food.seasoning.cooking_alcohol": [
-    "food:seasoning:cooking_wine"
-  ],
-  "food.seasoning.dry_spice": [
-    "food:seasoning:black_pepper"
-  ],
-  "food.beverage.tea": [
-    "food:taxon:camellia_sinensis:leaves:dried",
-    "food:beverage:tea"
-  ],
-  "food.beverage.coffee": [
-    "food:taxon:coffea_arabica:grounds",
-    "food:beverage:coffee:black"
-  ],
-  "food.beverage.juice": [
-    "food:beverage:fruit_juice"
-  ],
-  "food.dairy.fermented": [
-    "food:beverage:yogurt:plain"
-  ],
-  "food.beverage.mixed": [
-    "food:beverage:milk_tea",
-    "food:beverage:lemon_water",
-    "food:beverage:brown_sugar_water"
-  ],
-  "food.nut.seed": [
-    "food:taxon:helianthus_annuus:kernels:raw",
-    "food:taxon:cucurbita_pepo:kernels:raw",
-    "food:taxon:citrullus_lanatus:seeds:raw",
-    "food:taxon:trichosanthes_kirilowii:seeds:raw",
-    "food:taxon:benincasa_hispida:seeds:raw",
-    "food:snack:sunflower_seed:plain",
-    "food:snack:sunflower_seed:caramel",
-    "food:snack:sunflower_seed:five_spice",
-    "food:snack:sunflower_seed:hickory",
-    "food:snack:watermelon_seed:plain",
-    "food:snack:pumpkin_seed:plain",
-    "food:snack:snake_gourd_seed:plain",
-    "food:snack:winter_melon_seed:plain"
-  ],
-  "food.nut.tree_nut": [
-    "food:taxon:juglans_regia:kernels:raw",
-    "food:taxon:prunus_dulcis:kernels:raw",
-    "food:taxon:anacardium_occidentale:kernels:raw",
-    "food:taxon:pistacia_vera:kernels:raw",
-    "food:taxon:carya_illinoinensis:kernels:raw",
-    "food:taxon:macadamia_integrifolia:kernels:raw",
-    "food:taxon:pinus_koraiensis:kernels:raw",
-    "food:taxon:corylus_avellana:kernels:raw",
-    "food:taxon:castanea_mollissima:kernels:raw",
-    "food:taxon:carya_cathayensis:kernels:raw",
-    "food:snack:cashew:plain",
-    "food:snack:almond:plain",
-    "food:snack:pistachio:plain",
-    "food:snack:walnut:plain",
-    "food:snack:pecan:plain",
-    "food:snack:macadamia:plain",
-    "food:snack:pine_nut:plain",
-    "food:snack:hazelnut:plain",
-    "food:snack:chinese_hickory:plain",
-    "food:snack:chestnut:plain",
-    "food:snack:chestnut:sugar_roasted"
-  ],
-  "food.nut.legume_snack": [
-    "food:taxon:vicia_faba:dry",
-    "food:taxon:glycine_max:black:dry",
-    "food:taxon:pisum_sativum:dry",
-    "food:snack:fava_bean:plain",
-    "food:snack:black_soybean:plain",
-    "food:snack:soybean:plain",
-    "food:snack:green_pea:plain"
-  ],
   "food.vegetable.fungi_algae": [
-    "food:taxon:lentinula_edodes:raw",
-    "food:taxon:pleurotus_ostreatus:raw",
-    "food:taxon:flammulina_velutipes:raw",
-    "food:taxon:pleurotus_eryngii:raw",
-    "food:taxon:auricularia_auricula:fresh:raw",
     "food:taxon:agaricus_bisporus:raw",
-    "food:taxon:volvariella_volvacea:raw",
+    "food:taxon:auricularia_auricula:dried:raw",
+    "food:taxon:auricularia_auricula:fresh:raw",
+    "food:taxon:flammulina_velutipes:raw",
+    "food:taxon:lentinula_edodes:dried:raw",
+    "food:taxon:lentinula_edodes:fresh:raw",
+    "food:taxon:pleurotus_eryngii:raw",
+    "food:taxon:pleurotus_ostreatus:raw",
+    "food:taxon:porphyra:dried:raw",
     "food:taxon:saccharina_japonica:raw",
-    "food:taxon:porphyra:dried:raw"
+    "food:taxon:volvariella_volvacea:raw"
   ],
-  "food.beverage.soy": [
-    "food:taxon:glycine_max:soy_milk",
-    "food:beverage:soy_milk:commercial"
+  "food.vegetable": [
+    "food:taxon:allium_fistulosum:raw",
+    "food:taxon:allium_fistulosum:scallion",
+    "food:taxon:allium_sativum:raw",
+    "food:taxon:capsicum_annuum:chili",
+    "food:taxon:coriandrum_sativum:raw",
+    "food:taxon:houttuynia_cordata:raw",
+    "food:taxon:zingiber_officinale:raw"
+  ],
+  "food.seasoning.fresh_aromatic": [
+    "food:taxon:allium_fistulosum:raw",
+    "food:taxon:allium_fistulosum:scallion",
+    "food:taxon:allium_sativum:raw",
+    "food:taxon:capsicum_annuum:chili",
+    "food:taxon:coriandrum_sativum:raw",
+    "food:taxon:houttuynia_cordata:raw",
+    "food:taxon:zingiber_officinale:raw"
+  ],
+  "food.vegetable.leafy": [
+    "food:taxon:allium_tuberosum:raw",
+    "food:taxon:amaranthus_tricolor:raw",
+    "food:taxon:apium_graveolens:raw",
+    "food:taxon:brassica_oleracea:alboglabra:raw",
+    "food:taxon:brassica_oleracea:capitata:raw",
+    "food:taxon:brassica_rapa:chinensis:baby:raw",
+    "food:taxon:brassica_rapa:chinensis:raw",
+    "food:taxon:brassica_rapa:oleifera:raw",
+    "food:taxon:brassica_rapa:pekinensis:raw",
+    "food:taxon:glebionis_coronaria:raw",
+    "food:taxon:ipomoea_aquatica:raw",
+    "food:taxon:lactuca_sativa:longifolia:raw",
+    "food:taxon:lactuca_sativa:raw",
+    "food:taxon:spinacia_oleracea:raw"
+  ],
+  "food.vegetable.gourd_solanaceous": [
+    "food:taxon:benincasa_hispida:chieh_qua:raw",
+    "food:taxon:benincasa_hispida:raw",
+    "food:taxon:capsicum_annuum:bell_green:raw",
+    "food:taxon:cucumis_sativus:commercial:raw",
+    "food:taxon:cucumis_sativus:landrace:raw",
+    "food:taxon:cucurbita_moschata:raw",
+    "food:taxon:cucurbita_pepo:zucchini:raw",
+    "food:taxon:lagenaria_siceraria:raw",
+    "food:taxon:luffa_aegyptiaca:raw",
+    "food:taxon:momordica_charantia:raw",
+    "food:taxon:sechium_edule:raw",
+    "food:taxon:solanum_lycopersicum:cherry_raw",
+    "food:taxon:solanum_lycopersicum:raw",
+    "food:taxon:solanum_melongena:green_raw",
+    "food:taxon:solanum_melongena:local_round_raw",
+    "food:taxon:solanum_melongena:raw",
+    "food:taxon:solanum_melongena:slender_raw",
+    "food:taxon:solanum_melongena:variegated_raw",
+    "food:taxon:solanum_melongena:white_raw"
+  ],
+  "food.meat_egg.livestock": [
+    "food:taxon:bos_taurus:lean_raw",
+    "food:taxon:ovis_aries:lean_raw",
+    "food:taxon:sus_scrofa:fat_lean_raw",
+    "food:taxon:sus_scrofa:fat_raw",
+    "food:taxon:sus_scrofa:lean_raw",
+    "food:taxon:sus_scrofa:minced_raw",
+    "food:taxon:sus_scrofa:ribs_raw",
+    "food:taxon:sus_scrofa:trotter_raw"
+  ],
+  "food.beverage.dairy": [
+    "food:taxon:bos_taurus:milk:whole"
+  ],
+  "food.vegetable.flower": [
+    "food:taxon:brassica_oleracea:broccoli:raw",
+    "food:taxon:brassica_oleracea:cauliflower:raw",
+    "food:taxon:brassica_rapa:choy_sum:raw",
+    "food:taxon:hemerocallis:fresh:raw"
+  ],
+  "food.aquatic.fish": [
+    "food:taxon:carassius_auratus:raw",
+    "food:taxon:ctenopharyngodon_idella:raw",
+    "food:taxon:culter_alburnus:raw",
+    "food:taxon:hypophthalmichthys_nobilis:raw",
+    "food:taxon:salmo_salar:raw"
+  ],
+  "food.fruit": [
+    "food:taxon:citrullus_lanatus:raw",
+    "food:taxon:citrus_limon:raw",
+    "food:taxon:durio_zibethinus:raw",
+    "food:taxon:hylocereus_undatus:raw",
+    "food:taxon:malus_domestica:raw",
+    "food:taxon:musa_acuminata:ripe:raw",
+    "food:taxon:pyrus_pyrifolia:raw",
+    "food:taxon:solanum_lycopersicum:cherry_raw",
+    "food:taxon:solanum_lycopersicum:raw"
+  ],
+  "food.vegetable.aquatic": [
+    "food:taxon:eleocharis_dulcis:raw",
+    "food:taxon:nasturtium_officinale:raw",
+    "food:taxon:nelumbo_nucifera:rhizome:raw",
+    "food:taxon:oenanthe_javanica:raw",
+    "food:taxon:sagittaria_sagittifolia:raw",
+    "food:taxon:trapa:raw",
+    "food:taxon:zizania_latifolia:raw"
+  ],
+  "food.vegetable.fresh_legume": [
+    "food:taxon:glycine_max:edamame:raw",
+    "food:taxon:lablab_purpureus:raw",
+    "food:taxon:phaseolus_vulgaris:raw",
+    "food:taxon:pisum_sativum:fresh_peas:raw",
+    "food:taxon:pisum_sativum:snap_pea:raw",
+    "food:taxon:vicia_faba:fresh:raw",
+    "food:taxon:vigna_unguiculata:raw"
+  ],
+  "food.beverage.water": [
+    "food:water:drinking"
   ]
 }

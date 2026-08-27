@@ -628,6 +628,11 @@ private fun FoodRow(
         resolved?.healthMetrics?.glycemicLoadPer100g?.value ?: food.healthMetrics.glycemicLoadPer100g?.value,
     )
     var previewing by remember { mutableStateOf(false) }
+    val previewImage = if (previewing) {
+        viewModel.foodImages.rememberImage(food.imageKey(), ImageVariant.DETAIL)
+    } else {
+        image
+    }
     Row(modifier = Modifier.fillMaxWidth().clickable { onClick(food) }.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         FoodImageWithSystemTags(
             food = food,
@@ -659,7 +664,7 @@ private fun FoodRow(
         GlycemicGlass(glycemic)
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-    if (previewing) FoodImagePreview(image, onDismiss = { previewing = false })
+    if (previewing) FoodImagePreview(previewImage, onDismiss = { previewing = false })
 }
 
 @Composable

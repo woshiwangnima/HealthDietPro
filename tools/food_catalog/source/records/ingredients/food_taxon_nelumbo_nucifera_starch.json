@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:nelumbo_nucifera:starch",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "莲藕淀粉"
+    ],
+    "en": [
+      "Lotus root starch"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 351,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 86.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 85,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Lotus root starch; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "莲藕淀粉为配方计算使用的基础食材。",
+    "en": "Lotus root starch is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

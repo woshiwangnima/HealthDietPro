@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:almond:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒杏仁（原味）",
+      "炒巴旦木"
+    ],
+    "en": [
+      "Plain roasted almonds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:prunus_dulcis:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible almond kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 4
+}

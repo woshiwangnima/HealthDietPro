@@ -8,13 +8,8 @@ import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / "app/src/main/assets/food_nutrition.json"
 SOURCE_DIR = ROOT / "tools/food_catalog/source"
-SOURCE_FILES = {
-    "ingredient": SOURCE_DIR / "ingredients.json",
-    "food": SOURCE_DIR / "foods.json",
-    "dish": SOURCE_DIR / "dishes.json",
-}
+SOURCE_RECORDS = SOURCE_DIR / "records"
 NUTRIENTS = ROOT / "app/src/main/assets/DRIs/nutrients_meta.json"
 OUTPUT = ROOT / "app/src/main/assets/food_catalog"
 IMAGE_SOURCE = ROOT / "tools/food_catalog/images/source"
@@ -30,28 +25,30 @@ def normalize_tags(tags):
     return [tag for tag in unique if not any(other != tag and other.startswith(tag + ".") for other in unique)]
 
 
-def read_source(path=SOURCE):
-    if path == SOURCE and all(source_path.is_file() for source_path in SOURCE_FILES.values()):
-        foods = []
-        for source_path in SOURCE_FILES.values():
-            value = json.loads(source_path.read_text(encoding="utf-8"))
-            foods.extend(value.get("foods", []) if isinstance(value, dict) else value)
-        return {"foods": foods}
-    return json.loads(path.read_text(encoding="utf-8"))
+def source_record_paths():
+    return sorted(SOURCE_RECORDS.glob("*/*.json"))
 
 
-def write_source(asset):
-    SOURCE_DIR.mkdir(parents=True, exist_ok=True)
-    groups = {kind: [] for kind in SOURCE_FILES}
+def read_source():
+    paths = source_record_paths()
+    if paths:
+        return {"foods": [json.loads(path.read_text(encoding="utf-8")) for path in paths]}
+    raise FileNotFoundError("No food catalog source records found")
+
+
+def initialize_source(asset):
+    created = 0
     for food in asset.get("foods", []):
-        groups.setdefault(food.get("kind", "ingredient"), []).append(food)
-    for kind, path in SOURCE_FILES.items():
-        path.write_text(json.dumps({"foods": groups[kind]}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        path = SOURCE_DIR / record_path(food)
+        if path.exists():
+            continue
+        write_json(path, food)
+        created += 1
+    return created
 
 
 def source_bytes():
-    paths = list(SOURCE_FILES.values()) if all(path.is_file() for path in SOURCE_FILES.values()) else [SOURCE]
-    return b"".join(path.read_bytes() for path in paths)
+    return b"".join(path.read_bytes() for path in source_record_paths())
 
 
 def nutrient_codes():
@@ -197,26 +194,27 @@ def compile_catalog(asset):
 
 def normalize_source():
     asset = read_source()
-    changed = 0
+    normalized = 0
     for food in asset.get("foods", []):
         tags = food.get("categoryTags")
         if tags is not None:
-            normalized = normalize_tags(tags)
-            if normalized != tags:
-                food["categoryTags"] = normalized
-                changed += 1
-    if all(path.is_file() for path in SOURCE_FILES.values()):
-        write_source(asset)
-    else:
-        SOURCE.write_text(json.dumps(asset, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"normalized category tags in {changed} foods")
+            leaf_tags = normalize_tags(tags)
+            if leaf_tags != tags:
+                path = SOURCE_DIR / record_path(food)
+                write_json(path, {**food, "categoryTags": leaf_tags})
+                normalized += 1
+    print(f"normalized category tags in {normalized} source records")
 
 
-def split_source():
-    asset = json.loads(SOURCE.read_text(encoding="utf-8"))
+def initialize_source_records():
+    runtime_paths = sorted((ROOT / "app/src/main/assets/food_catalog/records").glob("*/*.json"))
+    if not runtime_paths:
+        print("no runtime records available to initialize")
+        return
+    asset = {"foods": [json.loads(path.read_text(encoding="utf-8")) for path in runtime_paths]}
     validate(asset)
-    write_source(asset)
-    print(f"split {len(asset.get('foods', []))} foods into {len(SOURCE_FILES)} source files")
+    created = initialize_source(asset)
+    print(f"initialized {created} missing source records")
 
 
 def export_catalog():
@@ -274,12 +272,12 @@ def build_images():
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("validate", "normalize", "split", "compile", "export", "inspect", "verify-roundtrip", "build-images"))
+    parser.add_argument("command", choices=("validate", "normalize", "initialize", "compile", "export", "inspect", "verify-roundtrip", "build-images"))
     args = parser.parse_args()
     if args.command == "normalize":
         normalize_source()
-    elif args.command == "split":
-        split_source()
+    elif args.command == "initialize":
+        initialize_source_records()
     elif args.command == "validate":
         foods = validate(read_source())
         print(f"validated {len(foods)} foods")
@@ -289,7 +287,7 @@ def main():
     elif args.command == "export":
         print(json.dumps(export_catalog(), ensure_ascii=False, indent=2))
     elif args.command == "inspect":
-        source = sum(path.stat().st_size for path in SOURCE_FILES.values()) if all(path.is_file() for path in SOURCE_FILES.values()) else SOURCE.stat().st_size
+        source = sum(path.stat().st_size for path in source_record_paths())
         generated = sum(path.stat().st_size for path in OUTPUT.rglob("*.json")) if OUTPUT.exists() else 0
         foods = validate(read_source())
         print(json.dumps({"records": len(foods), "sourceBytes": source, "generatedBytes": generated}, ensure_ascii=False))

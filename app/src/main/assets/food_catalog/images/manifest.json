@@ -1,21 +1,157 @@
 {
   "schemaVersion": 1,
   "images": {
+    "food:taxon:brassica_rapa:chinensis:baby:raw": {
+      "thumb": "images/thumb/food_taxon_brassica_rapa_chinensis_baby_raw.webp",
+      "detail": "images/detail/food_taxon_brassica_rapa_chinensis_baby_raw.webp"
+    },
+    "food:taxon:sus_scrofa:fat_lean_raw": {
+      "thumb": "images/thumb/food_taxon_sus_scrofa_fat_lean_raw.webp",
+      "detail": "images/detail/food_taxon_sus_scrofa_fat_lean_raw.webp"
+    },
+    "food:taxon:phaseolus_vulgaris:raw": {
+      "thumb": "images/thumb/food_taxon_phaseolus_vulgaris_raw.webp",
+      "detail": "images/detail/food_taxon_phaseolus_vulgaris_raw.webp"
+    },
+    "food:taxon:pyrus_pyrifolia:raw": {
+      "thumb": "images/thumb/food_taxon_pyrus_pyrifolia_raw.webp",
+      "detail": "images/detail/food_taxon_pyrus_pyrifolia_raw.webp"
+    },
+    "food:taxon:vigna_unguiculata:raw": {
+      "thumb": "images/thumb/food_taxon_vigna_unguiculata_raw.webp",
+      "detail": "images/detail/food_taxon_vigna_unguiculata_raw.webp"
+    },
+    "food:taxon:benincasa_hispida:raw": {
+      "thumb": "images/thumb/food_taxon_benincasa_hispida_raw.webp",
+      "detail": "images/detail/food_taxon_benincasa_hispida_raw.webp"
+    },
     "food:taxon:allium_sativum:raw": {
       "thumb": "images/thumb/food_taxon_allium_sativum_raw.webp",
       "detail": "images/detail/food_taxon_allium_sativum_raw.webp"
+    },
+    "food:taxon:sus_scrofa:lean_raw": {
+      "thumb": "images/thumb/food_taxon_sus_scrofa_lean_raw.webp",
+      "detail": "images/detail/food_taxon_sus_scrofa_lean_raw.webp"
+    },
+    "food:taxon:luffa_aegyptiaca:raw": {
+      "thumb": "images/thumb/food_taxon_luffa_aegyptiaca_raw.webp",
+      "detail": "images/detail/food_taxon_luffa_aegyptiaca_raw.webp"
+    },
+    "food:taxon:allium_cepa:raw": {
+      "thumb": "images/thumb/food_taxon_allium_cepa_raw.webp",
+      "detail": "images/detail/food_taxon_allium_cepa_raw.webp"
+    },
+    "food:taxon:apium_graveolens:raw": {
+      "thumb": "images/thumb/food_taxon_apium_graveolens_raw.webp",
+      "detail": "images/detail/food_taxon_apium_graveolens_raw.webp"
+    },
+    "food:taxon:sus_scrofa:minced_raw": {
+      "thumb": "images/thumb/food_taxon_sus_scrofa_minced_raw.webp",
+      "detail": "images/detail/food_taxon_sus_scrofa_minced_raw.webp"
+    },
+    "food:taxon:capsicum_annuum:bell_green:raw": {
+      "thumb": "images/thumb/food_taxon_capsicum_annuum_bell_green_raw.webp",
+      "detail": "images/detail/food_taxon_capsicum_annuum_bell_green_raw.webp"
+    },
+    "food:taxon:brassica_rapa:chinensis:raw": {
+      "thumb": "images/thumb/food_taxon_brassica_rapa_chinensis_raw.webp",
+      "detail": "images/detail/food_taxon_brassica_rapa_chinensis_raw.webp"
+    },
+    "food:taxon:dioscorea_polystachya:raw": {
+      "thumb": "images/thumb/food_taxon_dioscorea_polystachya_raw.webp",
+      "detail": "images/detail/food_taxon_dioscorea_polystachya_raw.webp"
+    },
+    "food:water:drinking": {
+      "thumb": "images/thumb/food_water_drinking.webp",
+      "detail": "images/detail/food_water_drinking.webp"
+    },
+    "food:taxon:brassica_oleracea:capitata:raw": {
+      "thumb": "images/thumb/food_taxon_brassica_oleracea_capitata_raw.webp",
+      "detail": "images/detail/food_taxon_brassica_oleracea_capitata_raw.webp"
+    },
+    "food:taxon:lentinula_edodes:fresh:raw": {
+      "thumb": "images/thumb/food_taxon_lentinula_edodes_fresh_raw.webp",
+      "detail": "images/detail/food_taxon_lentinula_edodes_fresh_raw.webp"
+    },
+    "food:taxon:cucurbita_pepo:kernels:raw": {
+      "thumb": "images/thumb/food_taxon_cucurbita_pepo_kernels_raw.webp",
+      "detail": "images/detail/food_taxon_cucurbita_pepo_kernels_raw.webp"
+    },
+    "food:taxon:solanum_lycopersicum:cherry_raw": {
+      "thumb": "images/thumb/food_taxon_solanum_lycopersicum_cherry_raw.webp",
+      "detail": "images/detail/food_taxon_solanum_lycopersicum_cherry_raw.webp"
+    },
+    "food:taxon:citrullus_lanatus:raw": {
+      "thumb": "images/thumb/food_taxon_citrullus_lanatus_raw.webp",
+      "detail": "images/detail/food_taxon_citrullus_lanatus_raw.webp"
+    },
+    "food:taxon:spinacia_oleracea:raw": {
+      "thumb": "images/thumb/food_taxon_spinacia_oleracea_raw.webp",
+      "detail": "images/detail/food_taxon_spinacia_oleracea_raw.webp"
+    },
+    "food:taxon:triticum_aestivum:flour:refined": {
+      "thumb": "images/thumb/food_taxon_triticum_aestivum_flour_refined.webp",
+      "detail": "images/detail/food_taxon_triticum_aestivum_flour_refined.webp"
     },
     "food:taxon:cucurbita_moschata:raw": {
       "thumb": "images/thumb/food_taxon_cucurbita_moschata_raw.webp",
       "detail": "images/detail/food_taxon_cucurbita_moschata_raw.webp"
     },
+    "food:taxon:lactuca_sativa:raw": {
+      "thumb": "images/thumb/food_taxon_lactuca_sativa_raw.webp",
+      "detail": "images/detail/food_taxon_lactuca_sativa_raw.webp"
+    },
+    "food:taxon:daucus_carota:raw": {
+      "thumb": "images/thumb/food_taxon_daucus_carota_raw.webp",
+      "detail": "images/detail/food_taxon_daucus_carota_raw.webp"
+    },
+    "food:taxon:zingiber_officinale:raw": {
+      "thumb": "images/thumb/food_taxon_zingiber_officinale_raw.webp",
+      "detail": "images/detail/food_taxon_zingiber_officinale_raw.webp"
+    },
     "food:taxon:brassica_rapa:pekinensis:raw": {
       "thumb": "images/thumb/food_taxon_brassica_rapa_pekinensis_raw.webp",
       "detail": "images/detail/food_taxon_brassica_rapa_pekinensis_raw.webp"
     },
+    "food:taxon:solanum_melongena:slender_raw": {
+      "thumb": "images/thumb/food_taxon_solanum_melongena_slender_raw.webp",
+      "detail": "images/detail/food_taxon_solanum_melongena_slender_raw.webp"
+    },
+    "food:taxon:sus_scrofa:fat_raw": {
+      "thumb": "images/thumb/food_taxon_sus_scrofa_fat_raw.webp",
+      "detail": "images/detail/food_taxon_sus_scrofa_fat_raw.webp"
+    },
+    "food:taxon:auricularia_auricula:fresh:raw": {
+      "thumb": "images/thumb/food_taxon_auricularia_auricula_fresh_raw.webp",
+      "detail": "images/detail/food_taxon_auricularia_auricula_fresh_raw.webp"
+    },
+    "food:taxon:bos_taurus:lean_raw": {
+      "thumb": "images/thumb/food_taxon_bos_taurus_lean_raw.webp",
+      "detail": "images/detail/food_taxon_bos_taurus_lean_raw.webp"
+    },
     "food:taxon:cucumis_sativus:landrace:raw": {
       "thumb": "images/thumb/food_taxon_cucumis_sativus_landrace_raw.webp",
       "detail": "images/detail/food_taxon_cucumis_sativus_landrace_raw.webp"
+    },
+    "food:taxon:solanum_melongena:local_round_raw": {
+      "thumb": "images/thumb/food_taxon_solanum_melongena_local_round_raw.webp",
+      "detail": "images/detail/food_taxon_solanum_melongena_local_round_raw.webp"
+    },
+    "food:taxon:solanum_melongena:raw": {
+      "thumb": "images/thumb/food_taxon_solanum_melongena_raw.webp",
+      "detail": "images/detail/food_taxon_solanum_melongena_raw.webp"
+    },
+    "food:taxon:solanum_melongena:green_raw": {
+      "thumb": "images/thumb/food_taxon_solanum_melongena_green_raw.webp",
+      "detail": "images/detail/food_taxon_solanum_melongena_green_raw.webp"
+    },
+    "food:taxon:solanum_melongena:white_raw": {
+      "thumb": "images/thumb/food_taxon_solanum_melongena_white_raw.webp",
+      "detail": "images/detail/food_taxon_solanum_melongena_white_raw.webp"
+    },
+    "food:taxon:raphanus_sativus:raw": {
+      "thumb": "images/thumb/food_taxon_raphanus_sativus_raw.webp",
+      "detail": "images/detail/food_taxon_raphanus_sativus_raw.webp"
     }
   }
 }

@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:pisum_sativum:snap_pea:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Fabaceae",
+    "genus": "Pisum",
+    "species": "Pisum sativum"
+  },
+  "names": {
+    "zh": [
+      "荷兰豆",
+      "豌豆荚"
+    ],
+    "en": [
+      "Snap pea",
+      "Snow pea"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.fresh_legume"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.98,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "snow pea pods, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 30,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 4.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "荷兰豆是常见的鲜豆类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Snap pea is a common fresh legume. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 4
+}

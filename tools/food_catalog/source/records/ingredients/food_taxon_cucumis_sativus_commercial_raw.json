@@ -1,0 +1,91 @@
+{
+  "id": "food:taxon:cucumis_sativus:commercial:raw",
+  "botanicalTaxonomy": {
+    "family": "Cucurbitaceae",
+    "genus": "Cucumis",
+    "species": "Cucumis sativus"
+  },
+  "names": {
+    "zh": [
+      "黄瓜",
+      "商品黄瓜",
+      "设施黄瓜"
+    ],
+    "en": [
+      "Cucumber",
+      "Commercial cucumber"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.gourd_solanaceous"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 0.4,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.16,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "cucumber with peel, raw"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "cucumber"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 15,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 2.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "生黄瓜含水量高、能量密度低，适合作为蔬菜搭配；应注意清洗和可食部分。",
+    "en": "Raw cucumber has high water content and low energy density; use it as part of a varied vegetable intake and wash before eating."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

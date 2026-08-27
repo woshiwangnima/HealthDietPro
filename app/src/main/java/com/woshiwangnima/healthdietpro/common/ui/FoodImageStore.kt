@@ -84,9 +84,14 @@ internal class FoodImageStore(
     private fun userImage(key: String, variant: ImageVariant): Bitmap? {
         val relativePath = key.removePrefix(USER_KEY_PREFIX)
         val root = context.filesDir.canonicalFile
-        val imageFile = java.io.File(root, relativePath).canonicalFile
+        val imageFile = java.io.File(root, userVariantPath(relativePath, variant)).canonicalFile
         return imageFile.takeIf { it.path.startsWith(root.path + java.io.File.separator) && it.isFile }
             ?.inputStream()?.use { decodeSampled(it, variant.maxPixels) }
+    }
+
+    private fun userVariantPath(path: String, variant: ImageVariant): String = when (variant) {
+        ImageVariant.THUMB -> path.replace(".detail.webp", ".thumb.webp")
+        ImageVariant.DETAIL -> path
     }
 
     private fun loadImageManifest(): Map<String, Map<ImageVariant, String>> = runCatching {

@@ -17,6 +17,8 @@ import com.woshiwangnima.healthdietpro.model.food.CookingMethodRepository
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
 import com.woshiwangnima.healthdietpro.model.food.NutritionResolver
+import com.woshiwangnima.healthdietpro.model.food.NutrientMeta
+import com.woshiwangnima.healthdietpro.model.food.NutrientMetaRepository
 import com.woshiwangnima.healthdietpro.model.food.ResolvedNutrition
 import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodRepository
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
@@ -37,6 +39,7 @@ internal data class DietUiState(
     val defaultWeightUnitId: String = "g",
     val pendingCreatedFoodId: String? = null,
     val goals: DietGoalsPrefs = DietGoalsPrefs(),
+    val nutrientMetas: List<NutrientMeta> = emptyList(),
 )
 
 class DietViewModel(application: Application) : AndroidViewModel(application) {
@@ -45,6 +48,7 @@ class DietViewModel(application: Application) : AndroidViewModel(application) {
     private val cookingMethodRepository = CookingMethodRepository.fromContext(application)
     private var customFoodRepository = UserCustomFoodRepository.fromContext(application)
     private var containerRepository = ContainerRepository.fromContext(application)
+    private val nutrientMetaRepository = NutrientMetaRepository.fromContext(application)
 
     private val _state = MutableStateFlow(DietUiState())
     internal val state: StateFlow<DietUiState> = _state.asStateFlow()
@@ -60,6 +64,7 @@ class DietViewModel(application: Application) : AndroidViewModel(application) {
         _state.value = _state.value.copy(
             weightUnitIds = weightUnits(),
             goals = loadDietGoalsPrefs(application),
+            nutrientMetas = nutrientMetaRepository.nutrients(),
         )
     }
 

@@ -1,0 +1,58 @@
+{
+  "id": "food:taxon:oryza_sativa:glutinous_herb_cake",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "糯米水萩粑",
+      "水萩粑"
+    ],
+    "en": [
+      "Glutinous rice herb cake"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.processed"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:oryza_sativa:glutinous:raw",
+      "quantity": {
+        "value": 56.0,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:water:drinking",
+      "quantity": {
+        "value": 44.0,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "steamed",
+  "servesPeople": 1,
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "Glutinous rice + water + cudweed herb, steamed"
+    }
+  ],
+  "description": {
+    "zh": "糯米水萩粑将浸泡磨浆的糯米拌入剁碎的水萩（鼠曲草）蒸制而成，色泽青绿、软糯清香，多作春季时令主食。",
+    "en": "A springtime steamed cake made from soaked glutinous rice mixed with chopped cudweed herb, soft, green-tinted and aromatic."
+  },
+  "recipeSteps": [
+    {
+      "text": "糯米浸泡后磨浆，拌入洗净剁碎的水萩（鼠曲草）。"
+    },
+    {
+      "text": "蒸熟后整形压制成粑。"
+    }
+  ],
+  "commonness": 2
+}

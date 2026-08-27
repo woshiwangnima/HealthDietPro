@@ -1,0 +1,60 @@
+{
+  "id": "food:taxon:sus_scrofa:minced_raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "猪肉末",
+      "猪绞肉"
+    ],
+    "en": [
+      "Ground pork",
+      "Minced pork"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.livestock"
+  ],
+  "commonness": 5,
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Ground pork, raw; per 100 g edible portion; lean/fat ratio must be specified for a product-specific value"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 254,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 17.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 20.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "猪肉末按 USDA FoodData Central 的生猪绞肉参考口径整理；市售猪肉末的肥瘦比例可能不同，应以包装或实际配比为准。",
+    "en": "Ground pork is represented using a USDA FoodData Central raw ground-pork reference; commercial products vary by lean-to-fat ratio."
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:carassius_auratus:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "鲫鱼"
+    ],
+    "en": [
+      "Crucian carp",
+      "Goldfish carp"
+    ]
+  },
+  "categoryTags": [
+    "food.aquatic.fish"
+  ],
+  "edibleRatio": 0.54,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "crucian carp, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 108,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 17.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 2.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 3.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "鲫鱼是常见淡水鱼，蛋白质丰富、脂肪较低，适合清蒸或炖汤；可食部约占购买量的 54%。",
+    "en": "Crucian carp is a common freshwater fish rich in protein with low fat; edible portion is about 54% of purchased weight."
+  },
+  "commonness": 4
+}

@@ -1,0 +1,37 @@
+{
+  "id": "food:taxon:auricularia_auricula:dried:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Auriculariaceae",
+    "genus": "Auricularia",
+    "species": "Auricularia auricula-judae"
+  },
+  "names": {
+    "zh": ["干黑木耳", "木耳（干）"],
+    "en": ["Wood ear mushroom, dried"]
+  },
+  "categoryTags": ["food.vegetable.fungi_algae"],
+  "systemTags": ["common", "dried"],
+  "edibleRatio": 1.0,
+  "sources": [{
+    "dataset": "USDA FoodData Central",
+    "reference": "dried wood ear mushrooms, per 100 g edible portion, FDC SR Legacy"
+  }],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {"value": 100, "unitCategory": "weight", "unitId": "g"},
+      "nutrients": {
+        "ENERGY": {"value": 296, "unitCategory": "energy", "unitId": "kcal"},
+        "PROTEIN": {"value": 9.25, "unitCategory": "weight", "unitId": "g"},
+        "FAT": {"value": 0.73, "unitCategory": "weight", "unitId": "g"},
+        "CHO": {"value": 73.01, "unitCategory": "weight", "unitId": "g"},
+        "FIBER": {"value": 70.0, "unitCategory": "weight", "unitId": "g"}
+      }
+    }
+  },
+  "description": {
+    "zh": "干黑木耳是脱水后的木耳，营养值按每 100 克干品计算；泡发后的重量和营养密度不同。",
+    "en": "Dried wood ear mushrooms are dehydrated mushrooms. Values are per 100 g dry product; soaked weight and nutrient density differ."
+  },
+  "commonness": 5
+}

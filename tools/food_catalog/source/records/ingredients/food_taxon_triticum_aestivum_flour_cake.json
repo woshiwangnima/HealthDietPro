@@ -1,0 +1,83 @@
+{
+  "id": "food:taxon:triticum_aestivum:flour:cake",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "低筋面粉",
+      "蛋糕粉"
+    ],
+    "en": [
+      "Cake flour",
+      "Low-protein flour"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "botanicalTaxonomy": {
+    "family": "Poaceae",
+    "genus": "Triticum",
+    "species": "Triticum aestivum"
+  },
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 351,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 8.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 77.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 85,
+      "unit": "GI",
+      "note": "Dry flour; GI is a reference estimate and not a diagnosis."
+    },
+    "glycemicLoadPer100g": {
+      "value": 65.5,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Cake flour, dry; values normalized per 100 g"
+    },
+    {
+      "dataset": "Encyclopaedia Britannica, Wheat",
+      "reference": "Soft wheat is used for cakes and pastries; https://www.britannica.com/plant/wheat"
+    }
+  ],
+  "description": {
+    "zh": "低筋面粉通常来自较软小麦，蛋白质含量较低，面筋形成能力较弱，适合蛋糕、饼干和酥点。与中筋、高筋面粉的区别主要是小麦硬度和蛋白质/面筋强度，不是营养学上的低碳水食品。",
+    "en": "Cake flour is generally milled from softer wheat and has lower protein and weaker gluten development than all-purpose or bread flour. The baking distinction is wheat hardness and gluten strength, not low carbohydrate content."
+  },
+  "commonness": 4
+}

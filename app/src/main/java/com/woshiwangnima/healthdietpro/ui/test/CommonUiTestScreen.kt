@@ -27,6 +27,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
@@ -45,6 +46,9 @@ import com.woshiwangnima.healthdietpro.common.ui.SingleChoiceSegmentedSelector
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
 import com.woshiwangnima.healthdietpro.common.ui.WaterGlassProgress
+import com.woshiwangnima.healthdietpro.common.ui.MappedValueGauge
+import com.woshiwangnima.healthdietpro.common.ui.GaugeMetricGroup
+import com.woshiwangnima.healthdietpro.common.ui.GaugeReferenceValue
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
 
 internal enum class CommonUiTestCategory(val chineseName: String, val className: String) {
@@ -54,6 +58,7 @@ internal enum class CommonUiTestCategory(val chineseName: String, val className:
     DataTable("数据表格", "AppDataTable"),
     Chart("图表", "ComposeBaseChart"),
     HydrationVisuals("饮水可视化", "AnimatedDonutChart / WaterGlassProgress"),
+    Gauge("仪表盘指针", "MappedValueGauge"),
     SegmentedTabs("等宽分段标签", "EqualWidthSegmentedTabs"),
     SingleChoiceSegmentedButtons("单选分段选择器", "SingleChoiceSegmentedSelector"),
     InputField("输入框", "TextInputField / NumericInputField"),
@@ -131,6 +136,7 @@ private fun CommonUiVariantScreen(category: CommonUiTestCategory, onBack: () -> 
             CommonUiTestCategory.DataTable -> DataTableSamples()
             CommonUiTestCategory.Chart -> com.woshiwangnima.healthdietpro.common.ui.ComposeChartPreviewSamples()
             CommonUiTestCategory.HydrationVisuals -> HydrationVisualSamples()
+            CommonUiTestCategory.Gauge -> GaugeSamples()
             CommonUiTestCategory.SegmentedTabs -> {
                 Text("选择不同标签以查看滑动指示条和文字颜色动画。")
                 EqualWidthSegmentedTabs(
@@ -192,6 +198,42 @@ private fun HydrationVisualSamples() {
         centerValue = "1,700 ml",
         centerLabel = "今日记录",
         modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun GaugeSamples() {
+    Text("每个指标组可独立映射范围；同一组的当前值、最大、最小、平均和中位数同时显示在环上。")
+    MappedValueGauge(
+        groups = listOf(
+            GaugeMetricGroup(
+                id = "glucoseHistory",
+                label = "血糖当前值 mmol/L",
+                currentValue = 6.8,
+                range = RangeBand(min = 3.9, max = 10.0, value = Unit),
+                color = Color(0xFF1565C0),
+                references = listOf(
+                    GaugeReferenceValue("minimum", "历史最小", 4.2, Color(0xFF00897B)),
+                    GaugeReferenceValue("median", "历史中位数", 5.8, Color(0xFF6A1B9A)),
+                    GaugeReferenceValue("average", "历史平均", 6.1, Color(0xFFF9A825)),
+                    GaugeReferenceValue("maximum", "历史最大", 8.9, Color(0xFFC62828)),
+                ),
+            ),
+            GaugeMetricGroup(
+                id = "weightHistory",
+                label = "体重当前值 kg",
+                currentValue = 72.4,
+                range = RangeBand(min = 40.0, max = 100.0, value = Unit),
+                color = Color(0xFF2E7D32),
+                references = listOf(
+                    GaugeReferenceValue("minimum", "历史最小", 69.8, Color(0xFF00897B)),
+                    GaugeReferenceValue("median", "历史中位数", 71.5, Color(0xFF6A1B9A)),
+                    GaugeReferenceValue("average", "历史平均", 72.0, Color(0xFFF9A825)),
+                    GaugeReferenceValue("maximum", "历史最大", 75.1, Color(0xFFC62828)),
+                ),
+            ),
+        ),
+        modifier = Modifier.fillMaxWidth().height(220.dp),
     )
 }
 

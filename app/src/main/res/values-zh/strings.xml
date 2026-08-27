@@ -1434,6 +1434,7 @@
     <string name="diet_add">添加用餐</string>
     <string name="diet_edit">编辑用餐</string>
     <string name="diet_tab_statistics">统计</string>
+    <string name="diet_tab_trend">趋势</string>
     <string name="diet_tab_records">记录</string>
     <string name="diet_settings_title">饮食设置</string>
     <string name="diet_meal_start">用餐开始时间</string>
@@ -1514,6 +1515,15 @@
     <string name="diet_food_source_custom">我的</string>
     <string name="diet_food_source_all">全部</string>
     <string name="diet_today_summary">当日摄入</string>
+    <string name="diet_show_nutrient_details">查看详细营养素</string>
+    <string name="diet_nutrient_category_energy">能量</string>
+    <string name="diet_nutrient_category_protein">蛋白质与氨基酸</string>
+    <string name="diet_nutrient_category_fat">脂类与脂肪酸</string>
+    <string name="diet_nutrient_category_carbohydrate">碳水化合物与膳食纤维</string>
+    <string name="diet_nutrient_category_vitamin">维生素</string>
+    <string name="diet_nutrient_category_mineral">矿物质</string>
+    <string name="diet_nutrient_category_water">水分</string>
+    <string name="diet_nutrient_category_other">其他营养素</string>
     <string name="diet_summary_energy">热量</string>
     <string name="diet_summary_protein">蛋白质</string>
     <string name="diet_summary_fat">脂肪</string>

@@ -1,0 +1,64 @@
+{
+  "id": "food:taxon:sus_scrofa:lean_raw",
+  "names": {
+      "zh": [
+        "猪肉-瘦",
+        "瘦猪肉"
+    ],
+    "en": [
+        "Lean pork",
+        "Pork, lean"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.livestock"
+  ],
+  "commonness": 5,
+  "healthMetrics": {},
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "猪肉-瘦；per 100 g edible portion"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
+      "reference": "Lean pork, preparation-matched reference"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 143,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 20.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 6.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+      "zh": "猪肉-瘦按每 100 克可食部分整理；实际脂肪含量会因部位和修整程度变化。",
+      "en": "Lean pork is represented per 100 g edible portion; fat varies with cut and trimming."
+  },
+  "kind": "ingredient"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:pine_nut:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒松子（原味）",
+      "松子"
+    ],
+    "en": [
+      "Plain roasted pine nuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:pinus_koraiensis:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible pine nut kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 2
+}

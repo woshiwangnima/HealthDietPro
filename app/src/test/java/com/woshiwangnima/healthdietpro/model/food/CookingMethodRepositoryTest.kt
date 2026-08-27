@@ -24,7 +24,7 @@ class CookingMethodRepositoryTest {
 
     @Test
     fun steamedRiceDerivesToStoredCookedValues() {
-        val foods = FoodNutrientRepository.fromAsset("src/main/assets/food_nutrition.json")
+        val foods = FoodNutrientRepository.fromCatalogAsset("src/main/assets/food_catalog")
         val methods = repo()
         val resolver = NutritionResolver(foods.byId(), methods.byId())
         val cooked = foods.find("food:taxon:oryza_sativa:polished:steamed")

@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:lentinula_edodes:fresh:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Marasmiaceae",
+    "genus": "Lentinula",
+    "species": "Lentinula edodes"
+  },
+  "names": {
+    "zh": [
+       "鲜香菇",
+      "冬菇"
+    ],
+    "en": [
+       "Shiitake mushroom, fresh"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.fungi_algae"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1.0,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "fresh shiitake mushroom, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 26,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 5.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 3.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "鲜香菇是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；干香菇另列条目。",
+    "en": "Fresh shiitake mushroom is a common fungus. Values are per 100 g edible portion; dried shiitake is a separate record."
+  },
+  "commonness": 5
+}

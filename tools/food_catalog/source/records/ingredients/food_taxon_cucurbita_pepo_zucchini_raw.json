@@ -1,0 +1,73 @@
+{
+  "id": "food:taxon:cucurbita_pepo:zucchini:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Cucurbitaceae",
+    "genus": "Cucurbita",
+    "species": "Cucurbita pepo"
+  },
+  "names": {
+    "zh": [
+      "西葫芦",
+      "角瓜"
+    ],
+    "en": [
+      "Zucchini",
+      "Courgette"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.gourd_solanaceous"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.95,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "zucchini, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 18,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 3.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 0.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "西葫芦是常见的瓜茄类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Zucchini is a common gourd and solanaceous vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 4
+}

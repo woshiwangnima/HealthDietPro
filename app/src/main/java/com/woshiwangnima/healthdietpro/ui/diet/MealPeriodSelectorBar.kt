@@ -41,14 +41,13 @@ internal fun MealPeriodSelectorBar(
         MealPeriod.entries.toList()
     }
     val labels = options.associateWith { option -> if (option == null) stringResource(R.string.diet_filter_all) else stringResource(option.displayRes()) }
-    val weights = options.map { labels.getValue(it).length.toFloat().coerceAtLeast(1f) }
     Surface(modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.56f), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.72f))) {
         Row(Modifier.fillMaxWidth().padding(3.dp)) {
             options.forEachIndexed { index, option ->
                 val label = labels.getValue(option)
                 val selectedColor = if (selected == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                Column(Modifier.weight(weights[index]).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(if (selected == option) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else Color.Transparent).clickable { onPeriodSelected(option) }.padding(horizontal = 4.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    if (option == null) Icon(painterResource(R.drawable.ic_diet), null, tint = selectedColor, modifier = Modifier.size(18.dp)) else MealPeriodIcon(option, Modifier.size(20.dp))
+                Column(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(if (selected == option) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else Color.Transparent).clickable { onPeriodSelected(option) }.padding(horizontal = 4.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    if (option == null) Icon(painterResource(R.drawable.ic_diet), null, tint = selectedColor, modifier = Modifier.size(18.dp)) else MealPeriodIcon(option, Modifier.size(20.dp), selectedColor)
                     TextOverflowText(label, Modifier.fillMaxWidth(), MaterialTheme.typography.labelSmall, selectedColor, textAlign = TextAlign.Center)
                 }
             }

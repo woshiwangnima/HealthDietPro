@@ -1,0 +1,44 @@
+{
+  "id": "food:snack:peanut:brined",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒花生（盐水）"
+    ],
+    "en": [
+      "Brined roasted peanuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.peanut"
+  ],
+  "flavorTags": [
+    "brined"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:arachis_hypogaea:raw",
+      "quantity": {
+        "value": 98.5,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:salt",
+      "quantity": {
+        "value": 1.5,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "baked",
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Approved brined standard: 98.5% kernels, 1.5% salt; components total 100 g finished snack"
+    }
+  ],
+  "commonness": 3
+}

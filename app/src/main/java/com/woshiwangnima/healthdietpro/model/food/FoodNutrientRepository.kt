@@ -15,6 +15,9 @@ internal class FoodNutrientRepository private constructor(
     private var cache: List<FoodItem>? = null
     private var index: Map<String, FoodItem>? = null
     private val recordCache = mutableMapOf<String, FoodItem>()
+    private var searchIndexCache: Map<String, List<String>>? = null
+    private var categoryIndexCache: Map<String, List<String>>? = null
+    private var relatedDishIndexCache: Map<String, List<String>>? = null
 
     fun foods(): List<FoodItem> = cache ?: source()
         .map { it.toDomain() }
@@ -39,16 +42,40 @@ internal class FoodNutrientRepository private constructor(
     fun searchIds(query: String): List<String> {
         val token = query.lowercase().filterNot(Char::isWhitespace)
         if (token.isBlank()) return emptyList()
-        return searchSource?.invoke().orEmpty().asSequence()
+        return searchIndex().asSequence()
             .filter { it.key.contains(token) }
             .flatMap { it.value.asSequence() }
             .distinct()
             .toList()
     }
 
-    fun categoryIds(tag: String): List<String> = categorySource?.invoke()?.get(tag).orEmpty()
+    fun categoryIds(tag: String): List<String> = categoryIndex()
+        .orEmpty()
+        .asSequence()
+        .filter { it.key == tag || it.key.startsWith("$tag.") }
+        .flatMap { it.value.asSequence() }
+        .distinct()
+        .toList()
 
-    fun relatedDishIds(foodId: String): List<String> = relatedDishSource?.invoke()?.get(foodId).orEmpty()
+    fun relatedDishIds(foodId: String): List<String> = relatedDishIndex()[foodId].orEmpty()
+
+    fun warmIndexes() {
+        searchIndex()
+        categoryIndex()
+        relatedDishIndex()
+    }
+
+    private fun searchIndex(): Map<String, List<String>> = searchIndexCache ?: searchSource?.invoke().orEmpty().also {
+        searchIndexCache = it
+    }
+
+    private fun categoryIndex(): Map<String, List<String>> = categoryIndexCache ?: categorySource?.invoke().orEmpty().also {
+        categoryIndexCache = it
+    }
+
+    private fun relatedDishIndex(): Map<String, List<String>> = relatedDishIndexCache ?: relatedDishSource?.invoke().orEmpty().also {
+        relatedDishIndexCache = it
+    }
 
     fun categoryRoots(): List<FoodCategory> = FoodCategories.roots
 
@@ -99,6 +126,20 @@ internal class FoodNutrientRepository private constructor(
         fun fromAsset(path: String) = FoodNutrientRepository(
             source = { json.decodeFromString<FoodAsset>(java.io.File(path).readText()).foods },
         )
+
+        fun fromCatalogAsset(path: String): FoodNutrientRepository {
+            val root = java.io.File(path)
+            val manifest = lazy {
+                json.decodeFromString<FoodCatalogManifest>(java.io.File(root, "manifest.json").readText())
+            }
+            return FoodNutrientRepository(
+                source = { manifest.value.records.values.map { recordPath -> json.decodeFromString<FoodDto>(java.io.File(root, recordPath).readText()) } },
+                findSource = { id -> manifest.value.records[id]?.let { recordPath -> json.decodeFromString<FoodDto>(java.io.File(root, recordPath).readText()) } },
+                searchSource = { json.decodeFromString(java.io.File(root, manifest.value.indexes.search).readText()) },
+                categorySource = { json.decodeFromString(java.io.File(root, manifest.value.indexes.categories).readText()) },
+                relatedDishSource = { json.decodeFromString(java.io.File(root, manifest.value.indexes.relatedDishes).readText()) },
+            )
+        }
 
         private fun loadManifest(context: Context): FoodCatalogManifest =
             context.assets.open("$CATALOG_ROOT/manifest.json").bufferedReader().use {

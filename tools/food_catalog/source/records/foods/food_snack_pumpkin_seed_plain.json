@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:pumpkin_seed:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒南瓜子（原味）",
+      "南瓜子"
+    ],
+    "en": [
+      "Plain roasted pumpkin seeds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:cucurbita_pepo:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible pumpkin seed kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

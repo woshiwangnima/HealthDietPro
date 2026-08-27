@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:auricularia_auricula:fresh:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Auriculariaceae",
+    "genus": "Auricularia",
+    "species": "Auricularia auricula-judae"
+  },
+  "names": {
+    "zh": [
+       "鲜黑木耳",
+      "木耳"
+    ],
+    "en": [
+       "Wood ear mushroom, fresh"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.fungi_algae"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1.0,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "fresh wood ear fungus, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 27,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 6.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 2.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "黑木耳是常见的菌藻菇类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Wood ear mushroom, fresh is a common fungus and algae vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 5
+}

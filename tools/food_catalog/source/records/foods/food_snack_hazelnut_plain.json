@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:hazelnut:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒榛子（原味）",
+      "榛子"
+    ],
+    "en": [
+      "Plain roasted hazelnuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:corylus_avellana:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible hazelnut kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 2
+}

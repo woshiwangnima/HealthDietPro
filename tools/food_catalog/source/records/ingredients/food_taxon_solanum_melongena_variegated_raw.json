@@ -1,0 +1,12 @@
+{
+  "id": "food:taxon:solanum_melongena:variegated_raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": { "family": "Solanaceae", "genus": "Solanum", "species": "Solanum melongena" },
+  "names": { "zh": ["花茄子", "花皮茄子"], "en": ["Variegated eggplant", "Striped eggplant"] },
+  "categoryTags": ["food.vegetable.gourd_solanaceous"],
+  "commonness": 2,
+  "healthMetrics": { "glycemicIndex": { "value": 15, "unit": "GI" }, "glycemicLoadPer100g": { "value": 0.8, "unit": "GL" } },
+  "sources": [{ "dataset": "China Food Composition Tables", "reference": "花茄子；uses generic raw eggplant reference per 100 g edible portion" }, { "dataset": "International Tables of Glycemic Index and Glycemic Load Values", "reference": "Eggplant, preparation-matched reference" }],
+  "nutritionTables": { "standard.100g": { "basis": { "value": 100, "unitCategory": "weight", "unitId": "g" }, "nutrients": { "ENERGY": { "value": 23, "unitCategory": "energy", "unitId": "kcal" }, "PROTEIN": { "value": 1.1, "unitCategory": "weight", "unitId": "g" }, "FAT": { "value": 0.2, "unitCategory": "weight", "unitId": "g" }, "CHO": { "value": 5.4, "unitCategory": "weight", "unitId": "g" } } } },
+  "description": { "zh": "花茄子按每 100 克可食部分整理；当前采用通用生茄子基础表，具体品系的营养值可能因品种和成熟度变化。", "en": "Variegated eggplant is represented per 100 g using a generic raw eggplant reference; values vary by cultivar and maturity." }
+}

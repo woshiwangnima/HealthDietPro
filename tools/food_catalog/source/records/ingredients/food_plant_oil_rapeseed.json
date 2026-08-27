@@ -1,0 +1,60 @@
+{
+  "id": "food:plant_oil:rapeseed",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "菜籽油",
+      "菜油"
+    ],
+    "en": [
+      "Rapeseed oil",
+      "Canola oil"
+    ]
+  },
+  "categoryTags": [
+    "food.oil.plant"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 899,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 99.9,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "rapeseed oil; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "菜籽油是中式烹调常用食用油，营养值按精炼菜籽油整理。",
+    "en": "Rapeseed oil is a common cooking oil in Chinese cuisine; values are for refined rapeseed oil."
+  },
+  "commonness": 4
+}

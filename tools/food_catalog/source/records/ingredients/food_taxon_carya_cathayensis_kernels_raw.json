@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:carya_cathayensis:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "山核桃仁"
+    ],
+    "en": [
+      "Chinese hickory kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 670,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 12,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 67,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 15,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Chinese hickory kernels, edible portion, per 100 g"
+    }
+  ],
+  "commonness": 2
+}

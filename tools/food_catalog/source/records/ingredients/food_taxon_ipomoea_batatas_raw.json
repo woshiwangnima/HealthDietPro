@@ -1,0 +1,78 @@
+{
+  "id": "food:taxon:ipomoea_batatas:raw",
+  "botanicalTaxonomy": {
+    "family": "Convolvulaceae",
+    "genus": "Ipomoea",
+    "species": "Ipomoea batatas"
+  },
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "生红薯"
+    ],
+    "en": [
+      "Sweet potato, raw"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.root",
+    "food.staple.tuber"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 86,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 20.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 54,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Sweet potato, raw; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "生红薯为配方计算使用的基础食材。",
+    "en": "Sweet potato, raw is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

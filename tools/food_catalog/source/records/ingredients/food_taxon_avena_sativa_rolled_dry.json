@@ -1,0 +1,89 @@
+{
+  "id": "food:taxon:avena_sativa:rolled:dry",
+  "names": {
+    "zh": [
+      "燕麦片",
+      "燕麦",
+      "压片燕麦"
+    ],
+    "en": [
+      "Rolled oats",
+      "Oats"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain",
+    "food.staple.whole_grain"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 55,
+      "unit": "GI",
+      "note": "rolled oats; preparation changes GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 33.9,
+      "unit": "GL",
+      "note": "dry edible portion"
+    },
+    "inflammatoryPotential": {
+      "value": -0.52,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "standard food composition values"
+    },
+    {
+      "dataset": "International Tables of Glycemic Index",
+      "reference": "rolled oats"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 367,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 15,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 6.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 61.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 10.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "压片燕麦属于全谷物，可提供可溶性膳食纤维；加糖、煮制时间和冲泡方式会改变实际能量和升糖反应。",
+    "en": "Rolled oats are a whole grain and provide soluble fiber; added sugar and preparation affect actual energy and glycemic response."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

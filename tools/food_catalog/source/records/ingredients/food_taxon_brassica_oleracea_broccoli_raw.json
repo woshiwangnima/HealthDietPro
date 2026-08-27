@@ -1,0 +1,87 @@
+{
+  "id": "food:taxon:brassica_oleracea:broccoli:raw",
+  "botanicalTaxonomy": {
+    "family": "Brassicaceae",
+    "genus": "Brassica",
+    "species": "Brassica oleracea"
+  },
+  "names": {
+    "zh": [
+      "西兰花",
+      "绿花椰菜",
+      "青花菜"
+    ],
+    "en": [
+      "Broccoli",
+      "Green broccoli"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.flower"
+  ],
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 10,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 0.4,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.45,
+      "unit": "DII"
+    }
+  },
+  "image": {
+    "attribution": "Wikimedia Commons"
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "broccoli, raw"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 36,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 4.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 4.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "西兰花属于十字花科蔬菜，含维生素和多种植物化学物；烹调时间会影响部分热敏营养素。",
+    "en": "Broccoli is a cruciferous vegetable with vitamins and phytochemicals; cooking duration affects some heat-sensitive nutrients."
+  },
+  "commonness": 3,
+  "kind": "ingredient"
+}

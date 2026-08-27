@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:glycine_max:soybean:dried",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "黄豆"
+    ],
+    "en": [
+      "Soybeans, dried"
+    ]
+  },
+  "categoryTags": [
+    "food.soy"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 390,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 35,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 16,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 34.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 15.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 15,
+      "unit": "GI"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Soybeans, dried; per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "黄豆为配方计算使用的基础食材。",
+    "en": "Soybeans, dried is a base ingredient used for recipe resolution."
+  },
+  "commonness": 3
+}

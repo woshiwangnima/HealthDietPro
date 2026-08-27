@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.HorizontalDivider
@@ -49,6 +50,7 @@ import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import androidx.compose.runtime.MutableState
 import kotlinx.coroutines.delay
 
 @Composable
@@ -60,11 +62,15 @@ internal fun DietHomeScreen(
     onDelete: (String) -> Unit,
     onSettings: () -> Unit,
     onBack: () -> Unit,
+    recordFilterPeriod: MutableState<MealPeriod?>,
+    recordTimeSelection: MutableState<RecordTimeRangeSelection>,
+    recordListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val tabs = remember {
         listOf(
-            DetailTabItem("statistics", R.string.diet_tab_statistics, R.drawable.ic_chart),
+            DetailTabItem("trend", R.string.diet_tab_trend, R.drawable.ic_chart),
+            DetailTabItem("statistics", R.string.diet_tab_statistics, R.drawable.ic_diet),
             DetailTabItem("records", R.string.diet_tab_records, R.drawable.ic_list),
         )
     }
@@ -94,10 +100,19 @@ internal fun DietHomeScreen(
                     DietStatisticsTab(
                         records = uiState.records,
                         goals = uiState.goals,
+                        nutrientMetas = uiState.nutrientMetas,
+                        onOpenMeal = onOpen,
+                        trendOnly = true,
+                    )
+                } else if (tab == 1) {
+                    DietStatisticsTab(
+                        records = uiState.records,
+                        goals = uiState.goals,
+                        nutrientMetas = uiState.nutrientMetas,
                         onOpenMeal = onOpen,
                     )
                 } else {
-                    DietRecordsTab(uiState, onAdd, onOpen, onEdit, onDelete)
+                    DietRecordsTab(uiState, onAdd, onOpen, onEdit, onDelete, recordFilterPeriod, recordTimeSelection, recordListState)
                 }
             }
             DetailTabBar(tabs, tabs[selectedTab].id) { item -> selectedTab = tabs.indexOf(item) }
@@ -112,12 +127,13 @@ private fun DietRecordsTab(
     onOpen: (DietRecord) -> Unit,
     onEdit: (DietRecord) -> Unit,
     onDelete: (String) -> Unit,
+    recordFilterPeriod: MutableState<MealPeriod?>,
+    recordTimeSelection: MutableState<RecordTimeRangeSelection>,
+    recordListState: LazyListState,
 ) {
-    var filterPeriod by remember { mutableStateOf<MealPeriod?>(null) }
+    var filterPeriod by recordFilterPeriod
     var deleting by remember { mutableStateOf<DietRecord?>(null) }
-    var timeSelection: RecordTimeRangeSelection by remember {
-        mutableStateOf(RecordTimeRangeSelection.Preset(RecordTimeRangePreset.TODAY))
-    }
+    var timeSelection: RecordTimeRangeSelection by recordTimeSelection
     var nowMillis by remember { mutableStateOf(System.currentTimeMillis()) }
     LaunchedEffect(timeSelection is RecordTimeRangeSelection.Preset) {
         if (timeSelection !is RecordTimeRangeSelection.Preset) return@LaunchedEffect
@@ -141,6 +157,7 @@ private fun DietRecordsTab(
     ) {
         AppIconTextButton(stringResource(R.string.diet_add), R.drawable.ic_add, onAdd, Modifier.fillMaxWidth())
         LazyColumn(
+            state = recordListState,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             contentPadding = PaddingValues(vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),

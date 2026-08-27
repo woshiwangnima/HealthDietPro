@@ -2,12 +2,12 @@
   "id": "food:taxon:sus_scrofa:lean_raw",
   "names": {
     "zh": [
-      "猪肉",
+      "猪肉-瘦",
       "瘦猪肉"
     ],
     "en": [
       "Lean pork",
-      "Pork"
+      "Pork, lean"
     ]
   },
   "categoryTags": [
@@ -18,7 +18,7 @@
   "sources": [
     {
       "dataset": "China Food Composition Tables",
-      "reference": "猪肉, per 100 g edible portion"
+      "reference": "猪肉-瘦；per 100 g edible portion"
     },
     {
       "dataset": "International Tables of Glycemic Index and Glycemic Load Values",
@@ -57,8 +57,8 @@
     }
   },
   "description": {
-    "zh": "猪肉的数值按每 100 克可食部分整理；GI 与 GL 会因原料、成熟度和烹调方式而变化。",
-    "en": "Values for Lean pork are curated per 100 g edible portion; GI and GL vary by ingredients, ripeness, and preparation."
+    "zh": "猪肉-瘦按每 100 克可食部分整理；实际脂肪含量会因部位和修整程度变化。",
+    "en": "Lean pork is represented per 100 g edible portion; fat varies with cut and trimming."
   },
   "kind": "ingredient"
 }

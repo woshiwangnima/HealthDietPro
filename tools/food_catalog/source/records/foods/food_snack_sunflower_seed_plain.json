@@ -1,0 +1,29 @@
+{
+  "id": "food:snack:sunflower_seed:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒葵花籽（原味）"
+    ],
+    "en": [
+      "Plain roasted sunflower seeds"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:helianthus_annuus:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible sunflower seed kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 4
+}

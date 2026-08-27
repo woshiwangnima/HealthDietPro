@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:benincasa_hispida:seeds:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "冬瓜子仁"
+    ],
+    "en": [
+      "Winter melon seed kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 541,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 26,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 45,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 19,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "Winter melon seed kernels, edible portion, per 100 g"
+    }
+  ],
+  "commonness": 2
+}

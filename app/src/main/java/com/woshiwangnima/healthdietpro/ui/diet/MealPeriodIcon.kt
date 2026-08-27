@@ -20,8 +20,8 @@ import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
 internal fun MealPeriodIcon(
     period: MealPeriod,
     modifier: Modifier = Modifier.size(18.dp),
+    tint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
 ) {
-    val tint = MaterialTheme.colorScheme.primary
     when (period) {
         MealPeriod.BREAKFAST -> MealIcon(Icons.Filled.RamenDining, tint, modifier)
         MealPeriod.LUNCH -> MealIcon(Icons.Filled.LunchDining, tint, modifier)

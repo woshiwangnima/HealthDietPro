@@ -1,0 +1,83 @@
+{
+  "id": "food:taxon:triticum_aestivum:flour:bread",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "高筋面粉",
+      "面包粉"
+    ],
+    "en": [
+      "Bread flour",
+      "High-protein flour"
+    ]
+  },
+  "categoryTags": [
+    "food.staple.grain"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 1,
+  "botanicalTaxonomy": {
+    "family": "Poaceae",
+    "genus": "Triticum",
+    "species": "Triticum aestivum"
+  },
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 364,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 13.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 71.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 85,
+      "unit": "GI",
+      "note": "Dry flour; GI is a reference estimate and not a diagnosis."
+    },
+    "glycemicLoadPer100g": {
+      "value": 60.4,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Bread flour, dry; values normalized per 100 g"
+    },
+    {
+      "dataset": "Encyclopaedia Britannica, Wheat",
+      "reference": "Hard wheat commonly has 11-15% protein and strong gluten; https://www.britannica.com/plant/wheat"
+    }
+  ],
+  "description": {
+    "zh": "高筋面粉通常来自硬质小麦，蛋白质和面筋形成能力较高，适合面包、吐司和需要较强支撑力的面团。",
+    "en": "Bread flour is generally milled from hard wheat and has higher protein and stronger gluten development for bread and other elastic doughs."
+  },
+  "commonness": 4
+}

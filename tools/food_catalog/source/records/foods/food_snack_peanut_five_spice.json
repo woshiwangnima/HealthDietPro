@@ -1,0 +1,52 @@
+{
+  "id": "food:snack:peanut:five_spice",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒花生（五香）"
+    ],
+    "en": [
+      "Five-spice roasted peanuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.peanut"
+  ],
+  "flavorTags": [
+    "five_spice"
+  ],
+  "components": [
+    {
+      "foodId": "food:taxon:arachis_hypogaea:raw",
+      "quantity": {
+        "value": 98,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:salt",
+      "quantity": {
+        "value": 1,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:black_pepper",
+      "quantity": {
+        "value": 1,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "techniqueId": "baked",
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Approved five-spice standard: 98% kernels, 1% salt, 1% dry spice; components total 100 g finished snack"
+    }
+  ],
+  "commonness": 3
+}

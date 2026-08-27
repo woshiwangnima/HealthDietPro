@@ -1,0 +1,60 @@
+{
+  "id": "food:taxon:ctenopharyngodon_idella:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "草鱼",
+      "白鲩"
+    ],
+    "en": [
+      "Grass carp",
+      "White amur"
+    ]
+  },
+  "categoryTags": [
+    "food.aquatic.fish"
+  ],
+  "edibleRatio": 0.6,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "grass carp, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 113,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 16.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 5.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "草鱼是常见的淡水养殖鱼类，蛋白质含量较高，脂肪适中；可食部约占购买量的 60%。",
+    "en": "Grass carp is a common freshwater farmed fish with high protein and moderate fat; edible portion is about 60% of purchased weight."
+  },
+  "commonness": 4
+}

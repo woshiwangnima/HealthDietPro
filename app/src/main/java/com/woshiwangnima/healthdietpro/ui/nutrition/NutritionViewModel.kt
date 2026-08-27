@@ -3,6 +3,8 @@ package com.woshiwangnima.healthdietpro.ui.nutrition
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import android.graphics.Bitmap
+import java.io.FileOutputStream
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.HealthDietProApplication
@@ -108,6 +110,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         val initialCustomRepository = customRepository
         viewModelScope.launch {
             val foods = withContext(Dispatchers.IO) { repository.foods() }
+            withContext(Dispatchers.IO) { repository.warmIndexes() }
             val methods = withContext(Dispatchers.IO) { cookingMethodRepository.byId() }
             val loadedContainers = withContext(Dispatchers.IO) { servingContainerRepository.containers() }
             val tags = withContext(Dispatchers.IO) { initialTagRepository.load() }
@@ -184,7 +187,10 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     /** Every dish whose components reference [foodId] (for the "related dishes" section). */
     fun relatedDishes(foodId: String): List<Dish> = foodsById.values
         .filterIsInstance<Dish>()
-        .filter { dish -> dish.components.any { it.foodId == foodId } }
+        .filter { dish ->
+            repository.relatedDishIds(foodId).contains(dish.id) ||
+                dish.components.any { it.foodId == foodId }
+        }
 
     fun selectKind(kind: FoodKind) {
         if (_state.value.selectedKind == kind) return
@@ -362,14 +368,34 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         viewModelScope.launch {
             val savedKey = withContext(Dispatchers.IO) {
                 val directory = File(userArchiveDirectory(context, imageUserId), "attachments/foods").apply { mkdirs() }
-                val file = File(directory, "${UUID.randomUUID()}.image")
+                val id = UUID.randomUUID().toString()
+                val original = File(directory, "$id.original")
+                val detail = File(directory, "$id.detail.webp")
+                val thumb = File(directory, "$id.thumb.webp")
                 runCatching {
                     checkNotNull(context.contentResolver.openInputStream(uri)).use { input ->
-                        file.outputStream().use(input::copyTo)
+                        original.outputStream().use(input::copyTo)
                     }
-                    "user:user_archives/${imageUserId.replace(Regex("[^A-Za-z0-9_-]"), "_")}/attachments/foods/${file.name}"
+                    val bitmap = checkNotNull(android.graphics.BitmapFactory.decodeFile(original.absolutePath))
+                    FileOutputStream(detail).use { output ->
+                        check(bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 86, output))
+                    }
+                    val scale = minOf(1.0, 160.0 / maxOf(bitmap.width, bitmap.height).toDouble())
+                    val preview = if (scale < 1.0) {
+                        Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), true)
+                    } else {
+                        bitmap
+                    }
+                    FileOutputStream(thumb).use { output ->
+                        check(preview.compress(Bitmap.CompressFormat.WEBP_LOSSY, 82, output))
+                    }
+                    if (preview !== bitmap) preview.recycle()
+                    bitmap.recycle()
+                    "user:user_archives/${imageUserId.replace(Regex("[^A-Za-z0-9_-]"), "_")}/attachments/foods/${detail.name}"
                 }.getOrElse {
-                    file.delete()
+                    original.delete()
+                    detail.delete()
+                    thumb.delete()
                     null
                 }
             }
@@ -395,7 +421,35 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         return true
     }
     fun filteredFoods(language: String): List<FoodItem> = state.value.let { state ->
+        val indexedIds = state.foods.map(FoodItem::id).toMutableSet().apply {
+            if (state.keyword.isNotBlank()) {
+                val query = state.keyword.lowercase().replace(" ", "")
+                val searchIds = repository.searchIds(state.keyword) + state.foods.filter { food ->
+                    food.searchableNames().any { it.lowercase().replace(" ", "").contains(query) }
+                }.map(FoodItem::id)
+                retainAll(searchIds.toSet())
+            }
+            if (state.selectedRoots.isNotEmpty()) {
+                val rootIds = state.selectedRoots.flatMap(repository::categoryIds) + state.foods
+                    .filter { food ->
+                        val tags = (food as? CategorizedFood)?.categoryTags.orEmpty()
+                        state.selectedRoots.any { repository.hasCategory(tags, it) }
+                    }
+                    .map(FoodItem::id)
+                retainAll(rootIds.toSet())
+            }
+            if (state.selectedChildren.isNotEmpty()) {
+                val childIds = state.selectedChildren.flatMap(repository::categoryIds) + state.foods
+                    .filter { food ->
+                        val tags = (food as? CategorizedFood)?.categoryTags.orEmpty()
+                        state.selectedChildren.any { repository.hasCategory(tags, it) }
+                    }
+                    .map(FoodItem::id)
+                retainAll(childIds.toSet())
+            }
+        }
         state.foods.filter { food ->
+            if (food.id !in indexedIds) return@filter false
             if (food.kind != state.selectedKind) return@filter false
             val searchable = food.searchableNames().joinToString(" ").lowercase()
             val categoryTags = (food as? CategorizedFood)?.categoryTags.orEmpty()

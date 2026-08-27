@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:walnut:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "炒核桃（原味）",
+      "核桃"
+    ],
+    "en": [
+      "Plain roasted walnuts"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.tree_nut"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:juglans_regia:kernels:raw",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible walnut kernels; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

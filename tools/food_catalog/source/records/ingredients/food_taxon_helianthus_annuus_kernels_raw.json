@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:helianthus_annuus:kernels:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "葵花籽仁"
+    ],
+    "en": [
+      "Sunflower seed kernels"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.seed"
+  ],
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 584,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 20.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 51.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 20,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 8.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "Sunflower seed kernels, raw; edible portion, per 100 g; accessed 2026"
+    }
+  ],
+  "commonness": 4
+}

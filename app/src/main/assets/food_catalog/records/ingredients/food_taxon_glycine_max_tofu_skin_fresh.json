@@ -1,0 +1,65 @@
+{
+  "id": "food:taxon:glycine_max:tofu_skin:fresh",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "鲜豆皮",
+      "豆腐皮",
+      "千张"
+    ],
+    "en": [
+      "Tofu skin, fresh",
+      "Bean curd sheet"
+    ]
+  },
+  "categoryTags": [
+    "food.soy"
+  ],
+  "systemTags": [
+    "common",
+    "fresh"
+  ],
+  "edibleRatio": 1,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "fresh bean curd sheet, per 100 g edible portion"
+    }
+  ],
+  "description": {
+    "zh": "豆腐皮是加热豆浆表面形成的蛋白质和脂质膜制品。名称在地区间可指鲜豆腐皮或薄豆干，购买时应以包装营养标签和含水量为准。",
+    "en": "Tofu skin is the protein- and lipid-rich film formed on heated soy milk. The name can refer to products with different water contents, so package labels should be checked."
+  },
+  "commonness": 3,
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 202,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 16.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 12.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 5.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  }
+}

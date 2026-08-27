@@ -1,0 +1,30 @@
+{
+  "id": "food:snack:fava_bean:plain",
+  "kind": "food",
+  "names": {
+    "zh": [
+      "兰花豆（原味）",
+      "炒蚕豆"
+    ],
+    "en": [
+      "Plain roasted fava beans"
+    ]
+  },
+  "categoryTags": [
+    "food.nut.legume_snack"
+  ],
+  "flavorTags": [
+    "plain"
+  ],
+  "derivedFrom": {
+    "ingredientId": "food:taxon:vicia_faba:dry",
+    "cookingMethodId": "baked"
+  },
+  "sources": [
+    {
+      "dataset": "HealthDietPro standard snack formulation",
+      "reference": "Plain roasted snack: 100% edible dried fava beans; nutrient calculation uses baked derivation"
+    }
+  ],
+  "commonness": 3
+}

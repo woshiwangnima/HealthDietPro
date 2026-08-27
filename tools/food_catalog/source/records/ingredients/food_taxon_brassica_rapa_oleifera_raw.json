@@ -1,0 +1,72 @@
+{
+  "id": "food:taxon:brassica_rapa:oleifera:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Brassicaceae",
+    "genus": "Brassica",
+    "species": "Brassica rapa subsp. oleifera"
+  },
+  "names": {
+    "zh": [
+      "油菜",
+      "青菜"
+    ],
+    "en": [
+      "Rapeseed greens"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.leafy"
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "edibleRatio": 0.87,
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "rapeseed greens, per 100 g edible portion"
+    }
+  ],
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 23,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 1.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 3.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "description": {
+    "zh": "油菜是常见的叶菜类。本条目营养值为每 100 克可食部基准；数值随品种、产地和季节有所波动。",
+    "en": "Rapeseed greens is a common leafy vegetable. Values are per 100 g edible portion and vary by variety, origin and season."
+  },
+  "commonness": 4
+}
