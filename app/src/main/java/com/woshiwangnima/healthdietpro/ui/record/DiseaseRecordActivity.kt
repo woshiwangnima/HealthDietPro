@@ -69,16 +69,16 @@ import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.model.disease.Disease
 
-import com.woshiwangnima.healthdietpro.model.disease.DiseaseDurationKind
-import com.woshiwangnima.healthdietpro.model.disease.DiseaseHistoryType
-import com.woshiwangnima.healthdietpro.model.disease.DiseaseRecordStatus
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseCourse
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseSourceKind
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseStatus
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseSubjectType
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseReference
-import com.woshiwangnima.healthdietpro.model.disease.FamilyRelation
 import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecord
 import com.woshiwangnima.healthdietpro.model.disease.UserCustomDisease
-import com.woshiwangnima.healthdietpro.model.disease.allowedStatuses
 import com.woshiwangnima.healthdietpro.model.disease.curatedId
 import com.woshiwangnima.healthdietpro.model.disease.customId
+import com.woshiwangnima.healthdietpro.model.disease.toCustomDiseaseId
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import java.time.LocalDate
 import java.time.ZoneId
@@ -144,7 +144,7 @@ private fun DiseaseRecordScreen(viewModel: DiseaseRecordViewModel, onBack: () ->
             mode = editorMode,
             onSelectDisease = { route = DiseaseRoute.PICKER },
             onBack = { route = DiseaseRoute.HOME },
-            onSave = { viewModel.upsert(it); route = DiseaseRoute.HOME },
+            onSave = { viewModel.upsert(it) { route = DiseaseRoute.HOME } },
         )
         DiseaseRoute.CUSTOM_EDITOR -> CustomDiseaseEditorScreen(
             disease = editingCustom,
@@ -160,7 +160,7 @@ private fun DiseaseRecordScreen(viewModel: DiseaseRecordViewModel, onBack: () ->
             onTabSelected = { tab = it },
             onBack = onBack,
             onAddEmpty = { editing = null; selectedDisease = null; selectedCustomName = ""; selectedCustomDiseaseId = null; editorMode = DiseaseEditorMode.RECORD; route = DiseaseRoute.EDITOR },
-            onEdit = { record -> editing = record; selectedDisease = record.disease.curatedId()?.let { id -> state.diseases.firstOrNull { it.id == id } }; selectedCustomDiseaseId = record.disease.customId(); selectedCustomName = record.disease.customId()?.let { state.customDiseaseById()[it]?.name }.orEmpty(); editorMode = DiseaseEditorMode.RECORD; route = DiseaseRoute.EDITOR },
+            onEdit = { record -> editing = record; selectedDisease = record.disease.curatedId()?.let { id -> state.diseases.firstOrNull { id in it.referenceIds() } }; selectedCustomDiseaseId = record.disease.customId(); selectedCustomName = record.disease.customId()?.let { state.customDiseaseById()[it]?.name }.orEmpty(); editorMode = DiseaseEditorMode.RECORD; route = DiseaseRoute.EDITOR },
             onDelete = viewModel::delete,
             onAddCustom = { editingCustom = null; route = DiseaseRoute.CUSTOM_EDITOR },
             onOpenDetail = { detailDisease = it; detailCustom = null; route = DiseaseRoute.DETAIL },
@@ -194,7 +194,7 @@ private fun DiseaseHomeScreen(
     onCategorySelect: (String) -> Unit,
     onCustomToggle: () -> Unit,
     onDepartmentToggle: (String) -> Unit,
-    onStatusToggle: (DiseaseRecordStatus) -> Unit,
+    onStatusToggle: (DiseaseStatus) -> Unit,
 ) {
     val tabs = remember { listOf(DetailTabItem("records", R.string.disease_record_tab_records, R.drawable.ic_list), DetailTabItem("catalog", R.string.disease_record_tab_catalog, R.drawable.ic_medical_history)) }
     BaseScreen(title = stringResource(R.string.disease_record_title), onBack = onBack, includeNavigationBarPadding = false) { padding ->
@@ -210,7 +210,7 @@ private fun DiseaseHomeScreen(
 
 @Composable
 private fun DiseaseRecordsPage(records: List<UserDiseaseRecord>, diseases: List<Disease>, customById: Map<String, UserCustomDisease>, onAdd: () -> Unit, onEdit: (UserDiseaseRecord) -> Unit, onDelete: (String) -> Unit) {
-    val byId = remember(diseases) { diseases.associateBy { it.id } }
+    val byId = remember(diseases) { diseases.flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap() }
     var deleting by remember { mutableStateOf<UserDiseaseRecord?>(null) }
     Column(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         AppIconTextButton(stringResource(R.string.disease_record_add), R.drawable.ic_add, onAdd)
@@ -220,10 +220,10 @@ private fun DiseaseRecordsPage(records: List<UserDiseaseRecord>, diseases: List<
             rowKey = { _, it -> it.id },
             columns = listOf(
                 AppDataTableColumn("disease", { AppDataTableHeaderText(stringResource(R.string.disease_record_disease)) }, ColumnWidth.Flex(1f, 150.dp)) { record -> AppDataTableText(record.disease.curatedId()?.let(byId::get)?.displayName(Locale.getDefault()) ?: record.disease.customId()?.let { customById[it]?.name }.orEmpty()) },
-                AppDataTableColumn("history", { AppDataTableHeaderText(stringResource(R.string.disease_record_history_type)) }, ColumnWidth.Fixed(110.dp)) { AppDataTableText(stringResource(it.historyType.labelRes())) },
+                AppDataTableColumn("subject", { AppDataTableHeaderText(stringResource(R.string.disease_record_subject_type)) }, ColumnWidth.Fixed(110.dp)) { AppDataTableText(stringResource(it.subjectType.labelRes())) },
                 AppDataTableColumn("status", { AppDataTableHeaderText(stringResource(R.string.disease_record_status)) }, ColumnWidth.Fixed(110.dp)) { AppDataTableText(stringResource(it.status.labelRes()), color = it.status.color()) },
-                AppDataTableColumn("date", { AppDataTableHeaderText(stringResource(R.string.disease_record_diagnosed_on)) }, ColumnWidth.Fixed(120.dp)) { AppDataTableText(it.diagnosedOn ?: "-") },
-                AppDataTableColumn("note", { AppDataTableHeaderText(stringResource(R.string.disease_record_note)) }, ColumnWidth.Flex(1f, 120.dp)) { AppDataTableText(it.note) },
+                AppDataTableColumn("date", { AppDataTableHeaderText(stringResource(R.string.disease_record_diagnosed_on)) }, ColumnWidth.Fixed(120.dp)) { AppDataTableText(it.startedOn ?: "-") },
+                AppDataTableColumn("note", { AppDataTableHeaderText(stringResource(R.string.disease_record_note)) }, ColumnWidth.Flex(1f, 120.dp)) { AppDataTableText(it.note.orEmpty()) },
             ),
             actionsHeader = { AppDataTableHeaderText(stringResource(R.string.body_record_delete)) },
             rowActions = { AppDataTableDeleteAction(stringResource(R.string.body_record_delete), onClick = { deleting = it }) },
@@ -244,7 +244,7 @@ private fun DiseasePickerScreen(
     onCategorySelect: (String) -> Unit,
     onCustomToggle: () -> Unit,
     onDepartmentToggle: (String) -> Unit,
-    onStatusToggle: (DiseaseRecordStatus) -> Unit,
+    onStatusToggle: (DiseaseStatus) -> Unit,
 ) {
     BaseScreen(title = stringResource(R.string.disease_record_select_disease), onBack = onBack) { padding ->
         DiseaseBrowsePanel(state, state.userGender, onQueryChange, onCategorySelect, onCustomToggle, onDepartmentToggle, onStatusToggle, onAddCustom = {}, onOpenDetail = {}, onOpenCustomDetail = {}, onAddDisease = onSelect, onSelectCustom = onSelectCustom, modifier = Modifier.padding(padding), pickerMode = true)
@@ -259,7 +259,7 @@ internal fun DiseaseBrowsePanel(
     onCategorySelect: (String) -> Unit,
     onCustomToggle: () -> Unit,
     onDepartmentToggle: (String) -> Unit,
-    onStatusToggle: (DiseaseRecordStatus) -> Unit,
+    onStatusToggle: (DiseaseStatus) -> Unit,
     onAddCustom: () -> Unit,
     onOpenDetail: (Disease) -> Unit,
     onOpenCustomDetail: (UserCustomDisease) -> Unit,
@@ -273,13 +273,13 @@ internal fun DiseaseBrowsePanel(
 ) {
     val categories = state.categoryLabels.entries.sortedBy { it.value }
     val departments = state.departmentLabels.entries.sortedBy { it.value }
-    val diseases = state.filteredCatalog().filter { DiseaseReference.Curated(mapOf("11" to it.id)) !in excludedReferences }
+    val diseases = state.filteredCatalog().filter { disease -> disease.referenceIds().none { id -> DiseaseReference(DiseaseSourceKind.CURATED, id) in excludedReferences } }
     val customDiseases = state.customDiseases.takeIf { state.customOnly }.orEmpty()
-        .filter { DiseaseReference.Custom(it.id) !in excludedReferences }
+        .filter { DiseaseReference(DiseaseSourceKind.CUSTOM, it.id.toCustomDiseaseId()) !in excludedReferences }
     Column(modifier.fillMaxSize().padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         FoodSearchField(state.query, onQueryChange, stringResource(R.string.disease_record_search), onSearch = { })
         DiseaseChipRow(stringResource(R.string.disease_record_department), departments.map { it.key to it.value }, state.selectedDepartmentIds, onDepartmentToggle)
-        DiseaseChipRow(stringResource(R.string.disease_record_status), DiseaseRecordStatus.entries.map { it.name to stringResource(it.labelRes()) }, state.selectedStatuses.map { it.name }.toSet()) { onStatusToggle(DiseaseRecordStatus.valueOf(it)) }
+        DiseaseChipRow(stringResource(R.string.disease_record_status), DiseaseStatus.entries.map { it.name to stringResource(it.labelRes()) }, state.selectedStatuses.map { it.name }.toSet()) { onStatusToggle(DiseaseStatus.valueOf(it)) }
         Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Column(Modifier.width(104.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (!pickerMode) AddCustomDiseaseButton(onAddCustom)
@@ -299,7 +299,7 @@ internal fun DiseaseBrowsePanel(
                 if (state.customOnly && customDiseases.isEmpty()) item { Text(stringResource(R.string.disease_record_no_custom), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 if (!state.customOnly && diseases.isEmpty()) item { Text(stringResource(R.string.disease_record_no_catalog_match), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 items(customDiseases, key = { it.id }) { custom ->
-                    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .35f)).clickable { if (pickerMode) onSelectReference?.invoke(DiseaseReference.Custom(custom.id)) ?: onSelectCustom(custom.id) else onOpenCustomDetail(custom) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .35f)).clickable { if (pickerMode) onSelectReference?.invoke(DiseaseReference(DiseaseSourceKind.CUSTOM, custom.id.toCustomDiseaseId())) ?: onSelectCustom(custom.id) else onOpenCustomDetail(custom) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                         Row(Modifier.fillMaxWidth()) {
                             Text(custom.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                             if (!pickerMode) IconButton(onClick = { onAddCustomRecord(custom) }, enabled = custom.allows(userGender)) { Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.disease_record_add)) }
@@ -309,7 +309,7 @@ internal fun DiseaseBrowsePanel(
                     }
                 }
                 items(diseases, key = { it.id }) { disease ->
-                    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .35f)).clickable { if (pickerMode) onSelectReference?.invoke(DiseaseReference.Curated(mapOf("11" to disease.id)) ) ?: onAddDisease(disease) else onOpenDetail(disease) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .35f)).clickable { if (pickerMode) onSelectReference?.invoke(DiseaseReference(DiseaseSourceKind.CURATED, requireNotNull(disease.referenceId()))) ?: onAddDisease(disease) else onOpenDetail(disease) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                         Row(Modifier.fillMaxWidth()) {
                             Text(disease.displayName(Locale.getDefault()), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                             if (!pickerMode) IconButton(onClick = { onAddDisease(disease) }, enabled = disease.applicability.allows(userGender)) { Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.disease_record_add)) }
@@ -434,55 +434,67 @@ private fun CustomDiseaseDetailScreen(
 
 @Composable
 private fun DiseaseEditorScreen(record: UserDiseaseRecord?, selectedDisease: Disease?, initialCustomName: String, selectedCustomDiseaseId: String?, mode: DiseaseEditorMode, onSelectDisease: () -> Unit, onBack: () -> Unit, onSave: (UserDiseaseRecord) -> Unit) {
-    var historyType by rememberSaveable(record?.id) { mutableStateOf(record?.historyType ?: DiseaseHistoryType.SELF) }
-    var status by rememberSaveable(record?.id) { mutableStateOf(record?.status ?: DiseaseRecordStatus.ACTIVE) }
-    var duration by rememberSaveable(record?.id) { mutableStateOf(record?.durationKind ?: DiseaseDurationKind.UNKNOWN) }
-    var diagnosedOn by rememberSaveable(record?.id) { mutableStateOf(record?.diagnosedOn ?: if (record == null) LocalDate.now().toString() else null) }
-    var resolvedOn by rememberSaveable(record?.id) { mutableStateOf(record?.resolvedOn) }
-    var relation by rememberSaveable(record?.id) { mutableStateOf(record?.familyRelation) }
-    var facility by rememberSaveable(record?.id) { mutableStateOf(record?.careFacility.orEmpty()) }
-    var clinician by rememberSaveable(record?.id) { mutableStateOf(record?.clinicianName.orEmpty()) }
-    var note by rememberSaveable(record?.id) { mutableStateOf(record?.note.orEmpty()) }
-    var pickingDiagnosis by rememberSaveable { mutableStateOf(false) }
-    var pickingResolution by rememberSaveable { mutableStateOf(false) }
-    val curatedId = selectedDisease?.id ?: record?.disease?.curatedId()
-    val customDiseaseId = selectedCustomDiseaseId ?: record?.disease?.customId()
-    val allowed = allowedStatuses(historyType)
-    if (status !in allowed) status = allowed.first()
-    val valid = (curatedId != null || customDiseaseId != null) && (status != DiseaseRecordStatus.RESOLVED || resolvedOn != null) && (historyType != DiseaseHistoryType.FAMILY || relation != null)
-    val dirty = record == null || historyType != record.historyType || status != record.status || duration != record.durationKind || diagnosedOn != record.diagnosedOn || resolvedOn != record.resolvedOn || relation != record.familyRelation || facility != record.careFacility || clinician != record.clinicianName || note != record.note || curatedId != record.disease.curatedId() || customDiseaseId != record.disease.customId()
+    var subjectType by remember(record?.id) { mutableStateOf(record?.subjectType ?: DiseaseSubjectType.SELF) }
+    var status by remember(record?.id) { mutableStateOf(record?.status ?: DiseaseStatus.HISTORY_ONLY) }
+    var course by remember(record?.id) { mutableStateOf(record?.course ?: DiseaseCourse.UNKNOWN) }
+    var startedOn by remember(record?.id) { mutableStateOf(record?.startedOn) }
+    var endedOn by remember(record?.id) { mutableStateOf(record?.endedOn) }
+    var subjectNote by remember(record?.id) { mutableStateOf(record?.subjectNote.orEmpty()) }
+    var institution by remember(record?.id) { mutableStateOf(record?.medicalInstitution.orEmpty()) }
+    var doctor by remember(record?.id) { mutableStateOf(record?.doctorName.orEmpty()) }
+    var phone by remember(record?.id) { mutableStateOf(record?.doctorPhone.orEmpty()) }
+    var note by remember(record?.id) { mutableStateOf(record?.note.orEmpty()) }
+    var pickingStarted by remember { mutableStateOf(false) }
+    var pickingEnded by remember { mutableStateOf(false) }
+    var dateWarning by remember { mutableStateOf(false) }
+    val curatedId = selectedDisease?.referenceId() ?: record?.disease?.curatedId()
+    val customId = selectedCustomDiseaseId?.toCustomDiseaseId() ?: record?.disease?.customId()
+    val valid = curatedId != null || customId != null
+    val dirty = record == null || subjectType != record.subjectType || status != record.status || course != record.course || startedOn != record.startedOn || endedOn != record.endedOn || subjectNote != record.subjectNote.orEmpty() || institution != record.medicalInstitution.orEmpty() || doctor != record.doctorName.orEmpty() || phone != record.doctorPhone.orEmpty() || note != record.note.orEmpty()
+    fun commit() {
+        val now = System.currentTimeMillis()
+        val reference = curatedId?.let { DiseaseReference(DiseaseSourceKind.CURATED, it) } ?: DiseaseReference(DiseaseSourceKind.CUSTOM, requireNotNull(customId))
+        onSave(UserDiseaseRecord(record?.id ?: UUID.randomUUID().toString(), reference, subjectType, subjectNote.trim().ifBlank { null }.takeIf { subjectType != DiseaseSubjectType.SELF }, status, course, startedOn, endedOn, institution.trim().ifBlank { null }, doctor.trim().ifBlank { null }, phone.trim().ifBlank { null }, note.trim().ifBlank { null }, record?.createdAt ?: now, now))
+    }
+    fun save() {
+        if (startedOn != null && endedOn != null && endedOn!! < startedOn!!) dateWarning = true else commit()
+    }
     BaseScreen(title = stringResource(if (record == null) R.string.disease_record_add else R.string.disease_record_edit), onBack = onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (curatedId != null) item { AppDropdownField(stringResource(R.string.disease_record_selected_disease), selectedDisease?.displayName(Locale.getDefault()) ?: curatedId, emptyList(), onSelect = {}, enabled = false) }
-                if (customDiseaseId != null) item { AppDropdownField(stringResource(R.string.disease_record_selected_disease), initialCustomName, emptyList(), onSelect = {}, enabled = false) }
-                if (curatedId == null && customDiseaseId == null) item { AppIconTextButton(stringResource(R.string.disease_record_select_disease), R.drawable.ic_medical_history, onSelectDisease, Modifier.fillMaxWidth()) }
-                item { AppDropdownField(stringResource(R.string.disease_record_history_type), stringResource(historyType.labelRes()), DiseaseHistoryType.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) }, { historyType = DiseaseHistoryType.valueOf(it.id) }) }
-                item { AppDropdownField(stringResource(R.string.disease_record_status), stringResource(status.labelRes()), allowed.map { AppDropdownOption(it.name, stringResource(it.labelRes())) }, { status = DiseaseRecordStatus.valueOf(it.id) }) }
-                item { AppDropdownField(stringResource(R.string.disease_record_duration), stringResource(duration.labelRes()), DiseaseDurationKind.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) }, { duration = DiseaseDurationKind.valueOf(it.id) }) }
-                if (historyType == DiseaseHistoryType.FAMILY) item { AppDropdownField(stringResource(R.string.disease_record_family_relation), relation?.let { stringResource(it.labelRes()) }.orEmpty(), FamilyRelation.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) }, { relation = FamilyRelation.valueOf(it.id) }) }
-                if (historyType != DiseaseHistoryType.FAMILY) { item { DateField(stringResource(R.string.disease_record_diagnosed_on), diagnosedOn) { pickingDiagnosis = true } }; item { EditorTextField(stringResource(R.string.disease_record_facility), facility, { facility = it }) }; item { EditorTextField(stringResource(R.string.disease_record_clinician), clinician, { clinician = it }) } }
-                if (status == DiseaseRecordStatus.RESOLVED) item { DateField(stringResource(R.string.disease_record_resolved_on), resolvedOn) { pickingResolution = true } }
+                if (customId != null) item { AppDropdownField(stringResource(R.string.disease_record_selected_disease), initialCustomName, emptyList(), onSelect = {}, enabled = false) }
+                if (!valid) item { AppIconTextButton(stringResource(R.string.disease_record_select_disease), R.drawable.ic_medical_history, onSelectDisease, Modifier.fillMaxWidth()) }
+                item { AppDropdownField(stringResource(R.string.disease_record_subject_type), stringResource(subjectType.labelRes()), DiseaseSubjectType.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) }, { subjectType = DiseaseSubjectType.valueOf(it.id) }) }
+                if (subjectType != DiseaseSubjectType.SELF) item { EditorTextField(stringResource(R.string.disease_record_subject_note), subjectNote, { subjectNote = it }) }
+                item { AppDropdownField(stringResource(R.string.disease_record_status), stringResource(status.labelRes()), DiseaseStatus.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) }, { status = DiseaseStatus.valueOf(it.id) }) }
+                item { AppDropdownField(stringResource(R.string.disease_record_duration), stringResource(course.labelRes()), DiseaseCourse.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) }, { course = DiseaseCourse.valueOf(it.id) }) }
+                item { DateField(stringResource(R.string.disease_record_diagnosed_on), startedOn) { pickingStarted = true } }
+                item { DateField(stringResource(R.string.disease_record_resolved_on), endedOn) { pickingEnded = true } }
+                item { EditorTextField(stringResource(R.string.disease_record_facility), institution, { institution = it }) }
+                item { EditorTextField(stringResource(R.string.disease_record_clinician), doctor, { doctor = it }) }
+                item { EditorTextField(stringResource(R.string.disease_record_doctor_phone), phone, { phone = it }) }
                 item { EditorTextField(stringResource(R.string.disease_record_note), note, { note = it }, singleLine = false) }
             }
-            FormSaveBar(stringResource(R.string.disease_record_save), valid && dirty, onSave = { val now = System.currentTimeMillis(); val reference = curatedId?.let { DiseaseReference.Curated(mapOf("11" to it)) } ?: DiseaseReference.Custom(requireNotNull(customDiseaseId)); onSave(UserDiseaseRecord(record?.id ?: UUID.randomUUID().toString(), reference, historyType, status, duration, diagnosedOn, resolvedOn, if (historyType == DiseaseHistoryType.FAMILY) relation else null, facility.trim(), clinician.trim(), note.trim(), record?.createdAt ?: now, now)) })
+            FormSaveBar(stringResource(R.string.disease_record_save), valid && dirty, onSave = ::save)
         }
     }
-    if (pickingDiagnosis) ComposeDatePickerDialog((diagnosedOn?.let(LocalDate::parse) ?: LocalDate.now()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(), { pickingDiagnosis = false }) { diagnosedOn = it.toString(); pickingDiagnosis = false }
-    if (pickingResolution) ComposeDatePickerDialog((resolvedOn?.let(LocalDate::parse) ?: LocalDate.now()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(), { pickingResolution = false }) { resolvedOn = it.toString(); pickingResolution = false }
+    if (pickingStarted) ComposeDatePickerDialog((startedOn?.let(LocalDate::parse) ?: LocalDate.now()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(), { pickingStarted = false }) { startedOn = it.toString(); pickingStarted = false }
+    if (pickingEnded) ComposeDatePickerDialog((endedOn?.let(LocalDate::parse) ?: LocalDate.now()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(), { pickingEnded = false }) { endedOn = it.toString(); pickingEnded = false }
+    if (dateWarning) AlertDialog(onDismissRequest = { dateWarning = false }, title = { Text(stringResource(R.string.disease_record_invalid_date_order_title)) }, text = { Text(stringResource(R.string.disease_record_invalid_date_order)) }, confirmButton = { TextButton(onClick = { dateWarning = false; commit() }) { Text(stringResource(R.string.compose_confirm_dialog_ok)) } }, dismissButton = { TextButton(onClick = { dateWarning = false }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } })
 }
 @Composable
 private fun CustomDiseaseEditorScreen(
     disease: UserCustomDisease?, categoryLabels: Map<String, String>, departmentLabels: Map<String, String>, existingCodes: Set<String>, onBack: () -> Unit, onSave: (UserCustomDisease) -> Unit,
 ) {
-    var name by rememberSaveable(disease?.id) { mutableStateOf(disease?.name.orEmpty()) }
+    var name by remember(disease?.id) { mutableStateOf(disease?.name.orEmpty()) }
     val generatedCode = remember(disease?.id) { disease?.code ?: "CUSTOM-${UUID.randomUUID().toString().take(8).uppercase(Locale.ROOT)}" }
-    var aliases by rememberSaveable(disease?.id) { mutableStateOf(disease?.aliases ?: emptyList()) }
-    var description by rememberSaveable(disease?.id) { mutableStateOf(disease?.description.orEmpty()) }
-    var applicableGenders by rememberSaveable(disease?.id) { mutableStateOf(disease?.applicableGenders ?: emptyList()) }
-    var categoryIds by rememberSaveable(disease?.id) { mutableStateOf(disease?.categoryIds ?: emptyList()) }
-    var departmentIds by rememberSaveable(disease?.id) { mutableStateOf(disease?.careDepartmentIds ?: emptyList()) }
-    var note by rememberSaveable(disease?.id) { mutableStateOf(disease?.note.orEmpty()) }
+    var aliases by remember(disease?.id) { mutableStateOf(disease?.aliases ?: emptyList()) }
+    var description by remember(disease?.id) { mutableStateOf(disease?.description.orEmpty()) }
+    var applicableGenders by remember(disease?.id) { mutableStateOf(disease?.applicableGenders ?: emptyList()) }
+    var categoryIds by remember(disease?.id) { mutableStateOf(disease?.categoryIds ?: emptyList()) }
+    var departmentIds by remember(disease?.id) { mutableStateOf(disease?.careDepartmentIds ?: emptyList()) }
+    var note by remember(disease?.id) { mutableStateOf(disease?.note.orEmpty()) }
     var discardDialog by remember { mutableStateOf(false) }
     val codeDuplicate = existingCodes.any { it.equals(generatedCode, ignoreCase = true) }
     val dirty = disease == null || name != disease.name || aliases != disease.aliases || description != disease.description || applicableGenders != disease.applicableGenders || categoryIds != disease.categoryIds || departmentIds != disease.careDepartmentIds || note != disease.note
@@ -503,7 +515,7 @@ private fun CustomDiseaseEditorScreen(
             }
             FormSaveBar(stringResource(R.string.disease_record_save), name.isNotBlank() && !codeDuplicate && dirty, onSave = {
                 val now = System.currentTimeMillis()
-                onSave(UserCustomDisease(disease?.id ?: "custom:${UUID.randomUUID()}", name.trim(), generatedCode, aliases, description.trim(), applicableGenders, categoryIds, departmentIds, note.trim(), disease?.createdAt ?: now, now))
+                onSave(UserCustomDisease(disease?.id ?: "CUSTOM-${UUID.randomUUID().toString().take(8).uppercase(Locale.ROOT)}", name.trim(), generatedCode, aliases, description.trim(), applicableGenders, categoryIds, departmentIds, note.trim(), disease?.createdAt ?: now, now))
             })
         }
     }
@@ -530,7 +542,7 @@ private fun CustomDiseaseMultiSelect(title: String, labels: Map<String, String>,
     }
 }
 @Composable private fun DateField(label: String, value: String?, onClick: () -> Unit) {
-    val timestamp = value?.let { LocalDate.parse(it).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
+    val timestamp = value?.let { runCatching { LocalDate.parse(it) }.getOrNull() }?.atStartOfDay(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
     RecordTimePickerField(
         title = label,
         valueMillis = timestamp,
@@ -542,11 +554,10 @@ private fun CustomDiseaseMultiSelect(title: String, labels: Map<String, String>,
 @Composable private fun DeleteDiseaseDialog(onDismiss: () -> Unit, onDelete: () -> Unit) { AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.body_record_delete_confirm_title)) }, text = { Text(stringResource(R.string.body_record_delete_confirm_message)) }, confirmButton = { TextButton(onClick = onDelete) { Text(stringResource(R.string.body_record_delete)) } }, dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) } }) }
 private fun Disease.localizedDescription(): String = i18n[Locale.getDefault().language]?.description ?: i18n["zh"]?.description.orEmpty()
 private fun Disease.localizedAliases(): List<String> = i18n[Locale.getDefault().language]?.aliases ?: i18n["zh"]?.aliases.orEmpty()
-@Composable private fun DiseaseHistoryType.labelRes(): Int = when (this) { DiseaseHistoryType.SELF -> R.string.disease_history_self; DiseaseHistoryType.FAMILY -> R.string.disease_history_family; DiseaseHistoryType.PAST -> R.string.disease_history_past; DiseaseHistoryType.RISK -> R.string.disease_history_risk }
-@Composable private fun DiseaseRecordStatus.labelRes(): Int = when (this) { DiseaseRecordStatus.ACTIVE -> R.string.disease_status_active; DiseaseRecordStatus.RESOLVED -> R.string.disease_status_resolved; DiseaseRecordStatus.ONGOING_RISK -> R.string.disease_status_ongoing_risk; DiseaseRecordStatus.HISTORY_ONLY -> R.string.disease_status_history_only }
-@Composable private fun DiseaseDurationKind.labelRes(): Int = when (this) { DiseaseDurationKind.SHORT_TERM -> R.string.disease_duration_short; DiseaseDurationKind.LONG_TERM -> R.string.disease_duration_long; DiseaseDurationKind.UNKNOWN -> R.string.disease_duration_unknown }
-@Composable private fun FamilyRelation.labelRes(): Int = when (this) { FamilyRelation.PARENT -> R.string.disease_relation_parent; FamilyRelation.SIBLING -> R.string.disease_relation_sibling; FamilyRelation.CHILD -> R.string.disease_relation_child; FamilyRelation.GRANDPARENT -> R.string.disease_relation_grandparent; FamilyRelation.OTHER -> R.string.disease_relation_other }
-private fun DiseaseRecordStatus.color() = when (this) { DiseaseRecordStatus.ACTIVE -> androidx.compose.ui.graphics.Color(0xFFE53935); DiseaseRecordStatus.RESOLVED -> androidx.compose.ui.graphics.Color(0xFF43A047); DiseaseRecordStatus.ONGOING_RISK -> androidx.compose.ui.graphics.Color(0xFFF57C00); DiseaseRecordStatus.HISTORY_ONLY -> androidx.compose.ui.graphics.Color(0xFF607D8B) }
+@Composable private fun DiseaseSubjectType.labelRes(): Int = when (this) { DiseaseSubjectType.SELF -> R.string.disease_subject_self; DiseaseSubjectType.FATHER -> R.string.disease_subject_father; DiseaseSubjectType.MOTHER -> R.string.disease_subject_mother; DiseaseSubjectType.OLDER_BROTHER -> R.string.disease_subject_older_brother; DiseaseSubjectType.YOUNGER_BROTHER -> R.string.disease_subject_younger_brother; DiseaseSubjectType.OLDER_SISTER -> R.string.disease_subject_older_sister; DiseaseSubjectType.YOUNGER_SISTER -> R.string.disease_subject_younger_sister; DiseaseSubjectType.HUSBAND -> R.string.disease_subject_husband; DiseaseSubjectType.WIFE -> R.string.disease_subject_wife; DiseaseSubjectType.FRIEND -> R.string.disease_subject_friend; DiseaseSubjectType.CLASSMATE -> R.string.disease_subject_classmate; DiseaseSubjectType.OTHER -> R.string.disease_subject_other }
+@Composable private fun DiseaseStatus.labelRes(): Int = when (this) { DiseaseStatus.ACTIVE -> R.string.disease_status_active; DiseaseStatus.RESOLVED -> R.string.disease_status_resolved; DiseaseStatus.ONGOING_RISK -> R.string.disease_status_ongoing_risk; DiseaseStatus.HISTORY_ONLY -> R.string.disease_status_history_only }
+@Composable private fun DiseaseCourse.labelRes(): Int = when (this) { DiseaseCourse.ACUTE -> R.string.disease_course_acute; DiseaseCourse.CHRONIC -> R.string.disease_course_chronic; DiseaseCourse.EPISODIC -> R.string.disease_course_episodic; DiseaseCourse.UNKNOWN -> R.string.disease_course_unknown }
+private fun DiseaseStatus.color() = when (this) { DiseaseStatus.ACTIVE -> androidx.compose.ui.graphics.Color(0xFFE53935); DiseaseStatus.RESOLVED -> androidx.compose.ui.graphics.Color(0xFF43A047); DiseaseStatus.ONGOING_RISK -> androidx.compose.ui.graphics.Color(0xFFF57C00); DiseaseStatus.HISTORY_ONLY -> androidx.compose.ui.graphics.Color(0xFF607D8B) }
 private fun <T> List<T>.toggle(value: T): List<T> = if (value in this) this - value else this + value
 private fun UserCustomDisease.allows(gender: Gender): Boolean = applicableGenders.isEmpty() || gender in applicableGenders
 @Composable private fun Gender.labelRes(): Int = when (this) { Gender.MALE -> R.string.profile_gender_male; Gender.FEMALE -> R.string.profile_gender_female }

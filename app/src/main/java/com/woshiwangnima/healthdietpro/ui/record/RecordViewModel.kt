@@ -107,7 +107,7 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
                 RecordLatest(it.timestamp, String.format(Locale.getDefault(), precision, systolic, diastolic, pressureUnit))
             },
             RecordActionId.Disease to latestDisease?.let { record ->
-                val name = record.disease.curatedId()?.let { diseaseCatalog.findById(it)?.displayName(Locale.getDefault()) }
+                val name = record.disease.curatedId()?.let { id -> diseaseCatalog.loadAll().firstOrNull { id in it.referenceIds() }?.displayName(Locale.getDefault()) }
                     ?: record.disease.customId()?.let { customDiseases[it]?.name }.orEmpty()
                 RecordLatest(record.updatedAt, name)
             },

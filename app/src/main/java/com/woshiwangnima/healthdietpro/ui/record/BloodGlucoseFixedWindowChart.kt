@@ -45,6 +45,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -110,6 +113,8 @@ import com.woshiwangnima.healthdietpro.model.sleep.SleepRecord
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRepository
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseReference
+import com.woshiwangnima.healthdietpro.model.disease.curatedId
+import com.woshiwangnima.healthdietpro.model.disease.hasCurrentUserDiabetesRisk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -151,18 +156,23 @@ internal fun BloodGlucoseFixedWindowChart(
     var eventBars by remember { mutableStateOf(emptyList<BarSample>()) }
     var nightSleepRecords by remember { mutableStateOf(emptyList<SleepRecord>()) }
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val dietPrefs = remember(context) { loadDietPrefs(context) }
     var fullscreen by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTargetRateHelp by remember { mutableStateOf(false) }
     LaunchedEffect(initialEnd, scopeStart, currentScopeEnd, window, records) {
         if (sessionWindowEnd == null) ownedWindowEnd = initialEnd
-        val loaded = withContext(Dispatchers.IO) {
-            loadEventBars(context, scopeStart, currentScopeEnd) to SleepRepository.fromContext(context).load().records
-                .filter { it.kind == SleepKind.NIGHT_SLEEP && it.wakeUpAt != null }
+    }
+    LaunchedEffect(lifecycleOwner, scopeStart, currentScopeEnd, window, records) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            val loaded = withContext(Dispatchers.IO) {
+                loadEventBars(context, scopeStart, currentScopeEnd) to SleepRepository.fromContext(context).load().records
+                    .filter { it.kind == SleepKind.NIGHT_SLEEP && it.wakeUpAt != null }
+            }
+            eventBars = loaded.first
+            nightSleepRecords = loaded.second
         }
-        eventBars = loaded.first
-        nightSleepRecords = loaded.second
     }
     val slice = remember(index, scopeStart, currentScopeEnd, windowEnd, window) {
         index.scopedSlice(scopeStart, currentScopeEnd, windowEnd, window)
@@ -1521,12 +1531,18 @@ private fun BarSample.impactEndTimestamp(): Long = when (kind) {
 }
 private fun defaultBarStyles() = mapOf(BarKind.Medication to BarStyle(Color(0xFFE53935)), BarKind.Diet to BarStyle(Color(0xFFF57C00)), BarKind.Exercise to BarStyle(Color(0xFF43A047)), BarKind.Sleep to BarStyle(Color(0xFF7E57C2)))
 private fun loadEventBars(context: android.content.Context, start: Long, end: Long): List<BarSample> {
+    val hasDiabetesRisk = hasCurrentUserDiabetesRisk(context)
     val diseaseRepository = DiseaseRepository.fromContext(context)
     val diabetesIds = diseaseRepository.loadAll().filter { disease ->
         disease.id.contains("diabetes", ignoreCase = true) || disease.displayName(Locale.CHINA).contains("糖尿病") || disease.displayName(Locale.ENGLISH).contains("diabetes", ignoreCase = true)
-    }.mapTo(mutableSetOf()) { it.id }
+    }.mapTo(mutableSetOf()) { it.referenceId() }
     val medicationBars = MedicationPrefs.getRecords(context).asSequence()
-        .filter { it.timestamp in start..end && (it.indicationReferences.any { ref -> (ref as? DiseaseReference.Curated)?.curatedDiseaseId?.values?.any(diabetesIds::contains) == true } || it.legacyPurposeTags.any { tag -> tag.contains("糖尿病") || tag.contains("diabetes", true) }) }
+        .filter { medication ->
+            hasDiabetesRisk && medication.timestamp in start..end && (
+                medication.indicationReferences.any { it.curatedId() in diabetesIds } ||
+                    medication.legacyPurposeTags.any { tag -> tag.contains("糖尿病") || tag.contains("diabetes", true) }
+                )
+        }
         .map { BarSample(it.timestamp, it.timestamp + 10 * MINUTE_MILLIS, BarKind.Medication, 0.30f) }
     val dietBars = DietRepository.fromContext(context).load().records.asSequence()
         .filter { it.mealStartAt < end && it.mealEndAt > start }

@@ -30,6 +30,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
@@ -118,7 +120,9 @@ internal fun ProfileUserInfoCard(
                 Spacer(Modifier.height(4.dp))
                 ProfileInfoLabelRow(R.drawable.ic_birthday, state.birthdayText)
                 ProfileInfoLabelRow(R.drawable.ic_region, state.regionText)
-                if (state.hasDiseaseText) ProfileInfoLabelRow(R.drawable.ic_medical_history, state.diseaseText)
+                if (state.diseases.isNotEmpty()) {
+                    ProfileDiseaseLabelRow(state.diseases)
+                }
             }
 
             Spacer(Modifier.width(10.dp))
@@ -166,19 +170,49 @@ private fun ProfileAvatar(state: ProfileUserInfoUiState) {
 }
 
 @Composable
-private fun ProfileInfoLabelRow(iconRes: Int, text: String) {
+private fun ProfileInfoLabelRow(iconRes: Int, text: String, tint: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = tint,
             modifier = Modifier.size(16.dp),
         )
         Spacer(Modifier.width(6.dp))
         TextOverflowText(
             text = text,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = tint,
+        )
+    }
+}
+
+@Composable
+private fun ProfileDiseaseLabelRow(diseases: List<ProfileDiseaseDisplay>) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_medical_history),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(16.dp),
+        )
+        Spacer(Modifier.width(6.dp))
+        val text = buildAnnotatedString {
+            diseases.forEachIndexed { index, disease ->
+                if (index > 0) append("、")
+                withStyle(androidx.compose.ui.text.SpanStyle(color = disease.status.profileColor())) {
+                    append(disease.name)
+                }
+            }
+        }
+        TextOverflowText(
+            text = text,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 1,
         )
     }
 }

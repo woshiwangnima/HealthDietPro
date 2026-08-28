@@ -261,7 +261,7 @@ private fun MedicationIndicationsEditor(
 internal fun DiseaseReference.displayName(
     diseasesById: Map<String, com.woshiwangnima.healthdietpro.model.disease.Disease>,
     customDiseasesById: Map<String, UserCustomDisease>,
-): String = curatedId()?.let { diseasesById[it]?.displayName(Locale.getDefault()) ?: it }
+): String = curatedId()?.let { id -> diseasesById.values.firstOrNull { id in it.referenceIds() }?.displayName(Locale.getDefault()) ?: id }
     ?: customId()?.let { customDiseasesById[it]?.name ?: it }
     ?: ""
 

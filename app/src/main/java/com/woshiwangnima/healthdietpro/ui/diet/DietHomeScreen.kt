@@ -78,6 +78,7 @@ internal fun DietHomeScreen(
     var selectedTab by remember {
         mutableIntStateOf(UserPrefs.current(context).getInt(DIET_SELECTED_TAB_KEY, 1))
     }
+    val selectedStatisticsDay = remember { mutableStateOf(LocalDate.now(ZoneId.systemDefault())) }
     LaunchedEffect(selectedTab) {
         UserPrefs.current(context).putInt(DIET_SELECTED_TAB_KEY, selectedTab)
     }
@@ -102,6 +103,8 @@ internal fun DietHomeScreen(
                         goals = uiState.goals,
                         nutrientMetas = uiState.nutrientMetas,
                         onOpenMeal = onOpen,
+                        selectedDayState = selectedStatisticsDay,
+                        onOpenStatistics = { date -> selectedStatisticsDay.value = date; selectedTab = 1 },
                         trendOnly = true,
                     )
                 } else if (tab == 1) {
@@ -110,6 +113,7 @@ internal fun DietHomeScreen(
                         goals = uiState.goals,
                         nutrientMetas = uiState.nutrientMetas,
                         onOpenMeal = onOpen,
+                        selectedDayState = selectedStatisticsDay,
                     )
                 } else {
                     DietRecordsTab(uiState, onAdd, onOpen, onEdit, onDelete, recordFilterPeriod, recordTimeSelection, recordListState)

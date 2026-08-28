@@ -81,7 +81,7 @@ internal class UserDiseaseArchiveStore private constructor(
 
 @Serializable
 internal data class UserDiseaseArchive(
-    val schemaVersion: Int = 1,
+    val schemaVersion: Int = 2,
     val records: List<UserDiseaseRecord> = emptyList(),
     val customDiseases: List<UserCustomDisease> = emptyList(),
 )

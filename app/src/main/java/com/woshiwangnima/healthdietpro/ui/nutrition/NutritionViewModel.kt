@@ -32,6 +32,9 @@ import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodRepository
 import com.woshiwangnima.healthdietpro.model.food.UserFoodTag
 import com.woshiwangnima.healthdietpro.model.food.UserFoodTagRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import com.woshiwangnima.healthdietpro.model.disease.hasCurrentUserDiabetesRisk
+import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
+import com.woshiwangnima.healthdietpro.model.disease.stableId
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserItemCollectionRepository
 import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
@@ -66,6 +69,7 @@ internal data class NutritionUiState(
     val nrvReference: NrvReference? = null,
     val nrvReferences: List<NrvReference> = emptyList(),
     val exerciseRequest: NutritionExerciseRequest? = null,
+    val showGlycemicIndicator: Boolean = false,
 )
 
 internal data class NutritionExerciseServing(val label: String, val kilocalories: Double)
@@ -104,11 +108,14 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     private var builtInFoods: List<FoodItem> = emptyList()
     private var nutrientMetas: List<NutrientMeta> = emptyList()
     private var botanicalTaxonomy: BotanicalTaxonomyLabels = BotanicalTaxonomyLabels(emptyMap(), emptyMap())
+    private var diseaseRiskRefreshVersion = 0L
     init {
         val initialUserId = userId
         val initialTagRepository = tagRepository
         val initialCustomRepository = customRepository
         viewModelScope.launch {
+            val initialDiseaseRiskVersion = diseaseRiskRefreshVersion
+            val showGlycemicIndicator = withContext(Dispatchers.IO) { hasCurrentUserDiabetesRisk(application) }
             val foods = withContext(Dispatchers.IO) { repository.foods() }
             withContext(Dispatchers.IO) { repository.warmIndexes() }
             val methods = withContext(Dispatchers.IO) { cookingMethodRepository.byId() }
@@ -134,6 +141,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
                     favoriteFoodIds = collections.favoriteIds,
                     nrvReference = nrvReferences.firstOrNull(),
                     nrvReferences = nrvReferences,
+                    showGlycemicIndicator = if (diseaseRiskRefreshVersion == initialDiseaseRiskVersion) showGlycemicIndicator else _state.value.showGlycemicIndicator,
                 )
             }
         }
@@ -157,6 +165,17 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     fun categoryChildren(parentTag: String): List<com.woshiwangnima.healthdietpro.model.food.FoodCategory> = repository.categoryChildren(parentTag)
     fun categoryDisplayPath(tag: String): List<Int> = repository.categoryDisplayPath(tag)
     fun hasCategory(tags: List<String>, categoryTag: String): Boolean = repository.hasCategory(tags, categoryTag)
+
+    /** Refreshes the low-cost disease-dependent UI flag when the app returns to the foreground. */
+    internal fun refreshDiseaseRisk() {
+        val refreshVersion = ++diseaseRiskRefreshVersion
+        viewModelScope.launch(Dispatchers.IO) {
+            val visible = hasCurrentUserDiabetesRisk(getApplication())
+            if (refreshVersion == diseaseRiskRefreshVersion) {
+                _state.value = _state.value.copy(showGlycemicIndicator = visible)
+            }
+        }
+    }
 
     /** Ingredients + prepared foods usable as dish components / derivation sources. */
     fun selectableIngredients(): List<Ingredient> = foodsById.values

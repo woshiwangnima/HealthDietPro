@@ -14,11 +14,18 @@ data class Disease(
     val categoryIds: List<String>,
     val applicability: SexApplicability = SexApplicability(),
     val icd11References: List<Icd11Reference> = emptyList(),
-    val course: DiseaseCourse = DiseaseCourse.UNSPECIFIED,
+    val course: DiseaseCourse = DiseaseCourse.UNKNOWN,
     val careDepartmentIds: List<String> = emptyList(),
     val sourceIds: List<String> = emptyList(),
     val metricReferences: List<DiseaseMetricReference> = emptyList(),
 ) {
+    fun primaryIcd11Code(): String? = icd11References.firstOrNull { it.mappingType == Icd11MappingType.PRIMARY }?.code
+        ?: icd11References.firstOrNull()?.code
+
+    fun referenceId(): String? = primaryIcd11Code()?.let { "ICD-11-$it" }
+
+    fun referenceIds(): Set<String> = icd11References.mapTo(linkedSetOf()) { "ICD-11-${it.code}" }
+
     fun displayName(locale: Locale = Locale.getDefault()): String {
         return localizedI18nValue(i18n, locale) { it.label } ?: id
     }
@@ -63,7 +70,7 @@ enum class DiseaseCourse {
     ACUTE,
     CHRONIC,
     EPISODIC,
-    UNSPECIFIED,
+    UNKNOWN,
 }
 
 @Serializable

@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.model.disease.Disease
-import com.woshiwangnima.healthdietpro.model.disease.DiseaseRecordStatus
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseStatus
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecord
 import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
@@ -29,7 +29,7 @@ internal data class DiseaseRecordUiState(
     val departmentLabels: Map<String, String> = emptyMap(),
     val selectedCategoryIds: Set<String> = emptySet(),
     val selectedDepartmentIds: Set<String> = emptySet(),
-    val selectedStatuses: Set<DiseaseRecordStatus> = emptySet(),
+    val selectedStatuses: Set<DiseaseStatus> = emptySet(),
     val customOnly: Boolean = false,
     val query: String = "",
 ) {
@@ -46,7 +46,7 @@ internal data class DiseaseRecordUiState(
         (selectedCategoryIds.isEmpty() || disease.categoryIds.any(selectedCategoryIds::contains)) &&
             (selectedDepartmentIds.isEmpty() || disease.careDepartmentIds.any(selectedDepartmentIds::contains)) &&
             (selectedStatuses.isEmpty() || records.any { record ->
-                record.disease.curatedId() == disease.id && record.status in selectedStatuses
+            record.disease.curatedId() == disease.referenceId() && record.status in selectedStatuses
             }) &&
             (query.isBlank() || matchesDisease(disease, query))
     }
@@ -65,8 +65,8 @@ internal class DiseaseRecordViewModel(application: Application) : AndroidViewMod
     fun refresh() = viewModelScope.launch {
         val catalog = withContext(Dispatchers.IO) { diseaseRepository.loadCatalog() }
         val diseases = catalog.diseases
-        val records = withContext(Dispatchers.IO) { recordRepository.load() }
-        val customDiseases = withContext(Dispatchers.IO) { recordRepository.loadCustomDiseases() }
+        val records = withContext(Dispatchers.IO) { runCatching { recordRepository.load() }.getOrDefault(emptyList()) }
+        val customDiseases = withContext(Dispatchers.IO) { runCatching { recordRepository.loadCustomDiseases() }.getOrDefault(emptyList()) }
         val locale = Locale.getDefault()
         _uiState.value = _uiState.value.copy(
             diseases = diseases,
@@ -82,18 +82,25 @@ internal class DiseaseRecordViewModel(application: Application) : AndroidViewMod
     fun toggleCategory(id: String) = update { copy(selectedCategoryIds = selectedCategoryIds.toggle(id), customOnly = false) }
     fun toggleCustomOnly() = update { copy(customOnly = !customOnly, selectedCategoryIds = emptySet()) }
     fun toggleDepartment(id: String) = update { copy(selectedDepartmentIds = selectedDepartmentIds.toggle(id)) }
-    fun toggleStatus(status: DiseaseRecordStatus) = update { copy(selectedStatuses = selectedStatuses.toggle(status)) }
+    fun toggleStatus(status: DiseaseStatus) = update { copy(selectedStatuses = selectedStatuses.toggle(status)) }
 
-    fun upsert(record: UserDiseaseRecord) {
+    fun upsert(record: UserDiseaseRecord, onSaved: () -> Unit = {}) {
         val records = (_uiState.value.records.filterNot { it.id == record.id } + record).sortedByDescending { it.updatedAt }
         _uiState.value = _uiState.value.copy(records = records)
-        viewModelScope.launch(Dispatchers.IO) { recordRepository.save(records) }
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { recordRepository.save(records) }
+                .onSuccess { withContext(kotlinx.coroutines.Dispatchers.Main) { onSaved() } }
+                .onFailure { refresh() }
+        }
     }
 
     fun delete(id: String) {
         val records = _uiState.value.records.filterNot { it.id == id }
         _uiState.value = _uiState.value.copy(records = records)
-        viewModelScope.launch(Dispatchers.IO) { recordRepository.save(records) }
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { recordRepository.save(records) }
+                .onFailure { refresh() }
+        }
     }
 
     fun upsertCustomDisease(disease: UserCustomDisease) {

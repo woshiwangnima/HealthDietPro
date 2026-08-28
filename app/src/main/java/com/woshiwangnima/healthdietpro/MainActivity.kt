@@ -170,6 +170,7 @@ class MainActivity : BaseActivity() {
     ) {
         profileViewModel.refresh()
         recordViewModel.refresh()
+        nutritionViewModel.refreshDiseaseRisk()
     }
 
     private val userSwitchLauncher = registerForActivityResult(
@@ -427,6 +428,7 @@ class MainActivity : BaseActivity() {
         }
         profileViewModel.refresh()
         recordViewModel.refresh()
+        nutritionViewModel.refreshDiseaseRisk()
     }
 
     override fun onDestroy() {

@@ -6,7 +6,7 @@ internal class UserDiseaseRecordRepository private constructor(context: Context)
     private val archive = UserDiseaseArchiveStore.current(context)
 
     fun load(): List<UserDiseaseRecord> = archive.load().records
-        .onEach(UserDiseaseRecord::validate)
+        .mapNotNull { record -> runCatching { record.validate() }.getOrNull()?.let { record } }
         .sortedByDescending(UserDiseaseRecord::updatedAt)
 
     fun save(records: List<UserDiseaseRecord>) {

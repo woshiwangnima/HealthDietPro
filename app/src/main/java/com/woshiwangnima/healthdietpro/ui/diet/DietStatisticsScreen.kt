@@ -103,13 +103,15 @@ internal fun DietStatisticsTab(
     goals: DietGoalsPrefs,
     nutrientMetas: List<NutrientMeta>,
     onOpenMeal: (DietRecord) -> Unit,
+    selectedDayState: androidx.compose.runtime.MutableState<LocalDate>,
+    onOpenStatistics: (LocalDate) -> Unit = {},
     trendOnly: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val zone = remember { ZoneId.systemDefault() }
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
     var trendDays by rememberSaveable { mutableIntStateOf(7) }
-    var selectedDay by rememberSaveable { mutableStateOf(LocalDate.now(zone)) }
+    var selectedDay by selectedDayState
     var pickingDay by rememberSaveable { mutableStateOf(false) }
     var donutMetric by rememberSaveable { mutableStateOf(NutrientMetric.ENERGY) }
     var trendMetric by rememberSaveable { mutableStateOf(NutrientMetric.ENERGY) }
@@ -257,7 +259,9 @@ internal fun DietStatisticsTab(
                     formatValue = { formatCalories(it) },
                     labelEvery = 1,
                     selectedEntry = selectedEntry,
-                    onEntrySelected = { selectedTrendDate = it.date },
+                    onEntrySelected = {
+                        if (selectedTrendDate == it.date) onOpenStatistics(it.date) else selectedTrendDate = it.date
+                    },
                     referenceLine = averageValue?.let { average ->
                         DateStackedBarReferenceLine(
                             value = average,
@@ -289,6 +293,18 @@ internal fun DietStatisticsTab(
                         }
                     }
                 }
+            }
+        }
+        if (!trendOnly && dayRecords.any { record ->
+                val totals = sumNutrients(listOf(record))
+                NutrientMetric.entries.any { metric -> totals.value(metric) > 0.0 }
+            }) {
+            item {
+                MealNutrientTable(
+                    records = dayRecords,
+                    dayTotals = dayTotals,
+                    onOpenMeal = onOpenMeal,
+                )
             }
         }
     }

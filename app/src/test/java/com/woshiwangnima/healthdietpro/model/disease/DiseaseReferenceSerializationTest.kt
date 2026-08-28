@@ -10,31 +10,24 @@ import org.junit.Test
 
 class DiseaseReferenceSerializationTest {
     @Test
-    fun `curated reference writes a discriminated ICD family map`() {
+    fun `curated reference writes source and versioned ICD ID`() {
         val encoded = Json.encodeToString<DiseaseReference>(
-            DiseaseReference.Curated(mapOf("11" to "diabetes_type_2")),
+            DiseaseReference(DiseaseSourceKind.CURATED, "ICD-11-BA00"),
         )
 
-        assertTrue(encoded.contains("\"kind\":\"curated\""))
-        assertTrue(encoded.contains("\"11\":\"diabetes_type_2\""))
-        assertFalse(encoded.contains("customDiseaseId"))
+        assertTrue(encoded.contains("\"sourceKind\":\"CURATED\""))
+        assertTrue(encoded.contains("\"diseaseId\":\"ICD-11-BA00\""))
+        assertFalse(encoded.contains("curatedDiseaseId"))
         assertEquals(
-            DiseaseReference.Curated(mapOf("11" to "diabetes_type_2")),
+            DiseaseReference(DiseaseSourceKind.CURATED, "ICD-11-BA00"),
             Json.decodeFromString<DiseaseReference>(encoded),
         )
     }
 
     @Test
-    fun `legacy scalar curated reference migrates to ICD 11 map`() {
-        val decoded = Json.decodeFromString<DiseaseReference>("""{"curatedDiseaseId":"hypertension"}""")
+    fun `custom reference writes a prefixed ID`() {
+        val decoded = DiseaseReference(DiseaseSourceKind.CUSTOM, "CUSTOM-1B314519")
 
-        assertEquals(DiseaseReference.Curated(mapOf("11" to "hypertension")), decoded)
-    }
-
-    @Test
-    fun `legacy custom reference migrates to custom union branch`() {
-        val decoded = Json.decodeFromString<DiseaseReference>("""{"customDiseaseId":"custom:123"}""")
-
-        assertEquals(DiseaseReference.Custom("custom:123"), decoded)
+        assertEquals("CUSTOM-1B314519", decoded.diseaseId)
     }
 }

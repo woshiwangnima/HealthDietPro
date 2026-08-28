@@ -22,6 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +57,9 @@ import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
 import com.woshiwangnima.healthdietpro.model.diet.defaultDietTimes
 import com.woshiwangnima.healthdietpro.model.diet.resolveDefault
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 @Composable
 internal fun DietEditorScreen(
@@ -78,7 +83,15 @@ internal fun DietEditorScreen(
         mutableStateOf(restored?.mealPeriod ?: defaultPeriod)
     }
     var note by rememberSaveable(existing?.id, restoredDraft?.id) { mutableStateOf(restored?.note.orEmpty()) }
-    var entries by rememberSaveable(existing?.id, restoredDraft?.id) { mutableStateOf(restored?.entries ?: emptyList()) }
+    val entriesSaver = remember {
+        listSaver<List<DietFoodEntry>, String>(
+            save = { entries -> entries.map { dietEntryJson.encodeToString(it) } },
+            restore = { values -> values.mapNotNull { runCatching { dietEntryJson.decodeFromString<DietFoodEntry>(it) }.getOrNull() } },
+        )
+    }
+    var entries by rememberSaveable(existing?.id, restoredDraft?.id, stateSaver = entriesSaver) {
+        mutableStateOf(restored?.entries ?: emptyList())
+    }
     var pickField by remember { mutableStateOf<DietTimeField?>(null) }
     var editingEntry by remember { mutableStateOf<DietFoodEntry?>(null) }
     var deletingEntry by remember { mutableStateOf<DietFoodEntry?>(null) }
@@ -248,6 +261,8 @@ internal fun DietEditorScreen(
         )
     }
 }
+
+private val dietEntryJson = Json { ignoreUnknownKeys = true }
 
 @Composable
 private fun DietEntryCard(

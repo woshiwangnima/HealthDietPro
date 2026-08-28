@@ -37,6 +37,9 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.activity.compose.BackHandler
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -48,6 +51,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -223,6 +227,12 @@ private fun FoodImageWithSystemTags(
 @Composable
 internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner, viewModel) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.refreshDiseaseRisk()
+        }
+    }
     BackHandler(enabled = state.exerciseRequest != null) { viewModel.closeExerciseExpenditure() }
     when {
         state.exerciseRequest != null -> ExerciseExpenditureScreen(requireNotNull(state.exerciseRequest), viewModel::closeExerciseExpenditure)
@@ -233,6 +243,7 @@ internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier =
             isFavorite = requireNotNull(state.selectedFood).id in state.favoriteFoodIds,
             isRecent = requireNotNull(state.selectedFood).id in state.recentFoodIds,
             viewModel = viewModel,
+            showGlycemicIndicator = state.showGlycemicIndicator,
             nrvReference = state.nrvReference,
             nrvReferences = state.nrvReferences,
             onNrvReferenceSelected = viewModel::selectNrvReference,
@@ -281,7 +292,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                     }
                     Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         CategorySidebar(state, viewModel, Modifier.width(80.dp))
-                        FoodResults(foods, language, viewModel, Modifier.weight(1f))
+                        FoodResults(foods, language, viewModel, state.showGlycemicIndicator, Modifier.weight(1f))
                     }
                 }
                 tagsExpanded -> {
@@ -290,7 +301,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                         BrowseFilterControls(state.selectedKind, true, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.width(80.dp).height(88.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
                         TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
                     }
-                    FoodResults(foods, language, viewModel, Modifier.weight(1f))
+                    FoodResults(foods, language, viewModel, state.showGlycemicIndicator, Modifier.weight(1f))
                 }
                 showSidebar && categoriesExpanded -> {
                     // Tag filters are collapsed: cards span the right-hand column.
@@ -299,7 +310,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                             BrowseFilterControls(state.selectedKind, false, true, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth().height(88.dp), onAddCustom = { viewModel.openEditor(state.selectedKind) })
                             CategorySidebar(state, viewModel, Modifier.weight(1f))
                         }
-                        FoodResults(foods, language, viewModel, Modifier.weight(1f))
+                        FoodResults(foods, language, viewModel, state.showGlycemicIndicator, Modifier.weight(1f))
                     }
                 }
                 else -> {
@@ -315,7 +326,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                     } else {
                         BrowseFilterControls(state.selectedKind, false, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth(), onAddCustom = { viewModel.openEditor(state.selectedKind) })
                     }
-                    FoodResults(foods, language, viewModel, Modifier.weight(1f))
+                    FoodResults(foods, language, viewModel, state.showGlycemicIndicator, Modifier.weight(1f))
                 }
             }
         }
@@ -397,9 +408,15 @@ private fun TagFilters(state: NutritionUiState, viewModel: NutritionViewModel, o
 }
 
 @Composable
-private fun FoodResults(foods: List<FoodItem>, language: String, viewModel: NutritionViewModel, modifier: Modifier = Modifier) {
+private fun FoodResults(
+    foods: List<FoodItem>,
+    language: String,
+    viewModel: NutritionViewModel,
+    showGlycemicIndicator: Boolean,
+    modifier: Modifier = Modifier,
+) {
     if (foods.isEmpty()) Text(stringResource(R.string.nutrition_no_foods), modifier = modifier.padding(top = 20.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-    else LazyColumn(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) { items(foods, key = { it.id }) { FoodRow(it, language, viewModel, viewModel::openFood) } }
+    else LazyColumn(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) { items(foods, key = { it.id }) { FoodRow(it, language, viewModel, showGlycemicIndicator, viewModel::openFood) } }
 }
 
 @Composable
@@ -644,6 +661,7 @@ private fun FoodRow(
     food: FoodItem,
     language: String,
     viewModel: NutritionViewModel,
+    showGlycemicIndicator: Boolean,
     onClick: (FoodItem) -> Unit,
 ) {
     val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
@@ -711,7 +729,7 @@ private fun FoodRow(
                 )
             }
         }
-        GlycemicGlass(glycemic)
+        if (showGlycemicIndicator) GlycemicGlass(glycemic)
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
     if (previewing) FoodImagePreview(previewImage, onDismiss = { previewing = false })
@@ -795,6 +813,7 @@ private fun FoodDetailScreen(
     isFavorite: Boolean,
     isRecent: Boolean,
     viewModel: NutritionViewModel,
+    showGlycemicIndicator: Boolean,
     nrvReference: NrvReference?,
     nrvReferences: List<NrvReference>,
     onNrvReferenceSelected: (String) -> Unit,
