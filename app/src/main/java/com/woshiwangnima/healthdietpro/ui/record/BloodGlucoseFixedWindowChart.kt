@@ -115,6 +115,7 @@ import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseReference
 import com.woshiwangnima.healthdietpro.model.disease.curatedId
 import com.woshiwangnima.healthdietpro.model.disease.hasCurrentUserDiabetesRisk
+import com.woshiwangnima.healthdietpro.model.disease.diabetesReferenceIds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -1533,14 +1534,11 @@ private fun defaultBarStyles() = mapOf(BarKind.Medication to BarStyle(Color(0xFF
 private fun loadEventBars(context: android.content.Context, start: Long, end: Long): List<BarSample> {
     val hasDiabetesRisk = hasCurrentUserDiabetesRisk(context)
     val diseaseRepository = DiseaseRepository.fromContext(context)
-    val diabetesIds = diseaseRepository.loadAll().filter { disease ->
-        disease.id.contains("diabetes", ignoreCase = true) || disease.displayName(Locale.CHINA).contains("糖尿病") || disease.displayName(Locale.ENGLISH).contains("diabetes", ignoreCase = true)
-    }.mapTo(mutableSetOf()) { it.referenceId() }
+    val diabetesIds = diseaseRepository.diabetesReferenceIds()
     val medicationBars = MedicationPrefs.getRecords(context).asSequence()
         .filter { medication ->
             hasDiabetesRisk && medication.timestamp in start..end && (
-                medication.indicationReferences.any { it.curatedId() in diabetesIds } ||
-                    medication.legacyPurposeTags.any { tag -> tag.contains("糖尿病") || tag.contains("diabetes", true) }
+                medication.indicationReferences.any { it.curatedId() in diabetesIds }
                 )
         }
         .map { BarSample(it.timestamp, it.timestamp + 10 * MINUTE_MILLIS, BarKind.Medication, 0.30f) }

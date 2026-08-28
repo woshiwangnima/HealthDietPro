@@ -16,6 +16,7 @@ class DiseaseRepository private constructor(
 
     private var cache: DiseaseCatalog? = null
     private var diseasesById: Map<String, Disease>? = null
+    private var diseasesByReferenceId: Map<String, Disease>? = null
     private var categoriesById: Map<String, DiseaseCategory>? = null
     private var departmentsById: Map<String, CareDepartment>? = null
     private var searchTermsByDiseaseId: Map<String, Set<String>>? = null
@@ -30,6 +31,9 @@ class DiseaseRepository private constructor(
         return diseaseJson.decodeFromString<DiseaseCatalog>(readAsset()).also { catalog ->
             cache = catalog
             diseasesById = catalog.diseases.associateBy { it.id }
+            diseasesByReferenceId = catalog.diseases
+                .flatMap { disease -> disease.referenceIds().map { referenceId -> referenceId to disease } }
+                .toMap()
             categoriesById = catalog.categories.associateBy { it.id }
             departmentsById = catalog.departments.associateBy { it.id }
             searchTermsByDiseaseId = catalog.diseases.associate { disease ->
@@ -50,8 +54,16 @@ class DiseaseRepository private constructor(
         return diseasesById!![id]
     }
 
+    fun findByReferenceId(referenceId: String): Disease? {
+        loadCatalog()
+        return diseasesByReferenceId!![referenceId] ?: referenceId
+            .removePrefix("ICD-11-")
+            .let(::findByIcd11Code)
+            .firstOrNull()
+    }
+
     fun findByIcd11Code(code: String): List<Disease> {
-        val normalized = code.normalizeQuery()
+        val normalized = code.removePrefix("ICD-11-").normalizeQuery()
         if (normalized.isEmpty()) return emptyList()
         return loadAll().filter { disease ->
             disease.icd11References.any { it.code.normalizeQuery() == normalized }

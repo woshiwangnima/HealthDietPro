@@ -7,15 +7,19 @@ import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import java.io.File
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 internal class MedicationArchiveStore private constructor(
     private val context: Context,
     private val userId: String,
 ) {
-    fun load(): MedicationArchive = synchronized(lock) { read() ?: MedicationArchive() }
+    fun load(): MedicationArchive = synchronized(lock) {
+        read() ?: if (archiveFile().isFile) {
+            error("Unable to read medication archive for user $userId")
+        } else {
+            MedicationArchive()
+        }
+    }
 
     fun replace(archive: MedicationArchive) = save(archive)
 
@@ -40,7 +44,7 @@ internal class MedicationArchiveStore private constructor(
 
     fun update(transform: (MedicationArchive) -> MedicationArchive): MedicationArchive =
         synchronized(lock) {
-            transform(read() ?: MedicationArchive()).also(::save)
+            transform(load()).also(::save)
         }
 
     private fun read(): MedicationArchive? = runCatching {
@@ -48,8 +52,7 @@ internal class MedicationArchiveStore private constructor(
         if (!file.isFile) {
             null
         } else {
-            val raw = file.readText(Charsets.UTF_8)
-            json.decodeDomain(raw, DOMAIN_ID, MedicationArchive.serializer())
+            json.decodeDomain(file.readText(Charsets.UTF_8), DOMAIN_ID, MedicationArchive.serializer())
         }
     }.getOrNull()
 

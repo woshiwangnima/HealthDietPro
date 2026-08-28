@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,6 +53,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -292,7 +294,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                     }
                     Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         CategorySidebar(state, viewModel, Modifier.width(80.dp))
-                        FoodResults(foods, language, viewModel, state.showGlycemicIndicator, Modifier.weight(1f))
+                        FoodResults(foods, language, viewModel, state.showGlycemicIndicator, state.listTopFoodId, state.lastClickedFoodId, Modifier.weight(1f))
                     }
                 }
                 tagsExpanded -> {
@@ -301,7 +303,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                         BrowseFilterControls(state.selectedKind, true, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.width(80.dp).height(88.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
                         TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
                     }
-                    FoodResults(foods, language, viewModel, state.showGlycemicIndicator, Modifier.weight(1f))
+                    FoodResults(foods, language, viewModel, state.showGlycemicIndicator, state.listTopFoodId, state.lastClickedFoodId, Modifier.weight(1f))
                 }
                 showSidebar && categoriesExpanded -> {
                     // Tag filters are collapsed: cards span the right-hand column.
@@ -310,7 +312,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                             BrowseFilterControls(state.selectedKind, false, true, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth().height(88.dp), onAddCustom = { viewModel.openEditor(state.selectedKind) })
                             CategorySidebar(state, viewModel, Modifier.weight(1f))
                         }
-                        FoodResults(foods, language, viewModel, state.showGlycemicIndicator, Modifier.weight(1f))
+                        FoodResults(foods, language, viewModel, state.showGlycemicIndicator, state.listTopFoodId, state.lastClickedFoodId, Modifier.weight(1f))
                     }
                 }
                 else -> {
@@ -326,7 +328,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                     } else {
                         BrowseFilterControls(state.selectedKind, false, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth(), onAddCustom = { viewModel.openEditor(state.selectedKind) })
                     }
-                    FoodResults(foods, language, viewModel, state.showGlycemicIndicator, Modifier.weight(1f))
+                    FoodResults(foods, language, viewModel, state.showGlycemicIndicator, state.listTopFoodId, state.lastClickedFoodId, Modifier.weight(1f))
                 }
             }
         }
@@ -413,10 +415,30 @@ private fun FoodResults(
     language: String,
     viewModel: NutritionViewModel,
     showGlycemicIndicator: Boolean,
+    listTopFoodId: String?,
+    lastClickedFoodId: String?,
     modifier: Modifier = Modifier,
 ) {
     if (foods.isEmpty()) Text(stringResource(R.string.nutrition_no_foods), modifier = modifier.padding(top = 20.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-    else LazyColumn(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) { items(foods, key = { it.id }) { FoodRow(it, language, viewModel, showGlycemicIndicator, viewModel::openFood) } }
+    else {
+        val listState = rememberLazyListState()
+        LaunchedEffect(listState) {
+            snapshotFlow { listState.firstVisibleItemIndex }
+                .collect { index -> viewModel.rememberListTopFood(foods.getOrNull(index)?.id) }
+        }
+        LaunchedEffect(foods.map(FoodItem::id).joinToString("\u0000"), listTopFoodId, lastClickedFoodId) {
+            val targetId = listTopFoodId?.takeIf { id -> foods.any { it.id == id } }
+                ?: lastClickedFoodId?.takeIf { id -> foods.any { it.id == id } }
+            targetId?.let { id ->
+                foods.indexOfFirst { it.id == id }
+                    .takeIf { it >= 0 }
+                    ?.let { index -> listState.scrollToItem(index) }
+            }
+        }
+        LazyColumn(state = listState, modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            items(foods, key = { it.id }) { FoodRow(it, language, viewModel, showGlycemicIndicator, viewModel::openFood) }
+        }
+    }
 }
 
 @Composable

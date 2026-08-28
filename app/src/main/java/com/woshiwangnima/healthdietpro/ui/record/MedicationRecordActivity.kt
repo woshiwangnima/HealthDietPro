@@ -454,7 +454,7 @@ private fun CatalogSnapshot(state: MedicationRecordFormState) {
     ).formatSpecification(UnitConverter.getRepository(), java.util.Locale.getDefault())
     val locale = java.util.Locale.getDefault()
     val context = LocalContext.current
-    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().associateBy { it.id } }
+    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap() }
     val customDiseasesById = remember { UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy { it.id } }
     val content = listOf(spec, state.manufacturer, state.method, state.frequency.format(locale), state.intakeRules.format(locale), state.indicationReferences.joinToString(", ") { it.displayName(diseasesById, customDiseasesById) }, state.lotNumber).filter { it.isNotBlank() }.joinToString(" / ")
     Text(text = stringResource(R.string.medication_record_catalog_snapshot, content), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -466,7 +466,7 @@ private fun PurposeSection(
     onStateChange: (MedicationRecordFormState) -> Unit,
 ) {
     val context = LocalContext.current
-    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().associateBy { it.id } }
+    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap() }
     val customDiseasesById = remember { UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy { it.id } }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.medication_record_purpose), style = MaterialTheme.typography.titleSmall)

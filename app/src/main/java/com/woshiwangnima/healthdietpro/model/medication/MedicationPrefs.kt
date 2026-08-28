@@ -59,9 +59,22 @@ object MedicationPrefs {
     fun saveRecordPhoto(context: Context, bitmap: android.graphics.Bitmap): String =
         saveImage(context, "records", bitmap)
 
-    fun loadAttachment(context: Context, relativePath: String): android.graphics.Bitmap? =
-        File(context.filesDir, relativePath).takeIf(File::exists)
+    fun loadAttachment(context: Context, relativePath: String): android.graphics.Bitmap? {
+        val candidates = buildList {
+            add(File(context.filesDir, relativePath))
+            val fileName = relativePath.substringAfterLast('/')
+            if (relativePath.startsWith("medication_catalog_images/")) {
+                add(File(context.filesDir, "medication_catalog_images/$fileName"))
+                add(File(attachmentDirectory(context), "catalog/$fileName"))
+            }
+            if (relativePath.startsWith("medication_photos/")) {
+                add(File(context.filesDir, "medication_photos/$fileName"))
+                add(File(attachmentDirectory(context), "records/$fileName"))
+            }
+        }
+        return candidates.firstOrNull(File::isFile)
             ?.let { android.graphics.BitmapFactory.decodeFile(it.absolutePath) }
+    }
 
     fun deleteAttachment(context: Context, relativePath: String) {
         val file = File(context.filesDir, relativePath)

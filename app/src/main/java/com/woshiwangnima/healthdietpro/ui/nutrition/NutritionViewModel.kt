@@ -64,6 +64,8 @@ internal data class NutritionUiState(
     val userTags: List<UserFoodTag> = emptyList(),
     val selectedUserTags: Set<String> = emptySet(),
     val selectedFood: FoodItem? = null,
+    val listTopFoodId: String? = null,
+    val lastClickedFoodId: String? = null,
     val comparisonReturnTarget: NutritionDestination? = null,
     val editor: NutritionEditorState? = null,
     val nrvReference: NrvReference? = null,
@@ -309,12 +311,18 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         val collections = foodCollections.recordRecent(food.id, foodsById.keys)
         _state.value = _state.value.copy(
             selectedFood = food,
+            lastClickedFoodId = food.id,
             comparisonReturnTarget = null,
             searchHistory = history,
             recentFoodIds = collections.recentIds,
             favoriteFoodIds = collections.favoriteIds,
         )
         if (keyword.isNotBlank()) saveSearchHistory(history)
+    }
+    internal fun rememberListTopFood(id: String?) {
+        if (id != null && id != _state.value.listTopFoodId) {
+            _state.value = _state.value.copy(listTopFoodId = id)
+        }
     }
     fun closeFood() { _state.value = _state.value.copy(selectedFood = null) }
     fun selectNrvReference(id: String) {

@@ -34,6 +34,10 @@ import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.diet.DietRepository
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.disease.curatedId
+import com.woshiwangnima.healthdietpro.model.disease.diabetesReferenceIds
+import com.woshiwangnima.healthdietpro.model.disease.hasCurrentUserDiabetesRisk
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRecord
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRepository
 import com.woshiwangnima.healthdietpro.ui.diet.DietCard
@@ -91,7 +95,13 @@ internal class EventViewModel(application: Application) : ViewModel() {
     fun refresh() {
         viewModelScope.launch {
             val medicationRecords = withContext(Dispatchers.IO) {
-                MedicationPrefs.getRecords(app).sortedByDescending { it.timestamp }
+                val diabetesRisk = hasCurrentUserDiabetesRisk(app)
+                val diabetesReferences = DiseaseRepository.fromContext(app).diabetesReferenceIds()
+                MedicationPrefs.getRecords(app)
+                    .filter { record ->
+                        diabetesRisk && record.indicationReferences.any { it.curatedId() in diabetesReferences }
+                    }
+                    .sortedByDescending { it.timestamp }
             }
             val dietRecords = withContext(Dispatchers.IO) {
                 dietRepository.load().records.sortedByDescending(DietRecord::mealStartAt)

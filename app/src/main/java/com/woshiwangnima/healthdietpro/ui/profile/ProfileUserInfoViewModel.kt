@@ -134,22 +134,22 @@ internal class ProfileUserInfoViewModel(
             it.subjectType == DiseaseSubjectType.SELF && it.status in setOf(DiseaseStatus.ACTIVE, DiseaseStatus.ONGOING_RISK)
         }
         if (records.isEmpty()) return ""
-        val diseases = DiseaseRepository.fromContext(getApplication()).loadAll().flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap()
+        val diseaseRepository = DiseaseRepository.fromContext(getApplication())
         val customDiseases = repository.loadCustomDiseases().associateBy { it.id }
         val locale = Locale.getDefault()
         return records.mapNotNull { record ->
-            record.disease.curatedId()?.let { diseases[it]?.displayName(locale) }
+            record.disease.curatedId()?.let { diseaseRepository.findByReferenceId(it)?.displayName(locale) }
                 ?: record.disease.customId()?.let { customDiseases[it]?.name }
         }.joinToString("、")
     }
 
     private fun resolveDiseases(): List<ProfileDiseaseDisplay> {
         val repository = UserDiseaseRecordRepository.fromContext(getApplication())
-        val diseases = DiseaseRepository.fromContext(getApplication()).loadAll().flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap()
+        val diseaseRepository = DiseaseRepository.fromContext(getApplication())
         val customDiseases = repository.loadCustomDiseases().associateBy { it.id }
         val locale = Locale.getDefault()
         return repository.load().filter { it.subjectType == DiseaseSubjectType.SELF }.mapNotNull { record ->
-            val name = record.disease.curatedId()?.let { diseases[it]?.displayName(locale) }
+            val name = record.disease.curatedId()?.let { diseaseRepository.findByReferenceId(it)?.displayName(locale) }
                 ?: record.disease.customId()?.let { customDiseases[it]?.name }
             name?.let { ProfileDiseaseDisplay(it, record.status) }
         }

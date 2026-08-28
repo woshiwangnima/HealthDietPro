@@ -100,10 +100,13 @@ class MedicationCatalogActivity : DirtyFormActivity() {
         UnitConverter.init(this)
         editingId = intent.getStringExtra(EXTRA_CATALOG_ID)
         editingId?.let { id -> MedicationPrefs.getCatalog(this).find { it.id == id } }?.let { item ->
+            val recordImages = MedicationPrefs.getRecords(this)
+                .filter { it.medicationId == item.id }
+                .flatMap { it.medicationImagePaths }
             state = CatalogFormState(
                 name = item.name, specValue = item.specValue.takeIf { it > 0f }?.toString().orEmpty(), categoryId = item.specUnitCategory, unitId = item.specUnitId,
                 manufacturer = item.manufacturer, method = item.defaultMethod, defaultDoseValue = item.defaultDoseValue.takeIf { it > 0f }?.toString().orEmpty(), defaultDoseUnit = item.defaultDoseUnit,
-                imagePaths = item.imagePaths, imageBitmaps = item.imagePaths.mapNotNull(::loadBitmap), frequency = item.frequency, intakeRules = item.intakeRules.ifEmpty { item.frequency.defaultIntakeRules() },
+                imagePaths = (item.imagePaths + recordImages).distinct(), imageBitmaps = (item.imagePaths + recordImages).distinct().mapNotNull(::loadBitmap), frequency = item.frequency, intakeRules = item.intakeRules.ifEmpty { item.frequency.defaultIntakeRules() },
                 packageQuantity = item.packageQuantity.takeIf { it > 0f }?.toString().orEmpty(), packageUnit = item.packageUnit, packageDescription = item.packageDescription,
                 lotNumber = item.lotNumber, expiryAt = item.expiresAt, indications = item.indications, legacyIndicationTags = item.legacyIndicationTags, sideEffectWarning = item.sideEffectWarning, archived = item.archived,
             )
@@ -137,7 +140,7 @@ class MedicationCatalogActivity : DirtyFormActivity() {
                 }
             } else {
                 BaseScreen(getTitleText(), ::requestFormExit) { padding ->
-                    CatalogEditor(state, padding, categories, diseaseState.diseases.associateBy { it.id }, diseaseState.customDiseases.associateBy { it.id }, { state = it }, { galleryLauncher.launch("image/*") }, { showExpiryDatePicker = true }, { pickingIndication = true }, ::save, state != originalState)
+                    CatalogEditor(state, padding, categories, diseaseState.diseases.flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap(), diseaseState.customDiseases.associateBy { it.id }, { state = it }, { galleryLauncher.launch("image/*") }, { showExpiryDatePicker = true }, { pickingIndication = true }, ::save, state != originalState)
                 }
                 if (showExpiryDatePicker) ComposeDatePickerDialog(state.expiryAt ?: System.currentTimeMillis(), { showExpiryDatePicker = false }) { date -> state = state.copy(expiryAt = date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()); showExpiryDatePicker = false }
                 DiscardChangesConfirmation()
@@ -261,7 +264,7 @@ private fun MedicationIndicationsEditor(
 internal fun DiseaseReference.displayName(
     diseasesById: Map<String, com.woshiwangnima.healthdietpro.model.disease.Disease>,
     customDiseasesById: Map<String, UserCustomDisease>,
-): String = curatedId()?.let { id -> diseasesById.values.firstOrNull { id in it.referenceIds() }?.displayName(Locale.getDefault()) ?: id }
+): String = curatedId()?.let { id -> diseasesById[id]?.displayName(Locale.getDefault()) ?: id }
     ?: customId()?.let { customDiseasesById[it]?.name ?: it }
     ?: ""
 

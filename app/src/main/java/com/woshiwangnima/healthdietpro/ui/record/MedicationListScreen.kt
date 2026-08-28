@@ -146,7 +146,7 @@ private fun CatalogTable(catalog: List<MedicationCatalogItem>, onEdit: (Medicati
     val locale = Locale.getDefault()
     val units = UnitConverter.getRepository()
     val context = LocalContext.current
-    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().associateBy { it.id } }
+    val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap() }
     val customDiseasesById = remember { UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy { it.id } }
     AppDataTable(
         rows = catalog, modifier = modifier, rowKey = { _, item -> item.id },
@@ -312,26 +312,9 @@ private fun MedicationRecordTable(
                 overflow = ColumnOverflow.Wrap,
             ) { record -> MedicationTableText(formatFeeling(record), column.overflow, readOnly) },
         ),
-        layoutPolicy = AppDataTableLayoutPolicy.Responsive(
-            compactAt = 600.dp,
-            compactHeader = if (onDelete != null) {
-                {
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    AppDataTableHeaderText(stringResource(R.string.medication_record_time), Modifier.width(108.dp))
-                    AppDataTableHeaderText(stringResource(R.string.medication_record_name), Modifier.weight(1f))
-                    AppDataTableHeaderText(stringResource(R.string.medication_record_actions))
-                }
-                }
-            } else {
-                {
-                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        AppDataTableHeaderText(stringResource(R.string.medication_record_time), Modifier.width(108.dp))
-                        AppDataTableHeaderText(stringResource(R.string.medication_record_name), Modifier.weight(1f))
-                    }
-                }
-            },
-            compactRow = { record -> CompactMedicationRow(record, onDelete) },
-        ),
+        // Keep actions in their own column. CompactDataTable renders row actions beside the
+        // name by design, which makes the delete control look like part of that column.
+        layoutPolicy = AppDataTableLayoutPolicy.HorizontalScroll(minTableWidth = 720.dp),
         actionsWidth = if (onDelete != null) 76.dp else 0.dp,
         actionsHeader = onDelete?.let { { AppDataTableHeaderText(stringResource(R.string.medication_record_actions)) } },
         rowActions = onDelete?.let { delete ->

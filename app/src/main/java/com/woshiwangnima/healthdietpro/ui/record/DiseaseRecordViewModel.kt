@@ -33,8 +33,8 @@ internal data class DiseaseRecordUiState(
     val customOnly: Boolean = false,
     val query: String = "",
 ) {
-    fun filtered(diseaseById: Map<String, Disease>): List<UserDiseaseRecord> = records.filter { record ->
-        val disease = record.disease.curatedId()?.let(diseaseById::get)
+    fun filtered(diseaseById: Map<String, Disease>, diseaseByReferenceId: Map<String, Disease> = emptyMap()): List<UserDiseaseRecord> = records.filter { record ->
+        val disease = record.disease.curatedId()?.let { diseaseByReferenceId[it] ?: diseaseById[it] }
         (selectedCategoryIds.isEmpty() || disease?.categoryIds?.any(selectedCategoryIds::contains) == true) &&
             (selectedDepartmentIds.isEmpty() || disease?.careDepartmentIds?.any(selectedDepartmentIds::contains) == true) &&
             (selectedStatuses.isEmpty() || record.status in selectedStatuses) &&

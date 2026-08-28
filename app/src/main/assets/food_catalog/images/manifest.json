@@ -105,6 +105,10 @@
       "thumb": "images/thumb/food_taxon_brassica_oleracea_cauliflower_raw.webp",
       "detail": "images/detail/food_taxon_brassica_oleracea_cauliflower_raw.webp"
     },
+    "food:seasoning:soy_sauce": {
+      "thumb": "images/thumb/food_seasoning_soy_sauce.webp",
+      "detail": "images/detail/food_seasoning_soy_sauce.webp"
+    },
     "food:taxon:lentinula_edodes:dried:raw": {
       "thumb": "images/thumb/food_taxon_lentinula_edodes_dried_raw.webp",
       "detail": "images/detail/food_taxon_lentinula_edodes_dried_raw.webp"
@@ -221,6 +225,10 @@
       "thumb": "images/thumb/food_taxon_trapa_raw.webp",
       "detail": "images/detail/food_taxon_trapa_raw.webp"
     },
+    "food:seasoning:cooking_wine": {
+      "thumb": "images/thumb/food_seasoning_cooking_wine.webp",
+      "detail": "images/detail/food_seasoning_cooking_wine.webp"
+    },
     "food:taxon:malus_domestica:qing_banana:raw": {
       "thumb": "images/thumb/food_taxon_malus_domestica_qing_banana_raw.webp",
       "detail": "images/detail/food_taxon_malus_domestica_qing_banana_raw.webp"
@@ -288,6 +296,10 @@
     "food:taxon:glycine_max:yuba_dried": {
       "thumb": "images/thumb/food_taxon_glycine_max_yuba_dried.webp",
       "detail": "images/detail/food_taxon_glycine_max_yuba_dried.webp"
+    },
+    "food:taxon:corylus_avellana:kernels:raw": {
+      "thumb": "images/thumb/food_taxon_corylus_avellana_kernels_raw.webp",
+      "detail": "images/detail/food_taxon_corylus_avellana_kernels_raw.webp"
     },
     "food:water:drinking": {
       "thumb": "images/thumb/food_water_drinking.webp",
@@ -361,6 +373,10 @@
       "thumb": "images/thumb/food_taxon_sus_scrofa_trotter_raw.webp",
       "detail": "images/detail/food_taxon_sus_scrofa_trotter_raw.webp"
     },
+    "food:beverage:fruit_juice": {
+      "thumb": "images/thumb/food_beverage_fruit_juice.webp",
+      "detail": "images/detail/food_beverage_fruit_juice.webp"
+    },
     "food:taxon:cucurbita_pepo:zucchini:raw": {
       "thumb": "images/thumb/food_taxon_cucurbita_pepo_zucchini_raw.webp",
       "detail": "images/detail/food_taxon_cucurbita_pepo_zucchini_raw.webp"
@@ -368,6 +384,10 @@
     "dish:tomato_egg_soup": {
       "thumb": "images/thumb/dish_tomato_egg_soup.webp",
       "detail": "images/detail/dish_tomato_egg_soup.webp"
+    },
+    "food:beverage:milk_tea": {
+      "thumb": "images/thumb/food_beverage_milk_tea.webp",
+      "detail": "images/detail/food_beverage_milk_tea.webp"
     },
     "food:seasoning:brown_sugar": {
       "thumb": "images/thumb/food_seasoning_brown_sugar.webp",
@@ -461,6 +481,10 @@
       "thumb": "images/thumb/food_taxon_oryza_sativa_polished_steamed.webp",
       "detail": "images/detail/food_taxon_oryza_sativa_polished_steamed.webp"
     },
+    "food:beverage:yogurt:plain": {
+      "thumb": "images/thumb/food_beverage_yogurt_plain.webp",
+      "detail": "images/detail/food_beverage_yogurt_plain.webp"
+    },
     "food:taxon:hemerocallis:fresh:raw": {
       "thumb": "images/thumb/food_taxon_hemerocallis_fresh_raw.webp",
       "detail": "images/detail/food_taxon_hemerocallis_fresh_raw.webp"
@@ -504,6 +528,10 @@
     "food:taxon:volvariella_volvacea:raw": {
       "thumb": "images/thumb/food_taxon_volvariella_volvacea_raw.webp",
       "detail": "images/detail/food_taxon_volvariella_volvacea_raw.webp"
+    },
+    "food:taxon:pinus_koraiensis:kernels:raw": {
+      "thumb": "images/thumb/food_taxon_pinus_koraiensis_kernels_raw.webp",
+      "detail": "images/detail/food_taxon_pinus_koraiensis_kernels_raw.webp"
     },
     "food:plant_oil:corn": {
       "thumb": "images/thumb/food_plant_oil_corn.webp",
