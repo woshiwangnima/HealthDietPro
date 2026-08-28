@@ -10,6 +10,7 @@
     <string name="nutrition_system_tags">系统标签</string>
     <string name="nutrition_user_tags">我的标签</string>
     <string name="nutrition_collapse_tags">收起标签筛选</string>
+    <string name="nutrition_image_preview_close_hint">再次点击以关闭窗口</string>
     <string name="nutrition_expand_tags">展开标签筛选</string>
     <string name="nutrition_collapse_categories">收起分类筛选</string>
     <string name="nutrition_expand_categories">展开分类筛选</string>

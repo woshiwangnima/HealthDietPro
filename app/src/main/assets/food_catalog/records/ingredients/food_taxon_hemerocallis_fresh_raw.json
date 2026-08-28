@@ -8,7 +8,7 @@
   },
   "names": {
     "zh": [
-      "黄花菜",
+      "黄花菜-鲜",
       "金针菜"
     ],
     "en": [
@@ -37,12 +37,12 @@
       },
       "nutrients": {
         "ENERGY": {
-          "value": 27,
+          "value": 40,
           "unitCategory": "energy",
           "unitId": "kcal"
         },
         "PROTEIN": {
-          "value": 2.9,
+          "value": 2.4,
           "unitCategory": "weight",
           "unitId": "g"
         },
@@ -52,7 +52,7 @@
           "unitId": "g"
         },
         "CHO": {
-          "value": 12.0,
+          "value": 7.4,
           "unitCategory": "weight",
           "unitId": "g"
         },

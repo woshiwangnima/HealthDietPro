@@ -1,0 +1,82 @@
+{
+  "id": "dish:chili_scrambled_egg",
+  "kind": "dish",
+  "names": {
+    "zh": [
+      "辣椒炒鸡蛋",
+      "辣椒炒蛋"
+    ],
+    "en": [
+      "Chili scrambled eggs"
+    ]
+  },
+  "components": [
+    {
+      "foodId": "food:taxon:capsicum_annuum:chili",
+      "quantity": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:taxon:gallus_gallus:egg:whole",
+      "quantity": {
+        "value": 150,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:plant_oil:generic",
+      "quantity": {
+        "value": 15,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:salt",
+      "quantity": {
+        "value": 2,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "cuisine": "cuisine.chinese",
+  "dishCategories": [
+    "dishcat.home"
+  ],
+  "tastes": [
+    "taste.spicy",
+    "taste.salty"
+  ],
+  "techniqueId": "pan_fried",
+  "difficulty": 2,
+  "servesPeople": 2,
+  "recipeSteps": [
+    {
+      "text": "辣椒洗净切段，鸡蛋打散。",
+      "minutes": 5
+    },
+    {
+      "text": "热锅加油，先炒鸡蛋，再加入辣椒和盐炒熟。",
+      "minutes": 8
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition is resolved from listed chili, egg, oil, and salt"
+    }
+  ],
+  "description": {
+    "zh": "辣椒炒鸡蛋的营养由辣椒、鸡蛋、食用油和盐按用量实时求和。",
+    "en": "Nutrition is resolved from the listed chili, egg, oil, and salt."
+  },
+  "commonness": 3
+}

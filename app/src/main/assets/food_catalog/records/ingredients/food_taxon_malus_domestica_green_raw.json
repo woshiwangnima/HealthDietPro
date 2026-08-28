@@ -1,0 +1,80 @@
+{
+  "id": "food:taxon:malus_domestica:green:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "青苹果",
+      "绿苹果"
+    ],
+    "en": [
+      "Green apple",
+      "Green-skinned apple"
+    ]
+  },
+  "categoryTags": [
+    "food.fruit"
+  ],
+  "edibleRatio": 0.88,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 36,
+      "unit": "GI",
+      "note": "cultivar and ripeness affect GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 4.9,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.32,
+      "unit": "DII"
+    }
+  },
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 52,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 13.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 2.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "USDA FoodData Central",
+      "reference": "apples, raw, with skin; green-skinned cultivar values vary"
+    }
+  ],
+  "description": {
+    "zh": "青苹果按带皮鲜苹果基础营养估算；具体品种、成熟度和可食比例会影响实际营养值。",
+    "en": "Green apple uses a raw apple with skin nutrition estimate; cultivar, ripeness, and edible yield affect actual values."
+  },
+  "commonness": 2
+}

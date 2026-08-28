@@ -1,0 +1,33 @@
+{
+  "id": "food:taxon:anas_platyrhynchos:egg:salted",
+  "kind": "ingredient",
+  "names": {
+    "zh": ["咸鸭蛋", "盐鸭蛋"],
+    "en": ["Salted duck egg"]
+  },
+  "categoryTags": ["food.meat_egg.egg"],
+  "edibleRatio": 0.72,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {"value": 100, "unitCategory": "weight", "unitId": "g"},
+      "nutrients": {
+        "ENERGY": {"value": 190, "unitCategory": "energy", "unitId": "kcal"},
+        "PROTEIN": {"value": 12.5, "unitCategory": "weight", "unitId": "g"},
+        "FAT": {"value": 13.5, "unitCategory": "weight", "unitId": "g"},
+        "CHO": {"value": 3.0, "unitCategory": "weight", "unitId": "g"}
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {"value": 0, "unit": "GI"},
+    "glycemicLoadPer100g": {"value": 0, "unit": "GL"}
+  },
+  "sources": [
+    {"dataset": "China Food Composition Tables", "reference": "salted duck egg, edible portion"}
+  ],
+  "description": {
+    "zh": "咸鸭蛋按每 100 克可食部整理；腌制会显著增加钠含量，实际值随腌制程度变化。",
+    "en": "Salted duck egg values are provided per 100 g edible portion; curing substantially increases sodium and varies by curing degree."
+  },
+  "commonness": 2
+}

@@ -1,0 +1,28 @@
+{
+  "id": "dish:tomato_scrambled_egg",
+  "kind": "dish",
+  "names": {
+    "zh": ["番茄炒蛋", "西红柿炒鸡蛋"],
+    "en": ["Tomato scrambled eggs"]
+  },
+  "components": [
+    {"foodId": "food:taxon:solanum_lycopersicum:raw", "quantity": {"value": 250, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:taxon:gallus_gallus:egg:whole", "quantity": {"value": 150, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:plant_oil:generic", "quantity": {"value": 15, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:seasoning:salt", "quantity": {"value": 2, "unitCategory": "weight", "unitId": "g"}}
+  ],
+  "systemTags": ["common"],
+  "cuisine": "cuisine.chinese",
+  "dishCategories": ["dishcat.home"],
+  "tastes": ["taste.sour", "taste.salty"],
+  "techniqueId": "pan_fried",
+  "difficulty": 2,
+  "servesPeople": 2,
+  "recipeSteps": [
+    {"text": "番茄切块，鸡蛋打散。", "minutes": 5},
+    {"text": "热锅加油先炒鸡蛋盛出，再炒番茄，加入鸡蛋和盐翻炒均匀。", "minutes": 8}
+  ],
+  "sources": [{"dataset": "Recipe composition model", "reference": "nutrition is resolved from listed tomato, egg, oil, and salt"}],
+  "description": {"zh": "番茄炒蛋的营养由番茄、鸡蛋、食用油和盐按用量实时求和。", "en": "Nutrition is resolved from the listed tomato, egg, oil, and salt."},
+  "commonness": 3
+}

@@ -14,6 +14,39 @@
   "braisedporktrotter": [
     "dish:braised_pork_trotter"
   ],
+  "dish:chiffon_cake": [
+    "dish:chiffon_cake"
+  ],
+  "dish_chiffon_cake": [
+    "dish:chiffon_cake"
+  ],
+  "戚风蛋糕": [
+    "dish:chiffon_cake"
+  ],
+  "电饭煲蛋糕": [
+    "dish:chiffon_cake"
+  ],
+  "蛋糕": [
+    "dish:chiffon_cake"
+  ],
+  "chiffoncake": [
+    "dish:chiffon_cake"
+  ],
+  "dish:chili_scrambled_egg": [
+    "dish:chili_scrambled_egg"
+  ],
+  "dish_chili_scrambled_egg": [
+    "dish:chili_scrambled_egg"
+  ],
+  "辣椒炒鸡蛋": [
+    "dish:chili_scrambled_egg"
+  ],
+  "辣椒炒蛋": [
+    "dish:chili_scrambled_egg"
+  ],
+  "chiliscrambledeggs": [
+    "dish:chili_scrambled_egg"
+  ],
   "dish:corn_pork_rib_soup": [
     "dish:corn_pork_rib_soup"
   ],
@@ -28,6 +61,36 @@
   ],
   "cornandporkribsoup": [
     "dish:corn_pork_rib_soup"
+  ],
+  "dish:tomato_egg_soup": [
+    "dish:tomato_egg_soup"
+  ],
+  "dish_tomato_egg_soup": [
+    "dish:tomato_egg_soup"
+  ],
+  "西红柿蛋汤": [
+    "dish:tomato_egg_soup"
+  ],
+  "番茄蛋汤": [
+    "dish:tomato_egg_soup"
+  ],
+  "tomatoandeggsoup": [
+    "dish:tomato_egg_soup"
+  ],
+  "dish:tomato_scrambled_egg": [
+    "dish:tomato_scrambled_egg"
+  ],
+  "dish_tomato_scrambled_egg": [
+    "dish:tomato_scrambled_egg"
+  ],
+  "番茄炒蛋": [
+    "dish:tomato_scrambled_egg"
+  ],
+  "西红柿炒鸡蛋": [
+    "dish:tomato_scrambled_egg"
+  ],
+  "tomatoscrambledeggs": [
+    "dish:tomato_scrambled_egg"
   ],
   "food:beverage:brown_sugar_water": [
     "food:beverage:brown_sugar_water"
@@ -1302,6 +1365,39 @@
   "cashews": [
     "food:taxon:anacardium_occidentale:kernels:raw"
   ],
+  "food:taxon:anas_platyrhynchos:egg:salted": [
+    "food:taxon:anas_platyrhynchos:egg:salted"
+  ],
+  "food_taxon_anas_platyrhynchos_egg_salted": [
+    "food:taxon:anas_platyrhynchos:egg:salted"
+  ],
+  "咸鸭蛋": [
+    "food:taxon:anas_platyrhynchos:egg:salted"
+  ],
+  "盐鸭蛋": [
+    "food:taxon:anas_platyrhynchos:egg:salted"
+  ],
+  "saltedduckegg": [
+    "food:taxon:anas_platyrhynchos:egg:salted"
+  ],
+  "food:taxon:anas_platyrhynchos:egg:whole": [
+    "food:taxon:anas_platyrhynchos:egg:whole"
+  ],
+  "food_taxon_anas_platyrhynchos_egg_whole": [
+    "food:taxon:anas_platyrhynchos:egg:whole"
+  ],
+  "鸭蛋": [
+    "food:taxon:anas_platyrhynchos:egg:whole"
+  ],
+  "鲜鸭蛋": [
+    "food:taxon:anas_platyrhynchos:egg:whole"
+  ],
+  "duckegg": [
+    "food:taxon:anas_platyrhynchos:egg:whole"
+  ],
+  "freshduckegg": [
+    "food:taxon:anas_platyrhynchos:egg:whole"
+  ],
   "food:taxon:apium_graveolens:raw": [
     "food:taxon:apium_graveolens:raw"
   ],
@@ -2223,13 +2319,34 @@
   "sunflowerseedkernels": [
     "food:taxon:helianthus_annuus:kernels:raw"
   ],
+  "food:taxon:hemerocallis:dried:raw": [
+    "food:taxon:hemerocallis:dried:raw"
+  ],
+  "food_taxon_hemerocallis_dried_raw": [
+    "food:taxon:hemerocallis:dried:raw"
+  ],
+  "黄花菜-干": [
+    "food:taxon:hemerocallis:dried:raw"
+  ],
+  "干黄花菜": [
+    "food:taxon:hemerocallis:dried:raw"
+  ],
+  "干金针菜": [
+    "food:taxon:hemerocallis:dried:raw"
+  ],
+  "drieddaylilyflowerbuds": [
+    "food:taxon:hemerocallis:dried:raw"
+  ],
+  "drieddaylily": [
+    "food:taxon:hemerocallis:dried:raw"
+  ],
   "food:taxon:hemerocallis:fresh:raw": [
     "food:taxon:hemerocallis:fresh:raw"
   ],
   "food_taxon_hemerocallis_fresh_raw": [
     "food:taxon:hemerocallis:fresh:raw"
   ],
-  "黄花菜": [
+  "黄花菜-鲜": [
     "food:taxon:hemerocallis:fresh:raw"
   ],
   "金针菜": [
@@ -2465,6 +2582,42 @@
   ],
   "macadamiakernels": [
     "food:taxon:macadamia_integrifolia:kernels:raw"
+  ],
+  "food:taxon:malus_domestica:green:raw": [
+    "food:taxon:malus_domestica:green:raw"
+  ],
+  "food_taxon_malus_domestica_green_raw": [
+    "food:taxon:malus_domestica:green:raw"
+  ],
+  "青苹果": [
+    "food:taxon:malus_domestica:green:raw"
+  ],
+  "绿苹果": [
+    "food:taxon:malus_domestica:green:raw"
+  ],
+  "greenapple": [
+    "food:taxon:malus_domestica:green:raw"
+  ],
+  "green-skinnedapple": [
+    "food:taxon:malus_domestica:green:raw"
+  ],
+  "food:taxon:malus_domestica:qing_banana:raw": [
+    "food:taxon:malus_domestica:qing_banana:raw"
+  ],
+  "food_taxon_malus_domestica_qing_banana_raw": [
+    "food:taxon:malus_domestica:qing_banana:raw"
+  ],
+  "青香蕉苹果": [
+    "food:taxon:malus_domestica:qing_banana:raw"
+  ],
+  "香蕉苹果": [
+    "food:taxon:malus_domestica:qing_banana:raw"
+  ],
+  "qingbananaapple": [
+    "food:taxon:malus_domestica:qing_banana:raw"
+  ],
+  "bananaapple": [
+    "food:taxon:malus_domestica:qing_banana:raw"
   ],
   "food:taxon:malus_domestica:raw": [
     "food:taxon:malus_domestica:raw"

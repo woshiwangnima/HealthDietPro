@@ -12,10 +12,10 @@ class RecordTimeRangeTest {
     private val now = LocalDateTime.of(2026, 8, 1, 15, 30).atZone(zone).toInstant().toEpochMilli()
 
     @Test
-    fun `today begins at local midnight and ends now`() {
+    fun `today begins at local midnight and includes the whole local day`() {
         val range = RecordTimeRangePreset.TODAY.resolve(now, zone)
         assertEquals(LocalDateTime.of(2026, 8, 1, 0, 0).atZone(zone).toInstant().toEpochMilli(), range.startMillis)
-        assertEquals(now, range.endMillis)
+        assertEquals(LocalDateTime.of(2026, 8, 2, 0, 0).atZone(zone).toInstant().toEpochMilli(), range.endMillis)
     }
 
     @Test
@@ -41,11 +41,11 @@ class RecordTimeRangeTest {
     }
 
     @Test
-    fun `preset selection resolves against the latest current time`() {
+    fun `rolling preset selection resolves against the latest current time`() {
         val later = now + 90_000L
         val selection = RecordTimeRangeSelection.Preset(RecordTimeRangePreset.TODAY)
 
-        assertEquals(later, selection.resolve(later, zone).endMillis)
+        assertEquals(LocalDateTime.of(2026, 8, 2, 0, 0).atZone(zone).toInstant().toEpochMilli(), selection.resolve(later, zone).endMillis)
     }
 
     @Test

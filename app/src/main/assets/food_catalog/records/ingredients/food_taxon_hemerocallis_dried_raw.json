@@ -1,0 +1,74 @@
+{
+  "id": "food:taxon:hemerocallis:dried:raw",
+  "kind": "ingredient",
+  "botanicalTaxonomy": {
+    "family": "Asphodelaceae",
+    "genus": "Hemerocallis",
+    "species": "Hemerocallis fulva"
+  },
+  "names": {
+    "zh": [
+      "黄花菜-干",
+      "干黄花菜",
+      "干金针菜"
+    ],
+    "en": [
+      "Dried day lily flower buds",
+      "Dried day lily"
+    ]
+  },
+  "categoryTags": [
+    "food.vegetable.flower"
+  ],
+  "systemTags": [
+    "dried"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 199,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 14.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.4,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 49.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 7.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "dried day lily flower buds, per 100 g"
+    }
+  ],
+  "description": {
+    "zh": "干黄花菜按干制品每 100 克整理；食用前通常需要充分浸泡和加热，复水后重量与营养密度会改变。",
+    "en": "Dried day lily is reported per 100 g dry product; soaking and cooking are normally required and change weight and nutrient density."
+  },
+  "commonness": 2
+}

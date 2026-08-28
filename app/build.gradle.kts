@@ -1,7 +1,27 @@
+import org.gradle.api.tasks.Exec
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.compose)
+}
+
+val compileFoodCatalog = tasks.register<Exec>("compileFoodCatalog") {
+    description = "Compile maintained food catalog records into Android assets."
+    group = "food catalog"
+    workingDir(rootProject.projectDir)
+    commandLine("uv", "run", "python", "tools/food_catalog/catalog_tool.py", "compile")
+    inputs.dir(rootProject.file("tools/food_catalog/source/records"))
+    inputs.file(rootProject.file("app/src/main/assets/DRIs/nutrients_meta.json"))
+    outputs.dir(rootProject.file("app/src/main/assets/food_catalog/records"))
+    outputs.dir(rootProject.file("app/src/main/assets/food_catalog/indexes"))
+    outputs.file(rootProject.file("app/src/main/assets/food_catalog/manifest.json"))
+}
+
+tasks.configureEach {
+    if (name.startsWith("merge") && name.endsWith("Assets")) {
+        dependsOn(compileFoodCatalog)
+    }
 }
 
 android {

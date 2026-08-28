@@ -1,0 +1,70 @@
+{
+  "id": "food:taxon:anas_platyrhynchos:egg:whole",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "鸭蛋",
+      "鲜鸭蛋"
+    ],
+    "en": [
+      "Duck egg",
+      "Fresh duck egg"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.egg"
+  ],
+  "edibleRatio": 0.88,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 180,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 12.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 13.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 3.1,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 0,
+      "unit": "GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 0,
+      "unit": "GL"
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "duck egg, whole"
+    }
+  ],
+  "description": {
+    "zh": "鲜鸭蛋按每 100 克可食部整理；蛋黄比例和个体大小会影响实际营养值。",
+    "en": "Fresh duck egg values are provided per 100 g edible portion; yolk ratio and egg size affect actual values."
+  },
+  "commonness": 2
+}

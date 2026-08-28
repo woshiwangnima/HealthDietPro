@@ -58,6 +58,7 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -66,6 +67,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.text.font.FontWeight
@@ -273,7 +276,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                 tagsExpanded && showSidebar && categoriesExpanded -> {
                     // 2 x 2: controls / tags on top, categories / cards below.
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
-                        BrowseFilterControls(state.selectedKind, true, true, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.width(80.dp).height(88.dp)) { viewModel.openEditor(state.selectedKind) }
+                        BrowseFilterControls(state.selectedKind, true, true, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.width(80.dp).height(88.dp), onAddCustom = { viewModel.openEditor(state.selectedKind) })
                         TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
                     }
                     Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -284,7 +287,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                 tagsExpanded -> {
                     // Category filters are collapsed: cards span the entire lower row.
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
-                        BrowseFilterControls(state.selectedKind, true, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.width(80.dp).height(88.dp)) { viewModel.openEditor(state.selectedKind) }
+                        BrowseFilterControls(state.selectedKind, true, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.width(80.dp).height(88.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
                         TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
                     }
                     FoodResults(foods, language, viewModel, Modifier.weight(1f))
@@ -293,7 +296,7 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                     // Tag filters are collapsed: cards span the right-hand column.
                     Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Column(modifier = Modifier.width(80.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            BrowseFilterControls(state.selectedKind, false, true, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth().height(88.dp)) { viewModel.openEditor(state.selectedKind) }
+                            BrowseFilterControls(state.selectedKind, false, true, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth().height(88.dp), onAddCustom = { viewModel.openEditor(state.selectedKind) })
                             CategorySidebar(state, viewModel, Modifier.weight(1f))
                         }
                         FoodResults(foods, language, viewModel, Modifier.weight(1f))
@@ -301,13 +304,56 @@ private fun FoodBrowseScreen(state: NutritionUiState, viewModel: NutritionViewMo
                 }
                 else -> {
                     // Both filter areas are collapsed: only the flat control row remains above cards.
-                    BrowseFilterControls(state.selectedKind, false, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth()) { viewModel.openEditor(state.selectedKind) }
+                    if (state.selectedKind == FoodKind.DISH) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            BrowseFilterControls(state.selectedKind, false, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.weight(1f), onAddCustom = { viewModel.openEditor(state.selectedKind) })
+                            CustomOnlyButton(state.customOnly, state.selectedKind, viewModel::toggleCustomOnly, Modifier.width(80.dp).height(30.dp))
+                        }
+                    } else {
+                        BrowseFilterControls(state.selectedKind, false, false, { tagsExpanded = !tagsExpanded }, { categoriesExpanded = !categoriesExpanded }, Modifier.fillMaxWidth(), onAddCustom = { viewModel.openEditor(state.selectedKind) })
+                    }
                     FoodResults(foods, language, viewModel, Modifier.weight(1f))
                 }
             }
         }
     }
     if (addingTag) AddTagDialog({ addingTag = false }) { viewModel.addUserTag(it); addingTag = false }
+}
+
+@Composable
+private fun CustomOnlyButton(state: NutritionUiState, viewModel: NutritionViewModel, modifier: Modifier = Modifier) {
+    CustomOnlyButton(state.customOnly, state.selectedKind, viewModel::toggleCustomOnly, modifier)
+}
+
+@Composable
+private fun CustomOnlyButton(
+    selected: Boolean,
+    kind: FoodKind,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = kind.nameColors()
+    Surface(
+        modifier = modifier.fillMaxHeight().clickable(onClick = onClick),
+        shape = RoundedCornerShape(6.dp),
+        color = if (selected) colors.first else colors.first.copy(alpha = 0.4f),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (selected) colors.second else MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            TextOverflowText(
+                stringResource(kind.customLabelRes()),
+                style = TextStyle(fontSize = FontTokens.body),
+                color = colors.second,
+                maxLines = 1,
+            )
+        }
+    }
 }
 
 @Composable
@@ -319,6 +365,8 @@ private fun BrowseFilterControls(
     onToggleCategories: () -> Unit,
     modifier: Modifier = Modifier,
     onAddCustom: () -> Unit,
+    customOnly: Boolean = false,
+    onToggleCustom: () -> Unit = {},
 ) {
     val showCategories = kind != FoodKind.DISH
     val flat = !tagsExpanded && !categoriesExpanded
@@ -327,13 +375,15 @@ private fun BrowseFilterControls(
             AddCustomButton(kind, Modifier.weight(1f), onAddCustom)
             FilterCollapseButton(tagsExpanded, FilterCollapseAxis.Vertical, stringResource(R.string.nutrition_collapse_tags), stringResource(R.string.nutrition_expand_tags), onToggleTags, Modifier.weight(1f))
             if (showCategories) FilterCollapseButton(categoriesExpanded, FilterCollapseAxis.Horizontal, stringResource(R.string.nutrition_collapse_categories), stringResource(R.string.nutrition_expand_categories), onToggleCategories, Modifier.weight(1f))
+            if (!showCategories) CustomOnlyButton(customOnly, kind, onToggleCustom, Modifier.weight(1f))
         }
     } else {
-        val buttonCount = if (showCategories) 3 else 2
+        val buttonCount = if (showCategories) 3 else 3
         Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             AddCustomButton(kind, Modifier.weight(1f / buttonCount), onAddCustom)
             FilterCollapseButton(tagsExpanded, FilterCollapseAxis.Vertical, stringResource(R.string.nutrition_collapse_tags), stringResource(R.string.nutrition_expand_tags), onToggleTags, Modifier.weight(1f / buttonCount))
             if (showCategories) FilterCollapseButton(categoriesExpanded, FilterCollapseAxis.Horizontal, stringResource(R.string.nutrition_collapse_categories), stringResource(R.string.nutrition_expand_categories), onToggleCategories, Modifier.weight(1f / buttonCount))
+            else CustomOnlyButton(customOnly, kind, onToggleCustom, Modifier.weight(1f / buttonCount))
         }
     }
 }
@@ -1726,13 +1776,35 @@ private fun ExerciseExpenditureScreen(request: NutritionExerciseRequest, onBack:
 
 @Composable
 private fun FoodImagePreview(image: ImageBitmap, onDismiss: () -> Unit) {
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
-        confirmButton = { androidx.compose.material3.TextButton(onClick = onDismiss) { Text(stringResource(R.string.body_record_cancel)) } },
-        text = {
-            FoodImage(image, Modifier.fillMaxWidth().height(280.dp))
-        },
-    )
+        properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(0.96f).fillMaxHeight(0.92f),
+            shape = RoundedCornerShape(2.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize().clickable(onClick = onDismiss).padding(2.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = stringResource(R.string.nutrition_image_preview_close_hint),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 4.dp),
+                    )
+                    FoodImage(image, Modifier.fillMaxWidth().weight(1f))
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -1741,6 +1813,8 @@ internal fun FoodImage(image: ImageBitmap, modifier: Modifier = Modifier) {
         bitmap = image,
         contentDescription = stringResource(R.string.nutrition_food_image),
         modifier = modifier.clip(RoundedCornerShape(8.dp)),
+        contentScale = ContentScale.Fit,
+        alignment = Alignment.Center,
     )
 }
 

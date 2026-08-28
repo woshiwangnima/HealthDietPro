@@ -10,6 +10,7 @@
     <string name="nutrition_system_tags">System tags</string>
     <string name="nutrition_user_tags">My tags</string>
     <string name="nutrition_collapse_tags">Collapse tag filters</string>
+    <string name="nutrition_image_preview_close_hint">Tap again to close the window</string>
     <string name="nutrition_expand_tags">Expand tag filters</string>
     <string name="nutrition_collapse_categories">Collapse category filters</string>
     <string name="nutrition_expand_categories">Expand category filters</string>

@@ -1,0 +1,80 @@
+{
+  "id": "food:taxon:malus_domestica:qing_banana:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "青香蕉苹果",
+      "香蕉苹果"
+    ],
+    "en": [
+      "Qing banana apple",
+      "Banana apple"
+    ]
+  },
+  "categoryTags": [
+    "food.fruit"
+  ],
+  "edibleRatio": 0.88,
+  "healthMetrics": {
+    "glycemicIndex": {
+      "value": 36,
+      "unit": "GI",
+      "note": "cultivar and ripeness affect GI"
+    },
+    "glycemicLoadPer100g": {
+      "value": 4.9,
+      "unit": "GL"
+    },
+    "inflammatoryPotential": {
+      "value": -0.32,
+      "unit": "DII"
+    }
+  },
+  "nutritionTables": {
+    "standard.100g_edible": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 53,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 13.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FIBER": {
+          "value": 1.7,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "apple, raw; cultivar-specific values require a dedicated laboratory entry"
+    }
+  ],
+  "description": {
+    "zh": "青香蕉苹果按苹果类基础营养估算；品种、成熟度和可食比例会影响实际营养值。",
+    "en": "Qing banana apple uses an apple-category nutrition estimate; cultivar, ripeness, and edible yield affect actual values."
+  },
+  "commonness": 2
+}

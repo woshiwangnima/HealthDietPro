@@ -1,0 +1,27 @@
+{
+  "id": "dish:tomato_egg_soup",
+  "kind": "dish",
+  "names": {
+    "zh": ["西红柿蛋汤", "番茄蛋汤"],
+    "en": ["Tomato and egg soup"]
+  },
+  "components": [
+    {"foodId": "food:taxon:solanum_lycopersicum:raw", "quantity": {"value": 250, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:taxon:gallus_gallus:egg:whole", "quantity": {"value": 100, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:seasoning:salt", "quantity": {"value": 2, "unitCategory": "weight", "unitId": "g"}}
+  ],
+  "systemTags": ["common"],
+  "cuisine": "cuisine.chinese",
+  "dishCategories": ["dishcat.soup", "dishcat.home"],
+  "tastes": ["taste.light", "taste.salty"],
+  "techniqueId": "stewed",
+  "difficulty": 2,
+  "servesPeople": 2,
+  "recipeSteps": [
+    {"text": "番茄切块，加水煮至变软出味。", "minutes": 8},
+    {"text": "倒入打散的鸡蛋，凝固后加盐调味。", "minutes": 3}
+  ],
+  "sources": [{"dataset": "Recipe composition model", "reference": "nutrition is resolved from listed tomato, egg, and salt; soup water is not included"}],
+  "description": {"zh": "西红柿蛋汤的营养由番茄、鸡蛋和盐按用量实时求和，汤水不计入营养总量。", "en": "Nutrition is resolved from the listed tomato, egg, and salt; soup water is excluded."},
+  "commonness": 3
+}

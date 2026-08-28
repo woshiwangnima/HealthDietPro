@@ -53,7 +53,15 @@ internal fun RecordTimeRangePreset.resolve(
         RecordTimeRangePreset.LAST_30_DAYS -> now.minusDays(30)
         RecordTimeRangePreset.LAST_1_YEAR -> now.minusYears(1)
     }
-    return RecordTimeRange(start.toInstant().toEpochMilli(), now.toInstant().toEpochMilli())
+    val end = when (this) {
+        RecordTimeRangePreset.ALL -> now
+        RecordTimeRangePreset.TODAY -> today.plusDays(1).atStartOfDay(zoneId)
+        RecordTimeRangePreset.THIS_WEEK -> today.with(TemporalAdjusters.next(java.time.DayOfWeek.MONDAY)).atStartOfDay(zoneId)
+        RecordTimeRangePreset.THIS_MONTH -> today.withDayOfMonth(1).plusMonths(1).atStartOfDay(zoneId)
+        RecordTimeRangePreset.THIS_YEAR -> today.withDayOfYear(1).plusYears(1).atStartOfDay(zoneId)
+        else -> now
+    }
+    return RecordTimeRange(start.toInstant().toEpochMilli(), end.toInstant().toEpochMilli())
 }
 
 internal fun RecordTimeRangeSelection.resolve(

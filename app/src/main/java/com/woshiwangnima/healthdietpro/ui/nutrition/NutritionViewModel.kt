@@ -198,6 +198,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
             selectedKind = kind,
             selectedRoots = emptySet(),
             selectedChildren = emptySet(),
+            selectedSystemTags = emptySet(),
             customOnly = false,
         )
     }

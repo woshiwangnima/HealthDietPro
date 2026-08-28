@@ -2,11 +2,67 @@
   "food:taxon:sus_scrofa:trotter_raw": [
     "dish:braised_pork_trotter"
   ],
+  "food:taxon:gallus_gallus:egg:whole": [
+    "dish:chiffon_cake",
+    "dish:chili_scrambled_egg",
+    "dish:tomato_egg_soup",
+    "dish:tomato_scrambled_egg",
+    "food:taxon:triticum_aestivum:bread_white",
+    "food:taxon:triticum_aestivum:bread_whole_wheat",
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "food:seasoning:sugar": [
+    "dish:chiffon_cake",
+    "food:beverage:soy_milk:commercial",
+    "food:snack:chestnut:sugar_roasted",
+    "food:snack:sunflower_seed:caramel",
+    "food:snack:sunflower_seed:hickory"
+  ],
+  "food:taxon:triticum_aestivum:flour:cake": [
+    "dish:chiffon_cake"
+  ],
+  "food:starch:corn": [
+    "dish:chiffon_cake"
+  ],
+  "food:plant_oil:generic": [
+    "dish:chiffon_cake",
+    "dish:chili_scrambled_egg",
+    "dish:tomato_scrambled_egg",
+    "food:snack:chestnut:sugar_roasted",
+    "food:snack:peanut:garlic",
+    "food:snack:sunflower_seed:caramel",
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "food:seasoning:vinegar": [
+    "dish:chiffon_cake"
+  ],
+  "food:taxon:bos_taurus:milk:whole": [
+    "dish:chiffon_cake",
+    "food:taxon:triticum_aestivum:bread_white",
+    "food:taxon:triticum_aestivum:bread_whole_wheat"
+  ],
+  "food:taxon:capsicum_annuum:chili": [
+    "dish:chili_scrambled_egg"
+  ],
+  "food:seasoning:salt": [
+    "dish:chili_scrambled_egg",
+    "dish:tomato_egg_soup",
+    "dish:tomato_scrambled_egg",
+    "food:snack:peanut:brined",
+    "food:snack:peanut:five_spice",
+    "food:snack:peanut:garlic",
+    "food:snack:sunflower_seed:five_spice",
+    "food:snack:sunflower_seed:hickory"
+  ],
   "food:taxon:sus_scrofa:ribs_raw": [
     "dish:corn_pork_rib_soup"
   ],
   "food:taxon:zea_mays:boiled": [
     "dish:corn_pork_rib_soup"
+  ],
+  "food:taxon:solanum_lycopersicum:raw": [
+    "dish:tomato_egg_soup",
+    "dish:tomato_scrambled_egg"
   ],
   "food:seasoning:brown_sugar": [
     "food:beverage:brown_sugar_water"
@@ -43,35 +99,16 @@
     "food:beverage:soy_milk:commercial",
     "food:taxon:glycine_max:soy_milk"
   ],
-  "food:seasoning:sugar": [
-    "food:beverage:soy_milk:commercial",
-    "food:snack:chestnut:sugar_roasted",
-    "food:snack:sunflower_seed:caramel",
-    "food:snack:sunflower_seed:hickory"
-  ],
   "food:taxon:camellia_sinensis:leaves:dried": [
     "food:beverage:tea"
   ],
   "food:taxon:castanea_mollissima:kernels:raw": [
     "food:snack:chestnut:sugar_roasted"
   ],
-  "food:plant_oil:generic": [
-    "food:snack:chestnut:sugar_roasted",
-    "food:snack:peanut:garlic",
-    "food:snack:sunflower_seed:caramel",
-    "food:taxon:triticum_aestivum:youtiao"
-  ],
   "food:taxon:arachis_hypogaea:raw": [
     "food:snack:peanut:brined",
     "food:snack:peanut:five_spice",
     "food:snack:peanut:garlic"
-  ],
-  "food:seasoning:salt": [
-    "food:snack:peanut:brined",
-    "food:snack:peanut:five_spice",
-    "food:snack:peanut:garlic",
-    "food:snack:sunflower_seed:five_spice",
-    "food:snack:sunflower_seed:hickory"
   ],
   "food:seasoning:black_pepper": [
     "food:snack:peanut:five_spice",
@@ -117,15 +154,6 @@
     "food:taxon:triticum_aestivum:mantou",
     "food:taxon:triticum_aestivum:meat_bun",
     "food:taxon:triticum_aestivum:youtiao"
-  ],
-  "food:taxon:gallus_gallus:egg:whole": [
-    "food:taxon:triticum_aestivum:bread_white",
-    "food:taxon:triticum_aestivum:bread_whole_wheat",
-    "food:taxon:triticum_aestivum:youtiao"
-  ],
-  "food:taxon:bos_taurus:milk:whole": [
-    "food:taxon:triticum_aestivum:bread_white",
-    "food:taxon:triticum_aestivum:bread_whole_wheat"
   ],
   "food:taxon:triticum_aestivum:flour:whole": [
     "food:taxon:triticum_aestivum:bread_whole_wheat"

@@ -104,6 +104,8 @@
   ],
   "food.meat_egg.egg": [
     "food:taxon:gallus_gallus:egg:pan_fried",
+    "food:taxon:anas_platyrhynchos:egg:salted",
+    "food:taxon:anas_platyrhynchos:egg:whole",
     "food:taxon:gallus_gallus:egg:whole"
   ],
   "food.soy": [
@@ -286,6 +288,7 @@
     "food:taxon:brassica_oleracea:broccoli:raw",
     "food:taxon:brassica_oleracea:cauliflower:raw",
     "food:taxon:brassica_rapa:choy_sum:raw",
+    "food:taxon:hemerocallis:dried:raw",
     "food:taxon:hemerocallis:fresh:raw"
   ],
   "food.aquatic.fish": [
@@ -300,6 +303,8 @@
     "food:taxon:citrus_limon:raw",
     "food:taxon:durio_zibethinus:raw",
     "food:taxon:hylocereus_undatus:raw",
+    "food:taxon:malus_domestica:green:raw",
+    "food:taxon:malus_domestica:qing_banana:raw",
     "food:taxon:malus_domestica:raw",
     "food:taxon:musa_acuminata:ripe:raw",
     "food:taxon:pyrus_pyrifolia:raw",
