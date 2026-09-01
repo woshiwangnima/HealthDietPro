@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.util.LruCache
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -40,6 +41,7 @@ internal class FoodImageStore(
     }
 
     fun clear() {
+        Log.d(TAG, "clear image cache: ${cache.size()} entries, ${cache.size()} bytes")
         cache.evictAll()
     }
 
@@ -64,7 +66,12 @@ internal class FoodImageStore(
 
     private fun load(key: String, variant: ImageVariant): ImageBitmap {
         val cacheKey = "$key#${variant.name}"
-        return cache.get(cacheKey) ?: render(key, variant).also { cache.put(cacheKey, it) }
+        cache.get(cacheKey)?.let {
+            Log.d(TAG, "hit key=$cacheKey")
+            return it
+        }
+        Log.d(TAG, "miss key=$cacheKey; decoding asset/user image")
+        return render(key, variant).also { cache.put(cacheKey, it) }
     }
 
     private fun render(key: String, variant: ImageVariant): ImageBitmap {
@@ -139,6 +146,7 @@ internal class FoodImageStore(
     companion object {
         const val DEFAULT_KEY = "food.illustration.default"
         private const val USER_KEY_PREFIX = "user:"
+        private const val TAG = "FoodImageStore"
     }
 }
 

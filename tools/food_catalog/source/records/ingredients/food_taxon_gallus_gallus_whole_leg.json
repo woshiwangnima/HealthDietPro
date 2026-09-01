@@ -1,0 +1,11 @@
+{
+  "id": "food:taxon:gallus_gallus:whole_leg:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["鸡全腿", "手枪腿", "鸡排腿"], "en": ["Whole chicken leg"]},
+  "categoryTags": ["food.meat_egg.poultry"],
+  "edibleRatio": 0.71,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 173, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 18.0, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 10.8, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 0, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "chicken whole leg, edible portion"}],
+  "description": {"zh": "包含鸡上腿和鸡小腿的带骨整腿，按可食部计。", "en": "Bone-in whole chicken leg including thigh and drumstick."},
+  "commonness": 4
+}

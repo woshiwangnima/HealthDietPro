@@ -100,7 +100,16 @@
   ],
   "food.meat_egg.poultry": [
     "food:taxon:gallus_gallus:breast:steamed",
-    "food:taxon:gallus_gallus:breast:raw"
+    "food:taxon:anas_platyrhynchos:leg:raw",
+    "food:taxon:gallus_gallus:breast:raw",
+    "food:taxon:gallus_gallus:drumstick:raw",
+    "food:taxon:gallus_gallus:foot:raw",
+    "food:taxon:gallus_gallus:thigh:raw",
+    "food:taxon:gallus_gallus:whole_leg:raw",
+    "food:taxon:gallus_gallus:wing_middle:raw",
+    "food:taxon:gallus_gallus:wing_root:raw",
+    "food:taxon:gallus_gallus:wing_tip:raw",
+    "food:taxon:gallus_gallus:wing_whole:raw"
   ],
   "food.meat_egg.egg": [
     "food:taxon:gallus_gallus:egg:pan_fried",
@@ -158,6 +167,11 @@
     "food:taxon:raphanus_sativus:raw",
     "food:taxon:solanum_tuberosum:raw"
   ],
+  "food.meat_egg.offal": [
+    "food:animal:duck:blood",
+    "food:animal:duck:intestine",
+    "food:animal:pig:blood"
+  ],
   "food.oil.animal_fat": [
     "food:animal_fat:beef_tallow",
     "food:animal_fat:chicken_fat",
@@ -183,6 +197,31 @@
     "food:plant_oil:generic",
     "food:plant_oil:peanut",
     "food:plant_oil:rapeseed"
+  ],
+  "food.processed.meat": [
+    "food:processed:ham_sausage"
+  ],
+  "food.processed.grain": [
+    "food:processed:instant_noodle_cake"
+  ],
+  "food.processed.pickle": [
+    "food:processed:mustard_tuber"
+  ],
+  "food.seafood.shellfish": [
+    "food:seafood:clam:raw",
+    "food:seafood:mussel:raw",
+    "food:seafood:oyster:raw"
+  ],
+  "food.seafood.crab": [
+    "food:seafood:crab:raw"
+  ],
+  "food.seafood.mollusk": [
+    "food:seafood:octopus:raw",
+    "food:seafood:squid:raw"
+  ],
+  "food.seafood.shrimp": [
+    "food:seafood:prawn:raw",
+    "food:seafood:shrimp:raw"
   ],
   "food.seasoning.dry_spice": [
     "food:seasoning:black_pepper"

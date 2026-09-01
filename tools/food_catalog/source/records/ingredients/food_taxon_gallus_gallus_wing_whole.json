@@ -1,0 +1,11 @@
+{
+  "id": "food:taxon:gallus_gallus:wing_whole:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["鸡全翅", "整翅"], "en": ["Whole chicken wing"]},
+  "categoryTags": ["food.meat_egg.poultry"],
+  "edibleRatio": 0.5,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 220, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 18.1, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 15.8, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 0, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "whole chicken wing, edible portion"}],
+  "description": {"zh": "鸡翅根、翅中和翅尖组成的整翅。", "en": "Whole wing including drumette, flat and tip."},
+  "commonness": 4
+}

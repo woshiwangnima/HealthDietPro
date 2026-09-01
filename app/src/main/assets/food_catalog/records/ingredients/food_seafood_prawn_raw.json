@@ -1,0 +1,60 @@
+{
+  "id": "food:seafood:prawn:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "对虾",
+      "大虾",
+      "海虾"
+    ],
+    "en": [
+      "Prawn"
+    ]
+  },
+  "categoryTags": [
+    "food.seafood.shrimp"
+  ],
+  "edibleRatio": 0.55,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 97,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 20.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "prawn, edible portion"
+    }
+  ],
+  "description": {
+    "zh": "市场常见大规格海虾。",
+    "en": "Large market prawn, values per edible portion."
+  },
+  "commonness": 4
+}

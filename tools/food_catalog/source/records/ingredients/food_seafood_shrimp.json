@@ -1,0 +1,8 @@
+{
+  "id": "food:seafood:shrimp:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["基围虾", "明虾", "鲜虾"], "en": ["Shrimp"]},
+  "categoryTags": ["food.seafood.shrimp"], "edibleRatio": 0.55,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 93, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 18.6, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 1.4, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 1.5, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "fresh shrimp, edible portion"}], "description": {"zh": "鲜活或冰鲜虾，去壳去肠线后为可食部。", "en": "Fresh shrimp; edible portion after shell and vein removal."}, "commonness": 5
+}

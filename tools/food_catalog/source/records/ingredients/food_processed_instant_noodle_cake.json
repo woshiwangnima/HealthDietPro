@@ -1,0 +1,8 @@
+{
+  "id": "food:processed:instant_noodle_cake",
+  "kind": "ingredient",
+  "names": {"zh": ["方便面饼", "方便面面饼"], "en": ["Instant noodle cake"]},
+  "categoryTags": ["food.processed.grain"], "edibleRatio": 1,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 470, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 9.5, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 20.0, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 60.0, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "Chinese packaged food label reference", "reference": "fried instant noodle cake; brand values vary"}], "description": {"zh": "不含调味包的油炸或非油炸方便面饼；调味包需单独计算。", "en": "Instant noodle cake without seasoning sachets; seasoning should be counted separately."}, "commonness": 5
+}

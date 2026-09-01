@@ -1,0 +1,60 @@
+{
+  "id": "food:seafood:clam:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "花蛤",
+      "蛤蜊",
+      "文蛤"
+    ],
+    "en": [
+      "Clam"
+    ]
+  },
+  "categoryTags": [
+    "food.seafood.shellfish"
+  ],
+  "edibleRatio": 0.3,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 62,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 10.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 2.8,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "clam, edible portion"
+    }
+  ],
+  "description": {
+    "zh": "市场常见小型贝类，带壳售卖。",
+    "en": "Common small clam sold in the shell."
+  },
+  "commonness": 5
+}

@@ -1,0 +1,11 @@
+{
+  "id": "food:taxon:gallus_gallus:wing_root:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["鸡翅根", "鸡翅根部"], "en": ["Chicken wing drumette"]},
+  "categoryTags": ["food.meat_egg.poultry"],
+  "edibleRatio": 0.65,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 191, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 18.0, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 13.0, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 0, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "chicken wing drumette, edible portion"}],
+  "description": {"zh": "鸡翅靠近鸡身的一段，按可食部计。", "en": "The drumette section of chicken wing."},
+  "commonness": 4
+}

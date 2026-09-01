@@ -1,0 +1,16 @@
+{
+  "id": "dish:boiled_pork_slices",
+  "kind": "dish",
+  "names": {"zh": ["水煮肉片"], "en": ["Sichuan boiled pork slices"]},
+  "components": [
+    {"foodId": "food:taxon:sus_scrofa:lean_raw", "quantity": {"value": 250, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:taxon:capsicum_annuum:chili", "quantity": {"value": 30, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:plant_oil:generic", "quantity": {"value": 35, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:seasoning:soy_sauce", "quantity": {"value": 15, "unitCategory": "volume", "unitId": "ml"}},
+    {"foodId": "food:seasoning:salt", "quantity": {"value": 3, "unitCategory": "weight", "unitId": "g"}}
+  ],
+  "systemTags": ["common"], "cuisine": "cuisine.sichuan", "dishCategories": ["dishcat.home"], "tastes": ["taste.spicy", "taste.salty"], "techniqueId": "boiled", "difficulty": 3, "servesPeople": 2,
+  "recipeSteps": [{"text": "瘦肉切薄片，辣椒切段。", "minutes": 8}, {"text": "汤底烧开后放入肉片煮熟，最后淋热油并加入辣椒。", "minutes": 12}],
+  "sources": [{"dataset": "Recipe composition model", "reference": "nutrition is resolved from listed ingredients"}],
+  "description": {"zh": "川味水煮肉片的简化基础配方，实际钠和油摄入随调味变化。", "en": "A simplified Sichuan boiled pork recipe; sodium and oil vary with seasoning."}, "commonness": 5
+}

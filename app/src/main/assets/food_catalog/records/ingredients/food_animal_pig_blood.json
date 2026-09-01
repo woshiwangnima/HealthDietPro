@@ -1,0 +1,59 @@
+{
+  "id": "food:animal:pig:blood",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "猪血",
+      "猪血块"
+    ],
+    "en": [
+      "Pork blood curd"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.offal"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 45,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 12.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "pig blood curd"
+    }
+  ],
+  "description": {
+    "zh": "凝固猪血制品，铁含量和钠含量因加工而异。",
+    "en": "Pig blood curd; iron and sodium vary with processing."
+  },
+  "commonness": 4
+}

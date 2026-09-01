@@ -40,6 +40,9 @@ import com.woshiwangnima.healthdietpro.model.prefs.UserItemCollectionRepository
 import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
+import com.woshiwangnima.healthdietpro.common.cache.FoodCardMetadataCache
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheRegistry
+import com.woshiwangnima.healthdietpro.model.food.FoodCardMetadata
 import com.woshiwangnima.healthdietpro.model.archive.userArchiveDirectory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,8 +67,8 @@ internal data class NutritionUiState(
     val userTags: List<UserFoodTag> = emptyList(),
     val selectedUserTags: Set<String> = emptySet(),
     val selectedFood: FoodItem? = null,
-    val listTopFoodId: String? = null,
-    val lastClickedFoodId: String? = null,
+    val listHighlightFoodId: String? = null,
+    val listHighlightToken: Long = 0L,
     val comparisonReturnTarget: NutritionDestination? = null,
     val editor: NutritionEditorState? = null,
     val nrvReference: NrvReference? = null,
@@ -100,6 +103,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         context = application,
         cacheRegistry = (application as HealthDietProApplication).cacheRegistry,
     )
+    private val cardMetadataCache = FoodCardMetadataCache().also { (application as HealthDietProApplication).cacheRegistry.register(it) }
     private var userId = ProfilePrefs.getCurrentUserId(application)
     private val _state = MutableStateFlow(NutritionUiState())
     val state: StateFlow<NutritionUiState> = _state.asStateFlow()
@@ -151,6 +155,7 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
 
     /** Rebuild the merged food index + resolver from built-ins plus current custom foods. */
     private fun rebuild(customFoods: List<FoodItem>) {
+        cardMetadataCache.invalidate()
         val merged = builtInFoods + customFoods
         foodsById = merged.associateBy { it.id }
         resolver = NutritionResolver(foodsById, cookingMethodsById)
@@ -311,7 +316,6 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         val collections = foodCollections.recordRecent(food.id, foodsById.keys)
         _state.value = _state.value.copy(
             selectedFood = food,
-            lastClickedFoodId = food.id,
             comparisonReturnTarget = null,
             searchHistory = history,
             recentFoodIds = collections.recentIds,
@@ -319,12 +323,17 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         )
         if (keyword.isNotBlank()) saveSearchHistory(history)
     }
-    internal fun rememberListTopFood(id: String?) {
-        if (id != null && id != _state.value.listTopFoodId) {
-            _state.value = _state.value.copy(listTopFoodId = id)
-        }
+    fun openFood(id: String) {
+        foodsById[id]?.let(::openFood)
     }
-    fun closeFood() { _state.value = _state.value.copy(selectedFood = null) }
+    fun closeFood() {
+        val foodId = _state.value.selectedFood?.id
+        _state.value = _state.value.copy(
+            selectedFood = null,
+            listHighlightFoodId = foodId,
+            listHighlightToken = if (foodId == null) _state.value.listHighlightToken else _state.value.listHighlightToken + 1,
+        )
+    }
     fun selectNrvReference(id: String) {
         _state.value.nrvReferences.firstOrNull { it.id == id }?.let { reference ->
             _state.value = _state.value.copy(nrvReference = reference)
@@ -495,6 +504,45 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
             searchable.contains(state.keyword.lowercase()) && root && child && systemTag && custom
         }
     }.sortedWith(compareByDescending<FoodItem> { it.commonness }.thenBy { it.displayName(language) })
+
+    fun filteredCardMetadata(language: String): List<FoodCardMetadata> = filteredFoods(language).map { food ->
+        val key = "${food.id}#$language#${(food as? CategorizedFood)?.categoryTags.orEmpty().joinToString()}#${_state.value.favoriteFoodIds.contains(food.id)}#${_state.value.recentFoodIds.contains(food.id)}"
+        cardMetadataCache.get(key) ?: buildCardMetadata(food, language).also { cardMetadataCache.put(key, it) }
+    }
+
+    private fun buildCardMetadata(food: FoodItem, language: String): FoodCardMetadata {
+        val aliases = food.allNames(language).drop(1)
+        val categoryLabels = (food as? CategorizedFood)?.categoryTags.orEmpty().mapNotNull { tag ->
+            categoryDisplayPath(tag).takeIf { it.isNotEmpty() }?.joinToString(".") { resourceId -> getApplication<Application>().getString(resourceId) }
+        }
+        val cookingMethodLabel = (food as? PreparedFood)?.let { prepared ->
+            val methodId = prepared.derivedFrom?.cookingMethodId ?: prepared.techniqueId
+            methodId?.let { cookingMethodFor(it)?.displayLabel(language) }
+        }
+        val componentCount = when (food) {
+            is Dish -> food.components.size
+            is PreparedFood -> food.components.takeIf { it.isNotEmpty() }?.size
+            else -> null
+        }
+        val energy = runCatching { resolvePer100g(food).nutrients["ENERGY"]?.value ?: 0.0 }.getOrDefault(0.0)
+        return FoodCardMetadata(
+            id = food.id,
+            kind = food.kind,
+            primaryName = food.displayName(language),
+            aliases = aliases,
+            categoryLabels = categoryLabels,
+            cookingMethodLabel = cookingMethodLabel,
+            componentCount = componentCount,
+            imageKey = food.image?.localKey?.takeUnless { it == FoodImageStore.DEFAULT_KEY } ?: food.id,
+            systemTags = food.systemTags,
+            isCustom = isCustom(food.id),
+            isFavorite = isFavorite(food.id),
+            isRecent = food.id in _state.value.recentFoodIds,
+            energyPer100g = energy,
+            glycemicIndex = food.healthMetrics.glycemicIndex?.value,
+            glycemicLoadPer100g = food.healthMetrics.glycemicLoadPer100g?.value,
+        )
+    }
 
     private fun Set<String>.toggle(value: String) = if (value in this) this - value else this + value
     private fun loadSearchHistory(): List<String> = deserializeSearchHistory(

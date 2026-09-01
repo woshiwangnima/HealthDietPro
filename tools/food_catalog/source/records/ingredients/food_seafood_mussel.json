@@ -1,0 +1,8 @@
+{
+  "id": "food:seafood:mussel:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["贻贝", "青口", "海虹"], "en": ["Mussel"]},
+  "categoryTags": ["food.seafood.shellfish"], "edibleRatio": 0.25,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 86, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 11.9, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 2.2, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 3.7, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "mussel, edible portion"}], "description": {"zh": "常见贝类海产品，带壳售卖。", "en": "Common shellfish sold in the shell."}, "commonness": 4
+}

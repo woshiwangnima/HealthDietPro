@@ -18,9 +18,21 @@ val compileFoodCatalog = tasks.register<Exec>("compileFoodCatalog") {
     outputs.file(rootProject.file("app/src/main/assets/food_catalog/manifest.json"))
 }
 
+val buildFoodImages = tasks.register<Exec>("buildFoodImages") {
+    description = "Build reproducible thumbnail and detail images for the food catalog."
+    group = "food catalog"
+    workingDir(rootProject.projectDir)
+    commandLine("uv", "run", "python", "tools/food_catalog/catalog_tool.py", "build-images")
+    inputs.dir(rootProject.file("tools/food_catalog/images/source"))
+    inputs.dir(rootProject.file("tools/food_catalog/source/records"))
+    outputs.dir(rootProject.file("app/src/main/assets/food_catalog/images/thumb"))
+    outputs.dir(rootProject.file("app/src/main/assets/food_catalog/images/detail"))
+    outputs.file(rootProject.file("app/src/main/assets/food_catalog/images/manifest.json"))
+}
+
 tasks.configureEach {
     if (name.startsWith("merge") && name.endsWith("Assets")) {
-        dependsOn(compileFoodCatalog)
+        dependsOn(compileFoodCatalog, buildFoodImages)
     }
 }
 

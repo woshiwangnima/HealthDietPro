@@ -8,6 +8,7 @@ internal enum class AppCacheKind {
     CodeFiles,
     ExternalFiles,
     FoodImages,
+    FoodCardMetadata,
     ProfileAvatars,
 }
 
@@ -101,5 +102,6 @@ private fun AppCacheKind.isDiskCache(): Boolean = when (this) {
     AppCacheKind.CodeFiles,
     AppCacheKind.ExternalFiles -> true
     AppCacheKind.FoodImages,
+    AppCacheKind.FoodCardMetadata,
     AppCacheKind.ProfileAvatars -> false
 }

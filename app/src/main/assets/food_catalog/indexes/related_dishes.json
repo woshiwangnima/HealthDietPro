@@ -1,10 +1,51 @@
 {
+  "food:taxon:sus_scrofa:lean_raw": [
+    "dish:boiled_pork_slices",
+    "dish:farmhouse_one_bowl",
+    "dish:yu_xiang_shredded_pork"
+  ],
+  "food:taxon:capsicum_annuum:chili": [
+    "dish:boiled_pork_slices",
+    "dish:chili_scrambled_egg",
+    "dish:farmhouse_one_bowl",
+    "dish:yu_xiang_shredded_pork"
+  ],
+  "food:plant_oil:generic": [
+    "dish:boiled_pork_slices",
+    "dish:chiffon_cake",
+    "dish:chili_scrambled_egg",
+    "dish:di_san_xian",
+    "dish:farmhouse_one_bowl",
+    "dish:tomato_scrambled_egg",
+    "dish:yu_xiang_shredded_pork",
+    "food:snack:chestnut:sugar_roasted",
+    "food:snack:peanut:garlic",
+    "food:snack:sunflower_seed:caramel",
+    "food:taxon:triticum_aestivum:youtiao"
+  ],
+  "food:seasoning:soy_sauce": [
+    "dish:boiled_pork_slices",
+    "dish:di_san_xian",
+    "dish:yu_xiang_shredded_pork"
+  ],
+  "food:seasoning:salt": [
+    "dish:boiled_pork_slices",
+    "dish:chili_scrambled_egg",
+    "dish:tomato_egg_soup",
+    "dish:tomato_scrambled_egg",
+    "food:snack:peanut:brined",
+    "food:snack:peanut:five_spice",
+    "food:snack:peanut:garlic",
+    "food:snack:sunflower_seed:five_spice",
+    "food:snack:sunflower_seed:hickory"
+  ],
   "food:taxon:sus_scrofa:trotter_raw": [
     "dish:braised_pork_trotter"
   ],
   "food:taxon:gallus_gallus:egg:whole": [
     "dish:chiffon_cake",
     "dish:chili_scrambled_egg",
+    "dish:farmhouse_one_bowl",
     "dish:tomato_egg_soup",
     "dish:tomato_scrambled_egg",
     "food:taxon:triticum_aestivum:bread_white",
@@ -13,6 +54,7 @@
   ],
   "food:seasoning:sugar": [
     "dish:chiffon_cake",
+    "dish:yu_xiang_shredded_pork",
     "food:beverage:soy_milk:commercial",
     "food:snack:chestnut:sugar_roasted",
     "food:snack:sunflower_seed:caramel",
@@ -24,41 +66,32 @@
   "food:starch:corn": [
     "dish:chiffon_cake"
   ],
-  "food:plant_oil:generic": [
-    "dish:chiffon_cake",
-    "dish:chili_scrambled_egg",
-    "dish:tomato_scrambled_egg",
-    "food:snack:chestnut:sugar_roasted",
-    "food:snack:peanut:garlic",
-    "food:snack:sunflower_seed:caramel",
-    "food:taxon:triticum_aestivum:youtiao"
-  ],
   "food:seasoning:vinegar": [
-    "dish:chiffon_cake"
+    "dish:chiffon_cake",
+    "dish:yu_xiang_shredded_pork"
   ],
   "food:taxon:bos_taurus:milk:whole": [
     "dish:chiffon_cake",
     "food:taxon:triticum_aestivum:bread_white",
     "food:taxon:triticum_aestivum:bread_whole_wheat"
   ],
-  "food:taxon:capsicum_annuum:chili": [
-    "dish:chili_scrambled_egg"
-  ],
-  "food:seasoning:salt": [
-    "dish:chili_scrambled_egg",
-    "dish:tomato_egg_soup",
-    "dish:tomato_scrambled_egg",
-    "food:snack:peanut:brined",
-    "food:snack:peanut:five_spice",
-    "food:snack:peanut:garlic",
-    "food:snack:sunflower_seed:five_spice",
-    "food:snack:sunflower_seed:hickory"
-  ],
   "food:taxon:sus_scrofa:ribs_raw": [
     "dish:corn_pork_rib_soup"
   ],
   "food:taxon:zea_mays:boiled": [
     "dish:corn_pork_rib_soup"
+  ],
+  "food:taxon:solanum_melongena:raw": [
+    "dish:di_san_xian"
+  ],
+  "food:taxon:solanum_tuberosum:raw": [
+    "dish:di_san_xian"
+  ],
+  "food:taxon:capsicum_annuum:bell_green:raw": [
+    "dish:di_san_xian"
+  ],
+  "food:taxon:allium_cepa:raw": [
+    "dish:farmhouse_one_bowl"
   ],
   "food:taxon:solanum_lycopersicum:raw": [
     "dish:tomato_egg_soup",

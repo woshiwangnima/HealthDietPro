@@ -1,4 +1,16 @@
 {
+  "dish:boiled_pork_slices": [
+    "dish:boiled_pork_slices"
+  ],
+  "dish_boiled_pork_slices": [
+    "dish:boiled_pork_slices"
+  ],
+  "水煮肉片": [
+    "dish:boiled_pork_slices"
+  ],
+  "sichuanboiledporkslices": [
+    "dish:boiled_pork_slices"
+  ],
   "dish:braised_pork_trotter": [
     "dish:braised_pork_trotter"
   ],
@@ -62,6 +74,30 @@
   "cornandporkribsoup": [
     "dish:corn_pork_rib_soup"
   ],
+  "dish:di_san_xian": [
+    "dish:di_san_xian"
+  ],
+  "dish_di_san_xian": [
+    "dish:di_san_xian"
+  ],
+  "地三鲜": [
+    "dish:di_san_xian"
+  ],
+  "disanxian": [
+    "dish:di_san_xian"
+  ],
+  "dish:farmhouse_one_bowl": [
+    "dish:farmhouse_one_bowl"
+  ],
+  "dish_farmhouse_one_bowl": [
+    "dish:farmhouse_one_bowl"
+  ],
+  "农家一碗香": [
+    "dish:farmhouse_one_bowl"
+  ],
+  "farmhouseone-bowlstir-fry": [
+    "dish:farmhouse_one_bowl"
+  ],
   "dish:tomato_egg_soup": [
     "dish:tomato_egg_soup"
   ],
@@ -91,6 +127,18 @@
   ],
   "tomatoscrambledeggs": [
     "dish:tomato_scrambled_egg"
+  ],
+  "dish:yu_xiang_shredded_pork": [
+    "dish:yu_xiang_shredded_pork"
+  ],
+  "dish_yu_xiang_shredded_pork": [
+    "dish:yu_xiang_shredded_pork"
+  ],
+  "鱼香肉丝": [
+    "dish:yu_xiang_shredded_pork"
+  ],
+  "yuxiangshreddedpork": [
+    "dish:yu_xiang_shredded_pork"
   ],
   "food:beverage:brown_sugar_water": [
     "food:beverage:brown_sugar_water"
@@ -942,6 +990,33 @@
   "corn": [
     "food:taxon:zea_mays:boiled"
   ],
+  "food:animal:duck:blood": [
+    "food:animal:duck:blood"
+  ],
+  "food_animal_duck_blood": [
+    "food:animal:duck:blood"
+  ],
+  "鸭血": [
+    "food:animal:duck:blood"
+  ],
+  "鸭血块": [
+    "food:animal:duck:blood"
+  ],
+  "duckbloodcurd": [
+    "food:animal:duck:blood"
+  ],
+  "food:animal:duck:intestine": [
+    "food:animal:duck:intestine"
+  ],
+  "food_animal_duck_intestine": [
+    "food:animal:duck:intestine"
+  ],
+  "鸭肠": [
+    "food:animal:duck:intestine"
+  ],
+  "duckintestine": [
+    "food:animal:duck:intestine"
+  ],
   "food:animal_fat:beef_tallow": [
     "food:animal_fat:beef_tallow"
   ],
@@ -977,6 +1052,21 @@
   ],
   "lard": [
     "food:animal_fat:lard"
+  ],
+  "food:animal:pig:blood": [
+    "food:animal:pig:blood"
+  ],
+  "food_animal_pig_blood": [
+    "food:animal:pig:blood"
+  ],
+  "猪血": [
+    "food:animal:pig:blood"
+  ],
+  "猪血块": [
+    "food:animal:pig:blood"
+  ],
+  "porkbloodcurd": [
+    "food:animal:pig:blood"
   ],
   "food:beverage:cola": [
     "food:beverage:cola"
@@ -1118,6 +1208,192 @@
   ],
   "canolaoil": [
     "food:plant_oil:rapeseed"
+  ],
+  "food:processed:ham_sausage": [
+    "food:processed:ham_sausage"
+  ],
+  "food_processed_ham_sausage": [
+    "food:processed:ham_sausage"
+  ],
+  "火腿肠": [
+    "food:processed:ham_sausage"
+  ],
+  "香肠火腿肠": [
+    "food:processed:ham_sausage"
+  ],
+  "hamsausage": [
+    "food:processed:ham_sausage"
+  ],
+  "food:processed:instant_noodle_cake": [
+    "food:processed:instant_noodle_cake"
+  ],
+  "food_processed_instant_noodle_cake": [
+    "food:processed:instant_noodle_cake"
+  ],
+  "方便面饼": [
+    "food:processed:instant_noodle_cake"
+  ],
+  "方便面面饼": [
+    "food:processed:instant_noodle_cake"
+  ],
+  "instantnoodlecake": [
+    "food:processed:instant_noodle_cake"
+  ],
+  "food:processed:mustard_tuber": [
+    "food:processed:mustard_tuber"
+  ],
+  "food_processed_mustard_tuber": [
+    "food:processed:mustard_tuber"
+  ],
+  "榨菜": [
+    "food:processed:mustard_tuber"
+  ],
+  "榨菜丝": [
+    "food:processed:mustard_tuber"
+  ],
+  "pickledmustardtuber": [
+    "food:processed:mustard_tuber"
+  ],
+  "food:seafood:clam:raw": [
+    "food:seafood:clam:raw"
+  ],
+  "food_seafood_clam_raw": [
+    "food:seafood:clam:raw"
+  ],
+  "花蛤": [
+    "food:seafood:clam:raw"
+  ],
+  "蛤蜊": [
+    "food:seafood:clam:raw"
+  ],
+  "文蛤": [
+    "food:seafood:clam:raw"
+  ],
+  "clam": [
+    "food:seafood:clam:raw"
+  ],
+  "food:seafood:crab:raw": [
+    "food:seafood:crab:raw"
+  ],
+  "food_seafood_crab_raw": [
+    "food:seafood:crab:raw"
+  ],
+  "梭子蟹": [
+    "food:seafood:crab:raw"
+  ],
+  "海蟹": [
+    "food:seafood:crab:raw"
+  ],
+  "螃蟹": [
+    "food:seafood:crab:raw"
+  ],
+  "swimmingcrab": [
+    "food:seafood:crab:raw"
+  ],
+  "food:seafood:mussel:raw": [
+    "food:seafood:mussel:raw"
+  ],
+  "food_seafood_mussel_raw": [
+    "food:seafood:mussel:raw"
+  ],
+  "贻贝": [
+    "food:seafood:mussel:raw"
+  ],
+  "青口": [
+    "food:seafood:mussel:raw"
+  ],
+  "海虹": [
+    "food:seafood:mussel:raw"
+  ],
+  "mussel": [
+    "food:seafood:mussel:raw"
+  ],
+  "food:seafood:octopus:raw": [
+    "food:seafood:octopus:raw"
+  ],
+  "food_seafood_octopus_raw": [
+    "food:seafood:octopus:raw"
+  ],
+  "章鱼": [
+    "food:seafood:octopus:raw"
+  ],
+  "八爪鱼": [
+    "food:seafood:octopus:raw"
+  ],
+  "octopus": [
+    "food:seafood:octopus:raw"
+  ],
+  "food:seafood:oyster:raw": [
+    "food:seafood:oyster:raw"
+  ],
+  "food_seafood_oyster_raw": [
+    "food:seafood:oyster:raw"
+  ],
+  "生蚝": [
+    "food:seafood:oyster:raw"
+  ],
+  "牡蛎": [
+    "food:seafood:oyster:raw"
+  ],
+  "海蛎子": [
+    "food:seafood:oyster:raw"
+  ],
+  "oyster": [
+    "food:seafood:oyster:raw"
+  ],
+  "food:seafood:prawn:raw": [
+    "food:seafood:prawn:raw"
+  ],
+  "food_seafood_prawn_raw": [
+    "food:seafood:prawn:raw"
+  ],
+  "对虾": [
+    "food:seafood:prawn:raw"
+  ],
+  "大虾": [
+    "food:seafood:prawn:raw"
+  ],
+  "海虾": [
+    "food:seafood:prawn:raw"
+  ],
+  "prawn": [
+    "food:seafood:prawn:raw"
+  ],
+  "food:seafood:shrimp:raw": [
+    "food:seafood:shrimp:raw"
+  ],
+  "food_seafood_shrimp_raw": [
+    "food:seafood:shrimp:raw"
+  ],
+  "基围虾": [
+    "food:seafood:shrimp:raw"
+  ],
+  "明虾": [
+    "food:seafood:shrimp:raw"
+  ],
+  "鲜虾": [
+    "food:seafood:shrimp:raw"
+  ],
+  "shrimp": [
+    "food:seafood:shrimp:raw"
+  ],
+  "food:seafood:squid:raw": [
+    "food:seafood:squid:raw"
+  ],
+  "food_seafood_squid_raw": [
+    "food:seafood:squid:raw"
+  ],
+  "鱿鱼": [
+    "food:seafood:squid:raw"
+  ],
+  "鲜鱿": [
+    "food:seafood:squid:raw"
+  ],
+  "枪乌贼": [
+    "food:seafood:squid:raw"
+  ],
+  "squid": [
+    "food:seafood:squid:raw"
   ],
   "food:seasoning:black_pepper": [
     "food:seasoning:black_pepper"
@@ -1397,6 +1673,21 @@
   ],
   "freshduckegg": [
     "food:taxon:anas_platyrhynchos:egg:whole"
+  ],
+  "food:taxon:anas_platyrhynchos:leg:raw": [
+    "food:taxon:anas_platyrhynchos:leg:raw"
+  ],
+  "food_taxon_anas_platyrhynchos_leg_raw": [
+    "food:taxon:anas_platyrhynchos:leg:raw"
+  ],
+  "鸭腿": [
+    "food:taxon:anas_platyrhynchos:leg:raw"
+  ],
+  "鸭大腿": [
+    "food:taxon:anas_platyrhynchos:leg:raw"
+  ],
+  "duckleg": [
+    "food:taxon:anas_platyrhynchos:leg:raw"
   ],
   "food:taxon:apium_graveolens:raw": [
     "food:taxon:apium_graveolens:raw"
@@ -1748,6 +2039,9 @@
     "food:taxon:capsicum_annuum:bell_green:raw"
   ],
   "甜椒": [
+    "food:taxon:capsicum_annuum:bell_green:raw"
+  ],
+  "辣椒": [
     "food:taxon:capsicum_annuum:bell_green:raw"
   ],
   "greenbellpepper": [
@@ -2128,6 +2422,24 @@
   "chickenbreast,raw": [
     "food:taxon:gallus_gallus:breast:raw"
   ],
+  "food:taxon:gallus_gallus:drumstick:raw": [
+    "food:taxon:gallus_gallus:drumstick:raw"
+  ],
+  "food_taxon_gallus_gallus_drumstick_raw": [
+    "food:taxon:gallus_gallus:drumstick:raw"
+  ],
+  "琵琶腿": [
+    "food:taxon:gallus_gallus:drumstick:raw"
+  ],
+  "鸡小腿": [
+    "food:taxon:gallus_gallus:drumstick:raw"
+  ],
+  "棒棒腿": [
+    "food:taxon:gallus_gallus:drumstick:raw"
+  ],
+  "chickendrumstick": [
+    "food:taxon:gallus_gallus:drumstick:raw"
+  ],
   "food:taxon:gallus_gallus:egg:whole": [
     "food:taxon:gallus_gallus:egg:whole"
   ],
@@ -2148,6 +2460,117 @@
   ],
   "wholeegg": [
     "food:taxon:gallus_gallus:egg:whole"
+  ],
+  "food:taxon:gallus_gallus:foot:raw": [
+    "food:taxon:gallus_gallus:foot:raw"
+  ],
+  "food_taxon_gallus_gallus_foot_raw": [
+    "food:taxon:gallus_gallus:foot:raw"
+  ],
+  "鸡爪": [
+    "food:taxon:gallus_gallus:foot:raw"
+  ],
+  "凤爪": [
+    "food:taxon:gallus_gallus:foot:raw"
+  ],
+  "chickenfeet": [
+    "food:taxon:gallus_gallus:foot:raw"
+  ],
+  "food:taxon:gallus_gallus:thigh:raw": [
+    "food:taxon:gallus_gallus:thigh:raw"
+  ],
+  "food_taxon_gallus_gallus_thigh_raw": [
+    "food:taxon:gallus_gallus:thigh:raw"
+  ],
+  "鸡大腿": [
+    "food:taxon:gallus_gallus:thigh:raw"
+  ],
+  "鸡上腿": [
+    "food:taxon:gallus_gallus:thigh:raw"
+  ],
+  "带骨上腿": [
+    "food:taxon:gallus_gallus:thigh:raw"
+  ],
+  "chickenthigh": [
+    "food:taxon:gallus_gallus:thigh:raw"
+  ],
+  "food:taxon:gallus_gallus:whole_leg:raw": [
+    "food:taxon:gallus_gallus:whole_leg:raw"
+  ],
+  "food_taxon_gallus_gallus_whole_leg_raw": [
+    "food:taxon:gallus_gallus:whole_leg:raw"
+  ],
+  "鸡全腿": [
+    "food:taxon:gallus_gallus:whole_leg:raw"
+  ],
+  "手枪腿": [
+    "food:taxon:gallus_gallus:whole_leg:raw"
+  ],
+  "鸡排腿": [
+    "food:taxon:gallus_gallus:whole_leg:raw"
+  ],
+  "wholechickenleg": [
+    "food:taxon:gallus_gallus:whole_leg:raw"
+  ],
+  "food:taxon:gallus_gallus:wing_middle:raw": [
+    "food:taxon:gallus_gallus:wing_middle:raw"
+  ],
+  "food_taxon_gallus_gallus_wing_middle_raw": [
+    "food:taxon:gallus_gallus:wing_middle:raw"
+  ],
+  "鸡翅中": [
+    "food:taxon:gallus_gallus:wing_middle:raw"
+  ],
+  "鸡翅中段": [
+    "food:taxon:gallus_gallus:wing_middle:raw"
+  ],
+  "chickenwingflat": [
+    "food:taxon:gallus_gallus:wing_middle:raw"
+  ],
+  "food:taxon:gallus_gallus:wing_root:raw": [
+    "food:taxon:gallus_gallus:wing_root:raw"
+  ],
+  "food_taxon_gallus_gallus_wing_root_raw": [
+    "food:taxon:gallus_gallus:wing_root:raw"
+  ],
+  "鸡翅根": [
+    "food:taxon:gallus_gallus:wing_root:raw"
+  ],
+  "鸡翅根部": [
+    "food:taxon:gallus_gallus:wing_root:raw"
+  ],
+  "chickenwingdrumette": [
+    "food:taxon:gallus_gallus:wing_root:raw"
+  ],
+  "food:taxon:gallus_gallus:wing_tip:raw": [
+    "food:taxon:gallus_gallus:wing_tip:raw"
+  ],
+  "food_taxon_gallus_gallus_wing_tip_raw": [
+    "food:taxon:gallus_gallus:wing_tip:raw"
+  ],
+  "鸡翅尖": [
+    "food:taxon:gallus_gallus:wing_tip:raw"
+  ],
+  "翅尖": [
+    "food:taxon:gallus_gallus:wing_tip:raw"
+  ],
+  "chickenwingtip": [
+    "food:taxon:gallus_gallus:wing_tip:raw"
+  ],
+  "food:taxon:gallus_gallus:wing_whole:raw": [
+    "food:taxon:gallus_gallus:wing_whole:raw"
+  ],
+  "food_taxon_gallus_gallus_wing_whole_raw": [
+    "food:taxon:gallus_gallus:wing_whole:raw"
+  ],
+  "鸡全翅": [
+    "food:taxon:gallus_gallus:wing_whole:raw"
+  ],
+  "整翅": [
+    "food:taxon:gallus_gallus:wing_whole:raw"
+  ],
+  "wholechickenwing": [
+    "food:taxon:gallus_gallus:wing_whole:raw"
   ],
   "food:taxon:glebionis_coronaria:raw": [
     "food:taxon:glebionis_coronaria:raw"
@@ -2467,6 +2890,12 @@
     "food:taxon:lactuca_sativa:asparagus_lettuce"
   ],
   "莴苣": [
+    "food:taxon:lactuca_sativa:asparagus_lettuce"
+  ],
+  "莴笋": [
+    "food:taxon:lactuca_sativa:asparagus_lettuce"
+  ],
+  "青笋": [
     "food:taxon:lactuca_sativa:asparagus_lettuce"
   ],
   "asparaguslettuce": [

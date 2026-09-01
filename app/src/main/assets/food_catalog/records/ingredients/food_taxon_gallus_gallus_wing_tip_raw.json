@@ -1,0 +1,59 @@
+{
+  "id": "food:taxon:gallus_gallus:wing_tip:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "鸡翅尖",
+      "翅尖"
+    ],
+    "en": [
+      "Chicken wing tip"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.poultry"
+  ],
+  "edibleRatio": 0.25,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 230,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 18.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 17.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "chicken wing tip, edible portion"
+    }
+  ],
+  "description": {
+    "zh": "鸡翅尖，骨骼比例较高。",
+    "en": "Chicken wing tip with a high bone proportion."
+  },
+  "commonness": 3
+}

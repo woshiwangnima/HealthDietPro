@@ -1,0 +1,11 @@
+{
+  "id": "food:animal:duck:intestine",
+  "kind": "ingredient",
+  "names": {"zh": ["鸭肠"], "en": ["Duck intestine"]},
+  "categoryTags": ["food.meat_egg.offal"],
+  "edibleRatio": 1,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 140, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 14.0, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 8.0, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 1.0, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "duck intestine, cleaned edible portion"}],
+  "description": {"zh": "清洗后的鸭肠，营养值受去脂和处理方式影响。", "en": "Cleaned duck intestine; values vary with trimming and preparation."},
+  "commonness": 4
+}

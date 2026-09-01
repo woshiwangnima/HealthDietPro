@@ -1,0 +1,59 @@
+{
+  "id": "food:processed:mustard_tuber",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "榨菜",
+      "榨菜丝"
+    ],
+    "en": [
+      "Pickled mustard tuber"
+    ]
+  },
+  "categoryTags": [
+    "food.processed.pickle"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 38,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 2.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 0.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 6.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "Chinese packaged food label reference",
+      "reference": "pickled mustard tuber; sodium varies by rinsing and brand"
+    }
+  ],
+  "description": {
+    "zh": "腌制芥菜块，钠含量较高，食用前冲洗会改变实际摄入。",
+    "en": "Pickled mustard tuber; sodium is high and rinsing changes intake."
+  },
+  "commonness": 5
+}

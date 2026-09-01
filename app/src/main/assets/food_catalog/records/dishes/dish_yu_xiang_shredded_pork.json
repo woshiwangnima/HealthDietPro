@@ -1,0 +1,93 @@
+{
+  "id": "dish:yu_xiang_shredded_pork",
+  "kind": "dish",
+  "names": {
+    "zh": [
+      "鱼香肉丝"
+    ],
+    "en": [
+      "Yu xiang shredded pork"
+    ]
+  },
+  "components": [
+    {
+      "foodId": "food:taxon:capsicum_annuum:chili",
+      "quantity": {
+        "value": 30,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:taxon:sus_scrofa:lean_raw",
+      "quantity": {
+        "value": 200,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:plant_oil:generic",
+      "quantity": {
+        "value": 18,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:seasoning:soy_sauce",
+      "quantity": {
+        "value": 10,
+        "unitCategory": "volume",
+        "unitId": "ml"
+      }
+    },
+    {
+      "foodId": "food:seasoning:vinegar",
+      "quantity": {
+        "value": 12,
+        "unitCategory": "volume",
+        "unitId": "ml"
+      }
+    },
+    {
+      "foodId": "food:seasoning:sugar",
+      "quantity": {
+        "value": 8,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "cuisine": "cuisine.chinese",
+  "dishCategories": [
+    "dishcat.home"
+  ],
+  "techniqueId": "pan_fried",
+  "difficulty": 2,
+  "servesPeople": 2,
+  "recipeSteps": [
+    {
+      "text": "瘦肉切丝，辣椒切碎，调好酱油、醋和糖的鱼香汁。",
+      "minutes": 8
+    },
+    {
+      "text": "肉丝滑炒至变色，加入辣椒和鱼香汁快速炒匀。",
+      "minutes": 8
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition is resolved from listed ingredients"
+    }
+  ],
+  "description": {
+    "zh": "家常鱼香肉丝，营养由瘦猪肉、辣椒、食用油、酱油、醋和糖按用量实时求和。",
+    "en": "Home-style yu xiang shredded pork with sweet-sour savory seasoning."
+  },
+  "commonness": 5
+}

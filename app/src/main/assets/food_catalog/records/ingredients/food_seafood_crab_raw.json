@@ -1,0 +1,60 @@
+{
+  "id": "food:seafood:crab:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "梭子蟹",
+      "海蟹",
+      "螃蟹"
+    ],
+    "en": [
+      "Swimming crab"
+    ]
+  },
+  "categoryTags": [
+    "food.seafood.crab"
+  ],
+  "edibleRatio": 0.3,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 103,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 17.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 2.6,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "crab, edible portion"
+    }
+  ],
+  "description": {
+    "zh": "带壳鲜蟹，营养按可食部计。",
+    "en": "Fresh crab; values are per edible portion."
+  },
+  "commonness": 4
+}

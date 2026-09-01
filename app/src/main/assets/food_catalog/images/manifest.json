@@ -5,6 +5,14 @@
       "thumb": "images/thumb/food_beverage_cola.webp",
       "detail": "images/detail/food_beverage_cola.webp"
     },
+    "food:processed:instant_noodle_cake": {
+      "thumb": "images/thumb/food_processed_instant_noodle_cake.webp",
+      "detail": "images/detail/food_processed_instant_noodle_cake.webp"
+    },
+    "food:taxon:gallus_gallus:wing_root:raw": {
+      "thumb": "images/thumb/food_taxon_gallus_gallus_wing_root_raw.webp",
+      "detail": "images/detail/food_taxon_gallus_gallus_wing_root_raw.webp"
+    },
     "food:taxon:gallus_gallus:breast:raw": {
       "thumb": "images/thumb/food_taxon_gallus_gallus_breast_raw.webp",
       "detail": "images/detail/food_taxon_gallus_gallus_breast_raw.webp"
@@ -17,13 +25,25 @@
       "thumb": "images/thumb/food_taxon_pleurotus_eryngii_raw.webp",
       "detail": "images/detail/food_taxon_pleurotus_eryngii_raw.webp"
     },
+    "food:seafood:shrimp:raw": {
+      "thumb": "images/thumb/food_seafood_shrimp_raw.webp",
+      "detail": "images/detail/food_seafood_shrimp_raw.webp"
+    },
     "food:taxon:zea_mays:boiled": {
       "thumb": "images/thumb/food_taxon_zea_mays_boiled.webp",
       "detail": "images/detail/food_taxon_zea_mays_boiled.webp"
     },
+    "dish:boiled_pork_slices": {
+      "thumb": "images/thumb/dish_boiled_pork_slices.webp",
+      "detail": "images/detail/dish_boiled_pork_slices.webp"
+    },
     "food:taxon:oryza_sativa:wholegrain:raw": {
       "thumb": "images/thumb/food_taxon_oryza_sativa_wholegrain_raw.webp",
       "detail": "images/detail/food_taxon_oryza_sativa_wholegrain_raw.webp"
+    },
+    "dish:farmhouse_one_bowl": {
+      "thumb": "images/thumb/dish_farmhouse_one_bowl.webp",
+      "detail": "images/detail/dish_farmhouse_one_bowl.webp"
     },
     "food:taxon:eleocharis_dulcis:raw": {
       "thumb": "images/thumb/food_taxon_eleocharis_dulcis_raw.webp",
@@ -117,6 +137,10 @@
       "thumb": "images/thumb/food_taxon_oryza_sativa_glutinous_raw.webp",
       "detail": "images/detail/food_taxon_oryza_sativa_glutinous_raw.webp"
     },
+    "dish:di_san_xian": {
+      "thumb": "images/thumb/dish_di_san_xian.webp",
+      "detail": "images/detail/dish_di_san_xian.webp"
+    },
     "food:taxon:arachis_hypogaea:raw": {
       "thumb": "images/thumb/food_taxon_arachis_hypogaea_raw.webp",
       "detail": "images/detail/food_taxon_arachis_hypogaea_raw.webp"
@@ -125,9 +149,17 @@
       "thumb": "images/thumb/food_taxon_panicum_miliaceum_raw.webp",
       "detail": "images/detail/food_taxon_panicum_miliaceum_raw.webp"
     },
+    "food:taxon:oryza_sativa:rice_cake": {
+      "thumb": "images/thumb/food_taxon_oryza_sativa_rice_cake.webp",
+      "detail": "images/detail/food_taxon_oryza_sativa_rice_cake.webp"
+    },
     "food:taxon:brassica_rapa:choy_sum:raw": {
       "thumb": "images/thumb/food_taxon_brassica_rapa_choy_sum_raw.webp",
       "detail": "images/detail/food_taxon_brassica_rapa_choy_sum_raw.webp"
+    },
+    "food:seafood:prawn:raw": {
+      "thumb": "images/thumb/food_seafood_prawn_raw.webp",
+      "detail": "images/detail/food_seafood_prawn_raw.webp"
     },
     "food:taxon:sus_scrofa:lean_raw": {
       "thumb": "images/thumb/food_taxon_sus_scrofa_lean_raw.webp",
@@ -185,6 +217,10 @@
       "thumb": "images/thumb/food_taxon_anas_platyrhynchos_egg_whole.webp",
       "detail": "images/detail/food_taxon_anas_platyrhynchos_egg_whole.webp"
     },
+    "food:seafood:octopus:raw": {
+      "thumb": "images/thumb/food_seafood_octopus_raw.webp",
+      "detail": "images/detail/food_seafood_octopus_raw.webp"
+    },
     "food:taxon:allium_cepa:raw": {
       "thumb": "images/thumb/food_taxon_allium_cepa_raw.webp",
       "detail": "images/detail/food_taxon_allium_cepa_raw.webp"
@@ -192,6 +228,10 @@
     "food:taxon:gallus_gallus:egg:whole": {
       "thumb": "images/thumb/food_taxon_gallus_gallus_egg_whole.webp",
       "detail": "images/detail/food_taxon_gallus_gallus_egg_whole.webp"
+    },
+    "food:seafood:clam:raw": {
+      "thumb": "images/thumb/food_seafood_clam_raw.webp",
+      "detail": "images/detail/food_seafood_clam_raw.webp"
     },
     "food:taxon:helianthus_annuus:kernels:raw": {
       "thumb": "images/thumb/food_taxon_helianthus_annuus_kernels_raw.webp",
@@ -233,9 +273,17 @@
       "thumb": "images/thumb/food_taxon_malus_domestica_qing_banana_raw.webp",
       "detail": "images/detail/food_taxon_malus_domestica_qing_banana_raw.webp"
     },
+    "food:taxon:oryza_sativa:liangpi": {
+      "thumb": "images/thumb/food_taxon_oryza_sativa_liangpi.webp",
+      "detail": "images/detail/food_taxon_oryza_sativa_liangpi.webp"
+    },
     "food:taxon:glycine_max:tofu:firm": {
       "thumb": "images/thumb/food_taxon_glycine_max_tofu_firm.webp",
       "detail": "images/detail/food_taxon_glycine_max_tofu_firm.webp"
+    },
+    "food:taxon:gallus_gallus:wing_middle:raw": {
+      "thumb": "images/thumb/food_taxon_gallus_gallus_wing_middle_raw.webp",
+      "detail": "images/detail/food_taxon_gallus_gallus_wing_middle_raw.webp"
     },
     "food:taxon:citrus_limon:raw": {
       "thumb": "images/thumb/food_taxon_citrus_limon_raw.webp",
@@ -249,9 +297,17 @@
       "thumb": "images/thumb/food_taxon_allium_fistulosum_raw.webp",
       "detail": "images/detail/food_taxon_allium_fistulosum_raw.webp"
     },
+    "food:taxon:gallus_gallus:wing_whole:raw": {
+      "thumb": "images/thumb/food_taxon_gallus_gallus_wing_whole_raw.webp",
+      "detail": "images/detail/food_taxon_gallus_gallus_wing_whole_raw.webp"
+    },
     "food:taxon:macadamia_integrifolia:kernels:raw": {
       "thumb": "images/thumb/food_taxon_macadamia_integrifolia_kernels_raw.webp",
       "detail": "images/detail/food_taxon_macadamia_integrifolia_kernels_raw.webp"
+    },
+    "food:taxon:ipomoea_batatas:steamed": {
+      "thumb": "images/thumb/food_taxon_ipomoea_batatas_steamed.webp",
+      "detail": "images/detail/food_taxon_ipomoea_batatas_steamed.webp"
     },
     "food:taxon:ipomoea_aquatica:raw": {
       "thumb": "images/thumb/food_taxon_ipomoea_aquatica_raw.webp",
@@ -285,9 +341,17 @@
       "thumb": "images/thumb/food_taxon_anacardium_occidentale_kernels_raw.webp",
       "detail": "images/detail/food_taxon_anacardium_occidentale_kernels_raw.webp"
     },
+    "food:taxon:oryza_sativa:zongzi": {
+      "thumb": "images/thumb/food_taxon_oryza_sativa_zongzi.webp",
+      "detail": "images/detail/food_taxon_oryza_sativa_zongzi.webp"
+    },
     "food:taxon:benincasa_hispida:chieh_qua:raw": {
       "thumb": "images/thumb/food_taxon_benincasa_hispida_chieh_qua_raw.webp",
       "detail": "images/detail/food_taxon_benincasa_hispida_chieh_qua_raw.webp"
+    },
+    "food:taxon:gallus_gallus:thigh:raw": {
+      "thumb": "images/thumb/food_taxon_gallus_gallus_thigh_raw.webp",
+      "detail": "images/detail/food_taxon_gallus_gallus_thigh_raw.webp"
     },
     "food:taxon:raphanus_sativus:green:raw": {
       "thumb": "images/thumb/food_taxon_raphanus_sativus_green_raw.webp",
@@ -321,6 +385,10 @@
       "thumb": "images/thumb/food_taxon_pisum_sativum_fresh_peas_raw.webp",
       "detail": "images/detail/food_taxon_pisum_sativum_fresh_peas_raw.webp"
     },
+    "food:beverage:soy_milk:commercial": {
+      "thumb": "images/thumb/food_beverage_soy_milk_commercial.webp",
+      "detail": "images/detail/food_beverage_soy_milk_commercial.webp"
+    },
     "food:taxon:gallus_gallus:egg:pan_fried": {
       "thumb": "images/thumb/food_taxon_gallus_gallus_egg_pan_fried.webp",
       "detail": "images/detail/food_taxon_gallus_gallus_egg_pan_fried.webp"
@@ -349,6 +417,10 @@
       "thumb": "images/thumb/food_taxon_cucumis_sativus_commercial_raw.webp",
       "detail": "images/detail/food_taxon_cucumis_sativus_commercial_raw.webp"
     },
+    "food:seafood:crab:raw": {
+      "thumb": "images/thumb/food_seafood_crab_raw.webp",
+      "detail": "images/detail/food_seafood_crab_raw.webp"
+    },
     "food:taxon:lactuca_sativa:asparagus_lettuce": {
       "thumb": "images/thumb/food_taxon_lactuca_sativa_asparagus_lettuce.webp",
       "detail": "images/detail/food_taxon_lactuca_sativa_asparagus_lettuce.webp"
@@ -357,9 +429,21 @@
       "thumb": "images/thumb/food_taxon_amaranthus_tricolor_raw.webp",
       "detail": "images/detail/food_taxon_amaranthus_tricolor_raw.webp"
     },
+    "food:beverage:tea": {
+      "thumb": "images/thumb/food_beverage_tea.webp",
+      "detail": "images/detail/food_beverage_tea.webp"
+    },
+    "food:taxon:triticum_aestivum:bread_whole_wheat": {
+      "thumb": "images/thumb/food_taxon_triticum_aestivum_bread_whole_wheat.webp",
+      "detail": "images/detail/food_taxon_triticum_aestivum_bread_whole_wheat.webp"
+    },
     "food:taxon:capsicum_annuum:chili": {
       "thumb": "images/thumb/food_taxon_capsicum_annuum_chili.webp",
       "detail": "images/detail/food_taxon_capsicum_annuum_chili.webp"
+    },
+    "food:beverage:coffee:black": {
+      "thumb": "images/thumb/food_beverage_coffee_black.webp",
+      "detail": "images/detail/food_beverage_coffee_black.webp"
     },
     "food:taxon:prunus_dulcis:kernels:raw": {
       "thumb": "images/thumb/food_taxon_prunus_dulcis_kernels_raw.webp",
@@ -377,6 +461,10 @@
       "thumb": "images/thumb/food_beverage_fruit_juice.webp",
       "detail": "images/detail/food_beverage_fruit_juice.webp"
     },
+    "food:taxon:gallus_gallus:foot:raw": {
+      "thumb": "images/thumb/food_taxon_gallus_gallus_foot_raw.webp",
+      "detail": "images/detail/food_taxon_gallus_gallus_foot_raw.webp"
+    },
     "food:taxon:cucurbita_pepo:zucchini:raw": {
       "thumb": "images/thumb/food_taxon_cucurbita_pepo_zucchini_raw.webp",
       "detail": "images/detail/food_taxon_cucurbita_pepo_zucchini_raw.webp"
@@ -389,9 +477,29 @@
       "thumb": "images/thumb/food_beverage_milk_tea.webp",
       "detail": "images/detail/food_beverage_milk_tea.webp"
     },
+    "food:seafood:oyster:raw": {
+      "thumb": "images/thumb/food_seafood_oyster_raw.webp",
+      "detail": "images/detail/food_seafood_oyster_raw.webp"
+    },
+    "food:taxon:triticum_aestivum:bread_white": {
+      "thumb": "images/thumb/food_taxon_triticum_aestivum_bread_white.webp",
+      "detail": "images/detail/food_taxon_triticum_aestivum_bread_white.webp"
+    },
+    "food:seafood:squid:raw": {
+      "thumb": "images/thumb/food_seafood_squid_raw.webp",
+      "detail": "images/detail/food_seafood_squid_raw.webp"
+    },
     "food:seasoning:brown_sugar": {
       "thumb": "images/thumb/food_seasoning_brown_sugar.webp",
       "detail": "images/detail/food_seasoning_brown_sugar.webp"
+    },
+    "food:beverage:lemon_water": {
+      "thumb": "images/thumb/food_beverage_lemon_water.webp",
+      "detail": "images/detail/food_beverage_lemon_water.webp"
+    },
+    "food:processed:mustard_tuber": {
+      "thumb": "images/thumb/food_processed_mustard_tuber.webp",
+      "detail": "images/detail/food_processed_mustard_tuber.webp"
     },
     "dish:chili_scrambled_egg": {
       "thumb": "images/thumb/dish_chili_scrambled_egg.webp",
@@ -404,6 +512,10 @@
     "food:taxon:sagittaria_sagittifolia:raw": {
       "thumb": "images/thumb/food_taxon_sagittaria_sagittifolia_raw.webp",
       "detail": "images/detail/food_taxon_sagittaria_sagittifolia_raw.webp"
+    },
+    "food:taxon:oryza_sativa:rice_noodles": {
+      "thumb": "images/thumb/food_taxon_oryza_sativa_rice_noodles.webp",
+      "detail": "images/detail/food_taxon_oryza_sativa_rice_noodles.webp"
     },
     "food:beverage:cola:sugar_free": {
       "thumb": "images/thumb/food_beverage_cola_sugar_free.webp",
@@ -477,6 +589,10 @@
       "thumb": "images/thumb/food_taxon_cucurbita_moschata_raw.webp",
       "detail": "images/detail/food_taxon_cucurbita_moschata_raw.webp"
     },
+    "food:processed:ham_sausage": {
+      "thumb": "images/thumb/food_processed_ham_sausage.webp",
+      "detail": "images/detail/food_processed_ham_sausage.webp"
+    },
     "food:taxon:oryza_sativa:polished:steamed": {
       "thumb": "images/thumb/food_taxon_oryza_sativa_polished_steamed.webp",
       "detail": "images/detail/food_taxon_oryza_sativa_polished_steamed.webp"
@@ -537,6 +653,10 @@
       "thumb": "images/thumb/food_plant_oil_corn.webp",
       "detail": "images/detail/food_plant_oil_corn.webp"
     },
+    "food:taxon:triticum_aestivum:youtiao": {
+      "thumb": "images/thumb/food_taxon_triticum_aestivum_youtiao.webp",
+      "detail": "images/detail/food_taxon_triticum_aestivum_youtiao.webp"
+    },
     "food:taxon:daucus_carota:raw": {
       "thumb": "images/thumb/food_taxon_daucus_carota_raw.webp",
       "detail": "images/detail/food_taxon_daucus_carota_raw.webp"
@@ -557,9 +677,21 @@
       "thumb": "images/thumb/food_taxon_agaricus_bisporus_raw.webp",
       "detail": "images/detail/food_taxon_agaricus_bisporus_raw.webp"
     },
+    "food:beverage:brown_sugar_water": {
+      "thumb": "images/thumb/food_beverage_brown_sugar_water.webp",
+      "detail": "images/detail/food_beverage_brown_sugar_water.webp"
+    },
     "food:taxon:solanum_melongena:slender_raw": {
       "thumb": "images/thumb/food_taxon_solanum_melongena_slender_raw.webp",
       "detail": "images/detail/food_taxon_solanum_melongena_slender_raw.webp"
+    },
+    "food:taxon:gallus_gallus:drumstick:raw": {
+      "thumb": "images/thumb/food_taxon_gallus_gallus_drumstick_raw.webp",
+      "detail": "images/detail/food_taxon_gallus_gallus_drumstick_raw.webp"
+    },
+    "dish:yu_xiang_shredded_pork": {
+      "thumb": "images/thumb/dish_yu_xiang_shredded_pork.webp",
+      "detail": "images/detail/dish_yu_xiang_shredded_pork.webp"
     },
     "food:taxon:nasturtium_officinale:raw": {
       "thumb": "images/thumb/food_taxon_nasturtium_officinale_raw.webp",
@@ -577,9 +709,21 @@
       "thumb": "images/thumb/food_taxon_nelumbo_nucifera_rhizome_raw.webp",
       "detail": "images/detail/food_taxon_nelumbo_nucifera_rhizome_raw.webp"
     },
+    "food:taxon:oryza_sativa:porridge": {
+      "thumb": "images/thumb/food_taxon_oryza_sativa_porridge.webp",
+      "detail": "images/detail/food_taxon_oryza_sativa_porridge.webp"
+    },
     "food:taxon:hypophthalmichthys_nobilis:raw": {
       "thumb": "images/thumb/food_taxon_hypophthalmichthys_nobilis_raw.webp",
       "detail": "images/detail/food_taxon_hypophthalmichthys_nobilis_raw.webp"
+    },
+    "food:taxon:gallus_gallus:whole_leg:raw": {
+      "thumb": "images/thumb/food_taxon_gallus_gallus_whole_leg_raw.webp",
+      "detail": "images/detail/food_taxon_gallus_gallus_whole_leg_raw.webp"
+    },
+    "food:taxon:triticum_aestivum:meat_bun": {
+      "thumb": "images/thumb/food_taxon_triticum_aestivum_meat_bun.webp",
+      "detail": "images/detail/food_taxon_triticum_aestivum_meat_bun.webp"
     },
     "food:taxon:brassica_rapa:oleifera:raw": {
       "thumb": "images/thumb/food_taxon_brassica_rapa_oleifera_raw.webp",
@@ -588,6 +732,10 @@
     "food:taxon:panicum_miliaceum:porridge": {
       "thumb": "images/thumb/food_taxon_panicum_miliaceum_porridge.webp",
       "detail": "images/detail/food_taxon_panicum_miliaceum_porridge.webp"
+    },
+    "food:taxon:gallus_gallus:wing_tip:raw": {
+      "thumb": "images/thumb/food_taxon_gallus_gallus_wing_tip_raw.webp",
+      "detail": "images/detail/food_taxon_gallus_gallus_wing_tip_raw.webp"
     },
     "food:taxon:auricularia_auricula:fresh:raw": {
       "thumb": "images/thumb/food_taxon_auricularia_auricula_fresh_raw.webp",
@@ -637,6 +785,14 @@
       "thumb": "images/thumb/food_taxon_lagenaria_siceraria_raw.webp",
       "detail": "images/detail/food_taxon_lagenaria_siceraria_raw.webp"
     },
+    "food:taxon:oryza_sativa:glutinous_herb_cake": {
+      "thumb": "images/thumb/food_taxon_oryza_sativa_glutinous_herb_cake.webp",
+      "detail": "images/detail/food_taxon_oryza_sativa_glutinous_herb_cake.webp"
+    },
+    "food:taxon:fagopyrum_esculentum:steamed_cake": {
+      "thumb": "images/thumb/food_taxon_fagopyrum_esculentum_steamed_cake.webp",
+      "detail": "images/detail/food_taxon_fagopyrum_esculentum_steamed_cake.webp"
+    },
     "food:taxon:raphanus_sativus:raw": {
       "thumb": "images/thumb/food_taxon_raphanus_sativus_raw.webp",
       "detail": "images/detail/food_taxon_raphanus_sativus_raw.webp"
@@ -648,6 +804,10 @@
     "food:taxon:colocasia_esculenta:raw": {
       "thumb": "images/thumb/food_taxon_colocasia_esculenta_raw.webp",
       "detail": "images/detail/food_taxon_colocasia_esculenta_raw.webp"
+    },
+    "food:taxon:triticum_aestivum:mantou": {
+      "thumb": "images/thumb/food_taxon_triticum_aestivum_mantou.webp",
+      "detail": "images/detail/food_taxon_triticum_aestivum_mantou.webp"
     }
   }
 }

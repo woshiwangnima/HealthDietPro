@@ -56,6 +56,7 @@ internal fun AppSettingsScreen(
         AppCacheKind.CodeFiles to stringResource(R.string.settings_cache_entry_code_files),
         AppCacheKind.ExternalFiles to stringResource(R.string.settings_cache_entry_external_files),
         AppCacheKind.FoodImages to stringResource(R.string.settings_cache_entry_food_images),
+        AppCacheKind.FoodCardMetadata to stringResource(R.string.settings_cache_entry_food_card_metadata),
         AppCacheKind.ProfileAvatars to stringResource(R.string.settings_cache_entry_profile_avatars),
     )
     val cacheEntryTemplate = stringResource(R.string.settings_cache_entry)

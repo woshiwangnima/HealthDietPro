@@ -1,0 +1,8 @@
+{
+  "id": "food:seafood:oyster:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["生蚝", "牡蛎", "海蛎子"], "en": ["Oyster"]},
+  "categoryTags": ["food.seafood.shellfish"], "edibleRatio": 0.15,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 73, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 5.3, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 2.1, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 7.1, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "oyster, edible portion"}], "description": {"zh": "带壳或去壳生蚝，按可食部计。", "en": "Oyster, values per edible portion."}, "commonness": 4
+}

@@ -1,0 +1,60 @@
+{
+  "id": "food:taxon:gallus_gallus:thigh:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "鸡大腿",
+      "鸡上腿",
+      "带骨上腿"
+    ],
+    "en": [
+      "Chicken thigh"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.poultry"
+  ],
+  "edibleRatio": 0.72,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 181,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 17.3,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 12.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "chicken thigh, edible portion"
+    }
+  ],
+  "description": {
+    "zh": "带骨鸡上腿，按可食部计。",
+    "en": "Bone-in chicken upper thigh, values per edible portion."
+  },
+  "commonness": 5
+}

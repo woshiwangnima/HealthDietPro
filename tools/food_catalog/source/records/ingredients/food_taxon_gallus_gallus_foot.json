@@ -1,0 +1,11 @@
+{
+  "id": "food:taxon:gallus_gallus:foot:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["鸡爪", "凤爪"], "en": ["Chicken feet"]},
+  "categoryTags": ["food.meat_egg.poultry"],
+  "edibleRatio": 0.35,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 254, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 23.9, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 16.4, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 0, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "chicken feet, edible portion"}],
+  "description": {"zh": "鸡爪，胶原蛋白和脂肪含量受去皮及烹调影响。", "en": "Chicken feet; skin removal and cooking affect collagen and fat."},
+  "commonness": 4
+}

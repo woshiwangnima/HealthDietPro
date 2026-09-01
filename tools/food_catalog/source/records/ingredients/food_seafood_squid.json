@@ -1,0 +1,8 @@
+{
+  "id": "food:seafood:squid:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["鱿鱼", "鲜鱿", "枪乌贼"], "en": ["Squid"]},
+  "categoryTags": ["food.seafood.mollusk"], "edibleRatio": 0.8,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 92, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 15.6, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 1.4, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 3.1, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "squid, cleaned edible portion"}], "description": {"zh": "去内脏、去软骨后的鲜鱿。", "en": "Cleaned fresh squid after removing viscera and cartilage."}, "commonness": 5
+}

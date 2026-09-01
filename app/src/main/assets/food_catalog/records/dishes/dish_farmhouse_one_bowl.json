@@ -1,0 +1,85 @@
+{
+  "id": "dish:farmhouse_one_bowl",
+  "kind": "dish",
+  "names": {
+    "zh": [
+      "农家一碗香"
+    ],
+    "en": [
+      "Farmhouse one-bowl stir-fry"
+    ]
+  },
+  "components": [
+    {
+      "foodId": "food:taxon:sus_scrofa:lean_raw",
+      "quantity": {
+        "value": 120,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:taxon:gallus_gallus:egg:whole",
+      "quantity": {
+        "value": 150,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:taxon:capsicum_annuum:chili",
+      "quantity": {
+        "value": 60,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:taxon:allium_cepa:raw",
+      "quantity": {
+        "value": 80,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    },
+    {
+      "foodId": "food:plant_oil:generic",
+      "quantity": {
+        "value": 18,
+        "unitCategory": "weight",
+        "unitId": "g"
+      }
+    }
+  ],
+  "systemTags": [
+    "common"
+  ],
+  "cuisine": "cuisine.chinese",
+  "dishCategories": [
+    "dishcat.home"
+  ],
+  "techniqueId": "pan_fried",
+  "difficulty": 2,
+  "servesPeople": 2,
+  "recipeSteps": [
+    {
+      "text": "猪肉切片，辣椒和洋葱切段，鸡蛋打散。",
+      "minutes": 8
+    },
+    {
+      "text": "先炒鸡蛋和肉片，再加入辣椒、洋葱合炒。",
+      "minutes": 10
+    }
+  ],
+  "sources": [
+    {
+      "dataset": "Recipe composition model",
+      "reference": "nutrition is resolved from listed ingredients"
+    }
+  ],
+  "description": {
+    "zh": "湖南家常风味炒菜，配料可按家庭习惯调整。",
+    "en": "Hunan-style farmhouse stir-fry with pork, egg and chili."
+  },
+  "commonness": 3
+}

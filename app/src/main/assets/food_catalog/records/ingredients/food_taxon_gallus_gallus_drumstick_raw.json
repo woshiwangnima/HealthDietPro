@@ -1,0 +1,60 @@
+{
+  "id": "food:taxon:gallus_gallus:drumstick:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "琵琶腿",
+      "鸡小腿",
+      "棒棒腿"
+    ],
+    "en": [
+      "Chicken drumstick"
+    ]
+  },
+  "categoryTags": [
+    "food.meat_egg.poultry"
+  ],
+  "edibleRatio": 0.7,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 161,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 18.5,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 9.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "chicken drumstick, edible portion"
+    }
+  ],
+  "description": {
+    "zh": "带骨鸡小腿，按可食部计。",
+    "en": "Bone-in chicken drumstick, values per edible portion."
+  },
+  "commonness": 5
+}

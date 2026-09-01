@@ -1,0 +1,11 @@
+{
+  "id": "food:animal:duck:blood",
+  "kind": "ingredient",
+  "names": {"zh": ["鸭血", "鸭血块"], "en": ["Duck blood curd"]},
+  "categoryTags": ["food.meat_egg.offal"],
+  "edibleRatio": 1,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 55, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 13.0, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 0.3, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 0, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "duck blood curd"}],
+  "description": {"zh": "凝固鸭血制品，铁含量和钠含量因加工而异。", "en": "Duck blood curd; iron and sodium vary with processing."},
+  "commonness": 4
+}

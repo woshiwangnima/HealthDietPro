@@ -1,0 +1,11 @@
+{
+  "id": "food:taxon:gallus_gallus:wing_middle:raw",
+  "kind": "ingredient",
+  "names": {"zh": ["鸡翅中", "鸡翅中段"], "en": ["Chicken wing flat"]},
+  "categoryTags": ["food.meat_egg.poultry"],
+  "edibleRatio": 0.55,
+  "nutritionTables": {"standard.100g": {"basis": {"value": 100, "unitCategory": "weight", "unitId": "g"}, "nutrients": {"ENERGY": {"value": 222, "unitCategory": "energy", "unitId": "kcal"}, "PROTEIN": {"value": 18.3, "unitCategory": "weight", "unitId": "g"}, "FAT": {"value": 16.0, "unitCategory": "weight", "unitId": "g"}, "CHO": {"value": 0, "unitCategory": "weight", "unitId": "g"}}}},
+  "sources": [{"dataset": "China Food Composition Tables", "reference": "chicken wing flat, edible portion"}],
+  "description": {"zh": "鸡翅中段，市场常见分割部位。", "en": "The flat section of chicken wing."},
+  "commonness": 5
+}

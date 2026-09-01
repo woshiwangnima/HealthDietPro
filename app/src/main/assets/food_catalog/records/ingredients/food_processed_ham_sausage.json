@@ -1,0 +1,59 @@
+{
+  "id": "food:processed:ham_sausage",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "火腿肠",
+      "香肠火腿肠"
+    ],
+    "en": [
+      "Ham sausage"
+    ]
+  },
+  "categoryTags": [
+    "food.processed.meat"
+  ],
+  "edibleRatio": 1,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 212,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 14.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 15.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 6.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "Chinese packaged food label reference",
+      "reference": "typical ham sausage; brand values vary"
+    }
+  ],
+  "description": {
+    "zh": "加工肉制品，品牌配方和钠含量差异较大，应以包装标签为准。",
+    "en": "Processed meat; brand recipes and sodium vary, so check the package label."
+  },
+  "commonness": 5
+}

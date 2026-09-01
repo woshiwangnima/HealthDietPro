@@ -1,0 +1,16 @@
+{
+  "id": "dish:di_san_xian",
+  "kind": "dish",
+  "names": {"zh": ["地三鲜"], "en": ["Di san xian"]},
+  "components": [
+    {"foodId": "food:taxon:solanum_melongena:raw", "quantity": {"value": 200, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:taxon:solanum_tuberosum:raw", "quantity": {"value": 200, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:taxon:capsicum_annuum:bell_green:raw", "quantity": {"value": 100, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:plant_oil:generic", "quantity": {"value": 30, "unitCategory": "weight", "unitId": "g"}},
+    {"foodId": "food:seasoning:soy_sauce", "quantity": {"value": 12, "unitCategory": "volume", "unitId": "ml"}}
+  ],
+  "systemTags": ["common"], "cuisine": "cuisine.chinese", "dishCategories": ["dishcat.home"], "techniqueId": "pan_fried", "difficulty": 2, "servesPeople": 2,
+  "recipeSteps": [{"text": "茄子、土豆和青椒切块。", "minutes": 8}, {"text": "分别煎至表面微黄，再合炒并加入酱油调味。", "minutes": 12}],
+  "sources": [{"dataset": "Recipe composition model", "reference": "nutrition is resolved from listed vegetables, oil and seasoning"}],
+  "description": {"zh": "东北家常菜，营养由茄子、土豆、青椒、食用油和酱油按用量实时求和。", "en": "Northeastern Chinese home-style vegetables."}, "commonness": 4
+}

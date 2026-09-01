@@ -761,6 +761,7 @@
     <string name="settings_cache_entry_code_files">编译代码缓存</string>
     <string name="settings_cache_entry_external_files">外部临时文件</string>
     <string name="settings_cache_entry_food_images">食物图片内存缓存</string>
+    <string name="settings_cache_entry_food_card_metadata">食品卡片元数据内存缓存</string>
     <string name="settings_cache_entry_profile_avatars">用户头像内存缓存</string>
     <string name="settings_default_font_size">默认字体大小</string>
     <string name="settings_default_font_size_desc">应用于本软件内所有用户与已 Compose 化界面</string>

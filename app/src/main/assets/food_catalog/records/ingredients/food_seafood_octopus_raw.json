@@ -1,0 +1,59 @@
+{
+  "id": "food:seafood:octopus:raw",
+  "kind": "ingredient",
+  "names": {
+    "zh": [
+      "章鱼",
+      "八爪鱼"
+    ],
+    "en": [
+      "Octopus"
+    ]
+  },
+  "categoryTags": [
+    "food.seafood.mollusk"
+  ],
+  "edibleRatio": 0.75,
+  "nutritionTables": {
+    "standard.100g": {
+      "basis": {
+        "value": 100,
+        "unitCategory": "weight",
+        "unitId": "g"
+      },
+      "nutrients": {
+        "ENERGY": {
+          "value": 82,
+          "unitCategory": "energy",
+          "unitId": "kcal"
+        },
+        "PROTEIN": {
+          "value": 14.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "FAT": {
+          "value": 1.0,
+          "unitCategory": "weight",
+          "unitId": "g"
+        },
+        "CHO": {
+          "value": 2.2,
+          "unitCategory": "weight",
+          "unitId": "g"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "dataset": "China Food Composition Tables",
+      "reference": "octopus, edible portion"
+    }
+  ],
+  "description": {
+    "zh": "常见软体海产品，清洗后食用。",
+    "en": "Common mollusk seafood, cleaned before cooking."
+  },
+  "commonness": 3
+}

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.WindowInsets as AndroidWindowInsets
 import android.view.WindowManager
 import android.widget.Toast
+import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +27,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
@@ -478,6 +481,7 @@ class MainActivity : BaseActivity() {
 
     @Composable
     private fun MainContent(padding: PaddingValues) {
+        val saveableStateHolder = rememberSaveableStateHolder()
         val modifier = Modifier
             .fillMaxSize()
             .padding(padding)
@@ -489,6 +493,7 @@ class MainActivity : BaseActivity() {
                     navItems.indexOfFirst { it.route == initialRoute }
             },
         ) { route ->
+            saveableStateHolder.SaveableStateProvider(route) {
             when (route) {
                 ROUTE_NUTRITION -> {
                     val nutritionState by nutritionViewModel.state.collectAsState()
@@ -558,6 +563,7 @@ class MainActivity : BaseActivity() {
                     }
                 }
             }
+            }
         }
     }
 
@@ -590,6 +596,7 @@ class MainActivity : BaseActivity() {
             restoreSoftInputMode()
             TabPersistence.saveIndex(this, MAIN_NAV_KEY, index)
         }
+        Log.d("MainNavigation", "switch $selectedRoute -> $route")
         selectedRoute = route
         isMainPageTransitionRunning = true
         window.decorView.postDelayed(

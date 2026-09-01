@@ -761,6 +761,7 @@
     <string name="settings_cache_entry_code_files">Compiled code cache</string>
     <string name="settings_cache_entry_external_files">External temporary files</string>
     <string name="settings_cache_entry_food_images">Food image memory cache</string>
+    <string name="settings_cache_entry_food_card_metadata">Food card metadata memory cache</string>
     <string name="settings_cache_entry_profile_avatars">Profile avatar memory cache</string>
     <string name="settings_default_font_size">Default Font Size</string>
     <string name="settings_default_font_size_desc">Applies to all users and Compose screens in this app</string>
