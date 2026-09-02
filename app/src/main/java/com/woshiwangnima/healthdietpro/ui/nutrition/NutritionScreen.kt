@@ -1,6 +1,8 @@
 package com.woshiwangnima.healthdietpro.ui.nutrition
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -74,12 +76,15 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -677,59 +682,8 @@ private fun CompactFilterChip(selected: Boolean, onClick: () -> Unit, modifier: 
     }
 }
 
-/**
- * 名字区块：可选笔图标(自定义) + 用彩色圆角背景包裹的正名(按 kind 上色) +（烹饪方式）+ 别名。
- * cookingSuffix 与正名同字号并加括号；别名相对小字号，多个用 / 隔开。
- */
 @Composable
-private fun FoodNameHeader(
-    food: FoodItem,
-    language: String,
-    isCustom: Boolean,
-    nameFontSize: androidx.compose.ui.unit.TextUnit,
-    cookingSuffix: String?,
-    aliases: List<String>,
-    modifier: Modifier = Modifier,
-) {
-    val colors = food.kind.nameColors()
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        if (isCustom) {
-            Icon(
-                Icons.Filled.Edit,
-                contentDescription = stringResource(R.string.nutrition_custom_marker),
-                modifier = Modifier.size(with(androidx.compose.ui.platform.LocalDensity.current) { nameFontSize.toDp() * 0.72f }),
-                tint = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(Modifier.width(2.dp))
-        }
-        Surface(shape = RoundedCornerShape(6.dp), color = colors.first) {
-            Text(
-                food.displayName(language),
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp),
-                style = TextStyle(fontSize = nameFontSize),
-                color = colors.second,
-            )
-        }
-        cookingSuffix?.let {
-            Text(
-                " ($it)",
-                style = TextStyle(fontSize = nameFontSize),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        if (aliases.isNotEmpty()) {
-            Spacer(Modifier.width(6.dp))
-            TextOverflowText(
-                text = aliases.joinToString(" / "),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f, fill = false),
-            )
-        }
-    }
-}
-
-@Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun FoodCardNameHeader(
     food: FoodItem,
     language: String,
@@ -738,7 +692,9 @@ private fun FoodCardNameHeader(
     modifier: Modifier = Modifier,
 ) {
     val colors = food.kind.nameColors()
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+    val copyText = buildFoodNameText(food.displayName(language), cookingSuffix, food.allNames(language).drop(1))
+    CopyableFoodNameArea(copyText, modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
         if (isCustom) {
             Icon(
                 Icons.Filled.Edit,
@@ -774,13 +730,23 @@ private fun FoodCardNameHeader(
                 }
             }
         }
+        }
     }
 }
+
+private fun buildFoodNameText(primaryName: String, cookingSuffix: String?, aliases: List<String>): String =
+    buildList {
+        add(primaryName)
+        cookingSuffix?.takeIf(String::isNotBlank)?.let { add("($it)") }
+        aliases.filter(String::isNotBlank).takeIf { it.isNotEmpty() }?.let { add(it.joinToString(" / ")) }
+    }.joinToString(" ")
 
 @Composable
 private fun FoodCardMetadataHeader(food: FoodCardMetadata) {
     val colors = food.kind.nameColors()
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    val copyText = buildFoodNameText(food.primaryName, food.cookingMethodLabel, food.aliases)
+    CopyableFoodNameArea(copyText) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
         if (food.isCustom) {
             Icon(Icons.Filled.Edit, stringResource(R.string.nutrition_custom_marker), Modifier.size(14.dp), tint = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.width(2.dp))
@@ -796,6 +762,29 @@ private fun FoodCardMetadataHeader(food: FoodCardMetadata) {
                 }
             }
         }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun CopyableFoodNameArea(
+    copyText: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
+    Box(
+        modifier = modifier.combinedClickable(
+            onClick = {},
+            onLongClick = {
+                clipboard.setText(AnnotatedString(copyText))
+                Toast.makeText(context, R.string.nutrition_name_copied, Toast.LENGTH_SHORT).show()
+            },
+        ),
+    ) {
+        content()
     }
 }
 

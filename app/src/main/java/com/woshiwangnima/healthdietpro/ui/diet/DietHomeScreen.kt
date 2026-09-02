@@ -1,13 +1,18 @@
 package com.woshiwangnima.healthdietpro.ui.diet
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -15,6 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,7 +46,9 @@ import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
 import com.woshiwangnima.healthdietpro.common.time.resolve
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
-import com.woshiwangnima.healthdietpro.common.ui.ActionSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.GaugeMetricGroup
+import com.woshiwangnima.healthdietpro.common.ui.GaugeReferenceValue
+import com.woshiwangnima.healthdietpro.common.ui.MappedValueGauge
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
@@ -46,6 +58,8 @@ import com.woshiwangnima.healthdietpro.model.diet.DietFoodEntry
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
+import com.woshiwangnima.healthdietpro.common.range.UnitRange
+import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import java.time.Instant
 import java.time.LocalDate
@@ -187,6 +201,7 @@ private fun DietRecordsTab(
                     items(records, key = DietRecord::id) { record ->
                         DietCard(
                             record = record,
+                            allRecords = uiState.records,
                             onOpen = { onOpen(record) },
                             onEdit = { onEdit(record) },
                             onDelete = { deleting = record },
@@ -226,6 +241,7 @@ private fun DietDateHeader(date: LocalDate) {
 @Composable
 internal fun DietCard(
     record: DietRecord,
+    allRecords: List<DietRecord> = listOf(record),
     onOpen: (() -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
@@ -233,56 +249,72 @@ internal fun DietCard(
     val totalCalories = record.entries.sumOf { entry ->
         entry.resolvedNutrients["ENERGY"]?.value ?: 0.0
     }
-    ActionSectionCard(
-        title = stringResource(record.mealPeriod.displayRes()),
-        titleIcon = { MealPeriodIcon(record.mealPeriod) },
-        onClick = onOpen,
-        headerActions = {
-            onEdit?.let { edit ->
-                androidx.compose.material3.IconButton(onClick = edit) {
-                    androidx.compose.material3.Icon(painterResource(R.drawable.ic_edit), stringResource(R.string.diet_edit), tint = MaterialTheme.colorScheme.primary)
+    val sameMeals = allRecords.filter { it.mealPeriod == record.mealPeriod }
+    val currentWeight = record.entries.sumOf(DietFoodEntry::netWeightGrams)
+    val mealWeights = sameMeals.map { it.entries.sumOf(DietFoodEntry::netWeightGrams) }
+    val mealCalories = sameMeals.map { meal -> meal.entries.sumOf { it.resolvedNutrients["ENERGY"]?.value ?: 0.0 } }
+    val weightGauge = mealGauge(stringResource(R.string.diet_metric_net_weight), currentWeight, mealWeights, "g", Color(0xFF00897B), stringResource(R.string.diet_history_low), stringResource(R.string.diet_history_high), stringResource(R.string.diet_history_average))
+    val calorieGauge = mealGauge(stringResource(R.string.diet_summary_energy), totalCalories, mealCalories, "kcal", Color(0xFFE65100), stringResource(R.string.diet_history_low), stringResource(R.string.diet_history_high), stringResource(R.string.diet_history_average))
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(1.dp)) {
+        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.Top) {
+            Card(modifier = Modifier.weight(1f).then(if (onOpen != null) Modifier.clickable(onClick = requireNotNull(onOpen)) else Modifier)) {
+                Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier.width(72.dp).height(24.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            MealPeriodIcon(record.mealPeriod, modifier = Modifier.fillMaxSize())
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(record.mealPeriod.displayRes()), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                        Text(stringResource(R.string.diet_item_count, record.entries.size), style = MaterialTheme.typography.bodyMedium)
+                    }
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        MealGauge(weightGauge, Modifier.weight(1f))
+                        MealGauge(calorieGauge, Modifier.weight(1f))
+                    }
+                    TextOverflowText(
+                        "${formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE)} - ${formatRecordTimestamp(record.mealEndAt, RecordTimePrecision.MINUTE)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    TextOverflowText(record.note, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
                 }
             }
-            onDelete?.let { delete ->
-                androidx.compose.material3.IconButton(onClick = delete) {
-                    androidx.compose.material3.Icon(painterResource(R.drawable.ic_delete), stringResource(R.string.diet_delete), tint = MaterialTheme.colorScheme.error)
-                }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                onEdit?.let { IconButton(onClick = it) { Icon(painterResource(R.drawable.ic_edit), stringResource(R.string.diet_edit), tint = MaterialTheme.colorScheme.primary) } }
+                onDelete?.let { IconButton(onClick = it) { Icon(painterResource(R.drawable.ic_delete), stringResource(R.string.diet_delete), tint = MaterialTheme.colorScheme.error) } }
             }
-        },
-    ) {
-        Text(
-            text = stringResource(R.string.diet_summary_calories, formatCalories(totalCalories)),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        HorizontalDivider()
-        Text(
-            text = stringResource(
-                R.string.diet_card_summary,
-                formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE),
-                formatRecordTimestamp(record.mealEndAt, RecordTimePrecision.MINUTE),
-                record.entries.size,
-                formatGrams(record.entries.sumOf(DietFoodEntry::netWeightGrams)),
-            ),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-        if (record.note.isNotBlank()) {
-            HorizontalDivider()
-            Text(
-                text = record.note,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
         }
     }
 }
+
+private fun mealGauge(label: String, current: Double, values: List<Double>, unit: String, color: Color, lowLabel: String, highLabel: String, averageLabel: String): GaugeMetricGroup {
+    val all = values + current
+    val rawMin = all.minOrNull() ?: current
+    val rawMax = all.maxOrNull() ?: current
+    val padding = (kotlin.math.abs(rawMax).coerceAtLeast(1.0) * 0.1).coerceAtLeast(1.0)
+    val min = if (rawMin == rawMax) rawMin - padding else rawMin
+    val max = if (rawMin == rawMax) rawMax + padding else rawMax
+    val references = listOfNotNull(
+        values.minOrNull()?.let { GaugeReferenceValue("min", lowLabel, it, Color(0xFF00897B)) },
+        values.maxOrNull()?.let { GaugeReferenceValue("max", highLabel, it, Color(0xFFC62828)) },
+        values.takeIf { it.isNotEmpty() }?.average()?.let { GaugeReferenceValue("avg", averageLabel, it, Color(0xFFF9A825)) },
+    )
+    return GaugeMetricGroup(label, label, current, UnitRange(min, true, max, true, if (unit == "g") "weight" else "energy", unit), color, references, unit)
+}
+
+@Composable
+private fun MealGauge(group: GaugeMetricGroup, modifier: Modifier = Modifier) {
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        MappedValueGauge(listOf(group), Modifier.fillMaxWidth(), showTooltip = false, gaugeHeight = 59.dp)
+        Text("${formatDietGaugeValue(group.currentValue)} ${group.unit}", style = MaterialTheme.typography.bodySmall, color = group.color)
+    }
+}
+
+private fun formatDietGaugeValue(value: Double): String = if (value % 1.0 == 0.0) value.toInt().toString() else "%.1f".format(value)
 
 internal fun MealPeriod.displayRes(): Int = when (this) {
     MealPeriod.PRE_BREAKFAST_SNACK -> R.string.diet_meal_period_pre_breakfast_snack

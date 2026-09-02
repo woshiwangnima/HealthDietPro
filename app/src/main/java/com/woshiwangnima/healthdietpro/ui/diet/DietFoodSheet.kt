@@ -57,6 +57,7 @@ import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
 import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodRepository
+import com.woshiwangnima.healthdietpro.model.food.searchMatchRank
 
 private enum class DietFoodSource { EXISTING, FREE_NAME }
 
@@ -506,13 +507,14 @@ private fun filteredFoods(
     return foods.filter { food ->
         if (kind != null && food.kind != kind) return@filter false
         if (customOnly && !UserCustomFoodRepository.isCustom(food.id)) return@filter false
-        val searchable = food.searchableNames().joinToString(" ").lowercase()
-        if (keyword.isNotBlank() && !searchable.contains(keyword.lowercase())) return@filter false
+        food.searchMatchRank(keyword) ?: return@filter false
         val tags = (food as? CategorizedFood)?.categoryTags.orEmpty()
         if (kind != FoodKind.DISH) {
             if (root != null && !viewModel.hasCategory(tags, root)) return@filter false
             if (child != null && !viewModel.hasCategory(tags, child)) return@filter false
         }
         true
-    }.sortedWith(compareByDescending<FoodItem> { it.commonness }.thenBy { it.displayName(language) })
+    }.sortedWith(compareBy<FoodItem> { it.searchMatchRank(keyword) ?: Int.MAX_VALUE }
+        .thenByDescending { it.commonness }
+        .thenBy { it.displayName(language) })
 }

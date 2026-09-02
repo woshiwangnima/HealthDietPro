@@ -1,6 +1,8 @@
 package com.woshiwangnima.healthdietpro.ui.diet
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -51,12 +53,9 @@ internal fun MealPeriodIcon(
 
 @Composable
 private fun MealIcon(image: ImageVector, tint: androidx.compose.ui.graphics.Color, modifier: Modifier) {
-    Icon(
-        imageVector = image,
-        contentDescription = null,
-        tint = tint,
-        modifier = modifier,
-    )
+    Box(modifier = modifier, contentAlignment = androidx.compose.ui.Alignment.Center) {
+        Icon(imageVector = image, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
+    }
 }
 
 @Composable
@@ -65,17 +64,17 @@ private fun MealIconGroup(
     tint: androidx.compose.ui.graphics.Color,
     modifier: Modifier,
 ) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(0.dp),
-    ) {
-        icons.forEach { icon ->
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = tint,
-                modifier = Modifier.size(if (icon == Icons.Filled.Add) 7.dp else 11.dp),
-            )
+    Box(modifier = modifier, contentAlignment = androidx.compose.ui.Alignment.Center) {
+        val iconSize = 20.dp
+        Row(horizontalArrangement = Arrangement.spacedBy(0.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            icons.forEach { icon ->
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.size(if (icon == Icons.Filled.Add) 8.dp else iconSize),
+                )
+            }
         }
     }
 }

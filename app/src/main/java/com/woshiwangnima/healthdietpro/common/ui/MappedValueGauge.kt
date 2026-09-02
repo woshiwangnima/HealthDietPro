@@ -52,6 +52,7 @@ internal data class GaugeMetricGroup(
     val range: Range<Double>,
     val color: Color,
     val references: List<GaugeReferenceValue> = emptyList(),
+    val unit: String = "",
 )
 
 private data class GaugeTooltip(val anchor: Offset)
@@ -61,6 +62,8 @@ private data class GaugeTooltip(val anchor: Offset)
 internal fun MappedValueGauge(
     groups: List<GaugeMetricGroup>,
     modifier: Modifier = Modifier,
+    showTooltip: Boolean = true,
+    gaugeHeight: androidx.compose.ui.unit.Dp = 140.dp,
 ) {
     val progress = remember { Animatable(0f) }
     LaunchedEffect(groups) {
@@ -72,20 +75,18 @@ internal fun MappedValueGauge(
     var canvasSize by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
     var tooltipSize by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
     Column(modifier) {
-        BoxWithConstraints(Modifier.fillMaxWidth().height(140.dp).padding(horizontal = 12.dp)) {
+        BoxWithConstraints(Modifier.fillMaxWidth().height(gaugeHeight).padding(horizontal = 6.dp)) {
             val density = androidx.compose.ui.platform.LocalDensity.current
             val tooltipWidth = 176.dp
             Canvas(
-                Modifier.fillMaxWidth().height(140.dp)
+                Modifier.fillMaxWidth().height(gaugeHeight)
                     .onSizeChanged { canvasSize = it }
-                    .pointerInput(groups, progress.value, canvasSize) {
-                        detectTapGestures { tap ->
-                            tooltip = GaugeTooltip(tap)
-                        }
-                    },
+                    .then(if (showTooltip) Modifier.pointerInput(groups, progress.value, canvasSize) {
+                        detectTapGestures { tap -> tooltip = GaugeTooltip(tap) }
+                    } else Modifier),
             ) {
             val stroke = size.minDimension * 0.075f
-            val radius = (size.minDimension - stroke) / 2f
+            val radius = ((size.width - stroke) / 2f).coerceAtMost(size.height - stroke)
             val center = Offset(size.width / 2f, size.height - stroke / 2f)
             val arcBounds = androidx.compose.ui.geometry.Rect(center = center, radius = radius)
             drawArc(trackColor, 180f, 180f, false, arcBounds.topLeft, arcBounds.size, style = Stroke(stroke, cap = StrokeCap.Round))
@@ -126,7 +127,7 @@ internal fun MappedValueGauge(
             }
             drawCircle(trackColor, stroke * 0.48f, center)
             }
-            tooltip?.let { target ->
+            if (showTooltip) tooltip?.let { target ->
                 val tooltipWidthPx = tooltipSize.width.takeIf { it > 0 }?.toFloat() ?: with(density) { tooltipWidth.toPx() }
                 val tooltipHeightPx = tooltipSize.height.toFloat()
                 val maxX = canvasSize.width - tooltipWidthPx

@@ -29,6 +29,7 @@ import com.woshiwangnima.healthdietpro.model.food.ResolvedNutrition
 import com.woshiwangnima.healthdietpro.model.food.ServingContainer
 import com.woshiwangnima.healthdietpro.model.food.ServingContainerRepository
 import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodRepository
+import com.woshiwangnima.healthdietpro.model.food.searchMatchRank
 import com.woshiwangnima.healthdietpro.model.food.UserFoodTag
 import com.woshiwangnima.healthdietpro.model.food.UserFoodTagRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -458,13 +459,10 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         return true
     }
     fun filteredFoods(language: String): List<FoodItem> = state.value.let { state ->
+        val matchRanks = state.foods.associate { food -> food.id to food.searchMatchRank(state.keyword) }
         val indexedIds = state.foods.map(FoodItem::id).toMutableSet().apply {
             if (state.keyword.isNotBlank()) {
-                val query = state.keyword.lowercase().replace(" ", "")
-                val searchIds = repository.searchIds(state.keyword) + state.foods.filter { food ->
-                    food.searchableNames().any { it.lowercase().replace(" ", "").contains(query) }
-                }.map(FoodItem::id)
-                retainAll(searchIds.toSet())
+                retainAll(matchRanks.filterValues { it != null }.keys)
             }
             if (state.selectedRoots.isNotEmpty()) {
                 val rootIds = state.selectedRoots.flatMap(repository::categoryIds) + state.foods
@@ -488,7 +486,6 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         state.foods.filter { food ->
             if (food.id !in indexedIds) return@filter false
             if (food.kind != state.selectedKind) return@filter false
-            val searchable = food.searchableNames().joinToString(" ").lowercase()
             val categoryTags = (food as? CategorizedFood)?.categoryTags.orEmpty()
             val root = repository.hasAnyCategory(categoryTags, state.selectedRoots)
             val child = state.selectedChildren.isEmpty() || state.selectedChildren.any { repository.hasCategory(categoryTags, it) }
@@ -501,9 +498,11 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
                 }
             }
             val custom = !state.customOnly || isCustom(food.id)
-            searchable.contains(state.keyword.lowercase()) && root && child && systemTag && custom
-        }
-    }.sortedWith(compareByDescending<FoodItem> { it.commonness }.thenBy { it.displayName(language) })
+            matchRanks[food.id] != null && root && child && systemTag && custom
+        }.sortedWith(compareBy<FoodItem> { matchRanks[it.id] ?: Int.MAX_VALUE }
+            .thenByDescending { it.commonness }
+            .thenBy { it.displayName(language) })
+    }
 
     fun filteredCardMetadata(language: String): List<FoodCardMetadata> = filteredFoods(language).map { food ->
         val key = "${food.id}#$language#${(food as? CategorizedFood)?.categoryTags.orEmpty().joinToString()}#${_state.value.favoriteFoodIds.contains(food.id)}#${_state.value.recentFoodIds.contains(food.id)}"
