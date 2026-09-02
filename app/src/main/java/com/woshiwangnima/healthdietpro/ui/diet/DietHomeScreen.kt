@@ -274,17 +274,36 @@ internal fun DietCard(
                         Text(stringResource(record.mealPeriod.displayRes()), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                         Text(stringResource(R.string.diet_item_count, record.entries.size), style = MaterialTheme.typography.bodyMedium)
                     }
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.Top,
+                    ) {
                         MealGauge(weightGauge, Modifier.weight(1f))
                         MealGauge(calorieGauge, Modifier.weight(1f))
                     }
-                    TextOverflowText(
-                        "${formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE)} - ${formatRecordTimestamp(record.mealEndAt, RecordTimePrecision.MINUTE)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    TextOverflowText(record.note, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TextOverflowText(
+                            formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                        )
+                        if (record.note.isNotBlank()) {
+                            TextOverflowText(
+                                record.note,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
+                                maxLines = 1,
+                            )
+                        }
+                    }
                 }
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -315,16 +334,16 @@ private fun MealGauge(group: GaugeMetricGroup, modifier: Modifier = Modifier) {
     Box(
         modifier
             .layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                val scale = 0.7f
-                val compactHeight = (placeable.height * scale).toInt()
-                layout(placeable.width, compactHeight) {
-                    val x = ((placeable.width - placeable.width * scale) / 2f).toInt()
-                    val y = ((compactHeight - placeable.height) / 2f).toInt()
-                    placeable.placeWithLayer(x, y) {
-                        scaleX = scale
-                        scaleY = scale
-                    }
+                    val placeable = measurable.measure(constraints)
+                    val scale = 0.7f
+                    val compactHeight = (placeable.height * scale).toInt()
+                    layout(placeable.width, compactHeight) {
+                        val y = ((compactHeight - placeable.height) / 2f).toInt()
+                        // The layer scales around its own center; adding an x offset here would shift it right.
+                        placeable.placeWithLayer(0, y) {
+                            scaleX = scale
+                            scaleY = scale
+                        }
                 }
             },
     ) {
