@@ -42,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
@@ -335,9 +336,12 @@ private fun MealGauge(group: GaugeMetricGroup, modifier: Modifier = Modifier) {
         )
         Text(
             "${formatDietGaugeValue(group.currentValue)} ${group.unit}",
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 26.sp,
+                lineHeight = 26.sp,
+            ),
             color = group.color,
-            modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp),
+            modifier = Modifier.align(Alignment.Center).offset(y = (-4).dp),
         )
     }
 }
