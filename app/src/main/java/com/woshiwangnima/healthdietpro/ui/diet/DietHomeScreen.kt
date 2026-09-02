@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -308,9 +311,34 @@ private fun mealGauge(label: String, current: Double, values: List<Double>, unit
 
 @Composable
 private fun MealGauge(group: GaugeMetricGroup, modifier: Modifier = Modifier) {
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        MappedValueGauge(listOf(group), Modifier.fillMaxWidth(), showTooltip = false, gaugeHeight = 59.dp)
-        Text("${formatDietGaugeValue(group.currentValue)} ${group.unit}", style = MaterialTheme.typography.bodySmall, color = group.color)
+    Box(
+        modifier
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val scale = 0.7f
+                val compactHeight = (placeable.height * scale).toInt()
+                layout(placeable.width, compactHeight) {
+                    val x = ((placeable.width - placeable.width * scale) / 2f).toInt()
+                    val y = ((compactHeight - placeable.height) / 2f).toInt()
+                    placeable.placeWithLayer(x, y) {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                }
+            },
+    ) {
+        MappedValueGauge(
+            listOf(group),
+            Modifier.fillMaxWidth(),
+            showTooltip = false,
+            showProgressDial = true,
+        )
+        Text(
+            "${formatDietGaugeValue(group.currentValue)} ${group.unit}",
+            style = MaterialTheme.typography.bodySmall,
+            color = group.color,
+            modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp),
+        )
     }
 }
 

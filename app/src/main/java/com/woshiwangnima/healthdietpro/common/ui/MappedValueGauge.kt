@@ -8,6 +8,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.offset
@@ -63,7 +65,7 @@ internal fun MappedValueGauge(
     groups: List<GaugeMetricGroup>,
     modifier: Modifier = Modifier,
     showTooltip: Boolean = true,
-    gaugeHeight: androidx.compose.ui.unit.Dp = 140.dp,
+    showProgressDial: Boolean = false,
 ) {
     val progress = remember { Animatable(0f) }
     LaunchedEffect(groups) {
@@ -75,55 +77,103 @@ internal fun MappedValueGauge(
     var canvasSize by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
     var tooltipSize by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
     Column(modifier) {
-        BoxWithConstraints(Modifier.fillMaxWidth().height(gaugeHeight).padding(horizontal = 6.dp)) {
+        BoxWithConstraints(Modifier.fillMaxWidth().aspectRatio(4f / 3f).padding(horizontal = 6.dp)) {
             val density = androidx.compose.ui.platform.LocalDensity.current
             val tooltipWidth = 176.dp
             Canvas(
-                Modifier.fillMaxWidth().height(gaugeHeight)
+                Modifier.fillMaxSize()
                     .onSizeChanged { canvasSize = it }
                     .then(if (showTooltip) Modifier.pointerInput(groups, progress.value, canvasSize) {
                         detectTapGestures { tap -> tooltip = GaugeTooltip(tap) }
                     } else Modifier),
             ) {
-            val stroke = size.minDimension * 0.075f
-            val radius = ((size.width - stroke) / 2f).coerceAtMost(size.height - stroke)
-            val center = Offset(size.width / 2f, size.height - stroke / 2f)
+            val stroke = (size.minDimension * 0.05f).coerceAtLeast(1f)
+            // Canvas angles increase clockwise on screen. The data range uses
+            // the lower arc from 150 degrees through 390 degrees.
+            val radius = ((size.width - stroke) / 2f)
+                .coerceAtMost((size.height - stroke) / 1.5f)
+                .coerceAtLeast(0f)
+            val panelCenter = Offset(size.width / 2f, size.height / 2f)
+            val center = Offset(panelCenter.x, panelCenter.y + radius * 0.25f)
             val arcBounds = androidx.compose.ui.geometry.Rect(center = center, radius = radius)
-            drawArc(trackColor, 180f, 180f, false, arcBounds.topLeft, arcBounds.size, style = Stroke(stroke, cap = StrokeCap.Round))
+            if (showProgressDial) {
+                // Draw the progress dial first so the arc and pointers remain
+                // visually above it.
+                val left = center.x - radius * 0.5f
+                val right = center.x + radius * 0.5f
+                val bottom = center.y + radius * 0.5f
+                val topRight = center.y + radius * 0.25f
+                val triangle = Path().apply {
+                    moveTo(left, bottom)
+                    lineTo(right, bottom)
+                    lineTo(right, topRight)
+                    close()
+                }
+                groups.map { group ->
+                    val minimum = group.range.min
+                    val maximum = group.range.max
+                    val fraction = if (minimum != null && maximum != null && maximum > minimum) {
+                        (((group.currentValue - minimum) / (maximum - minimum)).toFloat().coerceIn(0f, 1f) * progress.value)
+                    } else 0f
+                    group to fraction
+                }.sortedByDescending { it.second }.forEach { (group, fraction) ->
+                    val fillRight = left + (right - left) * fraction
+                    val fillTop = bottom - (bottom - topRight) * fraction
+                    drawPath(Path().apply {
+                        moveTo(left, bottom)
+                        lineTo(fillRight, bottom)
+                        lineTo(fillRight, fillTop)
+                        close()
+                    }, group.color)
+                }
+                drawPath(triangle, trackColor, style = Stroke(stroke * 0.25f))
+            }
+            drawArc(trackColor, 150f, 240f, false, arcBounds.topLeft, arcBounds.size, style = Stroke(stroke, cap = StrokeCap.Round))
             groups.forEachIndexed { index, group ->
                 val minimum = group.range.min
                 val maximum = group.range.max
                 if (minimum != null && maximum != null && maximum > minimum) {
                     val groupRadius = radius - stroke * (0.8f + index * 0.72f)
                     val groupBounds = androidx.compose.ui.geometry.Rect(center = center, radius = groupRadius)
-                    drawArc(group.color.copy(alpha = 0.25f), 180f, 180f, false, groupBounds.topLeft, groupBounds.size, style = Stroke(stroke * 0.48f, cap = StrokeCap.Round))
+                    drawArc(group.color.copy(alpha = 0.25f), 150f, 240f, false, groupBounds.topLeft, groupBounds.size, style = Stroke(stroke * 2.4f, cap = StrokeCap.Round))
                     group.references.forEach { reference ->
                         val fraction = ((reference.value - minimum) / (maximum - minimum)).toFloat().coerceIn(0f, 1f)
-                        val angle = Math.toRadians((180f + fraction * 180f).toDouble())
+                        val angle = Math.toRadians((150f + fraction * 240f).toDouble())
                         val direction = Offset(cos(angle).toFloat(), sin(angle).toFloat())
                         val markerHalfLength = stroke * 0.05f
                         val markerStart = Offset(center.x + direction.x * (groupRadius - markerHalfLength), center.y + direction.y * (groupRadius - markerHalfLength))
                         val markerEnd = Offset(center.x + direction.x * (groupRadius + markerHalfLength), center.y + direction.y * (groupRadius + markerHalfLength))
                         drawLine(reference.color, markerStart, markerEnd, strokeWidth = stroke * 0.34f, cap = StrokeCap.Square)
                     }
-                    val fraction = ((group.currentValue - minimum) / (maximum - minimum)).toFloat().coerceIn(0f, 1f) * progress.value
-                    val angle = Math.toRadians((180f + fraction * 180f).toDouble())
-                    val direction = Offset(cos(angle).toFloat(), sin(angle).toFloat())
-                    val end = Offset(center.x + direction.x * (groupRadius - stroke * 0.4f), center.y + direction.y * (groupRadius - stroke * 0.4f))
-                    drawLine(group.color, center, end, strokeWidth = stroke * 0.3f, cap = StrokeCap.Round)
-                    val perpendicular = Offset(-direction.y, direction.x)
-                    val tip = Offset(end.x + direction.x * stroke * 0.52f, end.y + direction.y * stroke * 0.52f)
-                    val base = Offset(end.x - direction.x * stroke * 0.22f, end.y - direction.y * stroke * 0.22f)
-                    drawPath(
-                        Path().apply {
-                            moveTo(tip.x, tip.y)
-                            lineTo(base.x + perpendicular.x * stroke * 0.34f, base.y + perpendicular.y * stroke * 0.34f)
-                            lineTo(base.x - perpendicular.x * stroke * 0.34f, base.y - perpendicular.y * stroke * 0.34f)
-                            close()
-                        },
-                        color = group.color,
-                    )
                 }
+            }
+            groups.mapNotNull { group ->
+                val minimum = group.range.min
+                val maximum = group.range.max
+                if (minimum == null || maximum == null || maximum <= minimum) return@mapNotNull null
+                val fraction = ((group.currentValue - minimum) / (maximum - minimum))
+                    .toFloat().coerceIn(0f, 1f) * progress.value
+                group to fraction
+            }.sortedByDescending { it.second }.forEach { (group, fraction) ->
+                val angle = Math.toRadians((150f + fraction * 240f).toDouble())
+                val direction = Offset(cos(angle).toFloat(), sin(angle).toFloat())
+                val perpendicular = Offset(-direction.y, direction.x)
+                val end = Offset(
+                    center.x + direction.x * (radius - stroke * 0.4f),
+                    center.y + direction.y * (radius - stroke * 0.4f),
+                )
+                drawLine(group.color, center, end, strokeWidth = stroke * 0.3f, cap = StrokeCap.Round)
+                val tip = Offset(end.x + direction.x * stroke * 0.52f, end.y + direction.y * stroke * 0.52f)
+                val base = Offset(end.x - direction.x * stroke * 0.22f, end.y - direction.y * stroke * 0.22f)
+                drawPath(
+                    Path().apply {
+                        moveTo(tip.x, tip.y)
+                        lineTo(base.x + perpendicular.x * stroke * 0.34f, base.y + perpendicular.y * stroke * 0.34f)
+                        lineTo(base.x - perpendicular.x * stroke * 0.34f, base.y - perpendicular.y * stroke * 0.34f)
+                        close()
+                    },
+                    color = group.color,
+                )
             }
             drawCircle(trackColor, stroke * 0.48f, center)
             }
