@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +44,8 @@ import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -52,6 +55,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
@@ -83,6 +87,7 @@ import com.woshiwangnima.healthdietpro.common.ui.NumericInputSpec
 import com.woshiwangnima.healthdietpro.common.ui.ParticleValueOrb
 import com.woshiwangnima.healthdietpro.common.ui.TrendIndicatorArrowPreview
 import com.woshiwangnima.healthdietpro.common.ui.TextInputField
+import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
@@ -211,6 +216,11 @@ private fun BloodGlucoseScreen(
     val chartWindow by viewModel.chartWindow.collectAsStateWithLifecycle()
     val chartWindowEnd by viewModel.chartWindowEnd.collectAsStateWithLifecycle()
     val chartStyle by viewModel.chartStyle.collectAsStateWithLifecycle()
+    val predictionPoints by viewModel.predictionPoints.collectAsStateWithLifecycle()
+    val predictionConfidence by viewModel.predictionConfidence.collectAsStateWithLifecycle()
+    val predictionGenerating by viewModel.predictionGenerating.collectAsStateWithLifecycle()
+    val predictionGenerationStatus by viewModel.predictionGenerationStatus.collectAsStateWithLifecycle()
+    val predictionEligibility by viewModel.predictionEligibility.collectAsStateWithLifecycle()
     val eventUiState by eventViewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var selectedRecordType by rememberSaveable { mutableIntStateOf(0) }
@@ -391,10 +401,16 @@ private fun BloodGlucoseScreen(
                         window = chartWindow,
                         windowEnd = chartWindowEnd,
                         chartStyle = chartStyle,
+                        predictionPoints = predictionPoints,
+                        predictionGenerating = predictionGenerating,
+                        predictionGenerationStatus = predictionGenerationStatus,
+                        predictionEligibility = predictionEligibility,
+                        predictionConfidence = predictionConfidence,
                         onScopeChanged = viewModel::setChartScope,
                         onWindowChanged = viewModel::setChartWindow,
                         onWindowEndChanged = viewModel::setChartWindowEnd,
                         onChartStyleChanged = viewModel::setChartStyle,
+                        onGeneratePrediction = viewModel::generatePrediction,
                     )
                 } else {
                     when (tab) {
@@ -875,41 +891,86 @@ private fun BloodGlucoseChart(
     window: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow,
     windowEnd: Long?,
     chartStyle: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStylePrefs,
+    predictionPoints: List<com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionPoint>,
+    predictionGenerating: Boolean,
+    predictionGenerationStatus: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionGenerationStatus,
+    predictionEligibility: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionEligibility,
+    predictionConfidence: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionConfidence?,
     onScopeChanged: (com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection) -> Unit,
     onWindowChanged: (com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow) -> Unit,
     onWindowEndChanged: (Long?) -> Unit,
     onChartStyleChanged: (com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStylePrefs) -> Unit,
+    onGeneratePrediction: () -> Unit,
 ) {
     val resolvedScope = scope.resolve()
-    Column(Modifier.fillMaxSize()) {
-        com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter(scope, onScopeChanged)
-        val windowOptions = com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow.entries.map { option ->
-            SingleChoiceSegmentedOption(
-                id = option.name,
-                labelRes = R.string.blood_glucose_chart_window_hours,
-                labelArgs = listOf(option.durationMillis / 3_600_000L),
+    val effectiveScopeEnd = resolvedScope.endMillis +
+        com.woshiwangnima.healthdietpro.model.bloodglucose.PREDICTION_DURATION_MILLIS
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().then(if (predictionGenerating) Modifier.blur(8.dp) else Modifier)) {
+            com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter(scope, onScopeChanged)
+            val windowOptions = com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow.entries.map { option ->
+                SingleChoiceSegmentedOption(
+                    id = option.name,
+                    labelRes = R.string.blood_glucose_chart_window_hours,
+                    labelArgs = listOf(option.durationMillis / 3_600_000L),
+                )
+            }
+            SingleChoiceSegmentedSelector(
+                options = windowOptions,
+                selectedId = window.name,
+                onOptionSelected = { selected ->
+                    onWindowChanged(com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow.valueOf(selected.id))
+                },
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+            val predictionStatusRes = when (predictionGenerationStatus) {
+            com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionGenerationStatus.INSUFFICIENT_DATA -> R.string.blood_glucose_prediction_status_insufficient_data
+            com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionGenerationStatus.FAILED -> R.string.blood_glucose_prediction_status_failed
+            else -> null
+        }
+            predictionStatusRes?.let { statusRes ->
+                Text(
+                    stringResource(statusRes),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.End).padding(bottom = 4.dp),
+                )
+            }
+            BloodGlucoseFixedWindowChart(
+                records = records,
+                scopeStart = resolvedScope.startMillis,
+                scopeEnd = effectiveScopeEnd,
+                window = window,
+                sessionWindowEnd = windowEnd,
+                onSessionWindowEndChanged = onWindowEndChanged,
+                diabetesType = diabetesType,
+                chartStyle = chartStyle,
+                onChartStyleChanged = onChartStyleChanged,
+                predictionPoints = predictionPoints,
+                predictionGenerating = predictionGenerating,
+                onGeneratePrediction = onGeneratePrediction,
+                predictionEligibility = predictionEligibility,
+                predictionConfidence = predictionConfidence,
+                modifier = Modifier.weight(1f),
             )
         }
-        SingleChoiceSegmentedSelector(
-            options = windowOptions,
-            selectedId = window.name,
-            onOptionSelected = { selected ->
-                onWindowChanged(com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow.valueOf(selected.id))
-            },
-            modifier = Modifier.padding(vertical = 8.dp),
-        )
-        BloodGlucoseFixedWindowChart(
-            records = records,
-            scopeStart = resolvedScope.startMillis,
-            scopeEnd = resolvedScope.endMillis,
-            window = window,
-            sessionWindowEnd = windowEnd,
-            onSessionWindowEndChanged = onWindowEndChanged,
-            diabetesType = diabetesType,
-            chartStyle = chartStyle,
-            onChartStyleChanged = onChartStyleChanged,
-            modifier = Modifier.weight(1f),
-        )
+        if (predictionGenerating) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator()
+                    TextOverflowText(
+                        text = stringResource(R.string.blood_glucose_prediction_generating),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 12.dp),
+                    )
+                }
+            }
+        }
     }
 }
 

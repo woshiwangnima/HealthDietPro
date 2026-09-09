@@ -17,6 +17,20 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.normalizeBloodGlucoseT
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStylePrefs
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStyleRepository
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionPoint
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionConfidence
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionArchiveStore
+import com.woshiwangnima.healthdietpro.model.bloodglucose.predictBloodGlucose
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionGenerationStatus
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionEligibility
+import com.woshiwangnima.healthdietpro.model.bloodglucose.evaluatePredictionEligibility
+import com.woshiwangnima.healthdietpro.model.diet.DietRepository
+import com.woshiwangnima.healthdietpro.model.sleep.SleepRepository
+import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
+import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
+import com.woshiwangnima.healthdietpro.model.disease.diabetesReferenceIds
+import com.woshiwangnima.healthdietpro.model.disease.hasCurrentUserDiabetesRisk
+import com.woshiwangnima.healthdietpro.model.disease.curatedId
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRange
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection
@@ -33,6 +47,7 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
     private val targetRepository = BloodGlucoseTargetRepository.fromContext(application)
     private val reminderRepository = BloodGlucoseReminderRepository.fromContext(application)
     private val chartStyleRepository = BloodGlucoseChartStyleRepository.fromContext(application)
+    private val predictionArchive = BloodGlucosePredictionArchiveStore.current(application)
     private val alertNotifier = BloodGlucoseAlertNotifier(application)
     private val _records = MutableStateFlow<List<BloodGlucoseRecord>>(emptyList())
     val records: StateFlow<List<BloodGlucoseRecord>> = _records.asStateFlow()
@@ -53,6 +68,16 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
     val chartWindowEnd: StateFlow<Long?> = _chartWindowEnd.asStateFlow()
     private val _chartStyle = MutableStateFlow(BloodGlucoseChartStylePrefs())
     val chartStyle: StateFlow<BloodGlucoseChartStylePrefs> = _chartStyle.asStateFlow()
+    private val _predictionPoints = MutableStateFlow<List<BloodGlucosePredictionPoint>>(emptyList())
+    val predictionPoints: StateFlow<List<BloodGlucosePredictionPoint>> = _predictionPoints.asStateFlow()
+    private val _predictionConfidence = MutableStateFlow<BloodGlucosePredictionConfidence?>(null)
+    val predictionConfidence: StateFlow<BloodGlucosePredictionConfidence?> = _predictionConfidence.asStateFlow()
+    private val _predictionGenerating = MutableStateFlow(false)
+    val predictionGenerating: StateFlow<Boolean> = _predictionGenerating.asStateFlow()
+    private val _predictionGenerationStatus = MutableStateFlow(BloodGlucosePredictionGenerationStatus.IDLE)
+    val predictionGenerationStatus: StateFlow<BloodGlucosePredictionGenerationStatus> = _predictionGenerationStatus.asStateFlow()
+    private val _predictionEligibility = MutableStateFlow(BloodGlucosePredictionEligibility(0, 0, 0, 0))
+    val predictionEligibility: StateFlow<BloodGlucosePredictionEligibility> = _predictionEligibility.asStateFlow()
 
     init {
         refresh()
@@ -73,6 +98,10 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
             _records.value = archive.records
             _hbA1cRecords.value = archive.hbA1cRecords
             _sources.value = archive.sources
+            val predictions = withContext(Dispatchers.IO) { predictionArchive.load() }
+            _predictionPoints.value = predictions.points
+            _predictionConfidence.value = predictions.confidence
+            refreshPredictionEligibility()
         }
     }
 
@@ -164,6 +193,51 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
     fun setChartStyle(style: BloodGlucoseChartStylePrefs) {
         _chartStyle.value = style
         viewModelScope.launch(Dispatchers.IO) { chartStyleRepository.save(style) }
+    }
+
+    fun generatePrediction() {
+        if (_predictionGenerating.value) return
+        _predictionGenerating.value = true
+        _predictionGenerationStatus.value = BloodGlucosePredictionGenerationStatus.GENERATING
+        viewModelScope.launch {
+            try {
+                val generatedAt = System.currentTimeMillis()
+                val result = withContext(Dispatchers.Default) {
+                    val diabetesIds = withContext(Dispatchers.IO) { DiseaseRepository.fromContext(getApplication()).diabetesReferenceIds() }
+                    val medications = withContext(Dispatchers.IO) {
+                        if (!hasCurrentUserDiabetesRisk(getApplication())) emptyList()
+                        else MedicationPrefs.getRecords(getApplication()).filter { record -> record.indicationReferences.any { it.curatedId() in diabetesIds } }
+                    }
+                    val meals = withContext(Dispatchers.IO) { DietRepository.fromContext(getApplication()).load().records }
+                    val sleep = withContext(Dispatchers.IO) { SleepRepository.fromContext(getApplication()).load().records }
+                    predictBloodGlucose(_records.value, medications, meals, sleep, generatedAt)
+                }
+                if (result != null) {
+                    withContext(Dispatchers.IO) { predictionArchive.replaceOverlapping(result, generatedAt) }
+                    _predictionPoints.value = withContext(Dispatchers.IO) { predictionArchive.load().points }
+                    _predictionConfidence.value = result.confidence
+                    _chartWindowEnd.value = result.points.lastOrNull()?.timestamp
+                    _predictionGenerationStatus.value = BloodGlucosePredictionGenerationStatus.SUCCESS
+                } else {
+                    _predictionGenerationStatus.value = BloodGlucosePredictionGenerationStatus.INSUFFICIENT_DATA
+                }
+            } catch (_: Throwable) {
+                _predictionGenerationStatus.value = BloodGlucosePredictionGenerationStatus.FAILED
+            } finally {
+                _predictionGenerating.value = false
+            }
+        }
+    }
+
+    fun refreshPredictionEligibility() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val diabetesIds = DiseaseRepository.fromContext(getApplication()).diabetesReferenceIds()
+            val medications = if (!hasCurrentUserDiabetesRisk(getApplication())) emptyList()
+            else MedicationPrefs.getRecords(getApplication()).filter { record -> record.indicationReferences.any { it.curatedId() in diabetesIds } }
+            val meals = DietRepository.fromContext(getApplication()).load().records
+            val sleep = SleepRepository.fromContext(getApplication()).load().records
+            _predictionEligibility.value = evaluatePredictionEligibility(_records.value, medications, meals, sleep)
+        }
     }
 
     private fun loadChartWindow(): BloodGlucoseChartWindow =

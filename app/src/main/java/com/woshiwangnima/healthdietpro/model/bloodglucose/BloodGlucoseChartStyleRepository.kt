@@ -19,6 +19,11 @@ internal data class BloodGlucoseChartStylePrefs(
         linePattern = "Dotted",
         pointShape = "Cross",
     ),
+    val prediction: BloodGlucoseSeriesStylePrefs = BloodGlucoseSeriesStylePrefs(
+        colorArgb = 0xFF7E57C2,
+        linePattern = "Dashed",
+        pointShape = "Diamond",
+    ),
     val bars: Map<String, BloodGlucoseBarStylePrefs> = defaultBloodGlucoseBarStyles(),
 )
 
@@ -79,6 +84,7 @@ private fun BloodGlucoseChartStylePrefs.sanitized(): BloodGlucoseChartStylePrefs
     return copy(
         primary = primary.sanitized(),
         delayed = delayed.sanitized(),
+        prediction = prediction.sanitized(),
         bars = defaults.mapValues { (kind, default) -> (bars[kind] ?: default).sanitized() },
     )
 }
