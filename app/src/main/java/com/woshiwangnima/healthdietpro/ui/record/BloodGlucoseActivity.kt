@@ -119,6 +119,7 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.bloodGlucoseTrendRateR
 import com.woshiwangnima.healthdietpro.model.bloodglucose.hbA1cInputRange
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
+import com.woshiwangnima.healthdietpro.common.time.formatRelativeTimeOffset
 import com.woshiwangnima.healthdietpro.model.profile.DataPoint
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
@@ -140,6 +141,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import java.util.Locale
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
 import kotlin.math.abs
 import kotlin.math.round
 
@@ -1241,6 +1244,16 @@ var relativeMinutes by rememberSaveable(record?.id) { mutableStateOf(record?.rel
     var sourceId by rememberSaveable(record?.id) { mutableStateOf(record?.sourceId) }
     var note by rememberSaveable(record?.id) { mutableStateOf(record?.note.orEmpty()) }
     var showDateTimePicker by rememberSaveable { mutableStateOf(false) }
+    var showTimeResetDialog by rememberSaveable { mutableStateOf(false) }
+    val timeResetOffset = ZERO
+    val timeResetLabel = formatRelativeTimeOffset(
+        offset = timeResetOffset,
+        zeroLabel = stringResource(R.string.record_time_reset_now),
+        dayUnit = stringResource(R.string.record_time_reset_day_unit),
+        hourUnit = stringResource(R.string.record_time_reset_hour_unit),
+        minuteUnit = stringResource(R.string.record_time_reset_minute_unit),
+        secondUnit = stringResource(R.string.record_time_reset_second_unit),
+    )
     val validValue = value.toDoubleOrNull()?.let { UnitConverter.toBase(UnitCategoryType.Glucose.id, it.toFloat(), unitId).toDouble() }?.takeIf(::isValidBloodGlucoseValue)
     val invalidValue = value.isNotBlank() && validValue == null
     val invalidRelativeMinutes = timingRelation != BloodGlucoseTimingRelation.At && (relativeMinutes.toIntOrNull()?.let { it > 0 } != true)
@@ -1312,6 +1325,9 @@ var relativeMinutes by rememberSaveable(record?.id) { mutableStateOf(record?.rel
                         valueMillis = timestamp,
                         precision = RecordTimePrecision.SECOND,
                         onClick = { showDateTimePicker = true },
+                        resetOffset = timeResetOffset,
+                        resetLabel = timeResetLabel,
+                        onResetClick = { showTimeResetDialog = true },
                     )
                 }
                 item {
@@ -1427,6 +1443,22 @@ var relativeMinutes by rememberSaveable(record?.id) { mutableStateOf(record?.rel
             precision = RecordTimePrecision.SECOND,
         )
     }
+    if (showTimeResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showTimeResetDialog = false },
+            title = { Text(stringResource(R.string.blood_glucose_time_reset_title)) },
+            text = { Text(stringResource(R.string.blood_glucose_time_reset_message, timeResetLabel)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    timestamp = normalizeBloodGlucoseTimestamp(System.currentTimeMillis() + timeResetOffset.inWholeMilliseconds)
+                    showTimeResetDialog = false
+                }) { Text(stringResource(R.string.compose_confirm_dialog_ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimeResetDialog = false }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) }
+            },
+        )
+    }
     if (showDiscardDialog) {
         DiscardChangesDialog(
             onDiscard = onBack,
@@ -1534,6 +1566,7 @@ private fun BloodGlucoseTimingAnchor.labelRes(): Int = when (this) {
 
 private fun formatBloodGlucoseTime(timestamp: Long): String =
     formatRecordTimestamp(timestamp, RecordTimePrecision.SECOND)
+
 
 private fun formatBloodGlucoseAxisTime(timestamp: Long, intervalMs: Long): String {
     val pattern = when {

@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -104,7 +102,8 @@ internal fun DietDefaultDurationScreen(
     onSave: (DietPrefs) -> Unit,
 ) {
     var period by rememberSaveable { mutableStateOf(MealPeriod.BREAKFAST) }
-    val current = prefs.forPeriod(period)
+    var draftPrefs by remember { mutableStateOf(prefs) }
+    val current = draftPrefs.forPeriod(period)
     var valueText by rememberSaveable(period, current.defaultMinutes, current.unitId) {
         mutableStateOf(formatDietDurationInput(current.defaultMinutes, current.unitId))
     }
@@ -124,14 +123,14 @@ internal fun DietDefaultDurationScreen(
     val changed = value != null && dietUnitToMinutes(value, unit) != current.defaultMinutes ||
         unit != current.unitId ||
         timing != current.timing ||
-        rangeStart != current.rangeStartMinute ||
-        rangeEnd != current.rangeEndMinute
+        rangeStart != (current.rangeStartMinute ?: period.defaultStartMinute) ||
+        rangeEnd != (current.rangeEndMinute ?: period.defaultEndMinute)
     val saveEnabled = valid && changed
 
     fun save() {
         val minutes = requireNotNull(value).let { dietUnitToMinutes(it, unit) }.coerceAtLeast(1)
         onSave(
-            prefs.withPeriod(
+            draftPrefs.withPeriod(
                 period,
                 current.copy(
                     defaultMinutes = minutes,
@@ -145,7 +144,7 @@ internal fun DietDefaultDurationScreen(
     }
 
     fun applyPeriod(target: MealPeriod) {
-        val targetPrefs = prefs.forPeriod(target)
+        val targetPrefs = draftPrefs.forPeriod(target)
         period = target
         valueText = formatDietDurationInput(targetPrefs.defaultMinutes, targetPrefs.unitId)
         unit = targetPrefs.unitId
@@ -164,12 +163,17 @@ internal fun DietDefaultDurationScreen(
         rangeEnd = target.defaultEndMinute
     }
 
+    fun resetAll() {
+        draftPrefs = DietPrefs()
+        applyDefaults(period)
+    }
+
     BaseScreen(
         title = stringResource(R.string.diet_settings_default_habits),
         onBack = onBack,
         actions = {
-            androidx.compose.material3.TextButton(onClick = { applyDefaults(period) }) {
-                Text(stringResource(R.string.diet_settings_restore_defaults))
+            androidx.compose.material3.TextButton(onClick = ::resetAll) {
+                Text(stringResource(R.string.diet_settings_reset_all))
             }
         },
     ) { padding ->
@@ -180,16 +184,18 @@ internal fun DietDefaultDurationScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 item {
-                    Text(stringResource(R.string.diet_meal_period), style = MaterialTheme.typography.titleSmall)
-                    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                        MealPeriod.entries.forEachIndexed { index, option ->
-                            SegmentedButton(
-                                selected = period == option,
-                                onClick = { applyPeriod(option) },
-                                shape = SegmentedButtonDefaults.itemShape(index, MealPeriod.entries.size),
-                                label = { Text(stringResource(option.displayRes())) },
-                            )
-                        }
+                    MealPeriodSelectorBar(
+                        selected = period,
+                        onPeriodSelected = { selected -> selected?.let(::applyPeriod) },
+                        includeAllPeriod = false,
+                    )
+                }
+                item {
+                    androidx.compose.material3.TextButton(
+                        onClick = { applyDefaults(period) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(stringResource(R.string.diet_settings_reset_current))
                     }
                 }
                 item {
@@ -232,18 +238,25 @@ internal fun DietDefaultDurationScreen(
                     )
                 }
                 item {
-                    SettingRadioRow(
-                        title = stringResource(R.string.diet_settings_timing_before_meal),
-                        subtitle = "",
-                        selected = timing == DietRecordTiming.BEFORE_MEAL,
-                        onClick = { timing = DietRecordTiming.BEFORE_MEAL },
-                    )
-                    SettingRadioRow(
-                        title = stringResource(R.string.diet_settings_timing_after_meal),
-                        subtitle = "",
-                        selected = timing == DietRecordTiming.AFTER_MEAL,
-                        onClick = { timing = DietRecordTiming.AFTER_MEAL },
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        SettingRadioRow(
+                            title = stringResource(R.string.diet_settings_timing_before_meal),
+                            subtitle = "",
+                            selected = timing == DietRecordTiming.BEFORE_MEAL,
+                            onClick = { timing = DietRecordTiming.BEFORE_MEAL },
+                            modifier = Modifier.weight(1f),
+                        )
+                        SettingRadioRow(
+                            title = stringResource(R.string.diet_settings_timing_after_meal),
+                            subtitle = "",
+                            selected = timing == DietRecordTiming.AFTER_MEAL,
+                            onClick = { timing = DietRecordTiming.AFTER_MEAL },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
                 item {
                     Row(

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
+import kotlin.time.Duration
 
 /** Standard clickable entry for choosing a date, minute-precision time, or second-precision time. */
 @Composable
@@ -29,6 +31,9 @@ internal fun RecordTimePickerField(
     precision: RecordTimePrecision,
     onClick: () -> Unit,
     emptyText: String? = null,
+    resetOffset: Duration? = null,
+    resetLabel: String? = null,
+    onResetClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -53,6 +58,35 @@ internal fun RecordTimePickerField(
                     text = valueMillis?.let { formatRecordTimestamp(it, precision) } ?: emptyText.orEmpty(),
                     style = MaterialTheme.typography.bodyLarge,
                 )
+            }
+            if (resetOffset != null && onResetClick != null) {
+                Surface(
+                    onClick = onResetClick,
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f),
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    shape = MaterialTheme.shapes.small,
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
+                        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(3.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = resetLabel,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        resetLabel?.let {
+                            TextOverflowText(
+                                text = it,
+                                modifier = Modifier.weight(1f, fill = false),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                maxLines = 1,
+                            )
+                        }
+                    }
+                }
             }
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

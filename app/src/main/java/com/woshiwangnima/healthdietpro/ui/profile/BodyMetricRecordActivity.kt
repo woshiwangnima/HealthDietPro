@@ -5,18 +5,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,11 +25,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Modifier
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.DirtyFormActivity
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
@@ -39,6 +41,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AppInputTextFieldColors
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDateTimePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
+import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
@@ -91,6 +94,7 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
             date = editing?.date ?: formatBodyRecordDateTime(LocalDateTime.now()),
             unitId = selectedUnit,
             value = editing?.let { formatBodyMetricValue(UnitConverter.fromBase(category, it.value, selectedUnit), category) }.orEmpty(),
+            isStableWeight = editing?.isStableWeight ?: false,
         )
     }
 
@@ -108,7 +112,7 @@ class BodyMetricRecordActivity : DirtyFormActivity() {
                     Activity.RESULT_OK,
                     Intent()
                         .putExtra(EXTRA_POSITION, position)
-                        .putExtra(EXTRA_RECORD, BodyRecord(form.date, UnitConverter.toBase(category, value, form.unitId), form.unitId, normalizeRecordTimestamp(bodyRecordEpochMillis(form.date), RecordTimePrecision.MINUTE), editing?.id)),
+                        .putExtra(EXTRA_RECORD, BodyRecord(form.date, UnitConverter.toBase(category, value, form.unitId), form.unitId, normalizeRecordTimestamp(bodyRecordEpochMillis(form.date), RecordTimePrecision.MINUTE), editing?.id, form.isStableWeight)),
                 )
                 finish()
             }
@@ -143,6 +147,7 @@ private data class BodyMetricRecordForm(
     val date: String = "",
     val value: String = "",
     val unitId: String = "",
+    val isStableWeight: Boolean = false,
 )
 
 @Composable
@@ -158,6 +163,7 @@ private fun BodyMetricRecordScreen(
     val isChineseLocale = LocalConfiguration.current.locales[0]?.language == "zh"
     val options = bodyMetricUnitOptions(category, isChineseLocale)
     var showDateTimePicker by rememberSaveable { mutableStateOf(false) }
+    var showStableWeightHelp by rememberSaveable { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().padding(contentPadding)) {
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -176,29 +182,40 @@ private fun BodyMetricRecordScreen(
                 )
             }
             item {
-                OutlinedTextField(
-                    value = form.value,
-                    onValueChange = { onFormChange(form.copy(value = it)) },
-                    label = { AppInputLabel(stringResource(R.string.body_record_value)) },
-                    colors = AppInputTextFieldColors(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = form.value,
+                        onValueChange = { onFormChange(form.copy(value = it)) },
+                        label = { AppInputLabel(stringResource(R.string.body_record_value)) },
+                        colors = AppInputTextFieldColors(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                    AppDropdownField(
+                        label = stringResource(R.string.body_record_unit),
+                        value = options.firstOrNull { it.id == form.unitId }?.label ?: form.unitId,
+                        options = options,
+                        onSelect = { selected ->
+                            val converted = form.value.toFloatOrNull()?.let { value ->
+                                "%.2f".format(UnitConverter.fromBase(category, UnitConverter.toBase(category, value, form.unitId), selected.id))
+                            } ?: form.value
+                            onFormChange(form.copy(value = converted, unitId = selected.id))
+                        },
+                        modifier = Modifier.weight(0.72f),
+                    )
+                }
             }
-            item {
-                AppDropdownField(
-                    label = stringResource(R.string.body_record_unit),
-                    value = options.firstOrNull { it.id == form.unitId }?.label ?: form.unitId,
-                    options = options,
-                    onSelect = { selected ->
-                        val converted = form.value.toFloatOrNull()?.let { value ->
-                            "%.2f".format(UnitConverter.fromBase(category, UnitConverter.toBase(category, value, form.unitId), selected.id))
-                        } ?: form.value
-                        onFormChange(form.copy(value = converted, unitId = selected.id))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+            if (!isHeight) {
+                item {
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Checkbox(checked = form.isStableWeight, onCheckedChange = { onFormChange(form.copy(isStableWeight = it)) })
+                        Text(stringResource(R.string.body_record_stable_weight))
+                        IconButton(onClick = { showStableWeightHelp = true }, modifier = Modifier.size(22.dp)) {
+                            Icon(painterResource(R.drawable.ic_help), stringResource(R.string.body_record_stable_weight_help_title), modifier = Modifier.size(16.dp))
+                        }
+                    }
+                }
             }
         }
         FormSaveBar(
@@ -218,6 +235,14 @@ private fun BodyMetricRecordScreen(
             },
             precision = RecordTimePrecision.MINUTE,
         )
+    }
+    if (showStableWeightHelp) {
+        AppInfoDialog(
+            title = stringResource(R.string.body_record_stable_weight_help_title),
+            onDismiss = { showStableWeightHelp = false },
+        ) {
+            Text(stringResource(R.string.body_record_stable_weight_help))
+        }
     }
 }
 

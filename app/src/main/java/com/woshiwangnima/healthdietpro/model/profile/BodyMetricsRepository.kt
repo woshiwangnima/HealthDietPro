@@ -113,6 +113,7 @@ private data class BodyRecordDto(
     val value: Float,
     val unit: String? = null,
     val recordedAtMillis: Long,
+    val isStableWeight: Boolean = false,
 )
 
 private fun BodyMetrics.toDto(): BodyMetricsDto = BodyMetricsDto(
@@ -127,6 +128,6 @@ private fun BodyMetricsDto.toDomain(): BodyMetrics = BodyMetrics(
     circumferenceRecords = circumferenceRecords.mapValues { (_, records) -> records.map(BodyRecordDto::toDomain) },
 )
 
-private fun BodyRecord.toDto(): BodyRecordDto = BodyRecordDto(id.orEmpty(), date, value, unit, recordedAtMillis)
+private fun BodyRecord.toDto(): BodyRecordDto = BodyRecordDto(id.orEmpty(), date, value, unit, recordedAtMillis, isStableWeight)
 
-private fun BodyRecordDto.toDomain(): BodyRecord = BodyRecord(date, value, unit, recordedAtMillis, id)
+private fun BodyRecordDto.toDomain(): BodyRecord = BodyRecord(date, value, unit, recordedAtMillis, id, isStableWeight)

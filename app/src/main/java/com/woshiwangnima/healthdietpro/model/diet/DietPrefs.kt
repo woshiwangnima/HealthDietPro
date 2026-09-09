@@ -40,13 +40,13 @@ internal fun loadDietPrefs(context: Context): DietPrefs {
     val periods = MealPeriod.entries.mapNotNull { period ->
         val prefix = "diet_default_${period.name.lowercase()}"
         val defaults = DietPeriodPrefs()
-        val minutes = scope.getInt("${prefix}_minutes", defaults.defaultMinutes)
-        val unitId = scope.getString("${prefix}_unit", "min")
+        val minutes = scope.getInt("${prefix}_minutes", defaults.defaultMinutes).coerceAtLeast(1)
+        val unitId = scope.getString("${prefix}_unit", defaults.unitId).takeIf { it == "min" || it == "h" } ?: defaults.unitId
         val timingName = scope.getString("${prefix}_timing", DietRecordTiming.BEFORE_MEAL.name)
         val timing = DietRecordTiming.entries.firstOrNull { it.name == timingName } ?: DietRecordTiming.BEFORE_MEAL
         val hasRange = scope.getBoolean("${prefix}_range_custom", false)
-        val startMinute = if (hasRange) scope.getInt("${prefix}_range_start", period.defaultStartMinute) else null
-        val endMinute = if (hasRange) scope.getInt("${prefix}_range_end", period.defaultEndMinute) else null
+        val startMinute = if (hasRange) scope.getInt("${prefix}_range_start", period.defaultStartMinute).coerceIn(0, 1439) else null
+        val endMinute = if (hasRange) scope.getInt("${prefix}_range_end", period.defaultEndMinute).coerceIn(0, 1439) else null
         val value = DietPeriodPrefs(
             defaultMinutes = minutes,
             unitId = unitId,
@@ -62,19 +62,24 @@ internal fun loadDietPrefs(context: Context): DietPrefs {
 /** 持久化当前用户的饮食习惯偏好。 */
 internal fun saveDietPrefs(context: Context, prefs: DietPrefs) {
     val scope = UserPrefs.current(context)
+    val values = scope.snapshot().toMutableMap()
     MealPeriod.entries.forEach { period ->
         val value = prefs.forPeriod(period)
         val prefix = "diet_default_${period.name.lowercase()}"
-        scope.putInt("${prefix}_minutes", value.defaultMinutes.coerceAtLeast(1))
-        scope.putString("${prefix}_unit", value.unitId)
-        scope.putString("${prefix}_timing", value.timing.name)
+        values["${prefix}_minutes"] = value.defaultMinutes.coerceAtLeast(1)
+        values["${prefix}_unit"] = value.unitId
+        values["${prefix}_timing"] = value.timing.name
         val hasRange = value.rangeStartMinute != null && value.rangeEndMinute != null
-        scope.putBoolean("${prefix}_range_custom", hasRange)
+        values["${prefix}_range_custom"] = hasRange
         if (hasRange) {
-            scope.putInt("${prefix}_range_start", value.rangeStartMinute!!.coerceIn(0, 1439))
-            scope.putInt("${prefix}_range_end", value.rangeEndMinute!!.coerceIn(0, 1439))
+            values["${prefix}_range_start"] = value.rangeStartMinute!!.coerceIn(0, 1439)
+            values["${prefix}_range_end"] = value.rangeEndMinute!!.coerceIn(0, 1439)
+        } else {
+            values.remove("${prefix}_range_start")
+            values.remove("${prefix}_range_end")
         }
     }
+    scope.replaceAll(values)
 }
 
 /**

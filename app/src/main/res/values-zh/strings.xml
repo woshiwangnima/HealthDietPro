@@ -512,6 +512,13 @@
     <string name="blood_glucose_note_hint">可记录用药、胰岛素、睡眠、运动、心情等情况，便于回顾总结，更好的管理血糖</string>
     <string name="blood_glucose_save">保存记录</string>
     <string name="blood_glucose_time">日期时间</string>
+    <string name="record_time_reset_now">当前时间</string>
+    <string name="record_time_reset_day_unit">天</string>
+    <string name="record_time_reset_hour_unit">小时</string>
+    <string name="record_time_reset_minute_unit">分</string>
+    <string name="record_time_reset_second_unit">秒</string>
+    <string name="blood_glucose_time_reset_title">重置记录时间</string>
+    <string name="blood_glucose_time_reset_message">确定使用“%1$s”重置记录时间吗？</string>
     <string name="blood_glucose_source_time">数据来源日期时间</string>
     <string name="blood_glucose_anchor_breakfast">早餐</string>
     <string name="blood_glucose_anchor_lunch">午餐</string>
@@ -878,6 +885,9 @@
     <string name="body_record_save">保存</string>
     <string name="body_record_save_height">保存身高记录</string>
     <string name="body_record_save_weight">保存体重记录</string>
+    <string name="body_record_stable_weight">稳定体重</string>
+    <string name="body_record_stable_weight_help_title">稳定体重</string>
+    <string name="body_record_stable_weight_help">晨起排空膀胱与肠道、禁食状态下测量的体重，是全天波动最小、最能反映机体基础体重的观测值。</string>
     <string name="medication_record_add">添加用药</string>
     <string name="medication_record_time">时间</string>
     <string name="record_time_range_today">今天</string>
@@ -1453,6 +1463,10 @@
     <string name="diet_settings_title">饮食设置</string>
     <string name="diet_meal_start">用餐开始时间</string>
     <string name="diet_meal_end">用餐结束时间</string>
+    <string name="diet_time_reset_title">重置用餐时间</string>
+    <string name="diet_time_reset_message">确定使用“%1$s”重置此用餐时间吗？</string>
+    <string name="diet_time_reset_both">重置时间</string>
+    <string name="diet_time_reset_both_message">确定使用“%1$s”重置用餐开始时间，并使用“%2$s”重置用餐结束时间吗？</string>
     <string name="diet_meal_period">用餐时段</string>
     <string name="diet_meal_period_pre_breakfast_snack">早餐前加餐</string>
     <string name="diet_meal_period_breakfast">早餐</string>
@@ -1525,6 +1539,8 @@
     <string name="diet_settings_timing_after_meal">用餐后</string>
     <string name="diet_settings_save">保存</string>
     <string name="diet_settings_restore_defaults">恢复默认设置</string>
+    <string name="diet_settings_reset_all">重置全部</string>
+    <string name="diet_settings_reset_current">重置当前</string>
     <string name="diet_settings_goals">饮食建议设置</string>
     <string name="diet_settings_goals_description">设置每日推荐的热量、碳水、蛋白质和脂肪摄入目标。</string>
     <string name="diet_settings_period_range">时段默认区间</string>

@@ -19,6 +19,8 @@ data class BodyRecord(
     val recordedAtMillis: Long,
     /** Stable identity for editing, deleting, importing, and migrating this record. */
     val id: String? = null,
+    /** Whether this weight measurement represents a stable weight. */
+    val isStableWeight: Boolean = false,
 ) : Serializable {
     fun getUnit(isWeight: Boolean): String =
         unit?.takeIf { it.isNotEmpty() } ?: if (isWeight) UnitCategoryType.Weight.defaultUnitId else UnitCategoryType.Length.defaultUnitId

@@ -11,12 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.normalizeRecordTimestamp
+import com.woshiwangnima.healthdietpro.common.time.formatRelativeTimeOffset
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
@@ -55,11 +61,13 @@ import com.woshiwangnima.healthdietpro.model.diet.DietPrefs
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
 import com.woshiwangnima.healthdietpro.model.diet.defaultDietTimes
+import com.woshiwangnima.healthdietpro.model.diet.DietRecordTiming
 import com.woshiwangnima.healthdietpro.model.diet.resolveDefault
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun DietEditorScreen(
@@ -93,6 +101,8 @@ internal fun DietEditorScreen(
         mutableStateOf(restored?.entries ?: emptyList())
     }
     var pickField by remember { mutableStateOf<DietTimeField?>(null) }
+    var resetField by remember { mutableStateOf<DietTimeField?>(null) }
+    var resetBothTimes by remember { mutableStateOf(false) }
     var editingEntry by remember { mutableStateOf<DietFoodEntry?>(null) }
     var deletingEntry by remember { mutableStateOf<DietFoodEntry?>(null) }
     var showEntryEditor by remember { mutableStateOf(false) }
@@ -111,6 +121,25 @@ internal fun DietEditorScreen(
     val hasChanges = current != existing
     val valid = mealStartAt > 0L && mealEndAt >= mealStartAt && entries.isNotEmpty()
     val saveEnabled = valid && hasChanges
+    val defaultTiming = prefs.forPeriod(mealPeriod)
+    val defaultDuration = defaultTiming.defaultMinutes.toLong() * 60_000L
+    val startResetOffset = if (defaultTiming.timing == DietRecordTiming.BEFORE_MEAL) 0L else -defaultDuration
+    val endResetOffset = if (defaultTiming.timing == DietRecordTiming.BEFORE_MEAL) defaultDuration else 0L
+    val resetNowLabel = stringResource(R.string.record_time_reset_now)
+    val resetDayUnit = stringResource(R.string.record_time_reset_day_unit)
+    val resetHourUnit = stringResource(R.string.record_time_reset_hour_unit)
+    val resetMinuteUnit = stringResource(R.string.record_time_reset_minute_unit)
+    val resetSecondUnit = stringResource(R.string.record_time_reset_second_unit)
+    val formatOffset: (Long) -> String = { offset ->
+        formatRelativeTimeOffset(
+            offset = offset.milliseconds,
+            zeroLabel = resetNowLabel,
+            dayUnit = resetDayUnit,
+            hourUnit = resetHourUnit,
+            minuteUnit = resetMinuteUnit,
+            secondUnit = resetSecondUnit,
+        )
+    }
 
     androidx.compose.runtime.LaunchedEffect(current) {
         if (current != existing) draftRepository.save(existing?.id, current)
@@ -141,24 +170,75 @@ internal fun DietEditorScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                item { RecordTimePickerField(stringResource(R.string.diet_meal_start), mealStartAt, RecordTimePrecision.MINUTE, { pickField = DietTimeField.START }) }
-                item { RecordTimePickerField(stringResource(R.string.diet_meal_end), mealEndAt, RecordTimePrecision.MINUTE, { pickField = DietTimeField.END }) }
                 item {
-                    AppDropdownField(
-                        label = stringResource(R.string.diet_meal_period),
-                        value = stringResource(mealPeriod.displayRes()),
-                        options = MealPeriod.entries.map { period ->
-                            com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption(period.name, stringResource(period.displayRes()))
-                        },
-                        onSelect = { option ->
-                            val selected = MealPeriod.valueOf(option.id)
-                            if (selected != mealPeriod && endAtDefault && mealStartAt > 0L) {
-                                val duration = prefs.forPeriod(selected).defaultMinutes.toLong() * 60_000L
-                                mealEndAt = mealStartAt + duration
-                            }
-                            mealPeriod = selected
-                        },
+                    RecordTimePickerField(
+                        title = stringResource(R.string.diet_meal_start),
+                        valueMillis = mealStartAt,
+                        precision = RecordTimePrecision.MINUTE,
+                        onClick = { pickField = DietTimeField.START },
+                        resetOffset = startResetOffset.milliseconds,
+                        resetLabel = formatOffset(startResetOffset),
+                        onResetClick = { resetField = DietTimeField.START },
                     )
+                }
+                item {
+                    RecordTimePickerField(
+                        title = stringResource(R.string.diet_meal_end),
+                        valueMillis = mealEndAt,
+                        precision = RecordTimePrecision.MINUTE,
+                        onClick = { pickField = DietTimeField.END },
+                        resetOffset = endResetOffset.milliseconds,
+                        resetLabel = formatOffset(endResetOffset),
+                        onResetClick = { resetField = DietTimeField.END },
+                    )
+                }
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        AppDropdownField(
+                            label = stringResource(R.string.diet_meal_period),
+                            value = stringResource(mealPeriod.displayRes()),
+                            options = MealPeriod.entries.map { period ->
+                                com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption(period.name, stringResource(period.displayRes()))
+                            },
+                            onSelect = { option ->
+                                val selected = MealPeriod.valueOf(option.id)
+                                if (selected != mealPeriod && endAtDefault && mealStartAt > 0L) {
+                                    val duration = prefs.forPeriod(selected).defaultMinutes.toLong() * 60_000L
+                                    mealEndAt = mealStartAt + duration
+                                }
+                                mealPeriod = selected
+                            },
+                            modifier = Modifier.weight(1f),
+                        )
+                        Surface(
+                            onClick = { resetBothTimes = true },
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f),
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            shape = MaterialTheme.shapes.small,
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Refresh,
+                                    contentDescription = stringResource(R.string.diet_time_reset_both),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                TextOverflowText(
+                                    text = stringResource(R.string.diet_time_reset_both),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    maxLines = 1,
+                                )
+                            }
+                        }
+                    }
                 }
                 item {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -225,6 +305,50 @@ internal fun DietEditorScreen(
             onSave = ::onSaveRecord,
             onDismiss = { showDiscardDialog = false },
             saveEnabled = saveEnabled,
+        )
+    }
+    resetField?.let { field ->
+        val offset = if (field == DietTimeField.START) startResetOffset else endResetOffset
+        AlertDialog(
+            onDismissRequest = { resetField = null },
+            title = { Text(stringResource(R.string.diet_time_reset_title)) },
+            text = { Text(stringResource(R.string.diet_time_reset_message, formatOffset(offset))) },
+            confirmButton = {
+                TextButton(onClick = {
+                    val resetAt = normalizeRecordTimestamp(System.currentTimeMillis() + offset, RecordTimePrecision.MINUTE)
+                    if (field == DietTimeField.START) {
+                        val wasDefaultEnd = endAtDefault && mealEndAt == mealStartAt + defaultDuration
+                        mealStartAt = resetAt
+                        if (wasDefaultEnd) mealEndAt = resetAt + defaultDuration
+                    } else {
+                        mealEndAt = resetAt
+                        endAtDefault = false
+                    }
+                    resetField = null
+                }) { Text(stringResource(R.string.compose_confirm_dialog_ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { resetField = null }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) }
+            },
+        )
+    }
+    if (resetBothTimes) {
+        AlertDialog(
+            onDismissRequest = { resetBothTimes = false },
+            title = { Text(stringResource(R.string.diet_time_reset_title)) },
+            text = { Text(stringResource(R.string.diet_time_reset_both_message, formatOffset(startResetOffset), formatOffset(endResetOffset))) },
+            confirmButton = {
+                TextButton(onClick = {
+                    val resetNow = System.currentTimeMillis()
+                    mealStartAt = normalizeRecordTimestamp(resetNow + startResetOffset, RecordTimePrecision.MINUTE)
+                    mealEndAt = normalizeRecordTimestamp(resetNow + endResetOffset, RecordTimePrecision.MINUTE)
+                    endAtDefault = true
+                    resetBothTimes = false
+                }) { Text(stringResource(R.string.compose_confirm_dialog_ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { resetBothTimes = false }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) }
+            },
         )
     }
     if (showEntryEditor) {
