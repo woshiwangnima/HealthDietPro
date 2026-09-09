@@ -47,6 +47,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -221,6 +222,7 @@ private fun BloodGlucoseScreen(
     val predictionGenerating by viewModel.predictionGenerating.collectAsStateWithLifecycle()
     val predictionGenerationStatus by viewModel.predictionGenerationStatus.collectAsStateWithLifecycle()
     val predictionEligibility by viewModel.predictionEligibility.collectAsStateWithLifecycle()
+    val predictionFormula by viewModel.predictionFormula.collectAsStateWithLifecycle()
     val eventUiState by eventViewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var selectedRecordType by rememberSaveable { mutableIntStateOf(0) }
@@ -406,11 +408,13 @@ private fun BloodGlucoseScreen(
                         predictionGenerationStatus = predictionGenerationStatus,
                         predictionEligibility = predictionEligibility,
                         predictionConfidence = predictionConfidence,
+                        predictionFormula = predictionFormula,
                         onScopeChanged = viewModel::setChartScope,
                         onWindowChanged = viewModel::setChartWindow,
                         onWindowEndChanged = viewModel::setChartWindowEnd,
                         onChartStyleChanged = viewModel::setChartStyle,
                         onGeneratePrediction = viewModel::generatePrediction,
+                        onPredictionFormulaDismissed = viewModel::consumePredictionFormula,
                     )
                 } else {
                     when (tab) {
@@ -896,12 +900,20 @@ private fun BloodGlucoseChart(
     predictionGenerationStatus: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionGenerationStatus,
     predictionEligibility: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionEligibility,
     predictionConfidence: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionConfidence?,
+    predictionFormula: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionFormula?,
     onScopeChanged: (com.woshiwangnima.healthdietpro.common.time.RecordTimeRangeSelection) -> Unit,
     onWindowChanged: (com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartWindow) -> Unit,
     onWindowEndChanged: (Long?) -> Unit,
     onChartStyleChanged: (com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseChartStylePrefs) -> Unit,
     onGeneratePrediction: () -> Unit,
+    onPredictionFormulaDismissed: () -> Unit,
 ) {
+    var displayedPredictionFormula by remember { mutableStateOf<com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionFormula?>(null) }
+    LaunchedEffect(predictionFormula, predictionGenerating) {
+        if (!predictionGenerating && predictionFormula != null) {
+            displayedPredictionFormula = predictionFormula
+        }
+    }
     val resolvedScope = scope.resolve()
     val effectiveScopeEnd = resolvedScope.endMillis +
         com.woshiwangnima.healthdietpro.model.bloodglucose.PREDICTION_DURATION_MILLIS
@@ -970,6 +982,156 @@ private fun BloodGlucoseChart(
                     )
                 }
             }
+        }
+        displayedPredictionFormula?.let { formula ->
+            PredictionFormulaDialog(
+                formula = formula,
+                onDismiss = {
+                    displayedPredictionFormula = null
+                    onPredictionFormulaDismissed()
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun PredictionFormulaDialog(
+    formula: com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionFormula,
+    onDismiss: () -> Unit,
+) {
+    val number = { value: Double -> String.format(Locale.getDefault(), "%.3f", value) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.blood_glucose_prediction_formula_title)) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                PredictionFormulaSection(
+                    title = stringResource(R.string.blood_glucose_prediction_formula_total_title),
+                    originalFormula = stringResource(R.string.blood_glucose_prediction_formula_total_original),
+                    algebraExplanation = listOf(stringResource(R.string.blood_glucose_prediction_formula_total_algebra)),
+                    substitutedFormula = null,
+                )
+                PredictionFormulaSection(
+                    title = stringResource(R.string.blood_glucose_prediction_formula_baseline_title),
+                    originalFormula = stringResource(R.string.blood_glucose_prediction_formula_baseline_original),
+                    algebraExplanation = listOf(
+                        stringResource(R.string.blood_glucose_prediction_formula_baseline_base_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_baseline_start_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_baseline_decay_algebra),
+                    ),
+                    substitutedFormula = stringResource(
+                        R.string.blood_glucose_prediction_formula_baseline_substituted,
+                        number(formula.baseMmolPerL),
+                        number(formula.startMmolPerL),
+                        number(formula.baseMmolPerL),
+                        number(formula.baselineDecayPerHour),
+                    ),
+                )
+                PredictionFormulaSection(
+                    title = stringResource(R.string.blood_glucose_prediction_formula_meal_title),
+                    originalFormula = stringResource(R.string.blood_glucose_prediction_formula_meal_original),
+                    algebraExplanation = listOf(
+                        stringResource(R.string.blood_glucose_prediction_formula_meal_carbs_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_meal_peak_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_meal_window_algebra),
+                    ),
+                    substitutedFormula = stringResource(
+                        R.string.blood_glucose_prediction_formula_meal_substituted,
+                        number(formula.carbsCoefficientPerGram),
+                        number(formula.mealPeakMinutes),
+                    ),
+                )
+                PredictionFormulaSection(
+                    title = stringResource(R.string.blood_glucose_prediction_formula_drug_title),
+                    originalFormula = stringResource(R.string.blood_glucose_prediction_formula_drug_original),
+                    algebraExplanation = listOf(
+                        stringResource(R.string.blood_glucose_prediction_formula_drug_coefficient_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_drug_peak_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_drug_window_algebra),
+                    ),
+                    substitutedFormula = formula.drugFormulas.flatMap { drug ->
+                        drug.doseValues.map { dose ->
+                            stringResource(
+                                R.string.blood_glucose_prediction_formula_drug_substituted,
+                                drug.medicationName,
+                                number(drug.coefficientPerDose),
+                                number(dose),
+                                number(drug.peakMinutes),
+                            )
+                        }
+                    }.joinToString("\n").ifBlank {
+                        stringResource(R.string.blood_glucose_prediction_formula_drug_no_data)
+                    },
+                )
+                PredictionFormulaSection(
+                    title = stringResource(R.string.blood_glucose_prediction_formula_sleep_title),
+                    originalFormula = stringResource(R.string.blood_glucose_prediction_formula_sleep_original),
+                    algebraExplanation = listOf(
+                        stringResource(R.string.blood_glucose_prediction_formula_sleep_slow_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_sleep_stress_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_sleep_hours_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_sleep_decay_algebra),
+                    ),
+                    substitutedFormula = stringResource(
+                        R.string.blood_glucose_prediction_formula_sleep_substituted,
+                        number(formula.sleepFormula.slowMmolPerL),
+                        number(formula.sleepFormula.stressCoefficientMmolPerL),
+                        number(formula.sleepFormula.stressDecayPerHour),
+                    ),
+                )
+                PredictionFormulaSection(
+                    title = stringResource(R.string.blood_glucose_prediction_formula_exercise_title),
+                    originalFormula = stringResource(R.string.blood_glucose_prediction_formula_exercise_original),
+                    algebraExplanation = listOf(stringResource(R.string.blood_glucose_prediction_formula_exercise_algebra)),
+                    substitutedFormula = stringResource(R.string.blood_glucose_prediction_formula_exercise_substituted),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.compose_confirm_dialog_ok))
+            }
+        },
+    )
+}
+
+@Composable
+private fun PredictionFormulaSection(
+    title: String,
+    originalFormula: String,
+    algebraExplanation: List<String>,
+    substitutedFormula: String?,
+) {
+    androidx.compose.material3.Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(title, style = MaterialTheme.typography.titleSmall)
+            Text(originalFormula, style = MaterialTheme.typography.labelSmall)
+            androidx.compose.material3.Surface(
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.55f),
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+            ) {
+                Column(
+                    modifier = Modifier.padding(start = 8.dp, top = 6.dp, end = 8.dp, bottom = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    algebraExplanation.forEach { explanation ->
+                        Text(explanation, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+            substitutedFormula?.let { Text(it, style = MaterialTheme.typography.labelSmall) }
         }
     }
 }

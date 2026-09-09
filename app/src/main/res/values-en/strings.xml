@@ -544,6 +544,40 @@
     <string name="blood_glucose_prediction_condition_covered_count">Event-covered glucose records: %1$d (minimum 10)</string>
     <string name="blood_glucose_prediction_confirm_title">Generate prediction data?</string>
     <string name="blood_glucose_prediction_confirm_message">This creates a separate six-hour prediction every five minutes. It will not be added to actual blood glucose records, alerts, or statistics. Overlapping prediction times will be replaced by the new result.</string>
+    <string name="blood_glucose_prediction_formula_title">Prediction formula</string>
+    <string name="blood_glucose_prediction_formula_total_title">Prediction line</string>
+    <string name="blood_glucose_prediction_formula_total_original">Prediction(t) = G_Baseline(t) + G_Meal(t) + G_Drug(t) + G_Sleep(t) + G_Exercise(t)</string>
+    <string name="blood_glucose_prediction_formula_total_algebra">G_Meal(t) uses the fitted carbohydrate response. G_Drug(t), G_Sleep(t), and G_Exercise(t) are currently zero.</string>
+    <string name="blood_glucose_prediction_formula_baseline_title">Baseline line</string>
+    <string name="blood_glucose_prediction_formula_baseline_original">G_Baseline(t) = G_Base + (G_Start - G_Base) × exp(-K_Baseline × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_baseline_base_algebra">G_Base: historical baseline glucose.</string>
+    <string name="blood_glucose_prediction_formula_baseline_start_algebra">G_Start: historical glucose for the matching time of day.</string>
+    <string name="blood_glucose_prediction_formula_baseline_decay_algebra">K_Baseline: fitted hourly decay coefficient.</string>
+    <string name="blood_glucose_prediction_formula_baseline_substituted">G_Baseline(t) = %1$s + (%2$s - %3$s) × exp(-%4$s × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_meal_title">Meal glucose-rise line</string>
+    <string name="blood_glucose_prediction_formula_meal_original">G_Meal(t) = K_Carbs × Carbs × (t_minutes / T_Meal_Peak) × exp(1 - t_minutes / T_Meal_Peak)</string>
+    <string name="blood_glucose_prediction_formula_meal_carbs_algebra">K_Carbs: fitted glucose rise per gram of carbohydrate.</string>
+    <string name="blood_glucose_prediction_formula_meal_peak_algebra">T_Meal_Peak: fitted time to the post-meal peak.</string>
+    <string name="blood_glucose_prediction_formula_meal_window_algebra">The 0 to 240 minute range is used only for fitting; generation starts at the meal and decays continuously.</string>
+    <string name="blood_glucose_prediction_formula_meal_substituted">%1$s × Carbs × (t_minutes / %2$s) × exp(1 - t_minutes / %2$s), t_minutes ≥ 0; fitting window: 0 ≤ t_minutes ≤ 240</string>
+    <string name="blood_glucose_prediction_formula_drug_title">Medication glucose-lowering line</string>
+    <string name="blood_glucose_prediction_formula_drug_original">G_Drug(t) = -K_Drug × Dose × (t_minutes / T_Drug_Peak) × exp(1 - t_minutes / T_Drug_Peak), 20 ≤ t_minutes ≤ 480; otherwise 0</string>
+    <string name="blood_glucose_prediction_formula_drug_coefficient_algebra">K_Drug: fitted glucose lowering per dose unit for this medication.</string>
+    <string name="blood_glucose_prediction_formula_drug_peak_algebra">T_Drug_Peak: fitted time to peak medication effect.</string>
+    <string name="blood_glucose_prediction_formula_drug_window_algebra">The 20 to 480 minute range is used only for fitting; generation starts at intake and decays continuously.</string>
+    <string name="blood_glucose_prediction_formula_drug_substituted">%1$s: -%2$s × %3$s × (t_minutes / %4$s) × exp(1 - t_minutes / %4$s), t_minutes ≥ 0; fitting window: 20 ≤ t_minutes ≤ 480</string>
+    <string name="blood_glucose_prediction_formula_drug_no_data">No eligible medication formula was fitted.</string>
+    <string name="blood_glucose_prediction_formula_sleep_title">Sleep correction line</string>
+    <string name="blood_glucose_prediction_formula_sleep_original">G_Sleep(t) = G_Sleep_Slow during sleep; G_Sleep_Stress(t) = K_Sleep_Stress × max(0, 8 - H_Sleep) × exp(-K_Sleep_Decay × (t_minutes / 60)) after waking, 0 ≤ t_minutes ≤ 360; otherwise 0</string>
+    <string name="blood_glucose_prediction_formula_sleep_slow_algebra">G_Sleep_Slow: relative glucose correction during sleep.</string>
+    <string name="blood_glucose_prediction_formula_sleep_stress_algebra">K_Sleep_Stress: sleep-debt stress coefficient.</string>
+    <string name="blood_glucose_prediction_formula_sleep_hours_algebra">H_Sleep: sleep duration in hours.</string>
+    <string name="blood_glucose_prediction_formula_sleep_decay_algebra">K_Sleep_Decay: post-waking stress decay rate; post-waking t_minutes starts at wake time and lasts up to 360 minutes.</string>
+    <string name="blood_glucose_prediction_formula_sleep_substituted">During sleep: %1$s. After waking: %2$s × max(0, 8 - H_Sleep) × exp(-%3$s × (t_minutes / 60)), 0 ≤ t_minutes ≤ 360</string>
+    <string name="blood_glucose_prediction_formula_exercise_title">Exercise correction line</string>
+    <string name="blood_glucose_prediction_formula_exercise_original">G_Exercise(t) = exercise correction(t)</string>
+    <string name="blood_glucose_prediction_formula_exercise_algebra">The exercise correction model is disabled for this prediction.</string>
+    <string name="blood_glucose_prediction_formula_exercise_substituted">0</string>
     <string name="blood_glucose_chart_no_data_in_scope">No blood glucose records in this time range.</string>
     <string name="blood_glucose_delayed_comparison">Delayed comparison; time shown is the original measurement time.</string>
     <string name="blood_glucose_chart_series_style">%1$s style</string>

@@ -544,6 +544,40 @@
     <string name="blood_glucose_prediction_condition_covered_count">有事件覆盖的血糖记录：%1$d 条（最低 10 条）</string>
     <string name="blood_glucose_prediction_confirm_title">生成预测数据？</string>
     <string name="blood_glucose_prediction_confirm_message">将按每 5 分钟生成未来 6 小时的独立预测数据。预测结果不会加入实际血糖记录，也不会影响提醒或统计；与已有预测时间重叠的部分将由新结果替换。</string>
+    <string name="blood_glucose_prediction_formula_title">预测公式</string>
+    <string name="blood_glucose_prediction_formula_total_title">预测线</string>
+    <string name="blood_glucose_prediction_formula_total_original">预测线(t) = 基准线G_Baseline(t) + 饮食升糖线G_Meal(t) + 用药降糖线G_Drug(t) + 睡眠修正线G_Sleep(t) + 运动修正线G_Exercise(t)</string>
+    <string name="blood_glucose_prediction_formula_total_algebra">饮食升糖线使用拟合出的碳水响应；用药、睡眠和运动修正线当前为 0。</string>
+    <string name="blood_glucose_prediction_formula_baseline_title">基准线</string>
+    <string name="blood_glucose_prediction_formula_baseline_original">G_Baseline(t) = G_Base + (G_Start - G_Base) × exp(-K_Baseline × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_baseline_base_algebra">G_Base：历史基准血糖值。</string>
+    <string name="blood_glucose_prediction_formula_baseline_start_algebra">G_Start：当前时段对应的历史血糖值。</string>
+    <string name="blood_glucose_prediction_formula_baseline_decay_algebra">K_Baseline：拟合出的每小时衰减系数。</string>
+    <string name="blood_glucose_prediction_formula_baseline_substituted">%1$s + (%2$s - %3$s) × exp(-%4$s × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_meal_title">饮食升糖线</string>
+    <string name="blood_glucose_prediction_formula_meal_original">G_Meal(t) = K_Carbs × Carbs × (t_minutes / T_Meal_Peak) × exp(1 - t_minutes / T_Meal_Peak)</string>
+    <string name="blood_glucose_prediction_formula_meal_carbs_algebra">K_Carbs：每克碳水对应的拟合升糖幅度。</string>
+    <string name="blood_glucose_prediction_formula_meal_peak_algebra">T_Meal_Peak：拟合出的餐后达峰时间。</string>
+    <string name="blood_glucose_prediction_formula_meal_window_algebra">餐后 0 至 240 分钟仅用于拟合；生成时从餐食发生起持续衰减。</string>
+    <string name="blood_glucose_prediction_formula_meal_substituted">%1$s × Carbs × (t_minutes / %2$s) × exp(1 - t_minutes / %2$s)，t_minutes ≥ 0；拟合窗口：0 ≤ t_minutes ≤ 240</string>
+    <string name="blood_glucose_prediction_formula_drug_title">用药降糖线</string>
+    <string name="blood_glucose_prediction_formula_drug_original">G_Drug(t) = -K_Drug × Dose × (t_minutes / T_Drug_Peak) × exp(1 - t_minutes / T_Drug_Peak)，20 ≤ t_minutes ≤ 480；否则为 0</string>
+    <string name="blood_glucose_prediction_formula_drug_coefficient_algebra">K_Drug：该药品每单位剂量的拟合降糖幅度。</string>
+    <string name="blood_glucose_prediction_formula_drug_peak_algebra">T_Drug_Peak：该药品拟合出的药效达峰时间。</string>
+    <string name="blood_glucose_prediction_formula_drug_window_algebra">用药后 20 至 480 分钟仅用于拟合；生成时从用药发生起持续衰减。</string>
+    <string name="blood_glucose_prediction_formula_drug_substituted">%1$s：-%2$s × %3$s × (t_minutes / %4$s) × exp(1 - t_minutes / %4$s)，t_minutes ≥ 0；拟合窗口：20 ≤ t_minutes ≤ 480</string>
+    <string name="blood_glucose_prediction_formula_drug_no_data">没有拟合出符合条件的药品公式。</string>
+    <string name="blood_glucose_prediction_formula_sleep_title">睡眠修正线</string>
+    <string name="blood_glucose_prediction_formula_sleep_original">G_Sleep(t) = G_Sleep_Slow（睡眠期间）；G_Sleep_Stress(t) = K_Sleep_Stress × max(0, 8 - H_Sleep) × exp(-K_Sleep_Decay × (t_minutes / 60))（醒来后，0 ≤ t_minutes ≤ 360）；否则为 0</string>
+    <string name="blood_glucose_prediction_formula_sleep_slow_algebra">G_Sleep_Slow：睡眠期间的相对血糖修正值。</string>
+    <string name="blood_glucose_prediction_formula_sleep_stress_algebra">K_Sleep_Stress：缺觉应激系数。</string>
+    <string name="blood_glucose_prediction_formula_sleep_hours_algebra">H_Sleep：睡眠时长，单位为小时。</string>
+    <string name="blood_glucose_prediction_formula_sleep_decay_algebra">K_Sleep_Decay：醒后应激消退速率；醒后 t_minutes 从醒来时刻重新计算，最多生效 360 分钟。</string>
+    <string name="blood_glucose_prediction_formula_sleep_substituted">%1$s（睡眠期间）；%2$s × max(0, 8 - H_Sleep) × exp(-%3$s × (t_minutes / 60))（醒来后，0 ≤ t_minutes ≤ 360）</string>
+    <string name="blood_glucose_prediction_formula_exercise_title">运动修正线</string>
+    <string name="blood_glucose_prediction_formula_exercise_original">运动修正线G_Exercise(t) = 运动修正(t)</string>
+    <string name="blood_glucose_prediction_formula_exercise_algebra">本次预测未启用运动修正模型。</string>
+    <string name="blood_glucose_prediction_formula_exercise_substituted">0</string>
     <string name="blood_glucose_chart_no_data_in_scope">此时间范围内没有血糖记录。</string>
     <string name="blood_glucose_delayed_comparison">延迟对比，显示的是原始测量时间。</string>
     <string name="blood_glucose_chart_series_style">%1$s 样式</string>

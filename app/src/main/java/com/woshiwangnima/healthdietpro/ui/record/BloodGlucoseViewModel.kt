@@ -23,6 +23,7 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePrediction
 import com.woshiwangnima.healthdietpro.model.bloodglucose.predictBloodGlucose
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionGenerationStatus
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionEligibility
+import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionFormula
 import com.woshiwangnima.healthdietpro.model.bloodglucose.evaluatePredictionEligibility
 import com.woshiwangnima.healthdietpro.model.diet.DietRepository
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRepository
@@ -78,6 +79,8 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
     val predictionGenerationStatus: StateFlow<BloodGlucosePredictionGenerationStatus> = _predictionGenerationStatus.asStateFlow()
     private val _predictionEligibility = MutableStateFlow(BloodGlucosePredictionEligibility(0, 0, 0, 0))
     val predictionEligibility: StateFlow<BloodGlucosePredictionEligibility> = _predictionEligibility.asStateFlow()
+    private val _predictionFormula = MutableStateFlow<BloodGlucosePredictionFormula?>(null)
+    val predictionFormula: StateFlow<BloodGlucosePredictionFormula?> = _predictionFormula.asStateFlow()
 
     init {
         refresh()
@@ -218,6 +221,7 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
                     _predictionConfidence.value = result.confidence
                     _chartWindowEnd.value = result.points.lastOrNull()?.timestamp
                     _predictionGenerationStatus.value = BloodGlucosePredictionGenerationStatus.SUCCESS
+                    _predictionFormula.value = result.formula
                 } else {
                     _predictionGenerationStatus.value = BloodGlucosePredictionGenerationStatus.INSUFFICIENT_DATA
                 }
@@ -238,6 +242,10 @@ internal class BloodGlucoseViewModel(application: Application) : AndroidViewMode
             val sleep = SleepRepository.fromContext(getApplication()).load().records
             _predictionEligibility.value = evaluatePredictionEligibility(_records.value, medications, meals, sleep)
         }
+    }
+
+    fun consumePredictionFormula() {
+        _predictionFormula.value = null
     }
 
     private fun loadChartWindow(): BloodGlucoseChartWindow =
