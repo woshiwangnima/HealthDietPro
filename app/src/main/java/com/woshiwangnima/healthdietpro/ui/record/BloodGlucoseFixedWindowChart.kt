@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -54,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -86,6 +88,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
 import com.woshiwangnima.healthdietpro.common.ui.rememberAttentionShakeOffset
@@ -280,7 +283,7 @@ internal fun BloodGlucoseFixedWindowChart(
     }
     if (fullscreen) {
         Dialog(onDismissRequest = { fullscreen = false }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-            Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            Surface(Modifier.fillMaxSize(), color = LocalAppTokens.current.colors.bg) {
                 FixedLandscapeBox {
                     GlucoseChartSurface(
                         slice = slice,
@@ -394,10 +397,10 @@ private fun GlucoseChartSurface(
     val palette = ChartPalette(
         primary = primaryStyle.color.copy(alpha = primaryStyle.alpha),
         delayed = delayedStyle.color.copy(alpha = delayedStyle.alpha),
-        axis = MaterialTheme.colorScheme.onSurfaceVariant,
-        grid = MaterialTheme.colorScheme.outlineVariant,
-        target = MaterialTheme.colorScheme.secondaryContainer,
-        surface = MaterialTheme.colorScheme.surface,
+        axis = LocalAppTokens.current.colors.textMuted,
+        grid = LocalAppTokens.current.colors.border,
+        target = LocalAppTokens.current.colors.primaryContainer,
+        surface = LocalAppTokens.current.colors.panel,
     )
     var crosshair by remember { mutableStateOf<GlucoseCrosshair?>(null) }
     var barCrosshair by remember { mutableStateOf<BarCrosshair?>(null) }
@@ -450,6 +453,8 @@ private fun GlucoseChartSurface(
         }
         BoxWithConstraints(drawingModifier) {
             var chartSize by remember { mutableStateOf(IntSize.Zero) }
+            // 命中测试要和绘制用同一套 dp 边距，否则点在图上看得到的位置却选不中。
+            val chartDensity = LocalDensity.current.density
             var lineInfoOffset by remember { mutableStateOf(IntOffset.Zero) }
             var barInfoOffset by remember { mutableStateOf(IntOffset.Zero) }
             val currentLineInfoOffset by rememberUpdatedState(lineInfoOffset)
@@ -471,7 +476,7 @@ private fun GlucoseChartSurface(
                 Instant.ofEpochMilli(dateMarker).atZone(ZoneId.systemDefault()).toLocalDate().format(DATE_LABEL_FORMATTER)
             }
             fun handleChartTap(offset: Offset) {
-                val timestamp = chartTimestampAt(offset, chartSize.width, chartSize.height, currentSlice)
+                val timestamp = chartTimestampAt(offset, chartSize.width, chartSize.height, currentSlice, chartDensity)
                 if (timestamp == null) {
                     crosshair = null
                     barCrosshair = null
@@ -521,7 +526,7 @@ private fun GlucoseChartSurface(
                 Icon(painterResource(R.drawable.ic_birthday), null, modifier = Modifier.size(16.dp))
                 TextOverflowText(
                     text = markerLabel,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = LocalAppTokens.current.type.caption,
                     modifier = Modifier.padding(start = 3.dp),
                 )
             }
@@ -545,7 +550,7 @@ private fun GlucoseChartSurface(
             windowEnd = slice.windowEnd,
             earliest = earliest,
             latest = latest,
-            primaryActionColor = MaterialTheme.colorScheme.primary,
+            primaryActionColor = LocalAppTokens.current.colors.primary,
             onWindowEndChanged = onWindowEndChanged,
         )
         if (!fullscreen) {
@@ -582,7 +587,7 @@ private fun GlucoseChartSurface(
 private fun CrosshairInfo(value: GlucoseCrosshair, palette: ChartPalette, modifier: Modifier) {
     val originalTimestamp = if (value.series == SeriesKind.Delayed) value.drawingTimestamp - value.delayMillis else value.drawingTimestamp
     val time = Instant.ofEpochMilli(originalTimestamp).atZone(ZoneId.systemDefault()).format(CROSSHAIR_TIME_FORMATTER)
-    Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.76f), shape = MaterialTheme.shapes.small, modifier = modifier) {
+    Surface(color = LocalAppTokens.current.colors.panel.copy(alpha = 0.76f), shape = MaterialTheme.shapes.small, modifier = modifier) {
         Text(
             text = buildString {
                 append(when (value.series) {
@@ -594,7 +599,7 @@ private fun CrosshairInfo(value: GlucoseCrosshair, palette: ChartPalette, modifi
                 append("Y: ").append(String.format(Locale.getDefault(), "%.2f mmol/L", value.value))
             },
             color = palette.axis,
-            style = MaterialTheme.typography.bodyMedium,
+            style = LocalAppTokens.current.type.bodyS,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 3.dp),
         )
     }
@@ -604,11 +609,11 @@ private fun CrosshairInfo(value: GlucoseCrosshair, palette: ChartPalette, modifi
 private fun BarCrosshairInfo(value: BarCrosshair, modifier: Modifier) {
     val start = Instant.ofEpochMilli(value.startTimestamp).atZone(ZoneId.systemDefault()).format(CROSSHAIR_TIME_FORMATTER)
     val end = Instant.ofEpochMilli(value.endTimestamp).atZone(ZoneId.systemDefault()).format(CROSSHAIR_TIME_FORMATTER)
-    Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f), shape = MaterialTheme.shapes.small, modifier = modifier) {
+    Surface(color = LocalAppTokens.current.colors.panel.copy(alpha = 0.88f), shape = MaterialTheme.shapes.small, modifier = modifier) {
         Text(
             text = "${stringResource(value.kind.labelRes)}\n$start - $end",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
+            color = LocalAppTokens.current.colors.textMuted,
+            style = LocalAppTokens.current.type.bodyS,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 3.dp),
         )
     }
@@ -631,11 +636,11 @@ private fun GlucoseStatisticsCard(
     val average = records.takeIf { it.isNotEmpty() }?.map(BloodGlucoseRecord::valueMmolPerL)?.average()
     val fluctuation = if (highest != null && lowest != null) highest.valueMmolPerL - lowest.valueMmolPerL else null
     Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.24f),
-        shape = MaterialTheme.shapes.large,
-        modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+        color = LocalAppTokens.current.colors.panelRaised,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(LocalAppTokens.current.radii.container),
+        modifier = Modifier.fillMaxWidth().padding(top = LocalAppTokens.current.spacing.s2),
     ) {
-        Column(Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(LocalAppTokens.current.spacing.s2), verticalArrangement = Arrangement.spacedBy(LocalAppTokens.current.spacing.s2)) {
             TargetTimeRangeCard(
                 label = stringResource(R.string.blood_glucose_chart_target_rate, window.durationMillis / HOUR_MILLIS),
                 distribution = timeDistribution,
@@ -643,7 +648,7 @@ private fun GlucoseStatisticsCard(
             )
             Row(
                 Modifier.fillMaxWidth().height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(LocalAppTokens.current.spacing.s2),
             ) {
                 MetricCard(
                     label = stringResource(R.string.blood_glucose_chart_fluctuation),
@@ -706,16 +711,19 @@ private fun EightPointGlucoseCard(
             }
         }
     }
-    val unknownColor = MaterialTheme.colorScheme.outlineVariant
+    val unknownColor = LocalAppTokens.current.colors.border
     Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.24f),
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.padding(top = 6.dp).fillMaxWidth().height(382.dp),
+        color = LocalAppTokens.current.colors.panelRaised,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(LocalAppTokens.current.radii.container),
+        // 固定高度：八点表格靠父高度的 weight 分行列，换成 heightIn 会变成无界高度直接崩。
+        // 字号放大到 150% 时格内数字靠单行省略收尾，不改表格几何。
+        modifier = Modifier.padding(top = LocalAppTokens.current.spacing.s2).fillMaxWidth().height(382.dp),
     ) {
-        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(LocalAppTokens.current.spacing.s2), verticalArrangement = Arrangement.spacedBy(LocalAppTokens.current.spacing.s1)) {
             Text(
                 stringResource(R.string.blood_glucose_eight_point_chart_title),
-                style = MaterialTheme.typography.titleSmall,
+                style = LocalAppTokens.current.type.bodyS.copy(fontWeight = FontWeight.SemiBold),
+                color = LocalAppTokens.current.colors.text,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
@@ -733,7 +741,7 @@ private fun EightPointGlucoseCard(
                     EightPointLegendItem(glucoseTimeBandColor(GlucoseTimeRangeBand.LOW), stringResource(R.string.blood_glucose_chart_target_time_low))
                     EightPointLegendItem(unknownColor, stringResource(R.string.blood_glucose_eight_point_unknown))
                 }
-                Box(Modifier.width(1.dp).height(24.dp).background(MaterialTheme.colorScheme.outlineVariant))
+                Box(Modifier.width(1.dp).height(24.dp).background(LocalAppTokens.current.colors.border))
                 Row(
                     modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.Center,
@@ -800,8 +808,8 @@ private fun EightPointLegendItem(color: Color, label: String) {
         Text(
             label,
             modifier = Modifier.padding(start = 3.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.caption,
+            color = LocalAppTokens.current.colors.textMuted,
         )
     }
 }
@@ -814,11 +822,11 @@ private fun EightPointNumberSample(label: String, isFallback: Boolean) {
     ) {
         Text(
             text = "6.20",
-            style = if (isFallback) MaterialTheme.typography.labelSmall else MaterialTheme.typography.titleSmall,
+            style = if (isFallback) LocalAppTokens.current.type.caption else LocalAppTokens.current.type.numeric,
             fontWeight = if (isFallback) FontWeight.Normal else FontWeight.Bold,
-            color = if (isFallback) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+            color = if (isFallback) LocalAppTokens.current.colors.textMuted else LocalAppTokens.current.colors.text,
         )
-        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(label, style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted)
     }
 }
 
@@ -827,7 +835,7 @@ private fun EightPointGridHeader(text: String, modifier: Modifier, onClick: (() 
     Surface(
         color = Color.Transparent,
         shape = MaterialTheme.shapes.extraSmall,
-        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
+        border = BorderStroke(0.5.dp, LocalAppTokens.current.colors.border),
         modifier = modifier.fillMaxHeight().padding(1.dp).then(
             if (onClick == null) Modifier else Modifier.clickable(onClick = onClick),
         ),
@@ -835,8 +843,8 @@ private fun EightPointGridHeader(text: String, modifier: Modifier, onClick: (() 
         Box(Modifier.fillMaxSize().padding(horizontal = 1.dp), contentAlignment = Alignment.Center) {
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.caption,
+                color = LocalAppTokens.current.colors.textMuted,
                 textAlign = TextAlign.Center,
             )
         }
@@ -863,9 +871,9 @@ private fun EightPointGlucoseValue(
         Box(Modifier.fillMaxSize().padding(horizontal = 1.dp), contentAlignment = Alignment.Center) {
             Text(
                 text = record?.let { String.format(Locale.getDefault(), "%.2f", it.valueMmolPerL) } ?: "-",
-                style = if (isFallback) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodyMedium,
+                style = if (isFallback) LocalAppTokens.current.type.caption else LocalAppTokens.current.type.bodyS,
                 fontWeight = if (isFallback) FontWeight.Normal else FontWeight.Bold,
-                color = if (isFallback) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                color = if (isFallback) LocalAppTokens.current.colors.textMuted else LocalAppTokens.current.colors.text,
                 textAlign = TextAlign.Center,
             )
         }
@@ -1018,11 +1026,12 @@ private fun TargetTimeRangeCard(
     distribution: GlucoseTimeRangeDistribution,
     onHelp: () -> Unit,
 ) {
-    Surface(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f), shape = MaterialTheme.shapes.medium, modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
+    Surface(color = LocalAppTokens.current.colors.panel, shape = androidx.compose.foundation.shape.RoundedCornerShape(LocalAppTokens.current.radii.label), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(horizontal = LocalAppTokens.current.spacing.s2, vertical = LocalAppTokens.current.spacing.s1), verticalArrangement = Arrangement.spacedBy(0.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 TooltipLabel(label, Modifier.weight(1f))
-                IconButton(onClick = onHelp, modifier = Modifier.size(22.dp)) {
+                // 不手动压 IconButton 的尺寸：M3 默认保证 48 dp 热区，原来 size(22.dp) 点不中。
+                IconButton(onClick = onHelp) {
                     Icon(painterResource(R.drawable.ic_help), stringResource(R.string.blood_glucose_chart_target_rate_title), modifier = Modifier.size(16.dp))
                 }
             }
@@ -1069,7 +1078,7 @@ private fun TargetTimeRangeCard(
                 showLegend = false,
                 labelMaxLines = 2,
                 chartHeight = 173.dp,
-                centerContentColor = if (totalMillis > 0L && !allBandsWithinReferences) MaterialTheme.colorScheme.tertiary else null,
+                centerContentColor = if (totalMillis > 0L && !allBandsWithinReferences) LocalAppTokens.current.colors.warning else null,
                 centerContentModifier = Modifier.offset { IntOffset(0, centerAttentionShake.roundToPx()) },
             )
         }
@@ -1081,7 +1090,7 @@ private fun TargetTimeRangeHelp(targetRangeText: String) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
             text = stringResource(R.string.blood_glucose_chart_target_time_help_intro, targetRangeText),
-            style = MaterialTheme.typography.bodyMedium,
+            style = LocalAppTokens.current.type.bodyS,
         )
         GlucoseTimeRangeHelpRow(GlucoseTimeRangeBand.HIGH, R.string.blood_glucose_chart_target_time_high_help)
         GlucoseTimeRangeHelpRow(GlucoseTimeRangeBand.IN_RANGE, R.string.blood_glucose_chart_target_time_in_range_help)
@@ -1096,12 +1105,16 @@ private fun GlucoseTimeRangeHelpRow(band: GlucoseTimeRangeBand, descriptionRes: 
         Canvas(Modifier.size(10.dp).padding(top = 3.dp)) { drawCircle(glucoseTimeBandColor(band)) }
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(stringResource(glucoseTimeBandLabelRes(band)), style = MaterialTheme.typography.titleSmall)
-            Text(stringResource(descriptionRes), style = MaterialTheme.typography.bodySmall)
+            Text(
+                stringResource(glucoseTimeBandLabelRes(band)),
+                style = LocalAppTokens.current.type.bodyS.copy(fontWeight = FontWeight.SemiBold),
+                color = LocalAppTokens.current.colors.text,
+            )
+            Text(stringResource(descriptionRes), style = LocalAppTokens.current.type.bodyS)
             Text(
                 stringResource(R.string.blood_glucose_chart_target_time_reference, formatPercentRange(referenceRange)),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.bodyS,
+                color = LocalAppTokens.current.colors.textMuted,
             )
         }
     }
@@ -1109,8 +1122,8 @@ private fun GlucoseTimeRangeHelpRow(band: GlucoseTimeRangeBand, descriptionRes: 
 
 @Composable
 private fun MetricCard(label: String, value: String, unit: String, timestamp: String?, modifier: Modifier) {
-    Surface(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f), shape = MaterialTheme.shapes.medium, modifier = modifier) {
-        Column(Modifier.padding(8.dp)) {
+    Surface(color = LocalAppTokens.current.colors.panel, shape = androidx.compose.foundation.shape.RoundedCornerShape(LocalAppTokens.current.radii.label), modifier = modifier) {
+        Column(Modifier.padding(LocalAppTokens.current.spacing.s2)) {
             Row(Modifier.fillMaxWidth()) {
                 TooltipLabel(label, Modifier.weight(1f))
                 TooltipLabel(unit, Modifier.weight(1f), textAlign = TextAlign.End)
@@ -1125,8 +1138,8 @@ private fun MetricCard(label: String, value: String, unit: String, timestamp: St
 private fun TooltipLabel(text: String, modifier: Modifier = Modifier, textAlign: TextAlign? = null) {
     TextOverflowText(
         text = text,
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = LocalAppTokens.current.type.caption,
+        color = LocalAppTokens.current.colors.textMuted,
         modifier = modifier.fillMaxWidth(),
         textAlign = textAlign,
     )
@@ -1134,10 +1147,11 @@ private fun TooltipLabel(text: String, modifier: Modifier = Modifier, textAlign:
 
 @Composable
 private fun StatisticValue(value: String, modifier: Modifier = Modifier, textAlign: TextAlign? = null) {
+    // 统计数值走等宽：四张卡并排时 8.42 / 12.30 的小数点要落在同一条竖线上。
     TextOverflowText(
         text = value,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onSurface,
+        style = LocalAppTokens.current.type.numeric,
+        color = LocalAppTokens.current.colors.text,
         modifier = modifier.fillMaxWidth(),
         textAlign = textAlign,
     )
@@ -1237,7 +1251,7 @@ private fun ChartBottomControls(
         ) {
             TextOverflowText(
                 text = stringResource(R.string.blood_glucose_prediction_generate),
-                style = MaterialTheme.typography.labelSmall,
+                style = LocalAppTokens.current.type.caption,
             )
         }
     }
@@ -1257,8 +1271,8 @@ private fun ChartBottomControls(
                                     BloodGlucosePredictionConfidence.LOW -> R.string.blood_glucose_prediction_confidence_low
                                 },
                             ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalAppTokens.current.type.bodyS,
+                            color = LocalAppTokens.current.colors.textMuted,
                         )
                     }
                     PredictionEligibilityRow(predictionEligibility.historyReady, stringResource(R.string.blood_glucose_prediction_condition_history, predictionEligibility.historyDays))
@@ -1289,10 +1303,10 @@ private fun PredictionEligibilityRow(ready: Boolean, text: String) {
         Icon(
             imageVector = if (ready) Icons.Filled.Check else Icons.Filled.Close,
             contentDescription = null,
-            tint = if (ready) Color(0xFF43A047) else MaterialTheme.colorScheme.error,
+            tint = if (ready) Color(0xFF43A047) else LocalAppTokens.current.colors.danger,
             modifier = Modifier.size(18.dp),
         )
-        TextOverflowText(text, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(start = 6.dp))
+        TextOverflowText(text, style = LocalAppTokens.current.type.bodyS, modifier = Modifier.padding(start = 6.dp))
     }
 }
 
@@ -1306,7 +1320,7 @@ private fun BarLegend(styles: Map<BarKind, BarStyle>, selected: BarKind?, onSele
                 Surface(onClick = { onSelected(kind) }, shape = MaterialTheme.shapes.extraSmall, color = if (isSelected) style.color.copy(alpha = 0.12f) else Color.Transparent, border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, style.color.copy(alpha = 0.42f)) else null) {
                     Row(Modifier.padding(horizontal = 4.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                         Canvas(Modifier.size(14.dp, 12.dp)) { drawRect(style.color.copy(alpha = style.mainAlpha), size = androidx.compose.ui.geometry.Size(size.width, size.height)) }
-                        Text(stringResource(kind.labelRes), style = MaterialTheme.typography.labelSmall, textDecoration = if (style.visible) null else TextDecoration.LineThrough, modifier = Modifier.padding(start = 3.dp))
+                        Text(stringResource(kind.labelRes), style = LocalAppTokens.current.type.caption, textDecoration = if (style.visible) null else TextDecoration.LineThrough, modifier = Modifier.padding(start = 3.dp))
                     }
                 }
             }
@@ -1331,15 +1345,15 @@ private fun HorizontalPanArea(
     Column(Modifier.fillMaxWidth()) {
         Text(
             stringResource(R.string.blood_glucose_chart_pan_hint),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.caption,
+            color = LocalAppTokens.current.colors.textMuted,
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
         Canvas(
             Modifier
             .fillMaxWidth()
             .height(22.dp)
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.16f), MaterialTheme.shapes.small)
+            .background(LocalAppTokens.current.colors.panelRaised, androidx.compose.foundation.shape.RoundedCornerShape(LocalAppTokens.current.radii.label))
             .pointerInput("glucose-x-pan") {
                 var dragStartEnd = currentWindowEnd
                 var totalDragX = 0f
@@ -1382,7 +1396,7 @@ private fun LegendItem(kind: SeriesKind, style: SeriesStyle, label: String, sele
                 drawLine(style.color.copy(alpha = style.alpha), Offset(0f, size.height / 2), Offset(size.width, size.height / 2), 3f, StrokeCap.Round, style.linePattern.effect())
                 drawLegendPoint(style, Offset(size.width / 2, size.height / 2))
             }
-            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textDecoration = if (style.visible) null else TextDecoration.LineThrough, modifier = Modifier.padding(start = 4.dp))
+            Text(label, style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted, textDecoration = if (style.visible) null else TextDecoration.LineThrough, modifier = Modifier.padding(start = 4.dp))
         }
     }
 }
@@ -1401,7 +1415,7 @@ private fun SeriesStyleDialog(label: String, style: SeriesStyle, onStyleChanged:
                 Text(stringResource(R.string.blood_glucose_chart_color))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     CHART_COLORS.forEach { color ->
-                        Surface(onClick = { onStyleChanged(style.copy(color = color)) }, color = color, shape = MaterialTheme.shapes.small, modifier = Modifier.size(28.dp), border = if (color == style.color) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.onSurface) else null) {}
+                        Surface(onClick = { onStyleChanged(style.copy(color = color)) }, color = color, shape = MaterialTheme.shapes.small, modifier = Modifier.size(28.dp), border = if (color == style.color) androidx.compose.foundation.BorderStroke(2.dp, LocalAppTokens.current.colors.text) else null) {}
                     }
                 }
                 Text(stringResource(R.string.blood_glucose_chart_opacity, (style.alpha * 100).toInt()))
@@ -1454,8 +1468,8 @@ private fun BarStyleDialog(kind: BarKind, style: BarStyle, onStyleChanged: (BarS
     }, confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.compose_confirm_dialog_ok)) } })
 }
 
-private fun chartTimestampAt(touch: Offset, width: Int, height: Int, slice: BloodGlucoseChartSlice): Long? {
-    val bounds = ChartBounds(width.toFloat(), height.toFloat())
+private fun chartTimestampAt(touch: Offset, width: Int, height: Int, slice: BloodGlucoseChartSlice, density: Float): Long? {
+    val bounds = ChartBounds(width.toFloat(), height.toFloat(), density)
     if (bounds.width <= 0f || slice.windowEnd <= slice.windowStart || touch.x !in bounds.left..bounds.right || touch.y !in bounds.top..bounds.bottom) return null
     return slice.windowStart + ((touch.x - bounds.left) / bounds.width * (slice.windowEnd - slice.windowStart)).toLong()
 }
@@ -1504,7 +1518,7 @@ private fun DrawScope.drawGlucoseChart(
     xAxisUnit: String,
     yAxisUnit: String,
 ) {
-    val bounds = ChartBounds(size.width, size.height)
+    val bounds = ChartBounds(size.width, size.height, density)
     if (bounds.width <= 0f || bounds.height <= 0f) return
     fun x(timestamp: Long) = bounds.left + (timestamp - slice.windowStart).toFloat() / (slice.windowEnd - slice.windowStart) * bounds.width
     val chartMaximum = maxOf(slice.historicalMaximum, predictions.maxOfOrNull { it.record.valueMmolPerL } ?: 0.0)
@@ -1512,27 +1526,55 @@ private fun DrawScope.drawGlucoseChart(
     diabetesType.glucoseReferenceRangeMmolPerL.min?.let { min -> diabetesType.glucoseReferenceRangeMmolPerL.max?.let { max ->
         drawRect(palette.target.copy(alpha = 0.48f), Offset(bounds.left, y(max.toDouble())), androidx.compose.ui.geometry.Size(bounds.width, y(min.toDouble()) - y(max.toDouble())))
     } }
+    // 坐标轴文字：整张图共用一支画笔，避免每个刻度都 new 一次 Paint；11 sp 当量见 [axisPaint]。
+    val axisLabelPaint = axisPaint(palette.axis)
+    val baselineShift = axisLabelPaint.textSize * .35f
     val highestTick = kotlin.math.floor(chartMaximum / Y_TICK_INTERVAL) * Y_TICK_INTERVAL
     generateSequence(0.0) { it + Y_TICK_INTERVAL }.takeWhile { it <= highestTick }.forEach { value ->
         val lineY = y(value)
         drawLine(palette.grid, Offset(bounds.left, lineY), Offset(bounds.right, lineY))
-        drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.1f", value), bounds.right + 6f, lineY + 4f, axisPaint(palette.axis))
+        drawContext.canvas.nativeCanvas.drawText(
+            String.format(Locale.getDefault(), "%.1f", value),
+            bounds.right + 3f * density,
+            lineY + baselineShift,
+            axisLabelPaint,
+        )
     }
     generateSequence(slice.windowStart) { it + window.tickMillis }.takeWhile { it <= slice.windowEnd }.forEach { tick ->
         val tickX = x(tick)
         drawLine(palette.grid, Offset(tickX, bounds.top), Offset(tickX, bounds.bottom))
-        drawContext.canvas.nativeCanvas.drawText(Instant.ofEpochMilli(tick).atZone(ZoneId.systemDefault()).format(TIME_LABEL_FORMATTER), tickX - 14f, bounds.bottom + 18f, axisPaint(palette.axis))
+    }
+    // 时间标签单独一轮：字号换成 11 sp 后，“MM-dd HH:mm” 比原来的 6.7 sp 宽了六成，
+    // 逐个都画会连成一串。这里按实际测量宽度取舍，画不下的直接跳过（网格线仍保留，刻度不丢）。
+    var lastLabelRight = -Float.MAX_VALUE
+    generateSequence(slice.windowStart) { it + window.tickMillis }.takeWhile { it <= slice.windowEnd }.forEach { tick ->
+        val tickX = x(tick)
+        val label = Instant.ofEpochMilli(tick).atZone(ZoneId.systemDefault()).format(TIME_LABEL_FORMATTER)
+        val labelWidth = axisLabelPaint.measureText(label)
+        val labelLeft = tickX - labelWidth / 2f
+        if (labelLeft >= lastLabelRight + 6f * density) {
+            drawContext.canvas.nativeCanvas.drawText(label, labelLeft, bounds.bottom + 15f * density, axisLabelPaint)
+            lastLabelRight = labelLeft + labelWidth
+        }
     }
     drawLine(palette.axis, Offset(bounds.right, bounds.top), Offset(bounds.right, bounds.bottom), 2f)
     drawLine(palette.axis, Offset(bounds.left, bounds.bottom), Offset(bounds.right, bounds.bottom), 2f)
-    drawContext.canvas.nativeCanvas.drawText(yAxisUnit, bounds.right - 8f, bounds.top + 10f, axisPaint(palette.axis))
-    drawContext.canvas.nativeCanvas.drawText(xAxisUnit, bounds.left, bounds.bottom + 36f, axisPaint(palette.axis))
+    // 两个轴单位都避开刻度：y 轴单位挪到绘图区上方一行，x 轴单位接在时间刻度下面一行。
+    drawContext.canvas.nativeCanvas.drawText(
+        yAxisUnit,
+        bounds.right - axisLabelPaint.measureText(yAxisUnit),
+        bounds.top - 4f * density,
+        axisLabelPaint,
+    )
+    drawContext.canvas.nativeCanvas.drawText(xAxisUnit, bounds.left, bounds.bottom + 30f * density, axisLabelPaint)
     val targetRange = diabetesType.glucoseReferenceRangeMmolPerL
-    targetRange.min?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.1f", it), 2f, y(it.toDouble()) + 4f, axisPaint(Color(0xFFF57C00))) }
-    targetRange.max?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.1f", it), 2f, y(it.toDouble()) + 4f, axisPaint(Color(0xFFF57C00))) }
+    val targetPaint = axisPaint(Color(0xFFF57C00))
+    val primaryValuePaint = axisPaint(palette.primary)
+    targetRange.min?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.1f", it), 2f * density, y(it.toDouble()) + baselineShift, targetPaint) }
+    targetRange.max?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.1f", it), 2f * density, y(it.toDouble()) + baselineShift, targetPaint) }
     val visibleValues = primary.map { it.record.valueMmolPerL }
-    visibleValues.maxOrNull()?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.2f", it), 2f, y(it) + 4f, axisPaint(palette.primary)) }
-    visibleValues.minOrNull()?.takeIf { it != visibleValues.maxOrNull() }?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.2f", it), 2f, y(it) + 4f, axisPaint(palette.primary)) }
+    visibleValues.maxOrNull()?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.2f", it), 2f * density, y(it) + baselineShift, primaryValuePaint) }
+    visibleValues.minOrNull()?.takeIf { it != visibleValues.maxOrNull() }?.let { drawContext.canvas.nativeCanvas.drawText(String.format(Locale.getDefault(), "%.2f", it), 2f * density, y(it) + baselineShift, primaryValuePaint) }
     if (primaryStyle.visible) drawSeries(primary, ::x, ::y, palette.primary, primaryStyle)
     if (delayedStyle.visible) drawSeries(delayed, ::x, ::y, palette.delayed, delayedStyle)
     if (predictionStyle.visible) drawSeries(predictions, ::x, ::y, predictionStyle.color.copy(alpha = predictionStyle.alpha), predictionStyle)
@@ -1634,16 +1676,28 @@ private fun DrawScope.drawPointShape(center: Offset, color: Color, style: Series
 
 private fun DrawScope.drawLegendPoint(style: SeriesStyle, center: Offset) = drawPointShape(center, style.color.copy(alpha = style.alpha), style)
 
-private fun axisPaint(color: Color) = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+/**
+ * 坐标轴文字的字号（sp 当量）。
+ *
+ * 这里不用 px：原来写死 `textSize = 20f`，在 3 倍屏上只有约 6.7 sp，刻度几乎读不出来。
+ * 也不乘系统 fontScale——刻度要留在一个固定高度的绘图区里，跟随字号放大就会互相重叠。
+ */
+private const val AxisTextSizeSp = 11f
+
+private fun DrawScope.axisPaint(color: Color) = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
     this.color = android.graphics.Color.argb((color.alpha * 220).toInt(), (color.red * 255).toInt(), (color.green * 255).toInt(), (color.blue * 255).toInt())
-    textSize = 20f
+    textSize = AxisTextSizeSp * density
 }
 
-private data class ChartBounds(val widthPx: Float, val heightPx: Float) {
-    val left = 12f
-    val right = widthPx - 52f
-    val top = 12f
-    val bottom = heightPx - 42f
+/**
+ * 绘图区边界。四边按 dp 折算，而不是写死像素——原实现 `12/52/12/42` 是 px，
+ * 在 3 倍屏上等于 4/17/4/14 dp，四周几乎没有留白，11 sp 的刻度一放大就会压到曲线。
+ */
+private data class ChartBounds(val widthPx: Float, val heightPx: Float, val density: Float) {
+    val left = 2f * density
+    val right = widthPx - 30f * density
+    val top = 18f * density
+    val bottom = heightPx - 34f * density
     val width = right - left
     val height = bottom - top
 }

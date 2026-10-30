@@ -66,6 +66,9 @@ import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppPillIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.model.disease.Disease
 
@@ -198,7 +201,7 @@ private fun DiseaseHomeScreen(
 ) {
     val tabs = remember { listOf(DetailTabItem("records", R.string.disease_record_tab_records, R.drawable.ic_list), DetailTabItem("catalog", R.string.disease_record_tab_catalog, R.drawable.ic_medical_history)) }
     BaseScreen(title = stringResource(R.string.disease_record_title), onBack = onBack, includeNavigationBarPadding = false) { padding ->
-        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
+        Column(Modifier.fillMaxSize().background(LocalAppTokens.current.colors.bg).padding(padding)) {
             AnimatedPageContent(selectedTab, Modifier.weight(1f), direction = { from, to -> to - from }) { tab ->
                 if (tab == 0) DiseaseRecordsPage(state.records, state.diseases, state.customDiseaseById(), onAddEmpty, onEdit, onDelete)
                 else DiseaseBrowsePanel(state, state.userGender, onQueryChange, onCategorySelect, onCustomToggle, onDepartmentToggle, onStatusToggle, onAddCustom, onOpenDetail, onOpenCustomDetail, onAddDisease, onAddCustomRecord = onAddCustomRecord)
@@ -214,8 +217,14 @@ private fun DiseaseRecordsPage(records: List<UserDiseaseRecord>, diseases: List<
     var deleting by remember { mutableStateOf<UserDiseaseRecord?>(null) }
     Column(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         AppIconTextButton(stringResource(R.string.disease_record_add), R.drawable.ic_add, onAdd)
-        if (records.isEmpty()) Text(stringResource(R.string.disease_record_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        else AppDataTable(
+        if (records.isEmpty()) {
+            AppEmptyState(
+                title = stringResource(R.string.record_no_data),
+                description = stringResource(R.string.disease_record_empty),
+                iconRes = R.drawable.ic_medical_history,
+                action = { AppPillIconTextButton(stringResource(R.string.disease_record_add), onAdd, iconRes = R.drawable.ic_add) },
+            )
+        } else AppDataTable(
             rows = records,
             rowKey = { _, it -> it.id },
             columns = listOf(
@@ -286,7 +295,7 @@ internal fun DiseaseBrowsePanel(
                 Surface(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .35f),
+                    color = LocalAppTokens.current.colors.panelRaised.copy(alpha = .35f),
                 ) {
                     LazyColumn(Modifier.padding(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         item { DiseaseSidebarTag(state.customOnly, onCustomToggle, stringResource(R.string.disease_record_custom_disease_filter)) }
@@ -296,26 +305,26 @@ internal fun DiseaseBrowsePanel(
                 }
             }
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                if (state.customOnly && customDiseases.isEmpty()) item { Text(stringResource(R.string.disease_record_no_custom), color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                if (!state.customOnly && diseases.isEmpty()) item { Text(stringResource(R.string.disease_record_no_catalog_match), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                if (state.customOnly && customDiseases.isEmpty()) item { Text(stringResource(R.string.disease_record_no_custom), color = LocalAppTokens.current.colors.textMuted) }
+                if (!state.customOnly && diseases.isEmpty()) item { Text(stringResource(R.string.disease_record_no_catalog_match), color = LocalAppTokens.current.colors.textMuted) }
                 items(customDiseases, key = { it.id }) { custom ->
-                    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .35f)).clickable { if (pickerMode) onSelectReference?.invoke(DiseaseReference(DiseaseSourceKind.CUSTOM, custom.id.toCustomDiseaseId())) ?: onSelectCustom(custom.id) else onOpenCustomDetail(custom) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Column(Modifier.fillMaxWidth().background(LocalAppTokens.current.colors.panelRaised.copy(alpha = .35f)).clickable { if (pickerMode) onSelectReference?.invoke(DiseaseReference(DiseaseSourceKind.CUSTOM, custom.id.toCustomDiseaseId())) ?: onSelectCustom(custom.id) else onOpenCustomDetail(custom) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                         Row(Modifier.fillMaxWidth()) {
-                            Text(custom.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                            Text(custom.name, style = LocalAppTokens.current.type.titleS, modifier = Modifier.weight(1f))
                             if (!pickerMode) IconButton(onClick = { onAddCustomRecord(custom) }, enabled = custom.allows(userGender)) { Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.disease_record_add)) }
                         }
-                        Text(custom.code, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
-                        if (!pickerMode && custom.description.isNotBlank()) Text(custom.description, style = MaterialTheme.typography.bodySmall, maxLines = 2)
+                        Text(custom.code, style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.primary)
+                        if (!pickerMode && custom.description.isNotBlank()) Text(custom.description, style = LocalAppTokens.current.type.bodyS, maxLines = 2)
                     }
                 }
                 items(diseases, key = { it.id }) { disease ->
-                    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .35f)).clickable { if (pickerMode) onSelectReference?.invoke(DiseaseReference(DiseaseSourceKind.CURATED, requireNotNull(disease.referenceId()))) ?: onAddDisease(disease) else onOpenDetail(disease) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Column(Modifier.fillMaxWidth().background(LocalAppTokens.current.colors.panelRaised.copy(alpha = .35f)).clickable { if (pickerMode) onSelectReference?.invoke(DiseaseReference(DiseaseSourceKind.CURATED, requireNotNull(disease.referenceId()))) ?: onAddDisease(disease) else onOpenDetail(disease) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                         Row(Modifier.fillMaxWidth()) {
-                            Text(disease.displayName(Locale.getDefault()), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                            Text(disease.displayName(Locale.getDefault()), style = LocalAppTokens.current.type.titleS, modifier = Modifier.weight(1f))
                             if (!pickerMode) IconButton(onClick = { onAddDisease(disease) }, enabled = disease.applicability.allows(userGender)) { Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.disease_record_add)) }
                         }
-                        disease.icd11References.firstOrNull()?.let { Text(it.code, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
-                        if (!pickerMode) Text(disease.localizedDescription(), style = MaterialTheme.typography.bodySmall, maxLines = 2)
+                        disease.icd11References.firstOrNull()?.let { Text(it.code, style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.primary) }
+                        if (!pickerMode) Text(disease.localizedDescription(), style = LocalAppTokens.current.type.bodyS, maxLines = 2)
                     }
                 }
             }
@@ -328,7 +337,7 @@ private fun AddCustomDiseaseButton(onClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth().height(30.dp).clickable(onClick = onClick),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer,
+        color = LocalAppTokens.current.colors.primaryContainer,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 4.dp),
@@ -339,12 +348,12 @@ private fun AddCustomDiseaseButton(onClick: () -> Unit) {
                 painter = painterResource(R.drawable.ic_add),
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                tint = LocalAppTokens.current.colors.onPrimaryContainer,
             )
             TextOverflowText(
                 text = stringResource(R.string.disease_record_add_custom),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = LocalAppTokens.current.type.caption,
+                color = LocalAppTokens.current.colors.onPrimaryContainer,
                 maxLines = 1,
             )
         }
@@ -356,11 +365,11 @@ private fun DiseaseSidebarTag(selected: Boolean, onClick: () -> Unit, label: Str
     Surface(
         modifier = Modifier.fillMaxWidth().height(28.dp).clickable(onClick = onClick),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
-        color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        border = BorderStroke(1.dp, if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant),
+        color = if (selected) LocalAppTokens.current.colors.primaryContainer else LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.45f),
+        border = BorderStroke(1.dp, if (selected) LocalAppTokens.current.colors.primary else LocalAppTokens.current.colors.border),
     ) {
         Box(Modifier.padding(horizontal = 2.dp), contentAlignment = Alignment.Center) {
-            TextOverflowText(label, style = MaterialTheme.typography.labelSmall, color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface, maxLines = 1)
+            TextOverflowText(label, style = LocalAppTokens.current.type.caption, color = if (selected) LocalAppTokens.current.colors.onPrimaryContainer else LocalAppTokens.current.colors.text, maxLines = 1)
         }
     }
 }
@@ -368,7 +377,7 @@ private fun DiseaseSidebarTag(selected: Boolean, onClick: () -> Unit, label: Str
 @Composable
 private fun DiseaseChipRow(title: String, items: List<Pair<String, String>>, selected: Set<String>, onToggle: (String) -> Unit) {
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(title, style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 10.dp))
+        Text(title, style = LocalAppTokens.current.type.bodyS, modifier = Modifier.padding(top = 10.dp))
         items.forEach { (id, label) -> FilterChip(id in selected, { onToggle(id) }, label = { Text(label) }) }
     }
 }
@@ -377,13 +386,13 @@ private fun DiseaseChipRow(title: String, items: List<Pair<String, String>>, sel
 private fun DiseaseDetailScreen(disease: Disease, categoryLabels: Map<String, String>, departmentLabels: Map<String, String>, onBack: () -> Unit) {
     BaseScreen(title = disease.displayName(Locale.getDefault()), onBack = onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            item { Text(stringResource(R.string.disease_detail_icd11), style = MaterialTheme.typography.titleSmall) }
+            item { Text(stringResource(R.string.disease_detail_icd11), style = LocalAppTokens.current.type.titleS) }
             items(disease.icd11References) { reference -> Text("${reference.code}  ${reference.title[Locale.getDefault().language] ?: reference.title["en"].orEmpty()}") }
-            item { Text(stringResource(R.string.disease_detail_description), style = MaterialTheme.typography.titleSmall) }
-            item { Text(disease.localizedDescription(), style = MaterialTheme.typography.bodyLarge) }
-            disease.localizedAliases().takeIf { it.isNotEmpty() }?.let { aliases -> item { Text(stringResource(R.string.disease_detail_aliases), style = MaterialTheme.typography.titleSmall); Text(aliases.joinToString(" / ")) } }
-            disease.categoryIds.takeIf { it.isNotEmpty() }?.let { ids -> item { Text(stringResource(R.string.disease_record_category), style = MaterialTheme.typography.titleSmall); Text(ids.map { categoryLabels[it] ?: it }.joinToString(" / ")) } }
-            disease.careDepartmentIds.takeIf { it.isNotEmpty() }?.let { ids -> item { Text(stringResource(R.string.disease_detail_departments), style = MaterialTheme.typography.titleSmall); Text(ids.map { departmentLabels[it] ?: it }.joinToString(" / ")) } }
+            item { Text(stringResource(R.string.disease_detail_description), style = LocalAppTokens.current.type.titleS) }
+            item { Text(disease.localizedDescription(), style = LocalAppTokens.current.type.body) }
+            disease.localizedAliases().takeIf { it.isNotEmpty() }?.let { aliases -> item { Text(stringResource(R.string.disease_detail_aliases), style = LocalAppTokens.current.type.titleS); Text(aliases.joinToString(" / ")) } }
+            disease.categoryIds.takeIf { it.isNotEmpty() }?.let { ids -> item { Text(stringResource(R.string.disease_record_category), style = LocalAppTokens.current.type.titleS); Text(ids.map { categoryLabels[it] ?: it }.joinToString(" / ")) } }
+            disease.careDepartmentIds.takeIf { it.isNotEmpty() }?.let { ids -> item { Text(stringResource(R.string.disease_detail_departments), style = LocalAppTokens.current.type.titleS); Text(ids.map { departmentLabels[it] ?: it }.joinToString(" / ")) } }
         }
     }
 }
@@ -406,26 +415,26 @@ private fun CustomDiseaseDetailScreen(
         },
     ) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            item { Text(stringResource(R.string.disease_custom_code), style = MaterialTheme.typography.titleSmall) }
-            item { Text(disease.code, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary) }
+            item { Text(stringResource(R.string.disease_custom_code), style = LocalAppTokens.current.type.titleS) }
+            item { Text(disease.code, style = LocalAppTokens.current.type.body, color = LocalAppTokens.current.colors.primary) }
             disease.description.takeIf { it.isNotBlank() }?.let { description ->
-                item { Text(stringResource(R.string.disease_detail_description), style = MaterialTheme.typography.titleSmall) }
-                item { Text(description, style = MaterialTheme.typography.bodyLarge) }
+                item { Text(stringResource(R.string.disease_detail_description), style = LocalAppTokens.current.type.titleS) }
+                item { Text(description, style = LocalAppTokens.current.type.body) }
             }
             disease.aliases.takeIf { it.isNotEmpty() }?.let { aliases ->
-                item { Text(stringResource(R.string.disease_detail_aliases), style = MaterialTheme.typography.titleSmall) }
+                item { Text(stringResource(R.string.disease_detail_aliases), style = LocalAppTokens.current.type.titleS) }
                 item { Text(aliases.joinToString(" / ")) }
             }
             disease.categoryIds.takeIf { it.isNotEmpty() }?.let { ids ->
-                item { Text(stringResource(R.string.disease_record_category), style = MaterialTheme.typography.titleSmall) }
+                item { Text(stringResource(R.string.disease_record_category), style = LocalAppTokens.current.type.titleS) }
                 item { Text(ids.map { categoryLabels[it] ?: it }.joinToString(" / ")) }
             }
             disease.careDepartmentIds.takeIf { it.isNotEmpty() }?.let { ids ->
-                item { Text(stringResource(R.string.disease_detail_departments), style = MaterialTheme.typography.titleSmall) }
+                item { Text(stringResource(R.string.disease_detail_departments), style = LocalAppTokens.current.type.titleS) }
                 item { Text(ids.map { departmentLabels[it] ?: it }.joinToString(" / ")) }
             }
             disease.note.takeIf { it.isNotBlank() }?.let { note ->
-                item { Text(stringResource(R.string.disease_record_note), style = MaterialTheme.typography.titleSmall) }
+                item { Text(stringResource(R.string.disease_record_note), style = LocalAppTokens.current.type.titleS) }
                 item { Text(note) }
             }
         }
@@ -505,7 +514,7 @@ private fun CustomDiseaseEditorScreen(
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item { EditorTextField(stringResource(R.string.disease_record_custom_disease), name, { name = it }, required = true) }
                 item { AppDropdownField(stringResource(R.string.disease_custom_code), generatedCode, emptyList(), onSelect = {}, enabled = false) }
-                if (codeDuplicate) item { Text(stringResource(R.string.disease_custom_code_duplicate), color = MaterialTheme.colorScheme.error) }
+                if (codeDuplicate) item { Text(stringResource(R.string.disease_custom_code_duplicate), color = LocalAppTokens.current.colors.danger) }
                 item { AliasListEditor(aliases, stringResource(R.string.disease_custom_aliases), stringResource(R.string.disease_custom_add_alias), { aliases = it }) }
                 item { EditorTextField(stringResource(R.string.disease_custom_description), description, { description = it }, singleLine = false) }
                 item { CustomDiseaseApplicabilitySelector(applicableGenders) { applicableGenders = it } }
@@ -525,7 +534,7 @@ private fun CustomDiseaseEditorScreen(
 @Composable
 private fun CustomDiseaseApplicabilitySelector(selected: List<Gender>, onChange: (List<Gender>) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(stringResource(R.string.disease_applicability), style = MaterialTheme.typography.labelLarge)
+        Text(stringResource(R.string.disease_applicability), style = LocalAppTokens.current.type.bodyS)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             FilterChip(selected.isEmpty(), { onChange(emptyList()) }, label = { Text(stringResource(R.string.disease_applicability_all)) })
             Gender.entries.forEach { gender -> FilterChip(gender in selected, { onChange(selected.toggle(gender)) }, label = { Text(stringResource(gender.labelRes())) }) }
@@ -535,7 +544,7 @@ private fun CustomDiseaseApplicabilitySelector(selected: List<Gender>, onChange:
 @Composable
 private fun CustomDiseaseMultiSelect(title: String, labels: Map<String, String>, selected: List<String>, onToggle: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(title, style = MaterialTheme.typography.labelLarge)
+        Text(title, style = LocalAppTokens.current.type.bodyS)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             labels.entries.sortedBy { it.value }.forEach { (id, label) -> FilterChip(id in selected, { onToggle(id) }, label = { Text(label) }) }
         }

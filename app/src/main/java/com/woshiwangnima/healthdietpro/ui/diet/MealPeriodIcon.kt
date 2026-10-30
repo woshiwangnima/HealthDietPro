@@ -16,13 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
 
 @Composable
 internal fun MealPeriodIcon(
     period: MealPeriod,
     modifier: Modifier = Modifier.size(18.dp),
-    tint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
+    tint: androidx.compose.ui.graphics.Color = LocalAppTokens.current.colors.primary,
 ) {
     when (period) {
         MealPeriod.BREAKFAST -> MealIcon(Icons.Filled.RamenDining, tint, modifier)

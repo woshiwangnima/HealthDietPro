@@ -109,3 +109,4 @@ tools/food_catalog/images/source/*.[bB][mM][pP]
 
 
 tools/
+app/src/debug/AndroidManifest.xml

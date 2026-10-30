@@ -16,14 +16,15 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -48,9 +49,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.ui.rememberOverlayWindowFit
 
 /** 模态尺寸上限（通用规范表 5.5.1-1：S 480 / M 720 / L 960）。手机上取屏宽，等于全宽。 */
 enum class AppModalSize(val maxWidth: Dp) {
@@ -80,6 +85,7 @@ fun AppModal(
     subtitle: String? = null,
     size: AppModalSize = AppModalSize.M,
     dismissOnScrimClick: Boolean = true,
+    contentScrollable: Boolean = true,
     actions: (@Composable RowScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -92,7 +98,6 @@ fun AppModal(
         animationSpec = tween(durationMillis = tokens.motion.baseMs, easing = AppEaseOut),
         label = "appModalEnter",
     )
-    // 浮层距安全区边缘的最小距离 = space.5（§2.2），高度上限留出背景轮廓（§2.8）。
     val scrollState = rememberScrollState()
 
     androidx.compose.ui.window.Dialog(
@@ -111,15 +116,24 @@ fun AppModal(
                     indication = null,
                     onClick = { if (dismissOnScrimClick) onDismiss() },
                 )
-                .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(horizontal = tokens.spacing.s4, vertical = tokens.spacing.s5),
+                .padding(horizontal = tokens.spacing.s4),
             contentAlignment = Alignment.Center,
         ) {
-            val availableHeight = maxHeight
+            // 窗口位置/尺寸都按 px 对齐屏幕来算：Dialog 窗口在部分宿主里已被系统裁进安全区
+            // （实测 `frame=[0,84][1439,3032]`），再按 inset 让一次会让面板整体下沉一个状态栏的高度。
+            // 取值链见 `SystemInsets.rememberOverlayWindowFit`。
+            val windowHeightPx = with(LocalDensity.current) { maxHeight.roundToPx() }
+            val windowFit = rememberOverlayWindowFit(windowHeightPx)
+            val availableHeight = with(LocalDensity.current) {
+                // 首帧窗口尺寸还没量到时 usableHeightPx 会是 0，不能让它算出负的高度上限。
+                (windowFit.usableHeightPx.toDp() - tokens.spacing.s5 * 2).coerceAtLeast(0.dp)
+            }
             Column(
                 modifier = modifier
                     .widthIn(max = size.maxWidth)
                     .fillMaxWidth()
+                    // 只是把「窗口中心」挪到「安全区中心」，两种窗口（全屏 / 已裁进安全区）都落在正中。
+                    .offset { IntOffset(0, windowFit.centerShiftPx) }
                     .heightIn(max = availableHeight)
                     .graphicsLayer {
                         alpha = progress
@@ -173,13 +187,15 @@ fun AppModal(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .verticalScroll(scrollState)
+                            // [contentScrollable] = false 时由调用方自己放列表（`weight(1f, fill = false)`）：
+                            // 列表在 `verticalScroll` 里拿不到上界，只能写死高度，写死之后短内容也占满、长内容叠出弹窗。
+                            .then(if (contentScrollable) Modifier.verticalScroll(scrollState) else Modifier)
                             .padding(horizontal = tokens.spacing.s5, vertical = tokens.spacing.s4),
                         verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
                         content = content,
                     )
                     // 内容超出一屏时给上下 24 px 渐隐，提示还能继续滚（§4.8）。
-                    Canvas(modifier = Modifier.matchParentSize()) {
+                    if (contentScrollable) Canvas(modifier = Modifier.matchParentSize()) {
                         val fadePx = 24.dp.toPx()
                         if (scrollState.canScrollBackward) {
                             drawRect(

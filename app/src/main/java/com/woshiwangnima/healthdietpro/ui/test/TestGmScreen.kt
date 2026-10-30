@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.ActionSectionCard
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
@@ -45,8 +46,8 @@ internal fun TestGmScreen(
             item {
                 Text(
                     "用于为当前用户生成随机的本地测试数据。",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalAppTokens.current.type.body,
+                    color = LocalAppTokens.current.colors.textMuted,
                 )
             }
             item {

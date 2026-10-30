@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.rememberAppDarkTheme
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRecord
 
 /** 记睡眠：夜间睡眠 / 小憩记录（入睡/醒来/记录时间、备注、可选计时器）。 */
@@ -21,7 +23,16 @@ class SleepRecordActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { HealthDietProTheme { SleepRoute(::finish, intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false)) } }
+        setContent {
+            // 外层 HealthDietProTheme 只负责两件事：按 AppPrefs 解析深浅、把用户字号倍率塞进 LocalDensity。
+            // 内层 AppTheme 提供设计令牌。两层必须嵌套：单独用 AppTheme 会丢掉字号倍率，
+            // 单独用 HealthDietProTheme 则拿不到 tokens（§8.14 已在软件设置上验证过这个组合）。
+            HealthDietProTheme {
+                AppTheme(darkTheme = rememberAppDarkTheme()) {
+                    SleepRoute(::finish, intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false))
+                }
+            }
+        }
     }
 }
 

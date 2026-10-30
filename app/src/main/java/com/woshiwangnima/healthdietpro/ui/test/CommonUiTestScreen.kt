@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
@@ -88,7 +89,7 @@ private fun CommonUiCategoryList(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(padding).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("长按类名可复制 Kotlin 类名。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("长按类名可复制 Kotlin 类名。", color = LocalAppTokens.current.colors.textMuted)
         CommonUiTestCategory.entries.forEach { category ->
             CopyableClassName(category.chineseName, category.className)
             AppIconTextButton("测试${category.chineseName}的不同配置", R.drawable.ic_nav_test, { onCategorySelected(category) }, Modifier.fillMaxWidth())
@@ -299,7 +300,7 @@ private fun CopyableClassName(chineseName: String, className: String) {
     val clipboard = LocalClipboardManager.current
     Text(
         text = "$chineseName · $className",
-        style = MaterialTheme.typography.titleMedium,
+        style = LocalAppTokens.current.type.titleS,
         modifier = Modifier.combinedClickable(onClick = {}, onLongClick = { clipboard.setText(AnnotatedString(className)) }),
     )
 }

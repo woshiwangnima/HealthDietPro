@@ -5,25 +5,17 @@ import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,16 +29,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.DiscardChangesDialog
-import com.woshiwangnima.healthdietpro.common.ui.EditorSectionTitle
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
+import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
+import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.HorizontalImageEditor
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppFilterChip
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.container.CircleShape
 import com.woshiwangnima.healthdietpro.model.container.ContainerCapacityMode
 import com.woshiwangnima.healthdietpro.model.container.ContainerCategory
@@ -60,6 +56,13 @@ import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import java.util.UUID
 import kotlinx.coroutines.launch
 
+/**
+ * 记一个容器。
+ *
+ * 五块各一张 `AppSectionCard`：基本信息 → 容量 → 场景标签 → 备注 → 图片。
+ * 旧版用 `EditorSectionTitle` 平铺标题 + 一张手搓的 `surfaceVariant` 灰块装容量，
+ * 标题与字段同处一层，尤其「容量换算方式」那两支分段按钮落在灰块里像另一套控件。
+ */
 @Composable
 internal fun ContainerEditorScreen(
     existing: ContainerRecord?,
@@ -68,6 +71,7 @@ internal fun ContainerEditorScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val tokens = LocalAppTokens.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val defaultVolumeUnit = AppPrefs.getUnit(context, UnitCategoryType.Volume.id, UnitCategoryType.Volume.defaultUnitId)
@@ -149,47 +153,84 @@ internal fun ContainerEditorScreen(
     }
 
     BackHandler(onBack = ::requestBack)
-    BaseScreen(title = stringResource(if (existing == null) R.string.container_add else R.string.container_edit), onBack = ::requestBack) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                item { EditorSectionTitle(stringResource(R.string.container_section_basic)) }
-                item { EditorTextField(stringResource(R.string.container_name), name, { name = it }, required = false) }
+    BaseScreen(
+        title = stringResource(if (existing == null) R.string.container_add else R.string.container_edit),
+        onBack = ::requestBack,
+    ) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(tokens.colors.bg)
+                .padding(padding),
+        ) {
+            LazyColumn(
+                Modifier.weight(1f),
+                contentPadding = PaddingValues(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
+            ) {
                 item {
-                    AppDropdownField(
-                        label = stringResource(R.string.container_category),
-                        value = stringResource(category.labelRes()),
-                        options = ContainerCategory.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
-                        onSelect = { category = ContainerCategory.valueOf(it.id) },
-                    )
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_basic_profile,
+                        title = stringResource(R.string.container_section_basic),
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2)) {
+                            EditorTextField(
+                                label = stringResource(R.string.container_name),
+                                value = name,
+                                onValueChange = { name = it },
+                                required = false,
+                            )
+                            AppDropdownField(
+                                label = stringResource(R.string.container_category),
+                                value = stringResource(category.labelRes()),
+                                options = ContainerCategory.entries.map {
+                                    AppDropdownOption(it.name, stringResource(it.labelRes()))
+                                },
+                                onSelect = { category = ContainerCategory.valueOf(it.id) },
+                            )
+                        }
+                    }
                 }
                 item {
-                    Surface(
-                        Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    ) {
-                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                                ContainerCapacityMode.entries.forEachIndexed { index, mode ->
-                                    SegmentedButton(
-                                        selected = capacityMode == mode,
-                                        onClick = { capacityMode = mode },
-                                        shape = SegmentedButtonDefaults.itemShape(index, ContainerCapacityMode.entries.size),
-                                        label = { Text(stringResource(if (mode == ContainerCapacityMode.MANUAL) R.string.container_capacity_manual else R.string.container_capacity_cross_section)) },
+                    AppSectionGroup {
+                        Column(
+                            Modifier.padding(tokens.spacing.s3),
+                            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                        ) {
+                            EqualWidthSegmentedTabs(
+                                tabs = ContainerCapacityMode.entries.map {
+                                    EqualWidthTab.text(
+                                        stringResource(
+                                            if (it == ContainerCapacityMode.MANUAL) {
+                                                R.string.container_capacity_manual
+                                            } else {
+                                                R.string.container_capacity_cross_section
+                                            },
+                                        ),
                                     )
-                                }
-                            }
+                                },
+                                selectedIndex = ContainerCapacityMode.entries.indexOf(capacityMode),
+                                onSelected = { capacityMode = ContainerCapacityMode.entries[it] },
+                            )
                             if (capacityMode == ContainerCapacityMode.MANUAL) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                                    Column(Modifier.weight(1f)) {
-                                        EditorTextField(
-                                            label = stringResource(R.string.container_capacity),
-                                            value = capacityText,
-                                            onValueChange = { capacityText = it },
-                                            required = true,
-                                            numeric = true,
-                                        )
-                                    }
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.Top,
+                                ) {
+                                    EditorTextField(
+                                        label = stringResource(R.string.container_capacity),
+                                        value = capacityText,
+                                        onValueChange = { capacityText = it },
+                                        required = true,
+                                        numeric = true,
+                                        modifier = Modifier.weight(1f),
+                                    )
                                     AppDropdownField(
                                         label = stringResource(R.string.container_unit),
                                         value = volumeUnitSymbol(volumeUnitId),
@@ -200,9 +241,14 @@ internal fun ContainerEditorScreen(
                                 }
                             } else {
                                 Text(
-                                    stringResource(R.string.container_capacity_cross_section_derived, derivedCapacityMl?.let { "%.1f %s".format(fromMl(it, volumeUnitId), volumeUnitSymbol(volumeUnitId)) } ?: "-"),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    text = stringResource(
+                                        R.string.container_capacity_cross_section_derived,
+                                        derivedCapacityMl?.let {
+                                            "%.1f %s".format(fromMl(it, volumeUnitId), volumeUnitSymbol(volumeUnitId))
+                                        } ?: "-",
+                                    ),
+                                    style = tokens.type.numeric,
+                                    color = tokens.colors.primary,
                                     modifier = Modifier.fillMaxWidth(),
                                 )
                                 CrossSectionProfileEditor(
@@ -214,70 +260,90 @@ internal fun ContainerEditorScreen(
                     }
                 }
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        Column(Modifier.weight(1f)) {
+                    AppSectionGroup {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                            modifier = Modifier.fillMaxWidth().padding(tokens.spacing.s3),
+                            verticalAlignment = Alignment.Top,
+                        ) {
                             EditorTextField(
                                 label = stringResource(R.string.container_empty_mass),
                                 value = emptyMassText,
                                 onValueChange = { emptyMassText = it },
                                 required = false,
                                 numeric = true,
+                                modifier = Modifier.weight(1f),
+                            )
+                            AppDropdownField(
+                                label = stringResource(R.string.container_unit),
+                                value = weightUnitSymbol(weightUnitId),
+                                options = PRACTICAL_WEIGHT_UNITS.map { AppDropdownOption(it, weightUnitSymbol(it)) },
+                                onSelect = { weightUnitId = it.id },
+                                modifier = Modifier.weight(0.8f),
                             )
                         }
-                        AppDropdownField(
-                            label = stringResource(R.string.container_unit),
-                            value = weightUnitSymbol(weightUnitId),
-                            options = PRACTICAL_WEIGHT_UNITS.map { AppDropdownOption(it, weightUnitSymbol(it)) },
-                            onSelect = { weightUnitId = it.id },
-                            modifier = Modifier.weight(0.8f),
-                        )
                     }
                 }
                 if (scenarioTags.isNotEmpty()) {
-                    item { EditorSectionTitle(stringResource(R.string.container_scenario_tags)) }
                     item {
-                        Row(
-                            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                        AppSectionCard(
+                            iconRes = R.drawable.ic_event,
+                            title = stringResource(R.string.container_scenario_tags),
                         ) {
-                            scenarioTags.forEach { tag ->
-                                val selected = tag in selectedScenarioTags
-                                Surface(
-                                    modifier = Modifier.height(32.dp).clickable { selectedScenarioTags = if (selected) selectedScenarioTags - tag else selectedScenarioTags + tag },
-                                    shape = RoundedCornerShape(16.dp),
-                                    color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outlineVariant),
-                                ) {
-                                    Box(Modifier.padding(horizontal = 10.dp), contentAlignment = Alignment.Center) {
-                                        Text(tag, style = MaterialTheme.typography.bodySmall)
-                                    }
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                scenarioTags.forEach { tag ->
+                                    val selected = tag in selectedScenarioTags
+                                    AppFilterChip(
+                                        text = tag,
+                                        selected = selected,
+                                        onClick = {
+                                            selectedScenarioTags = if (selected) {
+                                                selectedScenarioTags - tag
+                                            } else {
+                                                selectedScenarioTags + tag
+                                            }
+                                        },
+                                    )
                                 }
                             }
                         }
                     }
                 }
-                item { EditorSectionTitle(stringResource(R.string.container_section_notes)) }
                 item {
-                    EditorTextField(
-                        label = stringResource(R.string.container_note),
-                        value = note,
-                        onValueChange = { note = it },
-                        required = false,
-                        singleLine = false,
-                    )
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_description,
+                        title = stringResource(R.string.container_section_notes),
+                    ) {
+                        EditorTextField(
+                            label = stringResource(R.string.container_note),
+                            value = note,
+                            onValueChange = { note = it },
+                            required = false,
+                            singleLine = false,
+                        )
+                    }
                 }
-                item { EditorSectionTitle(stringResource(R.string.container_section_images)) }
                 item {
-                    HorizontalImageEditor(
-                        bitmaps = imageBitmaps,
-                        onAdd = { galleryLauncher.launch("image/*") },
-                        onRemove = { index ->
-                            viewModel.deleteImage(imagePaths[index])
-                            imagePaths = imagePaths.filterIndexed { i, _ -> i != index }
-                            imageBitmaps = imageBitmaps.filterIndexed { i, _ -> i != index }
-                        },
-                    )
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_photo,
+                        title = stringResource(R.string.container_section_images),
+                    ) {
+                        HorizontalImageEditor(
+                            bitmaps = imageBitmaps,
+                            onAdd = { galleryLauncher.launch("image/*") },
+                            onRemove = { index ->
+                                viewModel.deleteImage(imagePaths[index])
+                                imagePaths = imagePaths.filterIndexed { i, _ -> i != index }
+                                imageBitmaps = imageBitmaps.filterIndexed { i, _ -> i != index }
+                            },
+                        )
+                    }
                 }
             }
             FormSaveBar(stringResource(R.string.container_save), saveEnabled, ::save)

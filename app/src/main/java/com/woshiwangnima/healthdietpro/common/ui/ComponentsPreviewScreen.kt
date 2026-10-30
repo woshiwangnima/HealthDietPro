@@ -1,36 +1,22 @@
 package com.woshiwangnima.healthdietpro.common.ui
 
 import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeBaseChart
 import com.woshiwangnima.healthdietpro.common.ui.chart.ComposeBaseChartSpec
@@ -55,27 +41,6 @@ fun ComponentsPreviewScreen(
     onBack: () -> Unit,
     includeStatusBarPadding: Boolean = true,
 ) {
-    LaunchedEffect(Unit) {
-        Log.d(TAG, "ComponentsPreviewScreen composed")
-    }
-    var showConfirm by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val fontScale by AppFontScaleState.scale.collectAsState()
-    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
-    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
-    val alphaMid = rememberFontStyleAlphaMid()
-
-    if (showConfirm) {
-        ConfirmDialog(
-            title = stringResource(R.string.compose_confirm_dialog_title),
-            message = stringResource(R.string.compose_confirm_dialog_message),
-            confirmText = stringResource(R.string.compose_confirm_dialog_ok),
-            cancelText = stringResource(R.string.compose_confirm_dialog_cancel),
-            onConfirm = { showConfirm = false },
-            onDismiss = { showConfirm = false },
-        )
-    }
-
     BaseScreen(
         title = stringResource(R.string.compose_components_preview_title),
         onBack = onBack,
@@ -89,101 +54,10 @@ fun ComponentsPreviewScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            // 这一页只留「设计令牌」本身：色板、间距、字号、层级、动效、按钮状态。
+            // 原先挂在这里的字体大小滑动条、确认对话框、文字溢出、Compose 图表四块已经各有归属：
+            // 字号与对话框成了正式功能/公共组件，文字溢出与图表在【通用UI功能测试】里已有同款演示。
             DesignSystemPreviewSection()
-
-            HorizontalDivider()
-
-            Text(
-                text = stringResource(R.string.compose_font_scale_section),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            FontScaleSlider(
-                currentScale = fontScale,
-                onScaleChangeStopped = { AppFontScaleState.update(context, it) },
-            )
-            TypographyPreview()
-
-            HorizontalDivider()
-
-            Text(
-                text = stringResource(R.string.compose_confirm_dialog_section),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Button(onClick = { showConfirm = true }) {
-                Text(stringResource(R.string.compose_show_confirm_dialog))
-            }
-
-            HorizontalDivider()
-
-            Text(
-                text = stringResource(R.string.compose_text_overflow_section),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = stringResource(R.string.compose_theme_preview_body),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = stringResource(R.string.text_overflow_preview_sample),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = stringResource(R.string.compose_theme_preview_body),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.alpha(alphaMid),
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(surfaceVariant.copy(alpha = 0.3f))
-                    .border(1.dp, onSurfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
-                    .padding(12.dp),
-            ) {
-                TextOverflowText(
-                    text = stringResource(R.string.text_overflow_preview_sample),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            Text(
-                text = stringResource(R.string.text_overflow_marquee_speed_desc),
-                style = TextStyle(fontSize = FontTokens.caption),
-                color = onSurfaceVariant,
-            )
-
-            HorizontalDivider()
-
-            Text(
-                text = stringResource(R.string.compose_chart_section),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            ComposeChartPreviewSamples()
-        }
-    }
-}
-
-@Composable
-private fun TypographyPreview() {
-    val styles = listOf(
-        "Headline" to MaterialTheme.typography.headlineLarge,
-        "Title" to MaterialTheme.typography.titleLarge,
-        "Subtitle" to MaterialTheme.typography.titleSmall,
-        "Body" to MaterialTheme.typography.bodyLarge,
-        "Label" to MaterialTheme.typography.labelLarge,
-        "Caption" to MaterialTheme.typography.bodySmall,
-        "Micro" to MaterialTheme.typography.labelSmall,
-    )
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        styles.forEach { (name, style) ->
-            Text(text = "$name  AaBbCc 0123", style = style, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }
@@ -500,8 +374,8 @@ private fun ChartPreviewCard(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            style = LocalAppTokens.current.type.titleS,
+            color = LocalAppTokens.current.colors.text,
         )
         content()
     }

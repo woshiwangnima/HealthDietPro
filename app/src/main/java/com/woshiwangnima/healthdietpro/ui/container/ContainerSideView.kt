@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.container.CrossSection
 import com.woshiwangnima.healthdietpro.model.container.CrossSectionProfile
 import com.woshiwangnima.healthdietpro.model.container.equivalentDiameterCm
@@ -50,7 +51,7 @@ internal fun ContainerSideView(
     onHeightChanged: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scheme = MaterialTheme.colorScheme
+    val scheme = LocalAppTokens.current.colors
     val density = LocalDensity.current
     val topInsetPx = with(density) { TRACK_LABEL_INSET_DP.dp.toPx() }
     val bottomInsetPx = with(density) { TRACK_LABEL_INSET_DP.dp.toPx() }
@@ -116,13 +117,13 @@ internal fun ContainerSideView(
                 drawPath(path, scheme.primary, style = Stroke(2.dp.toPx()))
 
                 val lineY = track.yForPercent(currentEditPercent.coerceIn(0f, 1f))
-                drawLine(scheme.error, Offset(0f, lineY), Offset(w, lineY), strokeWidth = 2.dp.toPx())
-                drawCircle(scheme.error, 6.dp.toPx(), Offset(cx, lineY))
+                drawLine(scheme.danger, Offset(0f, lineY), Offset(w, lineY), strokeWidth = 2.dp.toPx())
+                drawCircle(scheme.danger, 6.dp.toPx(), Offset(cx, lineY))
             }
             Text(
                 text = "${(currentEditPercent * 100).toInt()}%",
-                style = MaterialTheme.typography.labelSmall,
-                color = scheme.error,
+                style = LocalAppTokens.current.type.caption,
+                color = scheme.danger,
                 modifier = Modifier.align(Alignment.TopEnd).padding(6.dp),
             )
         }

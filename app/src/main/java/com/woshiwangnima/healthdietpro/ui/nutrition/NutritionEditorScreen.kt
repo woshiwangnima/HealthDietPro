@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.EditorSectionTitle
@@ -106,12 +107,12 @@ private fun namesMapList(language: String, primary: String, aliases: List<String
 @Composable
 private fun AliasEditor(aliases: androidx.compose.runtime.snapshots.SnapshotStateList<String>, onChanged: () -> Unit) {
     var adding by remember { mutableStateOf(false) }
-    Text(stringResource(R.string.nutrition_editor_aliases), style = MaterialTheme.typography.labelMedium)
+    Text(stringResource(R.string.nutrition_editor_aliases), style = LocalAppTokens.current.type.caption)
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
         aliases.forEachIndexed { index, alias ->
-            Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.secondaryContainer) {
+            Surface(shape = RoundedCornerShape(16.dp), color = LocalAppTokens.current.colors.primaryContainer) {
                 Row(Modifier.padding(start = 10.dp, end = 4.dp, top = 2.dp, bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(alias, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    Text(alias, style = LocalAppTokens.current.type.body, color = LocalAppTokens.current.colors.onPrimaryContainer)
                     IconButton(onClick = { aliases.removeAt(index); onChanged() }, modifier = Modifier.size(24.dp)) {
                         Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.nutrition_editor_delete), modifier = Modifier.size(16.dp))
                     }
@@ -156,7 +157,7 @@ private fun StarRatingPicker(rating: Int, onChange: (Int) -> Unit) {
                     imageVector = Icons.Filled.Star,
                     contentDescription = null,
                     modifier = Modifier.size(20.dp),
-                    tint = if (filled) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                    tint = if (filled) LocalAppTokens.current.colors.textMuted else LocalAppTokens.current.colors.textMuted.copy(alpha = 0.3f),
                 )
             }
         }
@@ -393,11 +394,11 @@ private fun FoodEditor(existing: PreparedFood?, editingId: String?, viewModel: N
         EditorTextField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, showRequirementMarker = false, singleLine = false)
 
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_derivation))
-        Text(stringResource(R.string.nutrition_editor_source_ingredient), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_source_ingredient), style = LocalAppTokens.current.type.caption)
         OutlinedButton(onClick = { selectingIngredient = true }, modifier = Modifier.fillMaxWidth()) {
             Text(ingredientId?.let { viewModel.foodById(it)?.displayName(language) } ?: stringResource(R.string.nutrition_editor_select_ingredient))
         }
-        Text(stringResource(R.string.nutrition_editor_cooking_method), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_cooking_method), style = LocalAppTokens.current.type.caption)
         // 烹饪方式标签为本地化字符串（非资源 id），直接渲染。
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             methods.forEach { m ->
@@ -406,16 +407,16 @@ private fun FoodEditor(existing: PreparedFood?, editingId: String?, viewModel: N
         }
 
         // 运行时派生的营养素预览
-        Text(stringResource(R.string.nutrition_editor_ratio_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(stringResource(R.string.nutrition_editor_ratio_note), style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.textMuted)
         if (preview != null) {
             EditorSectionTitle(stringResource(R.string.nutrition_editor_computed_nutrients))
-            Surface(shape = RoundedCornerShape(6.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f), modifier = Modifier.fillMaxWidth()) {
+            Surface(shape = RoundedCornerShape(6.dp), color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.35f), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     listOf("ENERGY", "PROTEIN", "FAT", "CHO", "FIBER").forEach { code ->
                         preview.nutrients[code]?.let { amt ->
                             Row(Modifier.fillMaxWidth()) {
-                                Text(code, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
-                                Text("%.1f %s".format(amt.value, amt.unitId), style = MaterialTheme.typography.bodySmall)
+                                Text(code, modifier = Modifier.weight(1f), style = LocalAppTokens.current.type.bodyS)
+                                Text("%.1f %s".format(amt.value, amt.unitId), style = LocalAppTokens.current.type.bodyS)
                             }
                         }
                     }
@@ -472,8 +473,8 @@ private fun IngredientPickerDialog(
                 }
                 Column(Modifier.heightIn(max = 260.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     filtered.take(80).forEach { ing ->
-                        Surface(modifier = Modifier.fillMaxWidth().clickable { onSelect(ing.id) }, shape = RoundedCornerShape(6.dp), color = if (ing.id == selectedId) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)) {
-                            Text(ing.displayName(language), modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp), style = MaterialTheme.typography.bodyMedium)
+                        Surface(modifier = Modifier.fillMaxWidth().clickable { onSelect(ing.id) }, shape = RoundedCornerShape(6.dp), color = if (ing.id == selectedId) LocalAppTokens.current.colors.primaryContainer else LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.4f)) {
+                            Text(ing.displayName(language), modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp), style = LocalAppTokens.current.type.body)
                         }
                     }
                 }
@@ -563,15 +564,15 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
         EditorTextField(stringResource(R.string.nutrition_editor_description), description, { description = it; markDirty() }, showRequirementMarker = false, singleLine = false)
 
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_components))
-        Text(stringResource(R.string.nutrition_ingredient_list), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_ingredient_list), style = LocalAppTokens.current.type.caption)
         components.forEachIndexed { index, draft ->
             val item = viewModel.foodById(draft.foodId)
             val label = item?.displayName(language) ?: draft.foodId
             val auxiliary = item?.let { viewModel.isAuxiliary(it) } == true
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Column(Modifier.weight(1f)) {
-                    Text(label, style = MaterialTheme.typography.bodyMedium)
-                    if (auxiliary) Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+                    Text(label, style = LocalAppTokens.current.type.body)
+                    if (auxiliary) Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.warning)
                 }
                 OutlinedTextField(
                     value = draft.grams,
@@ -592,7 +593,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_presentation))
 
         // 封面图（可选）
-        Text(stringResource(R.string.nutrition_editor_image), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_image), style = LocalAppTokens.current.type.caption)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             OutlinedButton(onClick = { imagePicker.launch("image/*") }) { Text(stringResource(R.string.nutrition_editor_image_pick)) }
             if (imageKey != null) {
@@ -601,7 +602,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
         }
 
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_dish_profile))
-        Text(stringResource(R.string.nutrition_editor_cuisine), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_cuisine), style = LocalAppTokens.current.type.caption)
         // 菜系多级选择（中餐可只选一级）
         val resources = context.resources
         MultiLevelTagSelector(
@@ -610,30 +611,30 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
             selectedTags = listOfNotNull(cuisine),
             onSelectionChange = { sel -> cuisine = sel.lastOrNull(); markDirty() },
         )
-        Text(stringResource(R.string.nutrition_editor_dish_category), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_dish_category), style = LocalAppTokens.current.type.caption)
         MultiChoiceChips(DishTaxonomy.categories.map { it.id to it.labelRes }, dishCategories) { toggle(dishCategories, it); markDirty() }
-        Text(stringResource(R.string.nutrition_editor_taste), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_taste), style = LocalAppTokens.current.type.caption)
         MultiChoiceChips(DishTaxonomy.tastes.map { it.id to it.labelRes }, tastes) { toggle(tastes, it); markDirty() }
-        Text(stringResource(R.string.nutrition_editor_season), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_season), style = LocalAppTokens.current.type.caption)
         MultiChoiceChips(DishTaxonomy.seasons.map { it.id to it.labelRes }, seasons) { toggle(seasons, it); markDirty() }
-        Text(stringResource(R.string.nutrition_editor_technique), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_technique), style = LocalAppTokens.current.type.caption)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             methods.forEach { m ->
                 FilterChip(selected = techniqueId == m.id, onClick = { techniqueId = if (techniqueId == m.id) null else m.id; markDirty() }, label = { Text(m.displayLabel(language)) })
             }
         }
         // 难度：10 星整数选择
-        Text(stringResource(R.string.nutrition_editor_difficulty), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_difficulty), style = LocalAppTokens.current.type.caption)
         StarRatingPicker(difficulty) { difficulty = it; markDirty() }
         EditorTextField(stringResource(R.string.nutrition_editor_serves), serves, { serves = it; markDirty() }, numeric = true, range = NumericInputRange(1.0))
 
         // 制作教程/菜谱，逐步（可选每步分钟）
         EditorSectionTitle(stringResource(R.string.nutrition_editor_section_recipe))
-        Text(stringResource(R.string.nutrition_editor_recipe), style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.nutrition_editor_recipe), style = LocalAppTokens.current.type.caption)
             steps.forEachIndexed { index, step ->
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.nutrition_editor_step_number, index + 1), style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.nutrition_editor_step_number, index + 1), style = LocalAppTokens.current.type.caption, modifier = Modifier.weight(1f))
                     IconButton(onClick = { steps.removeAt(index); markDirty() }) { Icon(Icons.Filled.Close, stringResource(R.string.nutrition_editor_delete)) }
                 }
                 OutlinedTextField(
@@ -642,7 +643,7 @@ private fun DishEditor(existing: Dish?, editingId: String?, viewModel: Nutrition
                     label = { Text(stringResource(R.string.nutrition_editor_step_hint)) },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Text(stringResource(R.string.nutrition_editor_heat_level), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.nutrition_editor_heat_level), style = LocalAppTokens.current.type.caption)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("low", "medium_low", "medium", "medium_high", "high").forEach { heat ->
                         FilterChip(selected = step.heatLevel == heat, onClick = { steps[index] = step.copy(heatLevel = if (step.heatLevel == heat) null else heat); markDirty() }, label = { Text(stringResource(heatLabelRes(heat))) })

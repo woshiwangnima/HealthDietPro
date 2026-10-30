@@ -169,6 +169,24 @@ class DesignTokenContrastTest {
         )
     }
 
+    /**
+     * §8.28.1 回归：不在 `Surface` / `Button` / `TextField` 里的 `Text` 会取 `LocalContentColor`，
+     * 而 Material3 的 `MaterialTheme` 不提供它——默认值是 `Color.Black`。深色底上就是黑底黑字。
+     * `AppTheme` 现在把它兜成 `tokens.colors.text`，这里守住「兜底色绝不能是纯黑」，
+     * 防止有人日后把 `AppTheme` 的那层 `CompositionLocalProvider` 删掉而毫无察觉。
+     */
+    @Test
+    fun fallbackContentColorIsNeverPureBlack() {
+        listOf("dark" to DarkAppColors, "light" to LightAppColors).forEach { (theme, colors) ->
+            assertTrue(
+                "$theme 兜底内容色是纯黑，深色下会读不出来",
+                colors.text != Color.Black,
+            )
+            assertAtLeast("$theme text/bg", colors.text, colors.bg, 7.0)
+            assertAtLeast("$theme text/panel", colors.text, colors.panel, 7.0)
+        }
+    }
+
     private fun linear(channel: Float): Float =
         if (channel <= 0.04045f) channel / 12.92f else ((channel + 0.055f) / 1.055f).pow(2.4f)
 

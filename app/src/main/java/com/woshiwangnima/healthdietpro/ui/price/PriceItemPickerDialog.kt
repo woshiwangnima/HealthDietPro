@@ -15,11 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,6 +33,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppBottomSheet
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSheetHeight
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.food.FoodItem
 import com.woshiwangnima.healthdietpro.model.food.FoodKind
@@ -50,9 +51,8 @@ internal data class PriceItemSelection(
 /**
  * 物品选择弹层：可直接挑库内食材/菜肴，也可以在搜索词上「用这个名字」记自定义物品。
  *
- * 用 `AlertDialog(usePlatformDefaultWidth = false)` 而不是底部抽屉，是因为列表必须是
- * `LazyColumn`：抽屉内容区是 `verticalScroll` 容器，里面再放懒加载列表会因无界高度而崩。
- * 项目里 `DietFoodSheet` 也是同一做法，保持一致。
+ * 走底部抽屉（§5.2 选择器）。列表是 `LazyColumn`，所以传 `contentScrollable = false`
+ * 让抽屉把滚动权交出来——抽屉默认的 `verticalScroll` 容器会给懒加载列表一个无界高度。
  */
 @Composable
 internal fun PriceItemPickerDialog(
@@ -68,26 +68,14 @@ internal fun PriceItemPickerDialog(
     val trimmed = keyword.trim()
     val customCandidate = trimmed.isNotBlank() && results.none { it.displayName(language) == trimmed }
 
-    AlertDialog(
-        modifier = Modifier.width((LocalConfiguration.current.screenWidthDp - 16).dp),
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = onDismiss,
-        // 阻断型浮层右上角必须有可见关闭入口（§5.5.1）；选择即完成，不需要底部「确定」，
-        // 「取消」与右上角关闭是同一个动作，重复摆一个只会让人以为有第二步。
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.price_item_pick_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(1f),
-                )
-                IconButton(onClick = onDismiss) {
-                    Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.compose_confirm_dialog_cancel))
-                }
-            }
-        },
-        text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+    val tokens = LocalAppTokens.current
+    AppBottomSheet(
+        title = stringResource(R.string.price_item_pick_title),
+        onDismiss = onDismiss,
+        initialSnap = AppSheetHeight.Full,
+        contentScrollable = false,
+    ) {
+            Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 OutlinedTextField(
                     value = keyword,
                     onValueChange = { keyword = it },
@@ -110,16 +98,16 @@ internal fun PriceItemPickerDialog(
                         onClick = {
                             onPick(PriceItemSelection(PriceItemSource.CUSTOM, "", trimmed))
                         },
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                        shape = MaterialTheme.shapes.small,
+                        color = tokens.colors.primaryContainer,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(tokens.radii.label),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp)
-                            .heightIn(min = 48.dp),
+                            .padding(top = tokens.spacing.s2)
+                            .heightIn(min = tokens.spacing.hitMin),
                     ) {
                         Text(
                             text = stringResource(R.string.price_item_use_custom, trimmed),
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = LocalAppTokens.current.type.body,
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
                         )
                     }
@@ -128,11 +116,11 @@ internal fun PriceItemPickerDialog(
                 if (results.isEmpty() && !customCandidate) {
                     Text(
                         text = stringResource(R.string.price_item_no_match),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = LocalAppTokens.current.colors.textMuted,
                         modifier = Modifier.padding(vertical = 12.dp),
                     )
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp)) {
+                    LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
                         items(results, key = { it.id }) { food ->
                             Row(
                                 modifier = Modifier
@@ -156,14 +144,14 @@ internal fun PriceItemPickerDialog(
                                     Column {
                                         Text(
                                             text = food.displayName(language),
-                                            style = MaterialTheme.typography.bodyLarge,
+                                            style = LocalAppTokens.current.type.body,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,
                                         )
                                         Text(
                                             text = stringResource(food.kind.labelRes()),
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            style = LocalAppTokens.current.type.bodyS,
+                                            color = LocalAppTokens.current.colors.textMuted,
                                         )
                                     }
                                 }
@@ -172,10 +160,7 @@ internal fun PriceItemPickerDialog(
                     }
                 }
             }
-        },
-        // 选择器没有「确认」步骤：点条目即完成，底部不放按钮（避免出现两个含义相同的取消）。
-        confirmButton = {},
-    )
+    }
 }
 
 internal fun FoodKind.toPriceItemSource(): PriceItemSource = when (this) {

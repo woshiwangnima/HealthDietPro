@@ -43,6 +43,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.RecordTimeRangePreset
@@ -113,7 +115,7 @@ internal fun DietHomeScreen(
             }
         },
     ) { padding ->
-        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
+        Column(Modifier.fillMaxSize().background(LocalAppTokens.current.colors.bg).padding(padding)) {
             AnimatedPageContent(selectedTab, Modifier.weight(1f), direction = { initial, target -> target - initial }) { tab ->
                 if (tab == 0) {
                     DietStatisticsTab(
@@ -193,10 +195,11 @@ private fun DietRecordsTab(
             }
             if (filtered.isEmpty()) {
                 item {
-                    Text(
-                        stringResource(R.string.diet_empty),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                    AppEmptyState(
+                        title = stringResource(R.string.record_no_data),
+                        description = stringResource(R.string.diet_empty),
+                        iconRes = R.drawable.ic_diet,
+                        modifier = Modifier.padding(vertical = LocalAppTokens.current.spacing.s4),
                     )
                 }
             } else {
@@ -222,7 +225,7 @@ private fun DietRecordsTab(
             text = { Text(stringResource(R.string.diet_delete_message, formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE))) },
             confirmButton = {
                 TextButton(onClick = { onDelete(record.id); deleting = null }) {
-                    Text(stringResource(R.string.body_record_delete), color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.body_record_delete), color = LocalAppTokens.current.colors.danger)
                 }
             },
             dismissButton = {
@@ -236,8 +239,8 @@ private fun DietRecordsTab(
 private fun DietDateHeader(date: LocalDate) {
     Text(
         text = date.toString(),
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = LocalAppTokens.current.type.titleS,
+        color = LocalAppTokens.current.colors.textMuted,
         modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
     )
 }
@@ -259,7 +262,7 @@ internal fun DietCard(
     val mealCalories = sameMeals.map { meal -> meal.entries.sumOf { it.resolvedNutrients["ENERGY"]?.value ?: 0.0 } }
     val weightGauge = mealGauge(stringResource(R.string.diet_metric_net_weight), currentWeight, mealWeights, "g", Color(0xFF00897B), stringResource(R.string.diet_history_low), stringResource(R.string.diet_history_high), stringResource(R.string.diet_history_average))
     val calorieGauge = mealGauge(stringResource(R.string.diet_summary_energy), totalCalories, mealCalories, "kcal", Color(0xFFE65100), stringResource(R.string.diet_history_low), stringResource(R.string.diet_history_high), stringResource(R.string.diet_history_average))
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(1.dp)) {
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = LocalAppTokens.current.colors.panel), elevation = CardDefaults.cardElevation(1.dp)) {
         Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.Top) {
             Card(modifier = Modifier.weight(1f).then(if (onOpen != null) Modifier.clickable(onClick = requireNotNull(onOpen)) else Modifier)) {
                 Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -271,8 +274,8 @@ internal fun DietCard(
                             MealPeriodIcon(record.mealPeriod, modifier = Modifier.fillMaxSize())
                         }
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(record.mealPeriod.displayRes()), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                        Text(stringResource(R.string.diet_item_count, record.entries.size), style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(record.mealPeriod.displayRes()), style = LocalAppTokens.current.type.titleS, modifier = Modifier.weight(1f))
+                        Text(stringResource(R.string.diet_item_count, record.entries.size), style = LocalAppTokens.current.type.body)
                     }
                     Row(
                         Modifier.fillMaxWidth(),
@@ -289,16 +292,16 @@ internal fun DietCard(
                     ) {
                         TextOverflowText(
                             formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalAppTokens.current.type.bodyS,
+                            color = LocalAppTokens.current.colors.textMuted,
                             modifier = Modifier.weight(1f),
                             maxLines = 1,
                         )
                         if (record.note.isNotBlank()) {
                             TextOverflowText(
                                 record.note,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = LocalAppTokens.current.type.bodyS,
+                                color = LocalAppTokens.current.colors.textMuted,
                                 modifier = Modifier.weight(1f),
                                 maxLines = 1,
                             )
@@ -307,8 +310,8 @@ internal fun DietCard(
                 }
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                onEdit?.let { IconButton(onClick = it) { Icon(painterResource(R.drawable.ic_edit), stringResource(R.string.diet_edit), tint = MaterialTheme.colorScheme.primary) } }
-                onDelete?.let { IconButton(onClick = it) { Icon(painterResource(R.drawable.ic_delete), stringResource(R.string.diet_delete), tint = MaterialTheme.colorScheme.error) } }
+                onEdit?.let { IconButton(onClick = it) { Icon(painterResource(R.drawable.ic_edit), stringResource(R.string.diet_edit), tint = LocalAppTokens.current.colors.primary) } }
+                onDelete?.let { IconButton(onClick = it) { Icon(painterResource(R.drawable.ic_delete), stringResource(R.string.diet_delete), tint = LocalAppTokens.current.colors.danger) } }
             }
         }
     }
@@ -355,7 +358,7 @@ private fun MealGauge(group: GaugeMetricGroup, modifier: Modifier = Modifier) {
         )
         Text(
             "${formatDietGaugeValue(group.currentValue)} ${group.unit}",
-            style = MaterialTheme.typography.bodyLarge.copy(
+            style = LocalAppTokens.current.type.body.copy(
                 fontSize = 26.sp,
                 lineHeight = 26.sp,
             ),

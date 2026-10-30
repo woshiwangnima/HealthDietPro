@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,6 +39,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppModal
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
@@ -124,17 +125,15 @@ internal fun DietFoodSheet(
         }
     }
 
-    AlertDialog(
-        modifier = Modifier.width((LocalConfiguration.current.screenWidthDp - 16).dp),
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = if (existing != null) stringResource(R.string.diet_edit_food) else stringResource(R.string.diet_add_food),
-                style = MaterialTheme.typography.titleLarge,
-            )
-        },
-        confirmButton = {
+    // 表单型浮层走 AppModal（§5.2）：改动没保存就点遮罩直接丢掉，用户会当成保存失败。
+    AppModal(
+        title = if (existing != null) stringResource(R.string.diet_edit_food) else stringResource(R.string.diet_add_food),
+        onDismiss = onDismiss,
+        dismissOnScrimClick = false,
+        // 列表自己滚，不由 AppModal 套 verticalScroll：条目少时弹窗随内容缩短、真正居中，
+        // 条目多时列表在弹窗内滚，底部操作条始终可见。
+        contentScrollable = false,
+        actions = {
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -155,11 +154,15 @@ internal fun DietFoodSheet(
                 }
             }
         },
-        dismissButton = { },
-        text = {
-            Column {
+    ) {
+            // 这里**不要**给 Column / LazyColumn 加 `weight`：`content` 的 receiver 是 AppModal 外层
+            // Column 的 scope，但真正的父容器是内容区的 Box，权重会落到不被读取的 parentData 上；
+            // 而加在 LazyColumn 上的 weight 会走真正的 Column，把它从「按内容收缩」变成「吃满剩余」，
+            // 结果弹窗永远满高——条目少也不变矮，看上去就是「没有居中」。
+            // 列表在内容区拿到的是有界约束，天然就是「条目少收缩、条目多封顶并可滚」。
+            Column(modifier = Modifier.fillMaxWidth()) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().height(if (source == DietFoodSource.EXISTING) 500.dp else 540.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(vertical = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
@@ -177,7 +180,7 @@ internal fun DietFoodSheet(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .background(LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                                 .padding(10.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
@@ -208,7 +211,7 @@ internal fun DietFoodSheet(
                                 if (container != null) {
                                     OutlinedButton(
                                         onClick = { containerId = null },
-                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = LocalAppTokens.current.colors.danger),
                                     ) {
                                         Icon(painterResource(R.drawable.ic_cancel), contentDescription = null, modifier = Modifier.size(18.dp))
                                         Spacer(Modifier.width(8.dp))
@@ -231,8 +234,8 @@ internal fun DietFoodSheet(
                                             emptyMass?.let(::formatGrams) ?: "?",
                                             if (hasWeight) formatGrams(netGrams) else "?",
                                         ),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        style = LocalAppTokens.current.type.bodyS,
+                                        color = LocalAppTokens.current.colors.textMuted,
                                         modifier = Modifier.weight(1f),
                                     )
                                     AppIconTextButton(
@@ -257,21 +260,21 @@ internal fun DietFoodSheet(
                                 FilterChip(
                                     selected = selectedKind == null,
                                     onClick = { selectedKind = null; selectedFoodId = null; selectedRoot = null; selectedChild = null },
-                                    label = { TextOverflowText(stringResource(R.string.diet_food_source_all), style = MaterialTheme.typography.labelLarge) },
+                                    label = { TextOverflowText(stringResource(R.string.diet_food_source_all), style = LocalAppTokens.current.type.bodyS) },
                                     modifier = Modifier.weight(1f),
                                 )
                                 FoodKind.entries.forEach { kind ->
                                     FilterChip(
                                         selected = selectedKind == kind,
                                         onClick = { selectedKind = kind; selectedFoodId = null; selectedRoot = null; selectedChild = null },
-                                        label = { TextOverflowText(stringResource(kind.displayRes()), style = MaterialTheme.typography.labelLarge) },
+                                        label = { TextOverflowText(stringResource(kind.displayRes()), style = LocalAppTokens.current.type.bodyS) },
                                         modifier = Modifier.weight(1f),
                                     )
                                 }
                                 FilterChip(
                                     selected = customOnly,
                                     onClick = { customOnly = !customOnly; selectedFoodId = null },
-                                    label = { TextOverflowText(stringResource(R.string.diet_food_source_custom), style = MaterialTheme.typography.labelLarge) },
+                                    label = { TextOverflowText(stringResource(R.string.diet_food_source_custom), style = LocalAppTokens.current.type.bodyS) },
                                     modifier = Modifier.weight(1f),
                                 )
                             }
@@ -293,13 +296,13 @@ internal fun DietFoodSheet(
                         }
                         val matched = filteredFoods(state.foods, keyword, selectedKind, customOnly, selectedRoot, selectedChild, viewModel, language)
                         if (matched.isEmpty()) {
-                            item { Text(stringResource(R.string.diet_food_no_match), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                            item { Text(stringResource(R.string.diet_food_no_match), color = LocalAppTokens.current.colors.textMuted) }
                         } else {
                             items(matched, key = FoodItem::id) { food ->
                                 val selected = food.id == selectedFoodId
                                 Surface(
                                     onClick = { selectedFoodId = if (selected) null else food.id },
-                                    color = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                    color = if (selected) LocalAppTokens.current.colors.primaryContainer.copy(alpha = 0.5f) else LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.3f),
                                     shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
@@ -310,12 +313,18 @@ internal fun DietFoodSheet(
                                     ) {
                                         FoodKindBadge(food.kind, language)
                                         Column(Modifier.weight(1f)) {
-                                            Text(food.displayName(language), style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            Text(
+                                                text = food.displayName(language),
+                                                style = LocalAppTokens.current.type.body,
+                                                color = LocalAppTokens.current.colors.text,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
                                             if (food.allNames(language).size > 1) {
                                                 Text(
                                                     text = food.allNames(language).drop(1).joinToString(" / "),
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    style = LocalAppTokens.current.type.bodyS,
+                                                    color = LocalAppTokens.current.colors.textMuted,
                                                     maxLines = 1,
                                                     overflow = TextOverflow.Ellipsis,
                                                 )
@@ -325,7 +334,7 @@ internal fun DietFoodSheet(
                                             androidx.compose.material3.Icon(
                                                 painter = androidx.compose.ui.res.painterResource(R.drawable.ic_edit),
                                                 contentDescription = stringResource(R.string.diet_food_source_custom),
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                tint = LocalAppTokens.current.colors.textMuted,
                                             )
                                         }
                                     }
@@ -339,12 +348,12 @@ internal fun DietFoodSheet(
                                 value = freeName,
                                 onValueChange = { freeName = it },
                                 required = true,
-                                supportingTextOverride = { Text(stringResource(R.string.diet_free_name_hint), color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                                supportingTextOverride = { Text(stringResource(R.string.diet_free_name_hint), color = LocalAppTokens.current.colors.textMuted) },
                             )
                         }
                         item {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Text(stringResource(R.string.diet_create_custom), style = MaterialTheme.typography.titleSmall)
+                                Text(stringResource(R.string.diet_create_custom), style = LocalAppTokens.current.type.titleS)
                                 FoodKind.entries.forEach { kind ->
                                     TextButton(onClick = { onCreateCustomFood(kind) }) {
                                         Text(stringResource(R.string.diet_create_custom_kind, stringResource(kind.displayRes())))
@@ -362,12 +371,12 @@ internal fun DietFoodSheet(
                     ) {
                         Text(
                             text = stringResource(R.string.diet_selected_food),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (previewFood != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalAppTokens.current.type.body,
+                            color = if (previewFood != null) LocalAppTokens.current.colors.text else LocalAppTokens.current.colors.textMuted,
                         )
                         if (previewFood != null) {
                             Surface(
-                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                color = LocalAppTokens.current.colors.primaryContainer.copy(alpha = 0.5f),
                                 shape = RoundedCornerShape(10.dp),
                                 modifier = Modifier.weight(1f),
                             ) {
@@ -378,12 +387,18 @@ internal fun DietFoodSheet(
                                 ) {
                                     FoodKindBadge(previewFood.kind, language)
                                     Column(Modifier.weight(1f)) {
-                                        Text(previewFood.displayName(language), style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(
+                                            text = previewFood.displayName(language),
+                                            style = LocalAppTokens.current.type.body,
+                                            color = LocalAppTokens.current.colors.text,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
                                         if (previewFood.allNames(language).size > 1) {
                                             Text(
                                                 text = previewFood.allNames(language).drop(1).joinToString(" / "),
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                style = LocalAppTokens.current.type.bodyS,
+                                                color = LocalAppTokens.current.colors.textMuted,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis,
                                             )
@@ -395,22 +410,21 @@ internal fun DietFoodSheet(
                                 Icon(
                                     painter = painterResource(R.drawable.ic_cancel),
                                     contentDescription = stringResource(R.string.diet_selected_food),
-                                    tint = MaterialTheme.colorScheme.error,
+                                    tint = LocalAppTokens.current.colors.danger,
                                 )
                             }
                         } else {
                             Text(
                                 text = stringResource(R.string.diet_selected_food_none),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                style = LocalAppTokens.current.type.body,
+                                color = LocalAppTokens.current.colors.textMuted.copy(alpha = 0.5f),
                                 modifier = Modifier.weight(1f),
                             )
                         }
                     }
                 }
             }
-        },
-    )
+    }
     if (showContainerPicker) {
         DietContainerPickerSheet(
             containers = state.containers,
@@ -425,16 +439,16 @@ internal fun DietFoodSheet(
             title = {
                 Text(
                     text = stringResource(R.string.diet_nutrition_preview),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = LocalAppTokens.current.type.title,
                 )
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (source == DietFoodSource.FREE_NAME || netGrams <= 0.0 || previewNutrients.isEmpty()) {
-                        Text(stringResource(R.string.diet_no_nutrition), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.diet_no_nutrition), color = LocalAppTokens.current.colors.textMuted)
                     } else {
                         previewFood?.let {
-                            Text(it.displayName(language), style = MaterialTheme.typography.bodyLarge)
+                            Text(it.displayName(language), style = LocalAppTokens.current.type.body)
                         }
                         Text(
                             text = stringResource(
@@ -444,7 +458,7 @@ internal fun DietFoodSheet(
                                 formatGrams(previewNutrients["FAT"]?.value ?: 0.0),
                                 formatGrams(previewNutrients["CHO"]?.value ?: 0.0),
                             ),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = LocalAppTokens.current.type.body,
                         )
                     }
                 }
@@ -478,7 +492,7 @@ private fun FoodKindBadge(kind: FoodKind, language: String) {
         Text(
             text = stringResource(kind.displayRes()),
             color = onContainer,
-            style = MaterialTheme.typography.bodySmall,
+            style = LocalAppTokens.current.type.bodyS,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
         )
     }

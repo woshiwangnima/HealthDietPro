@@ -24,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
@@ -82,8 +84,8 @@ internal fun SleepStatisticsTab(records: List<SleepRecord>, modifier: Modifier =
     val totalNocturia = remember(nightRecords) { nightRecords.sumOf { it.nocturia.size } }
     val totalNocturiaMinutes = remember(nightRecords) { nightRecords.sumOf { record -> record.nocturia.sumOf { (it.endAt - it.startAt).coerceAtLeast(0L) / 60_000L } } }
 
-    val nightColor = MaterialTheme.colorScheme.primary
-    val napColor = MaterialTheme.colorScheme.secondary
+    val nightColor = LocalAppTokens.current.colors.primary
+    val napColor = LocalAppTokens.current.colors.textMuted
     val entries = remember(dates, dayTotals, nightColor, napColor) {
         dates.map { date ->
             val totals = dayTotals[date] ?: DaySleepTotals()
@@ -102,18 +104,22 @@ internal fun SleepStatisticsTab(records: List<SleepRecord>, modifier: Modifier =
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(LocalAppTokens.current.spacing.page),
+        verticalArrangement = Arrangement.spacedBy(LocalAppTokens.current.spacing.s3),
     ) {
         if (records.isEmpty()) {
             item {
-                Text(stringResource(R.string.sleep_statistics_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                AppEmptyState(
+                    title = stringResource(R.string.record_no_data),
+                    description = stringResource(R.string.sleep_statistics_empty),
+                    iconRes = R.drawable.ic_sleep,
+                )
             }
             return@LazyColumn
         }
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.sleep_statistics_trend), style = MaterialTheme.typography.titleMedium)
+            Column(verticalArrangement = Arrangement.spacedBy(LocalAppTokens.current.spacing.s2), modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.sleep_statistics_trend), style = LocalAppTokens.current.type.titleS)
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                     SleepStatKind.entries.forEachIndexed { index, option ->
                         SegmentedButton(
@@ -186,7 +192,7 @@ internal fun SleepStatisticsTab(records: List<SleepRecord>, modifier: Modifier =
                         DateStackedBarReferenceLine(
                             value = average,
                             label = stringResource(R.string.sleep_statistics_average, formatSleepDuration(average.toLong())),
-                            color = MaterialTheme.colorScheme.tertiary,
+                            color = LocalAppTokens.current.colors.warning,
                         )
                     },
                 )
@@ -222,8 +228,8 @@ private fun StatRow(content: @Composable androidx.compose.foundation.layout.RowS
 @Composable
 private fun androidx.compose.foundation.layout.RowScope.SleepStatAmount(label: String, value: String) {
     Column(modifier = Modifier.weight(1f)) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, style = MaterialTheme.typography.titleMedium)
+        Text(label, style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.textMuted)
+        Text(value, style = LocalAppTokens.current.type.titleS)
     }
 }
 
@@ -244,9 +250,9 @@ private fun SleepDayDetail(
             .sortedBy { it.sleepStartAt }
     }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(R.string.sleep_statistics_selected_day, entry.label, formatSleepDuration(total)), style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.sleep_statistics_selected_day, entry.label, formatSleepDuration(total)), style = LocalAppTokens.current.type.titleS)
         if (entry.segments.isEmpty()) {
-            Text(stringResource(R.string.sleep_statistics_selected_day_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.sleep_statistics_selected_day_empty), color = LocalAppTokens.current.colors.textMuted)
         } else {
             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                 SleepLegend(color = nightColor, label = stringResource(R.string.sleep_kind_night), minutes = night)
@@ -258,24 +264,24 @@ private fun SleepDayDetail(
             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                 Text(
                     text = stringResource(record.kind.labelRes()),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = LocalAppTokens.current.type.bodyS,
                     color = if (record.kind == SleepKind.NIGHT_SLEEP) nightColor else napColor,
                     modifier = Modifier.padding(end = 8.dp),
                 )
                 Text(
                     text = formatRecordTimestamp(record.sleepStartAt, RecordTimePrecision.MINUTE),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalAppTokens.current.type.bodyS,
+                    color = LocalAppTokens.current.colors.textMuted,
                 )
-                Text(" → ", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(" → ", style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.textMuted)
                 record.wakeUpAt?.let { wake ->
-                    Text(formatRecordTimestamp(wake, RecordTimePrecision.MINUTE), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(formatRecordTimestamp(wake, RecordTimePrecision.MINUTE), style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.textMuted)
                 }
                 if (record.kind == SleepKind.NIGHT_SLEEP && record.nocturia.isNotEmpty()) {
                     Text(
                         text = stringResource(R.string.sleep_nocturia_count_value, record.nocturia.size),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalAppTokens.current.type.bodyS,
+                        color = LocalAppTokens.current.colors.textMuted,
                         modifier = Modifier.padding(start = 8.dp),
                     )
                 }
@@ -288,7 +294,7 @@ private fun SleepDayDetail(
 private fun SleepLegend(color: androidx.compose.ui.graphics.Color, label: String, minutes: Long) {
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
         androidx.compose.foundation.Canvas(Modifier.size(10.dp).padding(end = 6.dp)) { drawCircle(color) }
-        Text("$label ${formatSleepDuration(minutes)}", style = MaterialTheme.typography.bodySmall)
+        Text("$label ${formatSleepDuration(minutes)}", style = LocalAppTokens.current.type.bodyS)
     }
 }
 

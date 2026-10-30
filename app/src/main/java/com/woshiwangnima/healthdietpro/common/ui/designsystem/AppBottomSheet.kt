@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -63,7 +64,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
 import com.woshiwangnima.healthdietpro.R
-import com.woshiwangnima.healthdietpro.common.ui.overlayNavigationBarPadding
+import com.woshiwangnima.healthdietpro.common.ui.rememberOverlayWindowFit
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -87,7 +88,6 @@ enum class AppSheetHeight(val fraction: Float) {
 }
 
 private val SheetMaxWidth = 560.dp
-private val EnterOffset = 48.dp
 
 /** 超出边界后的跟手衰减系数：拖过满档/拖过底部时只走 32% 位移，形成「拉不动」的阻尼手感。 */
 private const val RubberBandFactor = 0.32f
@@ -104,9 +104,13 @@ private const val DismissHeightRatio = 0.55f
 /**
  * 底部半屏抽屉底层容器（移动规范 05 §一、§二、§三）。
  *
- * **高度与吸附**：面板高度恒等于最高档（默认 Full 80%），用垂直偏移表现「露出多少」，
- * 因此多档之间切换不会引起内部重新布局，滚动位置也不会被重置。松手时按
- * 「当前位置 + 速度外推」吸附到最近的 [snapPoints]；拖到最低档 55% 以下或快速下甩则关闭。
+ * **高度与吸附**：面板的**可见高度**就是当前档位高度，面板底边始终停在系统导航条之上。
+ * 松手时按「当前位置 + 速度外推」吸附到最近的 [snapPoints]；拖到最低档 55% 以下或快速下甩则关闭。
+ *
+ * 高度随档位变化的理由（2026-10-30 修）：早先的实现是「面板恒为满档高度、整体向下位移」表示收放，
+ * 面板底边会跑到屏幕下方，可见区域的下沿于是变成屏幕底边——列表最后一行正好落在系统导航栏下面，
+ * 三键导航时既看不见也点不中。改成按当前高度布局后，底边永远在导航条之上，多余内容靠内部滚动。
+ * 代价是拖拽过程中内容会随高度重新布局（滚动位置由各自的 `scrollState` 保存，不受影响）。
  *
  * **手势**：拖拽条与标题区可直接拖；内容区滚到顶后继续下拉才带动抽屉
  * （`onPostScroll` 只在列表到顶时接管），内容还没到顶时下拉只滚内容。
@@ -117,6 +121,8 @@ private const val DismissHeightRatio = 0.55f
  *
  * @param snapPoints 停靠档位，默认 Peek/Half/Full 三档；只用一个档位时退化为「全高 + 下滑关闭」。
  * @param initialSnap 打开时停在哪一档，默认最低档。
+ * @param contentScrollable 内容区是否由本组件接管滚动。传 false 表示内容自己会滚（`LazyColumn`），
+ *   此时上下渐隐也不画——渐隐读的是本组件那套 `scrollState`，与列表自己的滚动位置无关。
  */
 @Composable
 fun AppBottomSheet(
@@ -131,6 +137,7 @@ fun AppBottomSheet(
     ),
     initialSnap: AppSheetHeight? = null,
     dismissOnScrimClick: Boolean = true,
+    contentScrollable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val tokens = LocalAppTokens.current
@@ -162,22 +169,28 @@ fun AppBottomSheet(
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
             // 正常情况 maxHeight 就是窗口高度；极少数宿主给出无界约束时退回屏幕高，避免 Infinity 传播。
             val measuredHeightPx = with(density) { maxHeight.toPx() }
-            val screenHeightPx = if (measuredHeightPx.isFinite() && measuredHeightPx > 0f) {
+            val windowHeightPx = if (measuredHeightPx.isFinite() && measuredHeightPx > 0f) {
                 measuredHeightPx
             } else {
                 with(density) { screenHeightDp.dp.toPx() }
             }
-            val anchorsPx = points.map { screenHeightPx * it.fraction }
+            // 浮层语义：三键（≈48 dp）与手势（≈24 dp）**都要**让出系统导航条，不能沿用页面「手势留 0」的规则。
+            //
+            // **刻意用窗口/屏幕坐标的 px，不用 dp**：Dialog 窗口在部分宿主里已被系统裁进安全区
+            // （实测 `frame=[0,84][1439,3032]`），而 Compose 拿到的约束高度仍是整屏。
+            // 这时「按导航条高度上抬」就抬多了，反过来「不抬」又会被导航条压住；正确做法是问
+            // `rememberOverlayWindowFit` 要一个按屏幕坐标算出来的抬升量。px 是绝对值，不经二次换算。
+            val windowFit = rememberOverlayWindowFit(windowHeightPx.roundToInt())
+            val usableHeightPx = windowFit.usableHeightPx.takeIf { it > 0 } ?: windowHeightPx.roundToInt()
+            // 档位高度按「可用高度」算：整屏高里含导航条，按它算 80% 会伸到导航条下面。
+            val anchorsPx = points.map { usableHeightPx * it.fraction }
             val fullHeightPx = anchorsPx.last()
             val lowestPx = anchorsPx.first()
             val startFraction = (initialSnap ?: points.first()).fraction
-            // 浮层语义：三键（≈48 dp）与手势（≈24 dp）**都要**让出系统导航条，不能沿用页面「手势留 0」的规则。
-            // Dialog 窗口里 Compose insets 实测恒为 0，取值链见 SystemInsets.overlayNavigationBarPadding()。
-            val navigationBarPadding = overlayNavigationBarPadding()
 
-            // 当前「露出高度」，px。面板高度固定为 fullHeightPx，靠偏移表现收放。
-            var sheetHeight by remember(screenHeightPx, startFraction) {
-                mutableFloatStateOf(screenHeightPx * startFraction)
+            // 当前「露出高度」，px。面板高度与它同值，底边固定停在导航条之上。
+            var sheetHeight by remember(usableHeightPx, startFraction) {
+                mutableFloatStateOf(usableHeightPx * startFraction)
             }
             var settleJob by remember { mutableStateOf<Job?>(null) }
 
@@ -222,7 +235,7 @@ fun AppBottomSheet(
             val currentSettle by rememberUpdatedState<(Float) -> Unit> { v -> settle(v) }
             val dragState = rememberDraggableState { delta -> currentDrag(delta) }
 
-            val connection = remember(screenHeightPx, points) {
+            val connection = remember(usableHeightPx, points) {
                 object : NestedScrollConnection {
                     // 抽屉还没到最高档时，上滑先撑开抽屉，别让内容同时滚。
                     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -255,8 +268,9 @@ fun AppBottomSheet(
                 }
             }
 
-            val offsetYPx = (fullHeightPx - sheetHeight) +
-                (1f - progress) * with(density) { EnterOffset.toPx() }
+            // 进场只做淡入。**任何位移/缩放都不要挂在面板上**：它们会让面板底边偏离
+            // 「屏幕底 - 导航条高度」这个位置，动画中途或被打断时看起来就是沉进系统栏。
+            // 位移改由上面的 offset 承担（px 精确值，只负责把面板整体抬到安全区下沿）。
 
             Box(
                 modifier = Modifier
@@ -272,19 +286,23 @@ fun AppBottomSheet(
             Column(
                 modifier = modifier
                     .align(Alignment.BottomCenter)
-                    // 整个面板抬到系统导航条之上（三键 ≈48 dp，手势 0）。留白必须加在**面板外层**：
+                    // 整个面板抬到系统导航条之上（三键 ≈48 dp，手势 ≈24 dp）。留白必须加在**面板外层**：
                     // 只加在滚动内容上时，面板背景照样铺到屏幕底、被 NavigationBar0 那条窗口压住，
                     // 表现为「抽屉沉进导航栏、底边和圆角看不见、系统键图标压字」。
-                    .padding(bottom = navigationBarPadding)
+                    .offset { IntOffset(0, -windowFit.bottomLiftPx) }
                     .widthIn(max = SheetMaxWidth)
                     .fillMaxWidth()
-                    // 固定满档高度：内部滚动区才有确定的上界，长内容不会被裁成「滚不动」。
-                    .height(with(density) { fullHeightPx.toDp() })
-                    .offset { IntOffset(0, offsetYPx.roundToInt()) }
+                    // **面板高度 = 当前可见高度**，而不是「恒为满档高度再整体下移」。
+                    // 早先用固定高度 + 向下偏移，面板底边会跑到屏幕下方：可见区域的下沿始终是屏幕底边，
+                    // 于是最后一行正好压在系统导航栏下面（三键导航时点不中、也看不见）。
+                    // 改成随档位改高度后，面板底边永远停在导航条之上，其余内容靠内部滚动去看。
+                    .height(with(density) { sheetHeight.coerceAtLeast(1f).toDp() })
+                    .graphicsLayer { alpha = progress }
                     .nestedScroll(connection)
                     .clip(sheetShape)
                     .background(tokens.colors.panel)
                     .border(tokens.radii.stroke, tokens.colors.border, sheetShape)
+
                     // 吞掉面板内点击，避免穿透到遮罩触发「点外部关闭」。
                     .pointerInput(Unit) { detectTapGestures { } },
             ) {
@@ -346,7 +364,9 @@ fun AppBottomSheet(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .verticalScroll(scrollState)
+                            // [contentScrollable] = false 时由调用方自己放 LazyColumn(weight(1f))：
+                            // 懒加载列表在 verticalScroll 里拿到的是无界高度，会直接抛测量异常。
+                            .then(if (contentScrollable) Modifier.verticalScroll(scrollState) else Modifier)
                             // 面板已整体让出导航条，这里只留常规内容留白。
                             .padding(
                                 start = tokens.spacing.s4,
@@ -357,7 +377,7 @@ fun AppBottomSheet(
                         verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
                         content = content,
                     )
-                    Canvas(modifier = Modifier.fillMaxSize()) {
+                    if (contentScrollable) Canvas(modifier = Modifier.fillMaxSize()) {
                         val fadePx = 24.dp.toPx()
                         if (scrollState.canScrollBackward) {
                             drawRect(

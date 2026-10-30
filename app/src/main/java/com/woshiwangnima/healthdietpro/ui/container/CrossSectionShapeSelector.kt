@@ -8,6 +8,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.container.ShapeKind
 
 private val ShapeKind.chineseLabel: String
@@ -31,7 +32,7 @@ internal fun CrossSectionShapeSelector(
                 selected = selected == kind,
                 onClick = { onSelected(kind) },
                 shape = SegmentedButtonDefaults.itemShape(index, ShapeKind.entries.size),
-                label = { Text(kind.chineseLabel, style = MaterialTheme.typography.bodySmall) },
+                label = { Text(kind.chineseLabel, style = LocalAppTokens.current.type.bodyS) },
             )
         }
     }

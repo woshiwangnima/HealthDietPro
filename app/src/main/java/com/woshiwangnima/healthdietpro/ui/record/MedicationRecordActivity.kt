@@ -56,6 +56,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDateTimePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.ui.HorizontalImageEditor
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
@@ -457,7 +458,7 @@ private fun CatalogSnapshot(state: MedicationRecordFormState) {
     val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap() }
     val customDiseasesById = remember { UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy { it.id } }
     val content = listOf(spec, state.manufacturer, state.method, state.frequency.format(locale), state.intakeRules.format(locale), state.indicationReferences.joinToString(", ") { it.displayName(diseasesById, customDiseasesById) }, state.lotNumber).filter { it.isNotBlank() }.joinToString(" / ")
-    Text(text = stringResource(R.string.medication_record_catalog_snapshot, content), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Text(text = stringResource(R.string.medication_record_catalog_snapshot, content), style = LocalAppTokens.current.type.body, color = LocalAppTokens.current.colors.textMuted)
 }
 
 @Composable
@@ -469,7 +470,7 @@ private fun PurposeSection(
     val diseasesById = remember { DiseaseRepository.fromContext(context).loadAll().flatMap { disease -> disease.referenceIds().map { it to disease } }.toMap() }
     val customDiseasesById = remember { UserDiseaseRecordRepository.fromContext(context).loadCustomDiseases().associateBy { it.id } }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.medication_record_purpose), style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.medication_record_purpose), style = LocalAppTokens.current.type.titleS)
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -510,7 +511,7 @@ private fun DoseSection(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(R.string.medication_record_dose_section),
-            style = MaterialTheme.typography.titleSmall,
+            style = LocalAppTokens.current.type.titleS,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(
@@ -544,7 +545,7 @@ private fun FeelingSection(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(R.string.medication_record_feeling_section),
-            style = MaterialTheme.typography.titleSmall,
+            style = LocalAppTokens.current.type.titleS,
         )
         Row(
             modifier = Modifier
@@ -589,7 +590,7 @@ private fun PhotoSection(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(R.string.medication_record_photo_section),
-            style = MaterialTheme.typography.titleSmall,
+            style = LocalAppTokens.current.type.titleS,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AppOutlinedIconTextButton(

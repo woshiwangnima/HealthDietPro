@@ -3,13 +3,14 @@ package com.woshiwangnima.healthdietpro.ui.diet
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,16 +21,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRowDivider
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppRadioRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.formatMinuteOfDay
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
+import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComposeClockPickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputRange
-import com.woshiwangnima.healthdietpro.common.ui.SettingRadioRow
-import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.model.diet.DietGoalsPrefs
 import com.woshiwangnima.healthdietpro.model.diet.DietPeriodPrefs
 import com.woshiwangnima.healthdietpro.model.diet.DietPrefs
@@ -46,29 +52,37 @@ internal fun DietSettingsScreen(
     onGoals: () -> Unit,
     onContainers: () -> Unit,
 ) {
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.diet_settings_title), onBack = onBack) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(vertical = 8.dp)) {
-            item {
-                SettingRow(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s4),
+        ) {
+            AppSectionGroup {
+                AppListRow(
                     title = stringResource(R.string.diet_settings_default_habits),
-                    subtitle = stringResource(R.string.diet_settings_default_habits_description),
-                    leadingIconRes = R.drawable.ic_diet,
+                    tooltip = stringResource(R.string.diet_settings_default_habits_description),
+                    iconRes = R.drawable.ic_diet,
+                    showChevron = true,
                     onClick = onDefaultHabits,
                 )
-            }
-            item {
-                SettingRow(
+                AppListRowDivider()
+                AppListRow(
                     title = stringResource(R.string.diet_settings_goals),
-                    subtitle = stringResource(R.string.diet_settings_goals_description),
-                    leadingIconRes = R.drawable.ic_health_metrics,
+                    tooltip = stringResource(R.string.diet_settings_goals_description),
+                    iconRes = R.drawable.ic_health_metrics,
+                    showChevron = true,
                     onClick = onGoals,
                 )
-            }
-            item {
-                SettingRow(
+                AppListRowDivider()
+                AppListRow(
                     title = stringResource(R.string.diet_settings_containers),
-                    subtitle = stringResource(R.string.diet_settings_containers_description),
-                    leadingIconRes = R.drawable.ic_container,
+                    tooltip = stringResource(R.string.diet_settings_containers_description),
+                    iconRes = R.drawable.ic_container,
+                    showChevron = true,
                     onClick = onContainers,
                 )
             }
@@ -82,14 +96,17 @@ internal fun DietContainersScreen(onBack: () -> Unit) {
     BaseScreen(title = stringResource(R.string.diet_settings_containers), onBack = onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(vertical = 8.dp)) {
             item {
-                SettingRow(
-                    title = stringResource(R.string.diet_containers_manage),
-                    subtitle = stringResource(R.string.diet_containers_manage_description),
-                    leadingIconRes = R.drawable.ic_container,
-                    onClick = {
-                        context.startActivity(Intent(context, ContainerRecordActivity::class.java))
-                    },
-                )
+                AppSectionGroup {
+                    AppListRow(
+                        title = stringResource(R.string.diet_containers_manage),
+                        tooltip = stringResource(R.string.diet_containers_manage_description),
+                        iconRes = R.drawable.ic_container,
+                        showChevron = true,
+                        onClick = {
+                            context.startActivity(Intent(context, ContainerRecordActivity::class.java))
+                        },
+                    )
+                }
             }
         }
     }
@@ -168,21 +185,28 @@ internal fun DietDefaultDurationScreen(
         applyDefaults(period)
     }
 
+    val tokens = LocalAppTokens.current
     BaseScreen(
         title = stringResource(R.string.diet_settings_default_habits),
         onBack = onBack,
-        actions = {
-            androidx.compose.material3.TextButton(onClick = ::resetAll) {
-                Text(stringResource(R.string.diet_settings_reset_all))
-            }
-        },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(horizontal = tokens.spacing.page, vertical = tokens.spacing.s3),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
             ) {
+                // 复位是二级动作，统一成「图标 + 文字 + 描边」的同一款按钮。
+                // 「重置全部」作用于整套饮食习惯（不分时段），固定放在时段选择条之上、通栏；
+                // 「重置当前」只作用于当前时段，跟在时段相关的设置后面。
+                item {
+                    AppOutlinedIconTextButton(
+                        text = stringResource(R.string.diet_settings_reset_all),
+                        iconRes = R.drawable.ic_refresh,
+                        onClick = ::resetAll,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
                 item {
                     MealPeriodSelectorBar(
                         selected = period,
@@ -191,108 +215,104 @@ internal fun DietDefaultDurationScreen(
                     )
                 }
                 item {
-                    androidx.compose.material3.TextButton(
-                        onClick = { applyDefaults(period) },
-                        modifier = Modifier.fillMaxWidth(),
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_time,
+                        title = stringResource(R.string.diet_settings_default_duration),
+                        tooltip = stringResource(R.string.diet_settings_default_duration_description),
                     ) {
-                        Text(stringResource(R.string.diet_settings_reset_current))
-                    }
-                }
-                item {
-                    Text(stringResource(R.string.diet_settings_default_duration), style = MaterialTheme.typography.titleMedium)
-                }
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = androidx.compose.ui.Alignment.Top,
-                    ) {
-                        EditorTextField(
-                            label = stringResource(R.string.diet_settings_default_duration_value),
-                            value = valueText,
-                            onValueChange = { valueText = it },
-                            required = true,
-                            numeric = true,
-                            range = NumericInputRange(minimum = 0.001),
-                            modifier = Modifier.weight(1f),
-                        )
-                        AppDropdownField(
-                            label = stringResource(R.string.diet_settings_duration_unit),
-                            value = dietDurationUnitLabel(unit),
-                            options = dietDurationUnitOptions(),
-                            onSelect = { option ->
-                                val converted = value?.let { convertDietDurationValue(it, unit, option.id) }
-                                unit = option.id
-                                converted?.let { valueText = trimDietDurationValue(it) }
-                            },
-                            modifier = Modifier.weight(0.9f),
-                        )
-                    }
-                }
-                item {
-                    Text(stringResource(R.string.diet_settings_record_timing), style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        stringResource(R.string.diet_settings_record_timing_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        SettingRadioRow(
-                            title = stringResource(R.string.diet_settings_timing_before_meal),
-                            subtitle = "",
-                            selected = timing == DietRecordTiming.BEFORE_MEAL,
-                            onClick = { timing = DietRecordTiming.BEFORE_MEAL },
-                            modifier = Modifier.weight(1f),
-                        )
-                        SettingRadioRow(
-                            title = stringResource(R.string.diet_settings_timing_after_meal),
-                            subtitle = "",
-                            selected = timing == DietRecordTiming.AFTER_MEAL,
-                            onClick = { timing = DietRecordTiming.AFTER_MEAL },
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                }
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                    ) {
-                        Text(stringResource(R.string.diet_settings_period_range), style = MaterialTheme.typography.titleMedium)
-                        if (rangeCustom) {
-                            Text(
-                                stringResource(R.string.diet_settings_period_range_custom),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary,
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                            verticalAlignment = androidx.compose.ui.Alignment.Top,
+                        ) {
+                            EditorTextField(
+                                label = stringResource(R.string.diet_settings_default_duration_value),
+                                value = valueText,
+                                onValueChange = { valueText = it },
+                                required = true,
+                                numeric = true,
+                                range = NumericInputRange(minimum = 0.001),
+                                modifier = Modifier.weight(1f),
+                            )
+                            AppDropdownField(
+                                label = stringResource(R.string.diet_settings_duration_unit),
+                                value = dietDurationUnitLabel(unit),
+                                options = dietDurationUnitOptions(),
+                                onSelect = { option ->
+                                    val converted = value?.let { convertDietDurationValue(it, unit, option.id) }
+                                    unit = option.id
+                                    converted?.let { valueText = trimDietDurationValue(it) }
+                                },
+                                modifier = Modifier.weight(0.9f),
                             )
                         }
                     }
                 }
                 item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = androidx.compose.ui.Alignment.Top,
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_check,
+                        title = stringResource(R.string.diet_settings_record_timing),
+                        tooltip = stringResource(R.string.diet_settings_record_timing_description),
                     ) {
-                        DietTimeRangeField(
-                            title = stringResource(R.string.diet_settings_period_range_start),
-                            minuteOfDay = rangeStart,
-                            onClick = { showStartPicker = true },
-                            modifier = Modifier.weight(1f),
+                        AppRadioRow(
+                            title = stringResource(R.string.diet_settings_timing_before_meal),
+                            selected = timing == DietRecordTiming.BEFORE_MEAL,
+                            onSelect = { timing = DietRecordTiming.BEFORE_MEAL },
                         )
-                        DietTimeRangeField(
-                            title = stringResource(R.string.diet_settings_period_range_end),
-                            minuteOfDay = rangeEnd,
-                            onClick = { showEndPicker = true },
-                            modifier = Modifier.weight(1f),
+                        AppListRowDivider()
+                        AppRadioRow(
+                            title = stringResource(R.string.diet_settings_timing_after_meal),
+                            selected = timing == DietRecordTiming.AFTER_MEAL,
+                            onSelect = { timing = DietRecordTiming.AFTER_MEAL },
                         )
                     }
+                }
+                item {
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_event,
+                        title = stringResource(R.string.diet_settings_period_range),
+                        tooltip = stringResource(R.string.diet_settings_meal_periods_description),
+                        action = if (rangeCustom) {
+                            {
+                                Text(
+                                    stringResource(R.string.diet_settings_period_range_custom),
+                                    style = tokens.type.caption,
+                                    color = tokens.colors.primary,
+                                    modifier = Modifier.padding(end = tokens.spacing.s2),
+                                )
+                            }
+                        } else {
+                            null
+                        },
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                            verticalAlignment = androidx.compose.ui.Alignment.Top,
+                        ) {
+                            DietTimeRangeField(
+                                title = stringResource(R.string.diet_settings_period_range_start),
+                                minuteOfDay = rangeStart,
+                                onClick = { showStartPicker = true },
+                                modifier = Modifier.weight(1f),
+                            )
+                            DietTimeRangeField(
+                                title = stringResource(R.string.diet_settings_period_range_end),
+                                minuteOfDay = rangeEnd,
+                                onClick = { showEndPicker = true },
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
+                }
+                // 复位是二级动作，统一成「图标 + 文字 + 描边」的同一款按钮。
+                item {
+                    AppOutlinedIconTextButton(
+                        text = stringResource(R.string.diet_settings_reset_current),
+                        iconRes = R.drawable.ic_refresh,
+                        onClick = { applyDefaults(period) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
             com.woshiwangnima.healthdietpro.common.ui.FormSaveBar(
@@ -318,6 +338,7 @@ internal fun DietDefaultDurationScreen(
     }
 }
 
+/** 时段边界的时间选择格：已经画在卡片里，底材取 `panel` + 细描边，与卡片区分而不与卡片同色。 */
 @Composable
 private fun DietTimeRangeField(
     title: String,
@@ -325,15 +346,17 @@ private fun DietTimeRangeField(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val tokens = LocalAppTokens.current
     androidx.compose.material3.Surface(
         onClick = onClick,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
+        color = tokens.colors.panel,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(tokens.radii.container),
+        border = androidx.compose.foundation.BorderStroke(tokens.radii.highlight, tokens.colors.border),
         modifier = modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-            Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(formatMinuteOfDay(minuteOfDay), style = MaterialTheme.typography.bodyLarge)
+        Column(Modifier.padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s2)) {
+            Text(title, style = tokens.type.caption, color = tokens.colors.textMuted)
+            Text(formatMinuteOfDay(minuteOfDay), style = tokens.type.body, color = tokens.colors.text)
         }
     }
 }
@@ -370,11 +393,6 @@ internal fun DietGoalsScreen(
     BaseScreen(
         title = stringResource(R.string.diet_settings_goals),
         onBack = onBack,
-        actions = {
-            androidx.compose.material3.TextButton(onClick = { apply(recommendedGoals) }) {
-                Text(stringResource(R.string.diet_settings_restore_defaults))
-            }
-        },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(
@@ -382,11 +400,20 @@ internal fun DietGoalsScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                // 与「默认饮食习惯」的复位动作同一款按钮（图标 + 文字 + 描边），不再挂在顶栏当文字按钮。
+                item {
+                    AppOutlinedIconTextButton(
+                        text = stringResource(R.string.diet_settings_restore_defaults),
+                        iconRes = R.drawable.ic_refresh,
+                        onClick = { apply(recommendedGoals) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
                 item {
                     Text(
                         stringResource(R.string.diet_settings_goals_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalAppTokens.current.type.bodyS,
+                        color = LocalAppTokens.current.colors.textMuted,
                     )
                 }
                 item {

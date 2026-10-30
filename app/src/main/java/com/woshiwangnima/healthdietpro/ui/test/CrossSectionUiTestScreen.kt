@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.model.container.CircleShape
 import com.woshiwangnima.healthdietpro.model.container.CrossSection
@@ -61,8 +62,8 @@ internal fun CrossSectionUiTestScreen(onBack: () -> Unit, modifier: Modifier = M
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text("静态形状预览", style = MaterialTheme.typography.titleMedium)
-            Text("圆形：直径 / 半径；正方形：边长 / 对角线；长方形无对角线；异形为水渍状。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("静态形状预览", style = LocalAppTokens.current.type.titleS)
+            Text("圆形：直径 / 半径；正方形：边长 / 对角线；长方形无对角线；异形为水渍状。", style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.textMuted)
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -82,7 +83,7 @@ internal fun CrossSectionUiTestScreen(onBack: () -> Unit, modifier: Modifier = M
 
             HorizontalDivider()
 
-            Text("形状切换器", style = MaterialTheme.typography.titleMedium)
+            Text("形状切换器", style = LocalAppTokens.current.type.titleS)
             CrossSectionShapeSelector(
                 selected = profile.points.last().shape.kind,
                 onSelected = {},
@@ -97,14 +98,14 @@ internal fun CrossSectionUiTestScreen(onBack: () -> Unit, modifier: Modifier = M
 
             HorizontalDivider()
 
-            Text("序列化 JSON（实时）", style = MaterialTheme.typography.titleMedium)
+            Text("序列化 JSON（实时）", style = LocalAppTokens.current.type.titleS)
             Text(
                 text = jsonText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.bodyS,
+                color = LocalAppTokens.current.colors.textMuted,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                    .background(LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.3f))
                     .padding(8.dp),
             )
         }

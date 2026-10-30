@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +53,10 @@ import com.woshiwangnima.healthdietpro.common.ui.ComposeDateTimePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppPillIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartEvent
@@ -171,7 +173,7 @@ private fun BloodPressureHomeScreen(
         includeNavigationBarPadding = false,
         actions = { IconButton(onClick = onOpenReference) { Icon(painterResource(R.drawable.ic_help), contentDescription = stringResource(R.string.blood_pressure_reference_title)) } },
     ) { padding ->
-        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
+        Column(Modifier.fillMaxSize().background(LocalAppTokens.current.colors.bg).padding(padding)) {
             AnimatedPageContent(selectedTab, Modifier.weight(1f), direction = { initial, target -> target - initial }) { tab ->
                 if (tab == 0) BloodPressureChart(records, chartState, chartStateKey, onChartStateChanged)
                 else BloodPressureDataContent(records, onAdd, onEdit, onDelete)
@@ -190,13 +192,20 @@ private fun BloodPressureDataContent(
     val context = androidx.compose.ui.platform.LocalContext.current
     val unitId = AppPrefs.getUnit(context, UnitCategoryType.Pressure.id, UnitCategoryType.Pressure.defaultUnitId)
     val unit = pressureUnitOptions().firstOrNull { it.id == unitId }?.label ?: unitId
-    Column(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    val tokens = LocalAppTokens.current
+    Column(Modifier.fillMaxSize().padding(tokens.spacing.s3), verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(stringResource(R.string.body_record_count, records.size), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.body_record_count, records.size), style = LocalAppTokens.current.type.titleS)
                 AppIconTextButton(stringResource(R.string.body_record_add), R.drawable.ic_add, onAdd)
             }
-            if (records.isEmpty()) Text(stringResource(R.string.blood_pressure_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            else AppDataTable(
+            if (records.isEmpty()) {
+                AppEmptyState(
+                    title = stringResource(R.string.record_no_data),
+                    description = stringResource(R.string.blood_pressure_empty),
+                    iconRes = R.drawable.ic_blood_pressure,
+                    action = { AppPillIconTextButton(stringResource(R.string.body_record_add), onAdd, iconRes = R.drawable.ic_add) },
+                )
+            } else AppDataTable(
                 rows = records,
                 rowKey = { _, record -> record.id },
                 columns = listOf(
@@ -272,12 +281,17 @@ private fun BloodPressureChart(
 @Composable
 private fun BloodPressureReferenceScreen(onBack: () -> Unit) {
     val rows = bloodPressureClassificationRules.reversed()
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.blood_pressure_reference_title), onBack = onBack) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(
+            Modifier.fillMaxSize().padding(padding),
+            contentPadding = PaddingValues(tokens.spacing.page),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
+        ) {
             item { AppFormSubtitle(stringResource(R.string.blood_pressure_reference_disclaimer)) }
             item {
-                Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
+                AppSectionGroup {
+                    Column(Modifier.padding(vertical = tokens.spacing.s1)) {
                         BloodPressureReferenceRow(stringResource(R.string.blood_pressure_category), stringResource(R.string.blood_pressure_reference_standard), header = true)
                         rows.forEach { rule ->
                             BloodPressureReferenceRow(
@@ -319,9 +333,14 @@ private fun Float.formatPressureThreshold(): String = "%.0f".format(this)
 
 @Composable
 private fun BloodPressureReferenceRow(label: String, standard: String, background: Color = Color.Transparent, header: Boolean = false) {
-    Row(Modifier.fillMaxWidth().background(background).padding(horizontal = 8.dp, vertical = 10.dp)) {
-        Text(label, style = if (header) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-        Text(standard, style = if (header) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1.5f))
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(background)
+            .padding(horizontal = LocalAppTokens.current.spacing.s3, vertical = LocalAppTokens.current.spacing.s2),
+    ) {
+        Text(label, style = if (header) LocalAppTokens.current.type.bodyS else LocalAppTokens.current.type.body, modifier = Modifier.weight(1f))
+        Text(standard, style = if (header) LocalAppTokens.current.type.bodyS else LocalAppTokens.current.type.body, modifier = Modifier.weight(1.5f))
     }
 }
 
@@ -347,7 +366,7 @@ private fun BloodPressureEditorScreen(record: BloodPressureRecord?, onBack: () -
                 item { EditorTextField(label = stringResource(R.string.blood_pressure_diastolic), value = diastolic, onValueChange = { diastolic = it }, required = true, numeric = true, suffix = { Text(unit) }, supportingTextOverride = if (!valid && systolic.isNotBlank() && diastolic.isNotBlank()) ({ Text(stringResource(R.string.blood_pressure_values_invalid)) }) else null) }
                 if (valid && systolicBase != null && diastolicBase != null) item {
                     val pulsePressure = systolicBase - diastolicBase
-                    Text(stringResource(R.string.blood_pressure_pulse_pressure_value, pressureValue(pulsePressure, unitId), unit), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.blood_pressure_pulse_pressure_value, pressureValue(pulsePressure, unitId), unit), style = LocalAppTokens.current.type.titleS)
                     val category = bloodPressureCategory(systolicBase, diastolicBase)
                     Text(stringResource(category.labelRes()), color = category.color())
                 }

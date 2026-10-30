@@ -420,7 +420,7 @@
     <string name="record_action_heart_rate">Log Heart Rate</string>
     <string name="record_action_temperature">Log Temperature</string>
     <string name="record_action_height">Log Height</string>
-    <string name="record_search">Search record functions</string>
+    <string name="record_search">Search record functions (fuzzy matching)</string>
     <string name="record_search_submit">Search records</string>
     <string name="record_section_expand">Expand</string>
     <string name="record_section_collapse">Collapse</string>
@@ -696,6 +696,7 @@
     <string name="record_search_alias_circumference">Waist, thigh, calf, hip, chest, upper arm</string>
     <string name="record_search_alias_container">cup, bowl, plate, bottle, jar, household container</string>
     <string name="circumference_title">Body circumference</string>
+    <string name="circumference_pick_hint">Choose which measurement to record. Each metric keeps its own history and chart.</string>
     <string name="circumference_waist">Waist</string>
     <string name="circumference_thigh">Thigh</string>
     <string name="circumference_calf">Calf</string>
@@ -966,6 +967,7 @@
     <string name="medication_catalog_delete_confirm_message">Delete “%1$s” from the medicine catalog? Existing medication records are retained.</string>
     <!-- Body records -->
     <string name="body_record_count">%1$d records</string>
+    <string name="body_record_empty_hint">Body records will show up here once you add one.</string>
     <string name="body_record_add">Add Record</string>
     <string name="body_record_date">Date</string>
     <string name="body_record_time">Time</string>
@@ -1099,20 +1101,13 @@
     <string name="compose_theme_preview_title">Compose Theme Preview</string>
     <string name="compose_theme_preview_body">Material 3 theme enabled</string>
     <string name="compose_theme_preview_open_settings">Open App Settings</string>
-    <string name="compose_components_preview_title">Common Components Preview</string>
+    <string name="compose_components_preview_title">Design Tokens</string>
     <string name="compose_components_preview_open">Open Common Components Preview</string>
-    <string name="compose_font_scale_section">Font Scale Slider</string>
-    <string name="compose_confirm_dialog_section">Confirm Dialog</string>
-    <string name="compose_show_confirm_dialog">Show Confirm Dialog</string>
-    <string name="compose_confirm_dialog_title">Confirm Action</string>
-    <string name="compose_confirm_dialog_message">This is a common confirm dialog component, used for destructive action secondary confirmation.</string>
     <string name="compose_confirm_dialog_ok">Confirm</string>
     <string name="compose_confirm_dialog_cancel">Cancel</string>
     <string name="compose_date_time_picker_select_time">Select time</string>
     <string name="compose_date_picker_select_date">Select date</string>
     <string name="compose_date_picker_select_year">Select year</string>
-    <string name="compose_text_overflow_section">Text Overflow</string>
-    <string name="compose_chart_section">Compose Charts</string>
     <string name="compose_chart_time_value_demo">Time-value chart</string>
     <string name="compose_chart_numeric_xy_demo">Numeric XY chart</string>
     <string name="compose_chart_category_demo">Category X chart</string>
@@ -1198,7 +1193,6 @@
     <string name="text_overflow_marquee">Marquee Mode</string>
     <string name="text_overflow_marquee_desc">Scroll overflow horizontally</string>
     <string name="text_overflow_marquee_speed">Marquee Speed</string>
-    <string name="text_overflow_marquee_speed_desc">ms/char, range 50-2000</string>
     <string name="text_overflow_marquee_iterations">Marquee repeat count</string>
     <string name="text_overflow_marquee_iterations_hint">0 means repeat indefinitely.</string>
     <string name="text_overflow_marquee_iterations_minimum_hint">Minimum value: 0. 0 means repeat indefinitely.</string>
@@ -1435,7 +1429,8 @@
     <string name="container_title">Containers</string>
     <string name="container_add">Add container</string>
     <string name="container_edit">Edit container</string>
-    <string name="container_empty">No containers yet. Add one to record a household container.</string>
+    <string name="container_empty">No containers yet</string>
+    <string name="container_empty_hint">Add the cups, bowls and bottles you actually use, then pick them when recording a meal.</string>
     <string name="container_section_basic">Basic info</string>
     <string name="container_name">Name</string>
     <string name="container_category">Category</string>
@@ -1458,7 +1453,8 @@
     <string name="container_save">Save container</string>
     <string name="container_delete_confirm_title">Delete container?</string>
     <string name="container_delete_confirm_message">Delete “%1$s”?</string>
-    <string name="container_filter_empty">No containers match the current filters.</string>
+    <string name="container_filter_empty">No containers match</string>
+    <string name="container_filter_empty_hint">Try another category or scenario tag, or tag your containers in container settings.</string>
     <string name="container_settings_title">Container settings</string>
     <string name="container_system_categories">System categories</string>
     <string name="container_scenario_tags">Usage scenario tags</string>
@@ -1491,13 +1487,16 @@
     <string name="sleep_edit">Edit Sleep</string>
     <string name="sleep_delete">Delete sleep record</string>
     <string name="sleep_delete_message">Delete the sleep record from %1$s?</string>
-    <string name="sleep_empty">No sleep records yet. Add your first night sleep or nap.</string>
+    <string name="sleep_empty">No sleep records yet</string>
+    <string name="sleep_empty_hint">Add your first night sleep or nap, and it will show up here.</string>
     <string name="sleep_kind_title">Sleep type</string>
     <string name="sleep_kind_night">Night sleep</string>
     <string name="sleep_kind_nap">Nap</string>
     <string name="sleep_filter_all">All</string>
     <string name="sleep_ongoing">In progress</string>
     <string name="sleep_history">History</string>
+    <string name="sleep_time_section">Sleep and wake time</string>
+    <string name="sleep_timer_section">Timer</string>
     <string name="sleep_start_time">Sleep start</string>
     <string name="sleep_wake_time">Wake up</string>
     <string name="sleep_wake_time_empty">In progress (no wake time yet)</string>
@@ -1645,6 +1644,7 @@
     <string name="diet_settings_default_habits">Default eating habits</string>
     <string name="diet_settings_default_habits_description">Set the default meal duration and record timing for each meal period.</string>
     <string name="diet_settings_default_duration">Default duration</string>
+    <string name="diet_settings_default_duration_description">Duration filled in automatically for a new meal in this period; changing the unit converts the value.</string>
     <string name="diet_settings_default_duration_value">Duration</string>
     <string name="diet_settings_duration_unit">Unit</string>
     <string name="diet_settings_record_timing">Record timing</string>

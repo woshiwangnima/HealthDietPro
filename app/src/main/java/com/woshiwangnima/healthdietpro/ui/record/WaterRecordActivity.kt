@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -66,11 +68,16 @@ import com.woshiwangnima.healthdietpro.common.ui.DiscardChangesDialog
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppPillIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRowDivider
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.ui.InlineTooltip
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter
-import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.ui.WaterGlassProgress
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputRange
 import com.woshiwangnima.healthdietpro.common.ui.formatDateTime
@@ -150,7 +157,7 @@ private fun WaterRecordRoute(onFinish: () -> Unit, openEditorInitially: Boolean)
 private fun WaterHomeScreen(records: List<WaterRecord>, beverages: List<Beverage>, activityLevel: ActivityLevel, selectedTab: Int, onTabSelected: (Int) -> Unit, onAdd: () -> Unit, onSettings: () -> Unit, onDelete: (String) -> Unit, onEdit: (WaterRecord) -> Unit, onBack: () -> Unit) {
     val tabs = remember { listOf(DetailTabItem("statistics", R.string.water_tab_statistics, R.drawable.ic_chart), DetailTabItem("data", R.string.water_tab_data, R.drawable.ic_list)) }
     BaseScreen(title = stringResource(R.string.water_title), onBack = onBack, includeNavigationBarPadding = false, actions = { IconButton(onClick = onSettings) { Icon(painterResource(R.drawable.ic_settings), stringResource(R.string.water_settings_title)) } }) { padding ->
-        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
+        Column(Modifier.fillMaxSize().background(LocalAppTokens.current.colors.bg).padding(padding)) {
             AnimatedPageContent(selectedTab, Modifier.weight(1f), direction = { initial, target -> target - initial }) { tab ->
                 if (tab == 0) WaterStatisticsPage(records, beverages, activityLevel) else WaterDataPage(records, onAdd, onEdit, onDelete)
             }
@@ -172,7 +179,7 @@ private fun WaterStatisticsPage(records: List<WaterRecord>, beverages: List<Beve
     val remaining = (recommendation - todayActualWater).coerceAtLeast(0.0)
     var rangeSelection by remember { mutableStateOf<RecordTimeRangeSelection>(RecordTimeRangeSelection.Preset(RecordTimeRangePreset.LAST_7_DAYS)) }
     val rangeRecords = remember(records, rangeSelection) { records.filter { rangeSelection.resolve(System.currentTimeMillis()).contains(it.timestamp) } }
-    val palette = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary, androidx.compose.ui.graphics.Color(0xFF039BE5), androidx.compose.ui.graphics.Color(0xFFF9A825), androidx.compose.ui.graphics.Color(0xFF8E24AA), androidx.compose.ui.graphics.Color(0xFF00897B))
+    val palette = listOf(LocalAppTokens.current.colors.primary, LocalAppTokens.current.colors.textMuted, androidx.compose.ui.graphics.Color(0xFF039BE5), androidx.compose.ui.graphics.Color(0xFFF9A825), androidx.compose.ui.graphics.Color(0xFF8E24AA), androidx.compose.ui.graphics.Color(0xFF00897B))
     val rows = remember(rangeRecords, beverageById, palette) {
         rangeRecords.groupBy { it.beverageId }.map { (id, items) ->
             WaterCompositionRow(
@@ -206,13 +213,13 @@ private fun WaterStatisticsPage(records: List<WaterRecord>, beverages: List<Beve
             }
         }
         item { WaterGlassProgress((todayActualWater / recommendation).toFloat(), formatMl(todayActualWater), stringResource(R.string.water_statistics_progress, (todayActualWater / recommendation * 100).toInt())) }
-        item { Text(stringResource(R.string.water_statistics_breakdown), modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium) }
+        item { Text(stringResource(R.string.water_statistics_breakdown), modifier = Modifier.fillMaxWidth(), style = LocalAppTokens.current.type.titleS) }
         item { RecordTimeRangeFilter(rangeSelection, { rangeSelection = it }) }
         item { AnimatedDonutChart(segments, formatMl(totalActualWater), stringResource(R.string.water_statistics_actual_water), Modifier.fillMaxWidth(), showLegend = false) }
         if (rows.isNotEmpty()) {
             item { WaterCompositionTable(rows, totalActualWater) }
         } else {
-            item { Text(stringResource(R.string.water_statistics_empty), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            item { Text(stringResource(R.string.water_statistics_empty), color = LocalAppTokens.current.colors.textMuted) }
         }
         item {
             WaterTrendChart(
@@ -237,8 +244,8 @@ private fun WaterRecord.actualWaterMl(beverage: Beverage?): Double? {
 @Composable
 private fun WaterStatAmount(label: String, value: String) {
     Column {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, style = MaterialTheme.typography.titleMedium)
+        Text(label, style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.textMuted)
+        Text(value, style = LocalAppTokens.current.type.titleS)
     }
 }
 
@@ -254,7 +261,7 @@ private fun BeverageNameCell(name: String, color: androidx.compose.ui.graphics.C
 private fun WaterCompositionTable(rows: List<WaterCompositionRow>, totalActualWater: Double) {
     val totalVolume = rows.sumOf(WaterCompositionRow::beverageVolumeMl)
     androidx.compose.material3.Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .32f),
+        color = LocalAppTokens.current.colors.panelRaised.copy(alpha = .32f),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -281,7 +288,7 @@ private fun WaterCompositionTable(rows: List<WaterCompositionRow>, totalActualWa
 
 @Composable
 private fun WaterCompositionTableRow(beverage: String, amount: String, percent: String, color: androidx.compose.ui.graphics.Color? = null, header: Boolean = false) {
-    val style = if (header) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodySmall
+    val style = if (header) LocalAppTokens.current.type.caption else LocalAppTokens.current.type.bodyS
     Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
         Row(Modifier.weight(1.15f), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             if (color != null) androidx.compose.foundation.Canvas(Modifier.size(10.dp)) { drawCircle(color) }
@@ -343,7 +350,7 @@ private fun WaterTrendChart(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(R.string.water_statistics_trend), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.water_statistics_trend), style = LocalAppTokens.current.type.titleS)
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
             listOf(7, 30).forEachIndexed { index, optionDays ->
                 SegmentedButton(
@@ -365,22 +372,22 @@ private fun WaterTrendChart(
                 DateStackedBarReferenceLine(
                     value = average,
                     label = stringResource(R.string.water_statistics_average, formatMl(average)),
-                    color = MaterialTheme.colorScheme.tertiary,
+                    color = LocalAppTokens.current.colors.warning,
                 )
             },
         )
         selectedEntry?.let { entry ->
             val total = entry.segments.sumOf(DateStackedBarSegment::value)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(stringResource(R.string.water_statistics_selected_day, entry.label, formatMl(total)), style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.water_statistics_selected_day, entry.label, formatMl(total)), style = LocalAppTokens.current.type.titleS)
                 if (entry.segments.isEmpty()) {
-                    Text(stringResource(R.string.water_statistics_selected_day_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.water_statistics_selected_day_empty), color = LocalAppTokens.current.colors.textMuted)
                 } else {
                     entry.segments.forEach { segment ->
                         val name = beverageById[segment.id]?.name ?: segment.id
                         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                             androidx.compose.foundation.Canvas(Modifier.size(10.dp)) { drawCircle(segment.color) }
-                            Text("$name ${formatMl(segment.value)}", modifier = Modifier.padding(start = 6.dp), style = MaterialTheme.typography.bodySmall)
+                            Text("$name ${formatMl(segment.value)}", modifier = Modifier.padding(start = 6.dp), style = LocalAppTokens.current.type.bodyS)
                         }
                     }
                 }
@@ -418,8 +425,14 @@ private fun WaterDataPage(records: List<WaterRecord>, onAdd: () -> Unit, onEdit:
     Column(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { AppIconTextButton(stringResource(R.string.water_add), R.drawable.ic_add, onAdd) }
         RecordTimeRangeFilter(rangeSelection, { rangeSelection = it })
-        if (filtered.isEmpty()) Text(stringResource(R.string.water_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        else AppDataTable(rows = filtered, rowKey = { _, item -> item.id }, modifier = Modifier.weight(1f), columns = listOf(
+        if (filtered.isEmpty()) {
+            AppEmptyState(
+                title = stringResource(R.string.record_no_data),
+                description = stringResource(R.string.water_empty),
+                iconRes = R.drawable.ic_volume,
+                action = { AppPillIconTextButton(stringResource(R.string.water_add), onAdd, iconRes = R.drawable.ic_add) },
+            )
+        } else AppDataTable(rows = filtered, rowKey = { _, item -> item.id }, modifier = Modifier.weight(1f), columns = listOf(
             AppDataTableColumn("time", { AppDataTableHeaderText(stringResource(R.string.water_time)) }, ColumnWidth.Fixed(150.dp)) { AppDataTableText(formatDateTime(it.timestamp)) },
             AppDataTableColumn("beverage", { AppDataTableHeaderText(stringResource(R.string.water_beverage)) }, ColumnWidth.Flex(1f, 140.dp)) { AppDataTableText(it.beverageName) },
             AppDataTableColumn("volume", { AppDataTableHeaderText(stringResource(R.string.water_volume)) }, ColumnWidth.Fixed(108.dp)) { AppDataTableText(formatMl(it.volumeMl)) },
@@ -485,12 +498,49 @@ private fun WaterEditorScreen(record: WaterRecord?, beverages: List<Beverage>, q
 
 @Composable
 private fun WaterSettingsScreen(onBack: () -> Unit, onRecommendation: () -> Unit, onHydration: () -> Unit, onQuickRecords: () -> Unit) {
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.water_settings_title), onBack = onBack) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(vertical = 8.dp)) {
-            item { SettingRow(stringResource(R.string.water_reminder), stringResource(R.string.water_reminder_unavailable), R.drawable.ic_notification, onClick = {}, clickable = false) }
-            item { SettingRow(stringResource(R.string.water_recommendation), stringResource(R.string.water_recommendation_description), R.drawable.ic_volume, onRecommendation) }
-            item { SettingRow(stringResource(R.string.water_hydration_title), stringResource(R.string.water_hydration_description), R.drawable.ic_info, onHydration) }
-            item { SettingRow(stringResource(R.string.water_quick_records), stringResource(R.string.water_quick_records_description), R.drawable.ic_edit, onQuickRecords) }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s4),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
+        ) {
+            AppSectionGroup {
+                // 提醒功能还没接：不能只靠变淡表达，必须在行里说清为什么点不了（§5 状态矩阵）。
+                AppListRow(
+                    title = stringResource(R.string.water_reminder),
+                    subtitle = stringResource(R.string.water_reminder_unavailable),
+                    iconRes = R.drawable.ic_notification,
+                    enabled = false,
+                )
+                AppListRowDivider()
+                AppListRow(
+                    title = stringResource(R.string.water_recommendation),
+                    tooltip = stringResource(R.string.water_recommendation_description),
+                    iconRes = R.drawable.ic_volume,
+                    showChevron = true,
+                    onClick = onRecommendation,
+                )
+                AppListRowDivider()
+                AppListRow(
+                    title = stringResource(R.string.water_hydration_title),
+                    tooltip = stringResource(R.string.water_hydration_description),
+                    iconRes = R.drawable.ic_info,
+                    showChevron = true,
+                    onClick = onHydration,
+                )
+                AppListRowDivider()
+                AppListRow(
+                    title = stringResource(R.string.water_quick_records),
+                    tooltip = stringResource(R.string.water_quick_records_description),
+                    iconRes = R.drawable.ic_edit,
+                    showChevron = true,
+                    onClick = onQuickRecords,
+                )
+            }
         }
     }
 }
@@ -509,8 +559,8 @@ private fun WaterRecommendationScreen(level: ActivityLevel, onBack: () -> Unit, 
                 onSelect = { onLevelChanged(ActivityLevel.valueOf(it.id)) },
                 showOptionDividers = true,
             )
-            Text(stringResource(R.string.water_recommended_amount, recommended), style = MaterialTheme.typography.titleLarge)
-            Text(stringResource(R.string.water_recommendation_basis), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.water_recommended_amount, recommended), style = LocalAppTokens.current.type.title)
+            Text(stringResource(R.string.water_recommendation_basis), style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.textMuted)
         }
     }
 }
@@ -548,10 +598,10 @@ private fun QuickRecordSettingsScreen(
         Column(Modifier.fillMaxSize().padding(padding)) {
             Column(Modifier.weight(1f).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(stringResource(R.string.water_quick_records_hint), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.water_quick_records_hint), modifier = Modifier.weight(1f), style = LocalAppTokens.current.type.body, color = LocalAppTokens.current.colors.textMuted)
                     AppIconTextButton(stringResource(R.string.water_quick_add), R.drawable.ic_add, onAdd)
                 }
-                if (orderedQuickRecords.isEmpty()) Text(stringResource(R.string.water_quick_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (orderedQuickRecords.isEmpty()) Text(stringResource(R.string.water_quick_empty), color = LocalAppTokens.current.colors.textMuted)
                 else AppDataTable(
                     rows = orderedQuickRecords,
                      rowKey = { _, item -> item.id },
@@ -598,7 +648,7 @@ private fun QuickRecordEditorScreen(beverages: List<Beverage>, quickRecord: Wate
         Column(Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item { AppDropdownField(stringResource(R.string.water_beverage), selected?.name.orEmpty(), beverages.map { AppDropdownOption(it.id, it.name) }, { beverageId = it.id }) }
-                item { EditorTextField(stringResource(R.string.water_quick_record_name_suffix), beverageNameSuffix, { beverageNameSuffix = it }, supportingTextOverride = { Text(stringResource(R.string.water_quick_record_name_suffix_hint), color = MaterialTheme.colorScheme.onSurfaceVariant) }) }
+                item { EditorTextField(stringResource(R.string.water_quick_record_name_suffix), beverageNameSuffix, { beverageNameSuffix = it }, supportingTextOverride = { Text(stringResource(R.string.water_quick_record_name_suffix_hint), color = LocalAppTokens.current.colors.textMuted) }) }
                 item { EditorTextField(stringResource(R.string.water_volume), volume, { volume = it }, required = true, numeric = true, range = NumericInputRange(minimum = 0.001)) }
                 item { AppDropdownField(stringResource(R.string.water_unit), unit.name.lowercase(), WaterVolumeUnit.entries.map { AppDropdownOption(it.name, it.name.lowercase()) }, { unit = WaterVolumeUnit.valueOf(it.id) }) }
             }

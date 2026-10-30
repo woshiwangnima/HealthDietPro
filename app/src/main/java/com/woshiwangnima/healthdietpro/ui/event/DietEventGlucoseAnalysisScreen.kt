@@ -42,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.range.UnitRange
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
@@ -129,8 +130,8 @@ private fun DietAnalysisHeader(
         ) {
             TextOverflowText(
                 text = formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.caption,
+                color = LocalAppTokens.current.colors.textMuted,
                 maxLines = 2,
                 overflowMode = "ellipsis",
                 modifier = Modifier.fillMaxWidth(),
@@ -144,8 +145,8 @@ private fun DietAnalysisHeader(
                 ) {
                     TextOverflowText(
                         text = stringResource(record.mealPeriod.displayRes()),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        style = LocalAppTokens.current.type.title,
+                        color = LocalAppTokens.current.colors.text,
                         maxLines = 2,
                         overflowMode = "ellipsis",
                         modifier = Modifier.weight(1f),
@@ -154,7 +155,7 @@ private fun DietAnalysisHeader(
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowDown,
                             contentDescription = stringResource(R.string.diet_event_analysis_meal_selector),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = LocalAppTokens.current.colors.textMuted,
                         )
                     }
                 }
@@ -168,7 +169,7 @@ private fun DietAnalysisHeader(
                                         stringResource(candidate.mealPeriod.displayRes()),
                                         formatRecordClock(candidate.mealStartAt).take(5),
                                     ),
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = LocalAppTokens.current.type.body,
                                     overflowMode = "ellipsis",
                                 )
                             },
@@ -243,15 +244,15 @@ private fun DietEventMetricCard(
     modifier: Modifier = Modifier,
 ) {
     val containerColor = if (important) {
-        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.72f)
+        LocalAppTokens.current.colors.primaryContainer.copy(alpha = 0.72f)
     } else {
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f)
+        LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.36f)
     }
-    val contentColor = if (important) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
+    val contentColor = if (important) LocalAppTokens.current.colors.onPrimaryContainer else LocalAppTokens.current.colors.text
     val secondaryContentColor = if (important) {
-        MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.72f)
+        LocalAppTokens.current.colors.onPrimaryContainer.copy(alpha = 0.72f)
     } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
+        LocalAppTokens.current.colors.textMuted
     }
     Card(
         modifier = modifier.height(if (compact) 72.dp else 96.dp),
@@ -264,7 +265,7 @@ private fun DietEventMetricCard(
         ) {
             TextOverflowText(
                 text = label,
-                style = MaterialTheme.typography.labelSmall,
+                style = LocalAppTokens.current.type.caption,
                 color = secondaryContentColor,
                 maxLines = 2,
                 overflowMode = "ellipsis",
@@ -272,11 +273,11 @@ private fun DietEventMetricCard(
             )
             TextOverflowText(
                 text = value,
-                style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
+                style = if (compact) LocalAppTokens.current.type.titleS else LocalAppTokens.current.type.title,
                 color = contentColor,
                 modifier = Modifier.fillMaxWidth(),
             )
-            TextOverflowText(footer, style = MaterialTheme.typography.labelSmall, color = secondaryContentColor, modifier = Modifier.fillMaxWidth())
+            TextOverflowText(footer, style = LocalAppTokens.current.type.caption, color = secondaryContentColor, modifier = Modifier.fillMaxWidth())
         }
     }
 }
@@ -333,11 +334,11 @@ private fun DietEventGlucoseChart(
     unitLabel: String,
     targetRange: UnitRange<Float>,
 ) {
-    val axisColor = MaterialTheme.colorScheme.onSurfaceVariant
-    val gridColor = MaterialTheme.colorScheme.outlineVariant
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val targetColor = MaterialTheme.colorScheme.secondaryContainer
-    val surfaceColor = MaterialTheme.colorScheme.surface
+    val axisColor = LocalAppTokens.current.colors.textMuted
+    val gridColor = LocalAppTokens.current.colors.border
+    val primaryColor = LocalAppTokens.current.colors.primary
+    val targetColor = LocalAppTokens.current.colors.primaryContainer
+    val surfaceColor = LocalAppTokens.current.colors.panel
     val axisLabels = listOf(
         stringResource(R.string.diet_event_analysis_axis_before_meal),
         stringResource(R.string.diet_event_analysis_axis_meal_time, formatRecordClock(mealStartAt).take(5)),
@@ -380,8 +381,8 @@ private fun DietEventGlucoseChart(
                                 formatGlucoseValue(selected.record.valueMmolPerL, unitId),
                                 unitLabel,
                             ),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            style = LocalAppTokens.current.type.caption,
+                            color = LocalAppTokens.current.colors.text,
                             maxLines = 2,
                             overflowMode = "ellipsis",
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
@@ -393,8 +394,8 @@ private fun DietEventGlucoseChart(
                 axisLabels.forEach { label ->
                     TextOverflowText(
                         text = label,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalAppTokens.current.type.caption,
+                        color = LocalAppTokens.current.colors.textMuted,
                         maxLines = 2,
                         textAlign = TextAlign.Center,
                         overflowMode = "ellipsis",

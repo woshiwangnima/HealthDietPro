@@ -3,6 +3,8 @@ package com.woshiwangnima.healthdietpro.ui.event
 import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,6 +33,10 @@ import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.ActionGridItem
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimeRangeFilter
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.rememberAppDarkTheme
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.diet.DietRepository
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
@@ -131,26 +138,53 @@ internal fun EventScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    // 事件页挂在 MainActivity 的页签里，全局主题仍是旧的 HealthDietProTheme，因此在屏内自套一层令牌主题。
+    AppTheme(darkTheme = rememberAppDarkTheme()) {
+        EventContent(
+            uiState = uiState,
+            onSelectTab = viewModel::selectTab,
+            onMedicationRange = viewModel::setMedicationTimeRangeSelection,
+            onDietRange = viewModel::setDietTimeRangeSelection,
+            onSleepRange = viewModel::setSleepTimeRangeSelection,
+            onOpenDietAnalysis = onOpenDietAnalysis,
+            onOpenSleepAnalysis = onOpenSleepAnalysis,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun EventContent(
+    uiState: EventUiState,
+    onSelectTab: (EventTab) -> Unit,
+    onMedicationRange: (RecordTimeRangeSelection) -> Unit,
+    onDietRange: (RecordTimeRangeSelection) -> Unit,
+    onSleepRange: (RecordTimeRangeSelection) -> Unit,
+    onOpenDietAnalysis: (DietRecord) -> Unit,
+    onOpenSleepAnalysis: (SleepRecord) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val tokens = LocalAppTokens.current
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().background(tokens.colors.bg),
     ) {
         EqualWidthSegmentedTabs(
             tabs = EventTab.entries.map { tab -> EqualWidthTab(tab.titleRes, tab.iconRes) },
             selectedIndex = uiState.selectedTab.ordinal,
-            onSelected = { viewModel.selectTab(EventTab.entries[it]) },
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            onSelected = { onSelectTab(EventTab.entries[it]) },
+            modifier = Modifier.padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s2),
         )
         when (uiState.selectedTab) {
             EventTab.Medication -> MedicationRecordsPage(
                 records = uiState.medicationRecords,
                 timeRangeSelection = uiState.medicationTimeRangeSelection,
-                onTimeRangeSelectionChanged = viewModel::setMedicationTimeRangeSelection,
+                onTimeRangeSelectionChanged = onMedicationRange,
                 editable = false,
             )
             EventTab.Diet -> EventReadOnlyRecordsPage(
                 records = uiState.dietRecords,
                 timeRangeSelection = uiState.dietTimeRangeSelection,
-                onTimeRangeSelectionChanged = viewModel::setDietTimeRangeSelection,
+                onTimeRangeSelectionChanged = onDietRange,
                 timestamp = DietRecord::mealStartAt,
                 key = DietRecord::id,
             ) { record ->
@@ -159,7 +193,7 @@ internal fun EventScreen(
             EventTab.Sleep -> EventReadOnlyRecordsPage(
                 records = uiState.sleepRecords,
                 timeRangeSelection = uiState.sleepTimeRangeSelection,
-                onTimeRangeSelectionChanged = viewModel::setSleepTimeRangeSelection,
+                onTimeRangeSelectionChanged = onSleepRange,
                 timestamp = SleepRecord::sleepStartAt,
                 key = SleepRecord::id,
             ) { record ->
@@ -192,20 +226,26 @@ private fun <T> EventReadOnlyRecordsPage(
     val grouped = remember(filtered) {
         filtered.groupBy { record -> Instant.ofEpochMilli(timestamp(record)).atZone(ZoneId.systemDefault()).toLocalDate() }
     }
+    val tokens = LocalAppTokens.current
     Column(
-        modifier = Modifier.fillMaxSize().padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s3),
+        verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
     ) {
         RecordTimeRangeFilter(selection = timeRangeSelection, onSelectionChanged = onTimeRangeSelectionChanged)
         if (filtered.isEmpty()) {
+            // 空态紧跟时间范围筛选，用一行居中说明即可；再套一张插图卡片会比上面的筛选条还重。
             Text(
                 text = stringResource(R.string.common_empty_records),
-                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
+                modifier = Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s5),
             )
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
             ) {
                 grouped.forEach { (date, dateRecords) ->
                     item(key = "date_$date") { EventDateHeader(date) }
@@ -218,11 +258,12 @@ private fun <T> EventReadOnlyRecordsPage(
 
 @Composable
 private fun EventDateHeader(date: LocalDate) {
+    val tokens = LocalAppTokens.current
     Text(
         text = date.toString(),
-        style = androidx.compose.material3.MaterialTheme.typography.titleSmall,
-        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(top = 4.dp),
+        style = tokens.type.bodyS,
+        color = tokens.colors.textMuted,
+        modifier = Modifier.padding(top = tokens.spacing.s2, start = tokens.spacing.s1),
     )
 }
 
@@ -240,19 +281,39 @@ internal fun EventInfoScreen(
     onOpenRecordAction: (RecordActionId) -> Unit,
 ) {
     androidx.activity.compose.BackHandler(onBack = onBack)
+    AppTheme(darkTheme = rememberAppDarkTheme()) {
+        baseScreenEventInfo(onBack, onOpenRecordAction)
+    }
+}
+
+@Composable
+private fun baseScreenEventInfo(
+    onBack: () -> Unit,
+    onOpenRecordAction: (RecordActionId) -> Unit,
+) {
+    val tokens = LocalAppTokens.current
     com.woshiwangnima.healthdietpro.common.ui.BaseScreen(
         title = stringResource(R.string.blood_glucose_events_info_title),
         onBack = onBack,
         includeNavigationBarPadding = false,
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(tokens.colors.bg)
+                .padding(padding)
+                .padding(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
         ) {
             Text(
                 text = stringResource(R.string.blood_glucose_events_info_description),
-                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
             )
             EventTab.entries.forEach { tab ->
                 val action = when (tab) {
@@ -276,14 +337,14 @@ internal fun EventInfoScreen(
 
 @Composable
 private fun EventUnavailablePage() {
-    Column(
-        modifier = Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background).padding(24.dp),
-        verticalArrangement = Arrangement.Center,
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = stringResource(R.string.event_unavailable),
-            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+        AppEmptyState(
+            title = stringResource(R.string.event_tab_exercise),
+            description = stringResource(R.string.event_unavailable),
+            iconRes = R.drawable.ic_exercise,
         )
     }
 }

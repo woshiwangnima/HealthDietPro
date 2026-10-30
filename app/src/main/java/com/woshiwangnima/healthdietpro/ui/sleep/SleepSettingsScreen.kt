@@ -8,17 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,27 +24,52 @@ import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
+import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
+import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
+import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.NumericInputRange
-import com.woshiwangnima.healthdietpro.common.ui.SettingRadioRow
-import com.woshiwangnima.healthdietpro.common.ui.SettingRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppRadioRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.sleep.SleepKind
 import com.woshiwangnima.healthdietpro.model.sleep.SleepPrefs
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRecordTiming
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 
+/**
+ * 睡眠设置首页：只有一条「默认时长」。
+ *
+ * 单行不值得为它起一张带标题的卡（§2.4 卡片标题），走无名分组卡 [AppSectionGroup]；
+ * 解释文案不常显在行下，改成长按该行弹出的 tooltip——设置项只留标题，列表因此保持一行一项的节奏。
+ */
 @Composable
 internal fun SleepSettingsScreen(
     onBack: () -> Unit,
     onDefaultDuration: () -> Unit,
 ) {
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.sleep_settings_title), onBack = onBack) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(vertical = 8.dp)) {
-            item {
-                SettingRow(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+        ) {
+            AppSectionGroup {
+                AppListRow(
                     title = stringResource(R.string.sleep_settings_default_duration),
-                    subtitle = stringResource(R.string.sleep_settings_default_duration_description),
-                    leadingIconRes = R.drawable.ic_sleep,
+                    tooltip = stringResource(R.string.sleep_settings_default_duration_description),
+                    iconRes = R.drawable.ic_sleep,
+                    showChevron = true,
                     onClick = onDefaultDuration,
                 )
             }
@@ -55,12 +77,20 @@ internal fun SleepSettingsScreen(
     }
 }
 
+/**
+ * 默认时长：夜间睡眠 / 小憩各一套「时长 + 单位 + 记录时机」。
+ *
+ * 三块语义分开装：类别是「切换」，用量一支分段控件置顶；数值与单位是「同一件事的两半」，
+ * 收在一张卡里同一行；记录时机是「二选一」，用单选行而不是分段控件——它不改下方内容，只存一个偏好。
+ * 「当前时间算入睡还是醒来」这句解释挂在卡标题上长按弹出，不再占卡内第一行。
+ */
 @Composable
 internal fun SleepDefaultDurationScreen(
     prefs: SleepPrefs,
     onBack: () -> Unit,
     onSave: (SleepPrefs) -> Unit,
 ) {
+    val tokens = LocalAppTokens.current
     var kind by rememberSaveable { mutableStateOf(SleepKind.NIGHT_SLEEP) }
     val isNight = kind == SleepKind.NIGHT_SLEEP
     val currentMinutes = if (isNight) prefs.nightDefaultMinutes else prefs.napDefaultMinutes
@@ -87,7 +117,7 @@ internal fun SleepDefaultDurationScreen(
             nightUnitId = if (isNight) unit else prefs.nightUnitId,
             napUnitId = if (isNight) prefs.napUnitId else unit,
             nightTiming = if (isNight) timing else prefs.nightTiming,
-            napTiming = if (isNight) prefs.napTiming else timing,
+            napTiming = if (isNight) timing else prefs.napTiming,
         )
         onSave(updated)
     }
@@ -96,88 +126,95 @@ internal fun SleepDefaultDurationScreen(
         Column(Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
             ) {
                 item {
-                    Text(stringResource(R.string.sleep_kind_title), style = MaterialTheme.typography.titleSmall)
-                    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                        SleepKind.entries.forEachIndexed { index, option ->
-                            SegmentedButton(
-                                selected = kind == option,
-                                onClick = {
-                                    kind = option
-                                    valueText = formatDurationInput(
-                                        if (option == SleepKind.NIGHT_SLEEP) prefs.nightDefaultMinutes else prefs.napDefaultMinutes,
-                                        if (option == SleepKind.NIGHT_SLEEP) prefs.nightUnitId else prefs.napUnitId,
-                                    )
-                                    unit = if (option == SleepKind.NIGHT_SLEEP) prefs.nightUnitId else prefs.napUnitId
-                                    timing = if (option == SleepKind.NIGHT_SLEEP) prefs.nightTiming else prefs.napTiming
+                    EqualWidthSegmentedTabs(
+                        tabs = listOf(
+                            EqualWidthTab.text(stringResource(SleepKind.NIGHT_SLEEP.labelRes())),
+                            EqualWidthTab.text(stringResource(SleepKind.NAP.labelRes())),
+                        ),
+                        selectedIndex = if (isNight) 0 else 1,
+                        onSelected = { index ->
+                            val option = if (index == 0) SleepKind.NIGHT_SLEEP else SleepKind.NAP
+                            if (option == kind) return@EqualWidthSegmentedTabs
+                            kind = option
+                            valueText = formatDurationInput(
+                                if (option == SleepKind.NIGHT_SLEEP) prefs.nightDefaultMinutes else prefs.napDefaultMinutes,
+                                if (option == SleepKind.NIGHT_SLEEP) prefs.nightUnitId else prefs.napUnitId,
+                            )
+                            unit = if (option == SleepKind.NIGHT_SLEEP) prefs.nightUnitId else prefs.napUnitId
+                            timing = if (option == SleepKind.NIGHT_SLEEP) prefs.nightTiming else prefs.napTiming
+                        },
+                    )
+                }
+                item {
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_sleep,
+                        title = stringResource(
+                            if (isNight) {
+                                R.string.sleep_settings_default_duration_night
+                            } else {
+                                R.string.sleep_settings_default_duration_nap
+                            },
+                        ),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                            verticalAlignment = Alignment.Top,
+                        ) {
+                            EditorTextField(
+                                label = stringResource(R.string.sleep_settings_default_duration_value),
+                                value = valueText,
+                                onValueChange = { valueText = it },
+                                required = true,
+                                numeric = true,
+                                range = NumericInputRange(minimum = 0.001),
+                                modifier = Modifier.weight(1f),
+                            )
+                            AppDropdownField(
+                                label = stringResource(R.string.sleep_settings_duration_unit),
+                                value = durationUnitLabel(unit),
+                                options = durationUnitOptions(),
+                                onSelect = { option ->
+                                    val converted = value?.let { convertDurationValue(it, unit, option.id) }
+                                    unit = option.id
+                                    converted?.let { valueText = trimDurationValue(it) }
                                 },
-                                shape = SegmentedButtonDefaults.itemShape(index, SleepKind.entries.size),
-                                label = { Text(stringResource(option.labelRes())) },
+                                modifier = Modifier.weight(0.9f),
                             )
                         }
                     }
                 }
                 item {
-                    Text(
-                        stringResource(if (isNight) R.string.sleep_settings_default_duration_night else R.string.sleep_settings_default_duration_nap),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = androidx.compose.ui.Alignment.Top,
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_time,
+                        title = stringResource(R.string.sleep_settings_record_timing),
+                        tooltip = stringResource(R.string.sleep_settings_record_timing_description),
                     ) {
-                        EditorTextField(
-                            label = stringResource(R.string.sleep_settings_default_duration_value),
-                            value = valueText,
-                            onValueChange = { valueText = it },
-                            required = true,
-                            numeric = true,
-                            range = NumericInputRange(minimum = 0.001),
-                            modifier = Modifier.weight(1f),
+                        AppRadioRow(
+                            title = stringResource(R.string.sleep_settings_timing_before_sleep),
+                            selected = timing == SleepRecordTiming.BEFORE_SLEEP,
+                            horizontalPadding = 0.dp,
+                            onSelect = { timing = SleepRecordTiming.BEFORE_SLEEP },
                         )
-                        AppDropdownField(
-                            label = stringResource(R.string.sleep_settings_duration_unit),
-                            value = durationUnitLabel(unit),
-                            options = durationUnitOptions(),
-                            onSelect = { option ->
-                                val converted = value?.let { convertDurationValue(it, unit, option.id) }
-                                unit = option.id
-                                converted?.let { valueText = trimDurationValue(it) }
-                            },
-                            modifier = Modifier.weight(0.9f),
+                        AppRadioRow(
+                            title = stringResource(R.string.sleep_settings_timing_after_wake),
+                            selected = timing == SleepRecordTiming.AFTER_WAKE,
+                            horizontalPadding = 0.dp,
+                            onSelect = { timing = SleepRecordTiming.AFTER_WAKE },
                         )
                     }
                 }
-                item {
-                    Text(stringResource(R.string.sleep_settings_record_timing), style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        stringResource(R.string.sleep_settings_record_timing_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                item {
-                    SettingRadioRow(
-                        title = stringResource(R.string.sleep_settings_timing_before_sleep),
-                        subtitle = "",
-                        selected = timing == SleepRecordTiming.BEFORE_SLEEP,
-                        onClick = { timing = SleepRecordTiming.BEFORE_SLEEP },
-                    )
-                    SettingRadioRow(
-                        title = stringResource(R.string.sleep_settings_timing_after_wake),
-                        subtitle = "",
-                        selected = timing == SleepRecordTiming.AFTER_WAKE,
-                        onClick = { timing = SleepRecordTiming.AFTER_WAKE },
-                    )
-                }
             }
-            com.woshiwangnima.healthdietpro.common.ui.FormSaveBar(
+            FormSaveBar(
                 text = stringResource(R.string.sleep_settings_save),
                 enabled = saveEnabled,
                 onSave = ::save,

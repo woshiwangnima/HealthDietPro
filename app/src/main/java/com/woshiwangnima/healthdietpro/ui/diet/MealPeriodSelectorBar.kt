@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.model.diet.MealPeriod
@@ -41,14 +42,14 @@ internal fun MealPeriodSelectorBar(
         MealPeriod.entries.toList()
     }
     val labels = options.associateWith { option -> if (option == null) stringResource(R.string.diet_filter_all) else stringResource(option.displayRes()) }
-    Surface(modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.56f), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.72f))) {
+    Surface(modifier.fillMaxWidth(), color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.56f), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, LocalAppTokens.current.colors.border.copy(alpha = 0.72f))) {
         Row(Modifier.fillMaxWidth().padding(3.dp)) {
             options.forEachIndexed { index, option ->
                 val label = labels.getValue(option)
-                val selectedColor = if (selected == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                Column(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(if (selected == option) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else Color.Transparent).clickable { onPeriodSelected(option) }.padding(horizontal = 4.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                val selectedColor = if (selected == option) LocalAppTokens.current.colors.primary else LocalAppTokens.current.colors.textMuted
+                Column(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(if (selected == option) LocalAppTokens.current.colors.primary.copy(alpha = 0.18f) else Color.Transparent).clickable { onPeriodSelected(option) }.padding(horizontal = 4.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     if (option == null) Icon(painterResource(R.drawable.ic_diet), null, tint = selectedColor, modifier = Modifier.size(18.dp)) else MealPeriodIcon(option, Modifier.size(20.dp), selectedColor)
-                    TextOverflowText(label, Modifier.fillMaxWidth(), MaterialTheme.typography.labelSmall, selectedColor, textAlign = TextAlign.Center)
+                    TextOverflowText(label, Modifier.fillMaxWidth(), LocalAppTokens.current.type.caption, selectedColor, textAlign = TextAlign.Center)
                 }
             }
         }

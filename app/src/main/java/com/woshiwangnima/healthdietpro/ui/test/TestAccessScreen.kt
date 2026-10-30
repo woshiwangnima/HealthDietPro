@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 
@@ -38,27 +39,27 @@ internal fun TestAccessScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(LocalAppTokens.current.colors.bg)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = "测试验证",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface,
+            style = LocalAppTokens.current.type.titleL,
+            color = LocalAppTokens.current.colors.text,
         )
         Text(
             text = "请输入验证手势后进入测试页面。",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.body,
+            color = LocalAppTokens.current.colors.textMuted,
             modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
         )
         if (showError) {
             Text(
                 text = "手势密码错误",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
+                style = LocalAppTokens.current.type.bodyS,
+                color = LocalAppTokens.current.colors.danger,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 6.dp),
@@ -90,8 +91,8 @@ private fun GesturePasswordPad(
     onPatternComplete: (List<Int>) -> Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val activeColor = MaterialTheme.colorScheme.primary
-    val inactiveColor = MaterialTheme.colorScheme.outline
+    val activeColor = LocalAppTokens.current.colors.primary
+    val inactiveColor = LocalAppTokens.current.colors.borderStrong
     val padDescription = "手势密码面板"
     var pattern by remember { mutableStateOf(emptyList<Int>()) }
     var pointerPosition by remember { mutableStateOf<Offset?>(null) }

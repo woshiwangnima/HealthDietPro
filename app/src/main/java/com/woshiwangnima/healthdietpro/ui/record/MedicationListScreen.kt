@@ -28,6 +28,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppPillIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
@@ -86,7 +89,7 @@ internal fun MedicationListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(LocalAppTokens.current.colors.bg)
                 .padding(padding),
         ) {
             Box(modifier = Modifier.weight(1f)) {
@@ -130,11 +133,16 @@ private fun MedicationCatalogPage(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.medication_catalog_heading), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.medication_catalog_heading), style = LocalAppTokens.current.type.titleS)
             AppIconTextButton(stringResource(R.string.medication_catalog_add), R.drawable.ic_add, onAdd)
         }
         if (catalog.isEmpty()) {
-            Text(stringResource(R.string.medication_catalog_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            AppEmptyState(
+                title = stringResource(R.string.record_no_data),
+                description = stringResource(R.string.medication_catalog_empty),
+                iconRes = R.drawable.ic_medication,
+                action = { AppPillIconTextButton(stringResource(R.string.medication_catalog_add), onAdd, iconRes = R.drawable.ic_add) },
+            )
         } else {
             CatalogTable(catalog, onEdit, { pendingDeletion = it }, Modifier.weight(1f))
         }
@@ -172,13 +180,13 @@ private fun MedicationReminderPage() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.medication_reminder_heading),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = LocalAppTokens.current.type.titleS,
+                color = LocalAppTokens.current.colors.text,
             )
             Text(
                 text = stringResource(R.string.medication_reminder_unavailable),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.body,
+                color = LocalAppTokens.current.colors.textMuted,
                 modifier = Modifier.padding(top = 8.dp),
             )
         }
@@ -249,14 +257,14 @@ internal fun MedicationRecordsPage(
         }
         RecordTimeRangeFilter(selection = timeRangeSelection, onSelectionChanged = onTimeRangeSelectionChanged)
         if (filteredRecords.isEmpty()) {
-            Text(
-                text = if (records.isEmpty()) {
-                    stringResource(R.string.common_empty_records)
+            AppEmptyState(
+                title = stringResource(R.string.common_empty_records),
+                description = if (records.isEmpty()) {
+                    stringResource(R.string.medication_record_empty)
                 } else {
                     stringResource(R.string.medication_record_empty_filtered, records.size)
                 },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                iconRes = R.drawable.ic_medication,
             )
         } else {
             MedicationRecordTable(
@@ -287,7 +295,7 @@ private fun MedicationRecordTable(
             ) { record ->
                 Text(
                     text = formatDateTime(record.timestamp),
-                    style = if (readOnly) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodySmall,
+                    style = if (readOnly) LocalAppTokens.current.type.caption else LocalAppTokens.current.type.bodyS,
                 )
             },
             AppDataTableColumn<MedicationRecord>(
@@ -323,7 +331,7 @@ private fun MedicationRecordTable(
                     text = stringResource(R.string.body_record_delete),
                     onClick = { delete(record) },
                     iconSize = 14.dp,
-                    textStyle = MaterialTheme.typography.labelSmall,
+                    textStyle = LocalAppTokens.current.type.caption,
                 )
             }
         },
@@ -333,7 +341,7 @@ private fun MedicationRecordTable(
 
 @Composable
 private fun MedicationTableHeader(text: String, compact: Boolean) {
-    if (compact) Text(text, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    if (compact) Text(text, style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted)
     else AppDataTableHeaderText(text)
 }
 
@@ -345,8 +353,8 @@ private fun MedicationTableText(text: String, overflow: ColumnOverflow, compact:
     }
     Text(
         text = text,
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurface,
+        style = LocalAppTokens.current.type.caption,
+        color = LocalAppTokens.current.colors.text,
         maxLines = if (overflow == ColumnOverflow.Wrap) Int.MAX_VALUE else 1,
         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
     )
@@ -359,8 +367,8 @@ private fun CompactMedicationRow(record: MedicationRecord, onDelete: ((Medicatio
             Text(
                 text = formatDateTime(record.timestamp),
                 modifier = Modifier.width(108.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.bodyS,
+                color = LocalAppTokens.current.colors.textMuted,
                 maxLines = 1,
             )
             AppDataTableText(record.medicationName, modifier = Modifier.weight(1f))
@@ -369,7 +377,7 @@ private fun CompactMedicationRow(record: MedicationRecord, onDelete: ((Medicatio
                     text = stringResource(R.string.body_record_delete),
                     onClick = { delete(record) },
                     iconSize = 14.dp,
-                    textStyle = MaterialTheme.typography.labelSmall,
+                    textStyle = LocalAppTokens.current.type.caption,
                 )
             }
         }
@@ -378,8 +386,8 @@ private fun CompactMedicationRow(record: MedicationRecord, onDelete: ((Medicatio
             Text(
                 text = listOf(formatDose(record), record.method).filter { it.isNotBlank() }.joinToString(" / "),
                 modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.bodyS,
+                color = LocalAppTokens.current.colors.textMuted,
             )
         }
         formatFeeling(record).takeIf { it.isNotBlank() }?.let { feeling ->
@@ -387,7 +395,7 @@ private fun CompactMedicationRow(record: MedicationRecord, onDelete: ((Medicatio
                 Spacer(modifier = Modifier.width(108.dp))
                 AppDataTableText(
                     text = feeling,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = LocalAppTokens.current.colors.textMuted,
                     overflow = ColumnOverflow.Wrap,
                     modifier = Modifier.weight(1f),
                 )

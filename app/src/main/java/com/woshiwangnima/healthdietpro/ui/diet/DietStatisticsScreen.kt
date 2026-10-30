@@ -1,6 +1,8 @@
 package com.woshiwangnima.healthdietpro.ui.diet
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.offset
@@ -13,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,9 +38,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRowDivider
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.format.formatGroupedInteger
 import com.woshiwangnima.healthdietpro.common.time.recordDateStartMillis
@@ -142,7 +148,7 @@ internal fun DietStatisticsTab(
     val periodColors = remember {
         MealPeriod.entries.associateWith(::periodColor)
     }
-    val primaryColor = MaterialTheme.colorScheme.primary
+    val primaryColor = LocalAppTokens.current.colors.primary
     val entries = remember(dates, dayTrendTotals, trendMetric, primaryColor) {
         dates.map { date ->
             val totals = dayTrendTotals[date] ?: DayNutrients()
@@ -186,111 +192,133 @@ internal fun DietStatisticsTab(
         }
     }
 
+    val tokens = LocalAppTokens.current
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(tokens.spacing.page),
+        verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
     ) {
         if (!trendOnly) item {
-            DayDatePicker(selectedDay, onPick = { pickingDay = true })
+            // 日期行用无标题分组卡：与「容器管理」「记容器」等页的行式入口同一写法。
+            // 日期本身已经说明了这一行是什么，再加一层卡标题就是多一级层级。
+            AppSectionGroup {
+                DayDatePicker(selectedDay, onPick = { pickingDay = true })
+            }
         }
         if (!trendOnly) item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                SectionTitle(R.drawable.ic_diet, stringResource(R.string.diet_today_summary))
-                NutrientSummaryVisuals(dayTotals, goals)
-                OutlinedButton(
-                    onClick = { showNutrientDetails = true },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Icon(Icons.Filled.Search, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.diet_show_nutrient_details))
+            AppSectionCard(
+                iconRes = R.drawable.ic_diet,
+                title = stringResource(R.string.diet_today_summary),
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3), modifier = Modifier.fillMaxWidth()) {
+                    NutrientSummaryVisuals(dayTotals, goals, nested = true)
+                    OutlinedButton(
+                        onClick = { showNutrientDetails = true },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(Icons.Filled.Search, contentDescription = null)
+                        Spacer(Modifier.width(tokens.spacing.s2))
+                        Text(stringResource(R.string.diet_show_nutrient_details))
+                    }
                 }
             }
         }
         if (!trendOnly) item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                SectionTitle(R.drawable.ic_energy_distribution, stringResource(R.string.diet_meal_distribution))
-                NutrientToggleRow(donutMetric) { donutMetric = it }
-                AnimatedDonutChart(
-                    segments = donutSegments,
-                    centerValue = formatMetricValue(dayTotals.value(donutMetric), donutMetric.unit),
-                    centerLabel = stringResource(R.string.diet_meal_distribution_center, stringResource(donutMetric.labelRes)),
-                    showLegend = false,
-                    labelMaxLines = 2,
-                    centerAction = {
-                        AppOutlinedIconTextButton(
-                            text = stringResource(R.string.diet_meal_distribution_switch),
-                            iconRes = R.drawable.ic_switch_user,
-                            onClick = {
-                                donutMetric = NutrientMetric.entries[
-                                    (NutrientMetric.entries.indexOf(donutMetric) + 1) % NutrientMetric.entries.size
-                                ]
-                            },
-                            modifier = Modifier.width(88.dp),
-                        )
-                    },
-                )
-                if (donutSegments.isEmpty()) {
-                    Text(stringResource(R.string.diet_statistics_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            AppSectionCard(
+                iconRes = R.drawable.ic_energy_distribution,
+                title = stringResource(R.string.diet_meal_distribution),
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3), modifier = Modifier.fillMaxWidth()) {
+                    NutrientToggleRow(donutMetric) { donutMetric = it }
+                    AnimatedDonutChart(
+                        segments = donutSegments,
+                        centerValue = formatMetricValue(dayTotals.value(donutMetric), donutMetric.unit),
+                        centerLabel = stringResource(R.string.diet_meal_distribution_center, stringResource(donutMetric.labelRes)),
+                        showLegend = false,
+                        labelMaxLines = 2,
+                        centerAction = {
+                            AppOutlinedIconTextButton(
+                                text = stringResource(R.string.diet_meal_distribution_switch),
+                                iconRes = R.drawable.ic_switch_user,
+                                onClick = {
+                                    donutMetric = NutrientMetric.entries[
+                                        (NutrientMetric.entries.indexOf(donutMetric) + 1) % NutrientMetric.entries.size
+                                    ]
+                                },
+                                modifier = Modifier.width(88.dp),
+                            )
+                        },
+                    )
+                    if (donutSegments.isEmpty()) {
+                        Text(stringResource(R.string.diet_statistics_empty), color = tokens.colors.textMuted)
+                    }
                 }
             }
         }
         if (trendOnly) item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                SectionTitle(R.drawable.ic_nutrients, stringResource(R.string.diet_trend))
-                SingleChoiceSegmentedSelector(
-                    options = listOf(7, 30, 90).map { optionDays ->
-                        SingleChoiceSegmentedOption(
-                            id = optionDays.toString(),
-                            labelRes = dayRangeLabelRes(optionDays),
-                        )
-                    },
-                    selectedId = trendDays.toString(),
-                    onOptionSelected = { option -> trendDays = option.id.toInt() },
-                )
-                NutrientToggleRow(trendMetric) { trendMetric = it }
-                val nonZeroTotals = entries.map { entry -> entry.segments.sumOf(DateStackedBarSegment::value) }.filter { it > 0.0 }
-                val averageValue = remember(nonZeroTotals) {
-                    if (nonZeroTotals.isEmpty()) null else nonZeroTotals.average()
-                }
-                DateStackedBarChart(
-                    entries = entries,
-                    yAxisTitle = stringResource(R.string.diet_statistics_daily_metric, stringResource(trendMetric.labelRes), trendMetric.unit),
-                    formatValue = { formatCalories(it) },
-                    labelEvery = 1,
-                    selectedEntry = selectedEntry,
-                    onEntrySelected = {
-                        if (selectedTrendDate == it.date) onOpenStatistics(it.date) else selectedTrendDate = it.date
-                    },
-                    referenceLine = averageValue?.let { average ->
-                        DateStackedBarReferenceLine(
-                            value = average,
-                            label = stringResource(R.string.diet_statistics_average, formatMetricValue(average, trendMetric.unit)),
-                            color = MaterialTheme.colorScheme.tertiary,
-                        )
-                    },
-                )
-                selectedTrendDate?.let { trendDate ->
-                    val trendDateStart = remember(trendDate, zone) { recordDateStartMillis(trendDate, zone) }
-                    val trendDateEnd = remember(trendDate, zone) { trendDate.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() }
-                    val trendDayTotals = remember(rangeRecords, trendDateStart, trendDateEnd) {
-                        sumNutrients(rangeRecords.filter { it.mealStartAt in trendDateStart until trendDateEnd })
-                    }
-                    if (NutrientMetric.entries.any { trendDayTotals.value(it) > 0.0 }) {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                stringResource(R.string.diet_statistics_selected_day_breakdown_title, trendDate.toString()),
-                                style = MaterialTheme.typography.titleSmall,
+            AppSectionCard(
+                iconRes = R.drawable.ic_nutrients,
+                title = stringResource(R.string.diet_trend),
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3), modifier = Modifier.fillMaxWidth()) {
+                    SingleChoiceSegmentedSelector(
+                        options = listOf(7, 30, 90).map { optionDays ->
+                            SingleChoiceSegmentedOption(
+                                id = optionDays.toString(),
+                                labelRes = dayRangeLabelRes(optionDays),
                             )
+                        },
+                        selectedId = trendDays.toString(),
+                        onOptionSelected = { option -> trendDays = option.id.toInt() },
+                    )
+                    NutrientToggleRow(trendMetric) { trendMetric = it }
+                    val nonZeroTotals = entries.map { entry -> entry.segments.sumOf(DateStackedBarSegment::value) }.filter { it > 0.0 }
+                    val averageValue = remember(nonZeroTotals) {
+                        if (nonZeroTotals.isEmpty()) null else nonZeroTotals.average()
+                    }
+                    DateStackedBarChart(
+                        entries = entries,
+                        yAxisTitle = stringResource(R.string.diet_statistics_daily_metric, stringResource(trendMetric.labelRes), trendMetric.unit),
+                        formatValue = { formatCalories(it) },
+                        labelEvery = 1,
+                        selectedEntry = selectedEntry,
+                        onEntrySelected = {
+                            if (selectedTrendDate == it.date) onOpenStatistics(it.date) else selectedTrendDate = it.date
+                        },
+                        referenceLine = averageValue?.let { average ->
+                            DateStackedBarReferenceLine(
+                                value = average,
+                                label = stringResource(R.string.diet_statistics_average, formatMetricValue(average, trendMetric.unit)),
+                                color = tokens.colors.warning,
+                            )
+                        },
+                    )
+                    selectedTrendDate?.let { trendDate ->
+                        val trendDateStart = remember(trendDate, zone) { recordDateStartMillis(trendDate, zone) }
+                        val trendDateEnd = remember(trendDate, zone) { trendDate.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() }
+                        val trendDayTotals = remember(rangeRecords, trendDateStart, trendDateEnd) {
+                            sumNutrients(rangeRecords.filter { it.mealStartAt in trendDateStart until trendDateEnd })
+                        }
+                        if (NutrientMetric.entries.any { trendDayTotals.value(it) > 0.0 }) {
                             val dayMeals = remember(rangeRecords, trendDateStart, trendDateEnd) {
                                 rangeRecords.filter { it.mealStartAt in trendDateStart until trendDateEnd }
                             }
-                            MealNutrientTable(
-                                records = dayMeals,
-                                dayTotals = trendDayTotals,
-                                onOpenMeal = onOpenMeal,
-                            )
+                            // 选中日的餐次明细留在趋势卡内：它是图表读数的下钻结果，另起一张卡会像是并列的第二个功能块。
+                            Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1), modifier = Modifier.fillMaxWidth()) {
+                                AppListRowDivider(leadingInset = false)
+                                Text(
+                                    stringResource(R.string.diet_statistics_selected_day_breakdown_title, trendDate.toString()),
+                                    style = tokens.type.titleS,
+                                    color = tokens.colors.text,
+                                    modifier = Modifier.padding(top = tokens.spacing.s2),
+                                )
+                                MealNutrientTable(
+                                    records = dayMeals,
+                                    dayTotals = trendDayTotals,
+                                    onOpenMeal = onOpenMeal,
+                                    inCard = true,
+                                )
+                            }
                         }
                     }
                 }
@@ -301,11 +329,17 @@ internal fun DietStatisticsTab(
                 NutrientMetric.entries.any { metric -> totals.value(metric) > 0.0 }
             }) {
             item {
-                MealNutrientTable(
-                    records = dayRecords,
-                    dayTotals = dayTotals,
-                    onOpenMeal = onOpenMeal,
-                )
+                AppSectionCard(
+                    iconRes = R.drawable.ic_list,
+                    title = stringResource(R.string.diet_meal_subtotals),
+                ) {
+                    MealNutrientTable(
+                        records = dayRecords,
+                        dayTotals = dayTotals,
+                        onOpenMeal = onOpenMeal,
+                        inCard = true,
+                    )
+                }
             }
         }
     }
@@ -347,21 +381,21 @@ private fun NutrientDetailsDialog(
                     item(key = category) {
                         Text(
                             text = nutrientCategoryName(category),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            style = LocalAppTokens.current.type.titleS,
+                            color = LocalAppTokens.current.colors.primary,
                             modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
                         )
                     }
                     items(metas, key = NutrientMeta::code) { meta ->
                         val rowIndex = metas.indexOf(meta)
                         Surface(
-                            color = if (rowIndex % 2 == 0) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f) else MaterialTheme.colorScheme.surface,
+                            color = if (rowIndex % 2 == 0) LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.45f) else LocalAppTokens.current.colors.panel,
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Row(Modifier.padding(horizontal = 10.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(meta.displayName(language), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
-                                Text(totals.amount(meta.code)?.let { "${formatCalories(it.value)} ${it.unitId}" } ?: "-", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(meta.displayName(language), Modifier.weight(1f), style = LocalAppTokens.current.type.bodyS)
+                                Text(totals.amount(meta.code)?.let { "${formatCalories(it.value)} ${it.unitId}" } ?: "-", style = LocalAppTokens.current.type.bodyS, color = LocalAppTokens.current.colors.textMuted)
                             }
                         }
                     }
@@ -386,47 +420,50 @@ private fun nutrientCategoryName(category: String): String = stringResource(
     },
 )
 
+/** 统计日期行：装在无标题分组卡里，一行 = 图标 + 当前日期 + 箭头，整行进日期选择。 */
 @Composable
 private fun DayDatePicker(selectedDay: LocalDate, onPick: () -> Unit) {
-    Surface(
-        onClick = onPick,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
-        modifier = Modifier.fillMaxWidth(),
+    val tokens = LocalAppTokens.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onPick)
+            .padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s2)
+            .heightIn(min = tokens.spacing.hitMin - tokens.spacing.s4),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            androidx.compose.material3.Icon(
-                painter = painterResource(R.drawable.ic_event),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = selectedDay.toString(),
-                modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            androidx.compose.material3.Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        androidx.compose.material3.Icon(
+            painter = painterResource(R.drawable.ic_event),
+            contentDescription = null,
+            modifier = Modifier.size(tokens.spacing.s5 - tokens.spacing.s1),
+            tint = tokens.colors.primary,
+        )
+        Text(
+            text = selectedDay.toString(),
+            modifier = Modifier.weight(1f).padding(horizontal = tokens.spacing.s3),
+            style = tokens.type.body,
+            color = tokens.colors.text,
+        )
+        androidx.compose.material3.Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = tokens.colors.textMuted,
+        )
     }
 }
 
 @Composable
 internal fun SectionTitle(iconRes: Int, text: String) {
-    val iconSize = with(LocalDensity.current) { MaterialTheme.typography.titleMedium.fontSize.toDp() }
+    val iconSize = with(LocalDensity.current) { LocalAppTokens.current.type.titleS.fontSize.toDp() }
     Row(verticalAlignment = Alignment.CenterVertically) {
         androidx.compose.material3.Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = LocalAppTokens.current.colors.primary,
             modifier = Modifier.size(iconSize),
         )
         Spacer(Modifier.width(8.dp))
-        Text(text, style = MaterialTheme.typography.titleMedium)    }
+        Text(text, style = LocalAppTokens.current.type.titleS)    }
 }
 
 private fun dayRangeLabelRes(days: Int): Int = when (days) {
@@ -451,7 +488,7 @@ private fun metricGoal(metric: NutrientMetric, goals: DietGoalsPrefs): Double = 
 }
 
 @Composable
-internal fun NutrientSummaryVisuals(totals: DayNutrients, goals: DietGoalsPrefs) {
+internal fun NutrientSummaryVisuals(totals: DayNutrients, goals: DietGoalsPrefs, nested: Boolean = false) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -463,7 +500,7 @@ internal fun NutrientSummaryVisuals(totals: DayNutrients, goals: DietGoalsPrefs)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 TextOverflowText(
                     text = "${formatCalories(goal)} ${metric.unit}" + if (overflow) " ${stringResource(R.string.diet_statistics_goal_exceeded_short)}" else "",
-                    style = MaterialTheme.typography.labelSmall,
+                    style = LocalAppTokens.current.type.caption,
                     color = MetricColor(metric),
                     maxLines = 1,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -476,6 +513,7 @@ internal fun NutrientSummaryVisuals(totals: DayNutrients, goals: DietGoalsPrefs)
                     rawValue = totals.value(metric),
                     goal = goal,
                     color = MetricColor(metric),
+                    nested = nested,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -499,15 +537,15 @@ internal fun CompleteNutrientSummary(
             ) {
                 TextOverflowText(
                     text = meta.displayName(language),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = LocalAppTokens.current.type.bodyS,
+                    color = LocalAppTokens.current.colors.text,
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
                 )
                 TextOverflowText(
                     text = amount?.let { "${formatCalories(it.value)} ${it.unitId}" } ?: "-",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalAppTokens.current.type.bodyS,
+                    color = LocalAppTokens.current.colors.textMuted,
                     maxLines = 1,
                 )
             }
@@ -515,6 +553,12 @@ internal fun CompleteNutrientSummary(
     }
 }
 
+/**
+ * 单个营养素指标卡（目标进度填充）。
+ *
+ * [nested] 为 true 时表示这张卡已经画在 [com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard]
+ * 里，底材降到 `panel`：卡片之内再叠一层 `panelRaised` 会与卡片本身同色，边界就消失了。
+ */
 @Composable
 internal fun DietStatCard(
     label: String,
@@ -524,11 +568,16 @@ internal fun DietStatCard(
     goal: Double = 0.0,
     color: Color? = null,
     modifier: Modifier = Modifier,
+    nested: Boolean = false,
 ) {
     val numericValue = rawValue
-    val fillColor = color ?: MaterialTheme.colorScheme.primary
+    val fillColor = color ?: LocalAppTokens.current.colors.primary
     Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+        color = if (nested) {
+            LocalAppTokens.current.colors.panel
+        } else {
+            LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.45f)
+        },
         shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
         modifier = modifier.height(100.dp),
     ) {
@@ -549,29 +598,29 @@ internal fun DietStatCard(
             ) {
                 TextOverflowText(
                     text = label,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalAppTokens.current.type.bodyS,
+                    color = LocalAppTokens.current.colors.textMuted,
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
                 )
                 TextOverflowText(
                     text = unit,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalAppTokens.current.type.bodyS,
+                    color = LocalAppTokens.current.colors.textMuted,
                     maxLines = 1,
                 )
             }
             TextOverflowText(
                 text = value,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = LocalAppTokens.current.type.titleS,
+                color = LocalAppTokens.current.colors.text,
                 maxLines = 1,
                 modifier = Modifier.align(Alignment.Center).padding(top = 12.dp),
             )
             TextOverflowText(
                 text = if (goal > 0.0) "${((numericValue / goal) * 100.0).roundToInt()}%" else "-",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.caption,
+                color = LocalAppTokens.current.colors.textMuted,
                 maxLines = 1,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 modifier = Modifier.align(Alignment.Center).padding(top = 52.dp).fillMaxWidth(0.6f),
@@ -580,54 +629,91 @@ internal fun DietStatCard(
     }
 }
 
+/**
+ * 每餐的主营养素占比行。
+ *
+ * [inCard] 为 true 时表示外面已经有一张 [com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard]：
+ * 行本身不再画面板（卡片里套同色面板等于没画），改用分隔线分段，与全站列表的语言保持一致。
+ */
 @Composable
 internal fun MealNutrientTable(
     records: List<DietRecord>,
     dayTotals: DayNutrients,
     onOpenMeal: ((DietRecord) -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    inCard: Boolean = false,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-        records.sortedBy(DietRecord::mealStartAt).forEach { record ->
-            val totals = remember(record) { sumNutrients(listOf(record)) }
-            if (NutrientMetric.entries.any { totals.value(it) > 0.0 }) {
-                Surface(
-                    onClick = { onOpenMeal?.invoke(record) },
-                    enabled = onOpenMeal != null,
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth(),
+    val rows = records.sortedBy(DietRecord::mealStartAt).filter { record ->
+        val totals = sumNutrients(listOf(record))
+        NutrientMetric.entries.any { totals.value(it) > 0.0 }
+    }
+    if (rows.isEmpty()) return
+    if (inCard) {
+        val tokens = LocalAppTokens.current
+        Column(modifier.fillMaxWidth()) {
+            rows.forEachIndexed { index, record ->
+                if (index > 0) AppListRowDivider(leadingInset = false)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(
+                            if (onOpenMeal != null) {
+                                Modifier.clickable { onOpenMeal(record) }
+                            } else {
+                                Modifier
+                            },
+                        )
+                        .padding(vertical = tokens.spacing.s3),
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(12.dp),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.width(MealLabelWidth),
-                        ) {
-                            androidx.compose.foundation.Canvas(Modifier.size(10.dp).padding(end = 6.dp)) { drawCircle(periodColor(record.mealPeriod)) }
-                            TextOverflowText(
-                                text = stringResource(record.mealPeriod.displayRes()),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 2,
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            NutrientMetric.entries.forEach { metric ->
-                                NutrientProgressRow(
-                                    metric = metric,
-                                    value = totals.value(metric),
-                                    total = dayTotals.value(metric),
-                                )
-                            }
-                        }
-                    }
+                    MealNutrientRowContent(record, dayTotals)
                 }
+            }
+        }
+        return
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier.fillMaxWidth()) {
+        rows.forEach { record ->
+            Surface(
+                onClick = { onOpenMeal?.invoke(record) },
+                enabled = onOpenMeal != null,
+                color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.42f),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Box(Modifier.padding(12.dp)) { MealNutrientRowContent(record, dayTotals) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MealNutrientRowContent(record: DietRecord, dayTotals: DayNutrients) {
+    val totals = remember(record) { sumNutrients(listOf(record)) }
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.width(MealLabelWidth),
+        ) {
+            androidx.compose.foundation.Canvas(Modifier.size(10.dp).padding(end = 6.dp)) { drawCircle(periodColor(record.mealPeriod)) }
+            TextOverflowText(
+                text = stringResource(record.mealPeriod.displayRes()),
+                style = LocalAppTokens.current.type.titleS,
+                color = LocalAppTokens.current.colors.text,
+                maxLines = 2,
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.weight(1f),
+        ) {
+            NutrientMetric.entries.forEach { metric ->
+                NutrientProgressRow(
+                    metric = metric,
+                    value = totals.value(metric),
+                    total = dayTotals.value(metric),
+                )
             }
         }
     }
@@ -640,15 +726,15 @@ internal fun NutrientProgressRow(metric: NutrientMetric, value: Double, total: D
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         TextOverflowText(
             text = stringResource(metric.labelRes),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.bodyS,
+            color = LocalAppTokens.current.colors.textMuted,
             maxLines = 1,
             modifier = Modifier.width(NutrientNameWidth),
         )
         LinearProgressWithPercent(
             progress = { fraction },
             color = MetricColor(metric),
-            trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            trackColor = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.5f),
             percentText = "$percent%",
             modifier = Modifier.weight(1f),
         )
@@ -664,8 +750,8 @@ internal fun NutrientProgressRow(metric: NutrientMetric, value: Double, total: D
             } else {
                 stringResource(R.string.diet_meal_nutrient_values_no_total, formatCalories(value), metric.unit)
             },
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.bodyS,
+            color = LocalAppTokens.current.colors.textMuted,
             maxLines = 1,
             modifier = Modifier.width(NutrientValueWidth),
         )

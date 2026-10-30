@@ -35,9 +35,11 @@ fun BaseScreen(
                     WindowInsets(0, 0, 0, 0)
                 },
                 title = {
+                    // 页头标题走 titleLarge（24 sp）。旧版取 headlineLarge：旧主题 36 sp、新令牌 32 sp，
+                    // 都高于《通用UI设计规范》§2.3 的 font.title（24 sp），一屏里比正文抢两档。
                     Text(
                         title,
-                        style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
+                        style = androidx.compose.material3.MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {

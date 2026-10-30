@@ -42,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.normalizeRecordTimestamp
@@ -216,8 +217,8 @@ internal fun DietEditorScreen(
                         )
                         Surface(
                             onClick = { resetBothTimes = true },
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f),
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            color = LocalAppTokens.current.colors.primaryContainer.copy(alpha = 0.65f),
+                            contentColor = LocalAppTokens.current.colors.onPrimaryContainer,
                             shape = MaterialTheme.shapes.small,
                         ) {
                             Row(
@@ -232,8 +233,8 @@ internal fun DietEditorScreen(
                                 )
                                 TextOverflowText(
                                     text = stringResource(R.string.diet_time_reset_both),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    style = LocalAppTokens.current.type.caption,
+                                    color = LocalAppTokens.current.colors.onPrimaryContainer,
                                     maxLines = 1,
                                 )
                             }
@@ -242,7 +243,7 @@ internal fun DietEditorScreen(
                 }
                 item {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.diet_entries), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                        Text(stringResource(R.string.diet_entries), style = LocalAppTokens.current.type.titleS, modifier = Modifier.weight(1f))
                         AppIconTextButton(text = stringResource(R.string.diet_add_food), iconRes = R.drawable.ic_add, onClick = {
                             editingEntry = null
                             showEntryEditor = true
@@ -254,7 +255,7 @@ internal fun DietEditorScreen(
                         if (entries.isEmpty()) {
                             Text(
                                 stringResource(R.string.diet_entries_empty),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = LocalAppTokens.current.colors.textMuted,
                                 modifier = Modifier.padding(vertical = 8.dp),
                             )
                         } else {
@@ -273,7 +274,7 @@ internal fun DietEditorScreen(
                         }
                     }
                 }
-                item { EditorTextField(stringResource(R.string.diet_note), note, { note = it }, required = false, supportingTextOverride = { Text(stringResource(R.string.diet_note_hint), color = MaterialTheme.colorScheme.onSurfaceVariant) }) }
+                item { EditorTextField(stringResource(R.string.diet_note), note, { note = it }, required = false, supportingTextOverride = { Text(stringResource(R.string.diet_note_hint), color = LocalAppTokens.current.colors.textMuted) }) }
             }
             FormSaveBar(text = stringResource(R.string.diet_save), enabled = saveEnabled, onSave = ::save)
         }
@@ -374,7 +375,7 @@ internal fun DietEditorScreen(
                     entries = entries.filterNot { it == target }
                     deletingEntry = null
                 }) {
-                    Text(stringResource(R.string.body_record_delete), color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.body_record_delete), color = LocalAppTokens.current.colors.danger)
                 }
             },
             dismissButton = {
@@ -409,7 +410,7 @@ private fun DietEntryCard(
         ) {
             TextOverflowText(
                 text = entry.foodName,
-                style = MaterialTheme.typography.bodyMedium,
+                style = LocalAppTokens.current.type.body,
                 color = onContainer,
                 maxLines = 1,
                 textAlign = TextAlign.Start,
@@ -420,8 +421,8 @@ private fun DietEntryCard(
                 value = formatGrams(entry.netWeightGrams),
                 fg = onContainer,
                 dimText = dimText,
-                labelStyle = MaterialTheme.typography.bodySmall,
-                valueStyle = MaterialTheme.typography.bodyMedium,
+                labelStyle = LocalAppTokens.current.type.bodyS,
+                valueStyle = LocalAppTokens.current.type.body,
                 modifier = Modifier.weight(1f),
             )
             NutrientMetric.entries.forEach { metric ->
@@ -454,8 +455,8 @@ private fun NutrientCell(
     fg: Color,
     dimText: Color,
     modifier: Modifier = Modifier,
-    labelStyle: TextStyle = MaterialTheme.typography.labelSmall,
-    valueStyle: TextStyle = MaterialTheme.typography.bodySmall,
+    labelStyle: TextStyle = LocalAppTokens.current.type.caption,
+    valueStyle: TextStyle = LocalAppTokens.current.type.bodyS,
 ) {
     Column(
         modifier,

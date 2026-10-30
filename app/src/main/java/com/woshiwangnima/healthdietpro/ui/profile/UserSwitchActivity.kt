@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,9 +27,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,7 +48,14 @@ import com.woshiwangnima.healthdietpro.common.ui.AppDestructiveTextButton
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.AppTextIconButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
+import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppChipSelectedAlpha
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.rememberAppDarkTheme
 import com.woshiwangnima.healthdietpro.model.profile.Gender
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
 import com.woshiwangnima.healthdietpro.model.profile.UserMetadata
@@ -75,11 +80,14 @@ class UserSwitchActivity : androidx.activity.ComponentActivity() {
         super.onCreate(savedInstanceState)
         reloadUsers()
         setContent {
+            // 外层保住字号倍率，内层提供设计令牌（§8.14 的固定组合）。
             HealthDietProTheme {
-                BaseScreen(title = stringResource(R.string.profile_switch_user), onBack = ::finish) { padding ->
-                    UserSwitchScreen(users, currentUserId, padding, ::createUser, ::selectUser, { pendingDelete = it })
+                AppTheme(darkTheme = rememberAppDarkTheme()) {
+                    BaseScreen(title = stringResource(R.string.profile_switch_user), onBack = ::finish) { padding ->
+                        UserSwitchScreen(users, currentUserId, padding, ::createUser, ::selectUser, { pendingDelete = it })
+                    }
+                    pendingDelete?.let { user -> DeleteUserDialog(user) }
                 }
-                pendingDelete?.let { user -> DeleteUserDialog(user) }
             }
         }
     }
@@ -142,26 +150,38 @@ private fun UserSwitchScreen(
         compareByDescending<UserMetadata> { it.id == currentUserId }
             .then(sortMode.comparator),
     )
-    Column(Modifier.fillMaxSize().padding(contentPadding)) {
+    val tokens = LocalAppTokens.current
+    Column(Modifier.fillMaxSize().background(tokens.colors.bg).padding(contentPadding)) {
         if (displayUsers.size > 1) {
-            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-                UserSortMode.entries.forEachIndexed { index, mode ->
-                    SegmentedButton(
-                        selected = sortMode == mode,
-                        onClick = { sortMode = mode },
-                        shape = SegmentedButtonDefaults.itemShape(index, UserSortMode.entries.size),
-                        label = { Text(mode.label()) },
-                    )
-                }
-            }
+            EqualWidthSegmentedTabs(
+                tabs = UserSortMode.entries.map { EqualWidthTab.text(it.label()) },
+                selectedIndex = UserSortMode.entries.indexOf(sortMode),
+                onSelected = { sortMode = UserSortMode.entries[it] },
+                modifier = Modifier.padding(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s2,
+                ),
+            )
         }
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(
+                start = tokens.spacing.page,
+                end = tokens.spacing.page,
+                top = tokens.spacing.s3,
+                bottom = tokens.spacing.s3,
+            ),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
         ) {
             if (displayUsers.isEmpty()) {
-                item { Text(stringResource(R.string.profile_no_users), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                item {
+                    AppEmptyState(
+                        title = stringResource(R.string.profile_no_users),
+                        description = stringResource(R.string.profile_create_user),
+                        iconRes = R.drawable.ic_switch_user,
+                    )
+                }
             } else {
                 items(displayUsers, key = { it.id }) { user ->
                     UserSwitchRow(
@@ -173,7 +193,14 @@ private fun UserSwitchScreen(
                 }
             }
         }
-        AppIconTextButton(stringResource(R.string.profile_create_user), R.drawable.ic_add, onCreateUser, Modifier.fillMaxWidth().padding(16.dp))
+        AppIconTextButton(
+            stringResource(R.string.profile_create_user),
+            R.drawable.ic_add,
+            onCreateUser,
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s3),
+        )
     }
 }
 
@@ -198,32 +225,58 @@ private fun UserSwitchRow(user: UserMetadata, isCurrent: Boolean, onSelect: () -
     val avatar = user.avatarFileName.takeIf { it.isNotBlank() }
         ?.let { resolveAvatarFile(context, user.id, it) }
         ?.let { android.graphics.BitmapFactory.decodeFile(it.absolutePath) }
-    val background = if (isCurrent) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f) else Color.Transparent
-    androidx.compose.foundation.layout.Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(background).padding(horizontal = 8.dp, vertical = 10.dp),
+    val tokens = LocalAppTokens.current
+    val shape = RoundedCornerShape(tokens.radii.container)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(if (isCurrent) tokens.colors.primary.copy(alpha = AppChipSelectedAlpha) else tokens.colors.panelRaised)
+            .border(
+                width = if (isCurrent) tokens.radii.stroke else tokens.radii.highlight,
+                color = if (isCurrent) tokens.colors.primary else tokens.colors.border,
+                shape = shape,
+            )
+            .padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s2),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.size(48.dp).clip(CircleShape).background(avatarColorFor(user.id)).clickable(onClick = onSelect), contentAlignment = Alignment.Center) {
             if (avatar != null) Image(avatar.asImageBitmap(), null, Modifier.size(48.dp).clip(CircleShape))
-            else Text(name.firstOrNull()?.toString() ?: "?", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+            else Text(name.firstOrNull()?.toString() ?: "?", style = tokens.type.titleS, fontWeight = FontWeight.Bold, color = Color.White)
         }
-        Spacer(Modifier.width(14.dp))
+        Spacer(Modifier.width(tokens.spacing.s3))
         Column(Modifier.weight(1f).clickable(onClick = onSelect)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(name, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                if (isCurrent) Text(stringResource(R.string.profile_current_user_marker), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(start = 4.dp))
+                Text(
+                    text = name,
+                    style = tokens.type.body,
+                    color = tokens.colors.text,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                if (isCurrent) {
+                    Text(
+                        text = stringResource(R.string.profile_current_user_marker),
+                        style = tokens.type.caption,
+                        color = tokens.colors.primary,
+                        modifier = Modifier.padding(start = tokens.spacing.s1),
+                    )
+                }
             }
-            Text(user.gender.displayText(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = user.gender.displayText(),
+                style = tokens.type.caption,
+                color = tokens.colors.textMuted,
+            )
             UserMetadataDateRows(user)
         }
-        IconButton(
-            onClick = onDelete,
-            modifier = Modifier.size(40.dp),
-        ) {
+        // 删除是行内唯一的破坏性动作，热区保持 48 dp（原来被 size(40.dp) 压到 40 dp，低于 §2.2）。
+        IconButton(onClick = onDelete) {
             Icon(
                 painter = painterResource(R.drawable.ic_delete),
                 contentDescription = stringResource(R.string.profile_delete_user_confirm),
-                tint = MaterialTheme.colorScheme.error,
+                tint = tokens.colors.danger,
             )
         }
     }
@@ -234,10 +287,11 @@ private fun UserMetadataDateRows(user: UserMetadata) {
     val created = formatMetadataDate(user.createdAtMillis)
     val lastActive = formatMetadataDate(user.lastActiveAtMillis)
     val updated = formatMetadataDate(user.updatedAtMillis)
+    val tokens = LocalAppTokens.current
     Text(
         text = stringResource(R.string.profile_user_dates_compact, created, lastActive, updated),
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = tokens.type.caption,
+        color = tokens.colors.textMuted,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
     )

@@ -50,6 +50,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AppInputLabel
 import com.woshiwangnima.healthdietpro.common.ui.AppInputTextFieldColors
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.ui.HorizontalImageEditor
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
@@ -186,7 +187,7 @@ private fun CatalogEditor(state: CatalogFormState, padding: PaddingValues, categ
     val units = category?.units?.filter { !it.hidden }.orEmpty()
     Column(Modifier.fillMaxSize().padding(padding)) {
     LazyColumn(Modifier.fillMaxWidth().weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Text(stringResource(R.string.medication_catalog_basic), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
+        item { Text(stringResource(R.string.medication_catalog_basic), style = LocalAppTokens.current.type.titleS) }
         item { OutlinedTextField(state.name, { onChange(state.copy(name = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_name)) }, colors = AppInputTextFieldColors()) }
         item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(state.specValue, { onChange(state.copy(specValue = it)) }, Modifier.weight(1f), label = { AppInputLabel(stringResource(R.string.medication_catalog_specification)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = AppInputTextFieldColors(), singleLine = true)
@@ -194,16 +195,16 @@ private fun CatalogEditor(state: CatalogFormState, padding: PaddingValues, categ
             AppDropdownField(stringResource(R.string.medication_record_spec_unit_select), units.find { it.id == state.unitId }?.symbol().orEmpty(), units.map { AppDropdownOption(it.id, it.symbol()) }, { onChange(state.copy(unitId = it.id)) }, Modifier.weight(1f), enabled = category != null)
         } }
         item { OutlinedTextField(state.manufacturer, { onChange(state.copy(manufacturer = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_manufacturer)) }, colors = AppInputTextFieldColors()) }
-        item { Text(stringResource(R.string.medication_catalog_default_medication), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
+        item { Text(stringResource(R.string.medication_catalog_default_medication), style = LocalAppTokens.current.type.titleS) }
         item { AppDropdownField(stringResource(R.string.medication_catalog_default_method), state.method, stringArrayResource(R.array.medication_record_default_methods).map { AppDropdownOption(it, it) }, { onChange(state.copy(method = it.id)) }) }
-        item { Text(stringResource(R.string.medication_catalog_default_dose), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
+        item { Text(stringResource(R.string.medication_catalog_default_dose), style = LocalAppTokens.current.type.titleS) }
         item { androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(state.defaultDoseValue, { onChange(state.copy(defaultDoseValue = it)) }, Modifier.weight(1f), label = { AppInputLabel(stringResource(R.string.medication_record_dose_value_hint)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = AppInputTextFieldColors(), singleLine = true)
             OutlinedTextField(state.defaultDoseUnit, { onChange(state.copy(defaultDoseUnit = it)) }, Modifier.weight(1f), label = { AppInputLabel(stringResource(R.string.medication_record_dose_unit_hint)) }, colors = AppInputTextFieldColors(), singleLine = true)
         } }
         item { FrequencyEditor(state.frequency) { frequency -> onChange(state.copy(frequency = frequency, intakeRules = frequency.defaultIntakeRules())) } }
         item { IntakeRulesEditor(state.intakeRules) { onChange(state.copy(intakeRules = it)) } }
-        item { Text(stringResource(R.string.medication_catalog_inventory), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
+        item { Text(stringResource(R.string.medication_catalog_inventory), style = LocalAppTokens.current.type.titleS) }
         item { androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(state.packageQuantity, { onChange(state.copy(packageQuantity = it)) }, Modifier.weight(1f), label = { AppInputLabel(stringResource(R.string.medication_catalog_package_quantity)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = AppInputTextFieldColors(), singleLine = true)
             OutlinedTextField(state.packageUnit, { onChange(state.copy(packageUnit = it)) }, Modifier.weight(1f), label = { AppInputLabel(stringResource(R.string.medication_catalog_package_unit)) }, colors = AppInputTextFieldColors(), singleLine = true)
@@ -219,10 +220,10 @@ private fun CatalogEditor(state: CatalogFormState, padding: PaddingValues, categ
                 onClick = onPickExpiryDate,
             )
         }
-        item { Text(stringResource(R.string.medication_catalog_clinical), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
+        item { Text(stringResource(R.string.medication_catalog_clinical), style = LocalAppTokens.current.type.titleS) }
         item { MedicationIndicationsEditor(state.indications, diseasesById, customDiseasesById, onAddIndication) { updated -> onChange(state.copy(indications = updated)) } }
         item { OutlinedTextField(state.sideEffectWarning, { onChange(state.copy(sideEffectWarning = it)) }, Modifier.fillMaxWidth(), label = { AppInputLabel(stringResource(R.string.medication_catalog_side_effect_warning)) }, colors = AppInputTextFieldColors(), minLines = 2) }
-        item { Text(stringResource(R.string.medication_catalog_other), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) }
+        item { Text(stringResource(R.string.medication_catalog_other), style = LocalAppTokens.current.type.titleS) }
         item { HorizontalImageEditor(state.imageBitmaps, onPickImage, { index -> onChange(state.copy(imagePaths = state.imagePaths.filterIndexed { i, _ -> i != index }, imageBitmaps = state.imageBitmaps.filterIndexed { i, _ -> i != index })) }) }
         item { androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             FilterChip(state.archived, { onChange(state.copy(archived = !state.archived)) }, label = { Text(stringResource(R.string.medication_catalog_archive)) })
@@ -249,11 +250,11 @@ private fun MedicationIndicationsEditor(
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         AppIconTextButton(stringResource(R.string.medication_catalog_add_indication), R.drawable.ic_add, onAdd)
         indications.forEach { reference ->
-            androidx.compose.material3.Surface(color = androidx.compose.material3.MaterialTheme.colorScheme.tertiaryContainer, shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp)) {
+            androidx.compose.material3.Surface(color = LocalAppTokens.current.colors.warning.copy(alpha = 0.18f), shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp)) {
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                    Text(reference.displayName(diseasesById, customDiseasesById), modifier = Modifier.padding(start = 8.dp), color = androidx.compose.material3.MaterialTheme.colorScheme.onTertiaryContainer)
+                    Text(reference.displayName(diseasesById, customDiseasesById), modifier = Modifier.padding(start = 8.dp), color = LocalAppTokens.current.colors.warning)
                     IconButton(onClick = { onChange(indications - reference) }) {
-                        Icon(painterResource(R.drawable.ic_cancel), contentDescription = stringResource(R.string.medication_catalog_remove_indication), tint = androidx.compose.material3.MaterialTheme.colorScheme.onTertiaryContainer)
+                        Icon(painterResource(R.drawable.ic_cancel), contentDescription = stringResource(R.string.medication_catalog_remove_indication), tint = LocalAppTokens.current.colors.warning)
                     }
                 }
             }
@@ -290,7 +291,7 @@ private fun FrequencyEditor(value: MedicationFrequency, onChange: (MedicationFre
 private fun IntakeRulesEditor(value: List<MedicationIntakeRule>, onChange: (List<MedicationIntakeRule>) -> Unit) {
     val anchorOptions = MedicationTimingAnchor.entries.map { anchor -> AppDropdownOption(anchor.name, when (anchor) { MedicationTimingAnchor.BREAKFAST -> stringResource(R.string.medication_timing_breakfast); MedicationTimingAnchor.LUNCH -> stringResource(R.string.medication_timing_lunch); MedicationTimingAnchor.DINNER -> stringResource(R.string.medication_timing_dinner); MedicationTimingAnchor.WAKE_UP -> stringResource(R.string.medication_timing_wake_up); MedicationTimingAnchor.BEDTIME -> stringResource(R.string.medication_timing_bedtime) }) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.medication_catalog_timing), style = androidx.compose.material3.MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.medication_catalog_timing), style = LocalAppTokens.current.type.titleS)
         value.forEachIndexed { index, rule ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 AppDropdownField(stringResource(R.string.medication_timing_anchor), anchorOptions.first { it.id == rule.anchor.name }.label, anchorOptions, { option -> onChange(value.toMutableList().apply { set(index, rule.copy(anchor = MedicationTimingAnchor.valueOf(option.id))) }) }, Modifier.weight(1f))

@@ -418,7 +418,7 @@
     <string name="record_action_heart_rate">记心率</string>
     <string name="record_action_temperature">记体温</string>
     <string name="record_action_height">记身高</string>
-    <string name="record_search">搜索记录功能</string>
+    <string name="record_search">搜索记录功能，支持模糊搜索</string>
     <string name="record_no_data">暂无记录</string>
     <string name="record_seconds_ago">%1$d 秒前</string>
     <string name="record_minutes_ago">%1$d 分钟前</string>
@@ -693,6 +693,7 @@
     <string name="record_search_alias_circumference">腰围、大腿围、小腿围、臀围、胸围、手臂围</string>
     <string name="record_search_alias_container">杯、碗、盘、瓶、罐、家用容器</string>
     <string name="circumference_title">身体围度</string>
+    <string name="circumference_pick_hint">选择要记录的部位，每个部位各自保存历史与走势图。</string>
     <string name="circumference_waist">腰围</string>
     <string name="circumference_thigh">大腿围</string>
     <string name="circumference_calf">小腿围</string>
@@ -965,6 +966,7 @@
     <string name="medication_timing_offset_minutes_help">单位为分钟：-60 表示前 60 分钟，0 表示同时，30 表示后 30 分钟。</string>
     <!-- 身体记录 -->
     <string name="body_record_count">共 %1$d 条记录</string>
+    <string name="body_record_empty_hint">添加身高或体重记录后，这里会显示走势与历史明细。</string>
     <string name="body_record_add">添加记录</string>
     <string name="body_record_date">日期</string>
     <string name="body_record_time">时间</string>
@@ -1096,20 +1098,13 @@
     <string name="compose_theme_preview_title">Compose 主题预览</string>
     <string name="compose_theme_preview_body">Material 3 主题已启用</string>
     <string name="compose_theme_preview_open_settings">打开软件设置</string>
-    <string name="compose_components_preview_title">公用组件预览</string>
+    <string name="compose_components_preview_title">设计令牌</string>
     <string name="compose_components_preview_open">打开公用组件预览</string>
-    <string name="compose_font_scale_section">字体大小滑动条</string>
-    <string name="compose_confirm_dialog_section">确认对话框</string>
-    <string name="compose_show_confirm_dialog">显示确认对话框</string>
-    <string name="compose_confirm_dialog_title">确认操作</string>
-    <string name="compose_confirm_dialog_message">这是一个公用确认对话框组件，用于破坏性动作的二次确认。</string>
     <string name="compose_confirm_dialog_ok">确认</string>
     <string name="compose_confirm_dialog_cancel">取消</string>
     <string name="compose_date_time_picker_select_time">选择时间</string>
     <string name="compose_date_picker_select_date">选择日期</string>
     <string name="compose_date_picker_select_year">选择年份</string>
-    <string name="compose_text_overflow_section">文字溢出处理</string>
-    <string name="compose_chart_section">Compose 图表</string>
     <string name="compose_chart_time_value_demo">时间-数值图表</string>
     <string name="compose_chart_numeric_xy_demo">纯数值 XY 图表</string>
     <string name="compose_chart_category_demo">类别 X 图表</string>
@@ -1195,7 +1190,6 @@
     <string name="text_overflow_marquee">轮播模式</string>
     <string name="text_overflow_marquee_desc">超出部分左右滚动显示</string>
     <string name="text_overflow_marquee_speed">轮播速度</string>
-    <string name="text_overflow_marquee_speed_desc">ms/字，范围 50-2000</string>
     <string name="text_overflow_marquee_iterations">轮播次数</string>
     <string name="text_overflow_marquee_iterations_hint">0 表示无限循环。</string>
     <string name="text_overflow_marquee_iterations_minimum_hint">最小值：0。0 表示无限循环。</string>
@@ -1436,7 +1430,8 @@
     <string name="container_title">记容器</string>
     <string name="container_add">添加容器</string>
     <string name="container_edit">编辑容器</string>
-    <string name="container_empty">还没有容器，点击上方按钮添加一个家用容器。</string>
+    <string name="container_empty">还没有容器</string>
+    <string name="container_empty_hint">把常用的杯子、碗、瓶子加进来，记饮食时就能直接选。</string>
     <string name="container_section_basic">基本信息</string>
     <string name="container_name">名称</string>
     <string name="container_category">分类</string>
@@ -1459,7 +1454,8 @@
     <string name="container_save">保存容器</string>
     <string name="container_delete_confirm_title">删除容器？</string>
     <string name="container_delete_confirm_message">确定删除“%1$s”？</string>
-    <string name="container_filter_empty">没有符合当前筛选条件的容器。</string>
+    <string name="container_filter_empty">没有符合条件的容器</string>
+    <string name="container_filter_empty_hint">换一组分类或场景标签，或者先在容器设置里给它们打上标签。</string>
     <string name="container_settings_title">容器设置</string>
     <string name="container_system_categories">系统分类</string>
     <string name="container_scenario_tags">容器使用场景标签</string>
@@ -1492,13 +1488,16 @@
     <string name="sleep_edit">编辑睡眠</string>
     <string name="sleep_delete">删除睡眠记录</string>
     <string name="sleep_delete_message">删除 %1$s 的睡眠记录？</string>
-    <string name="sleep_empty">还没有睡眠记录。添加你的第一次夜间睡眠或小憩吧。</string>
+    <string name="sleep_empty">还没有睡眠记录</string>
+    <string name="sleep_empty_hint">记录第一次夜间睡眠或小憩，这里就会出现。</string>
     <string name="sleep_kind_title">睡眠类型</string>
     <string name="sleep_kind_night">夜间睡眠</string>
     <string name="sleep_kind_nap">小憩</string>
     <string name="sleep_filter_all">全部</string>
     <string name="sleep_ongoing">进行中</string>
     <string name="sleep_history">历史</string>
+    <string name="sleep_time_section">入睡与醒来</string>
+    <string name="sleep_timer_section">计时器</string>
     <string name="sleep_start_time">入睡时间</string>
     <string name="sleep_wake_time">醒来时间</string>
     <string name="sleep_wake_time_empty">进行中（暂无醒来时间）</string>
@@ -1646,6 +1645,7 @@
     <string name="diet_settings_default_habits">默认饮食习惯</string>
     <string name="diet_settings_default_habits_description">为每个用餐时段设置默认时长与习惯记录时机。</string>
     <string name="diet_settings_default_duration">默认时长</string>
+    <string name="diet_settings_default_duration_description">该时段新增用餐时默认填写的时长，切换单位会按等值换算。</string>
     <string name="diet_settings_default_duration_value">时长</string>
     <string name="diet_settings_duration_unit">单位</string>
     <string name="diet_settings_record_timing">习惯记录时机</string>

@@ -22,6 +22,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 
 /**
  * Vertical percent slider: top = 100%, bottom = 0%.
@@ -43,7 +44,7 @@ internal fun VerticalPercentSlider(
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scheme = MaterialTheme.colorScheme
+    val scheme = LocalAppTokens.current.colors
     val density = LocalDensity.current
     val trackWidthPx = with(density) { 4.dp.toPx() }
     val thumbRadiusPx = with(density) { 9.dp.toPx() }
@@ -91,7 +92,7 @@ internal fun VerticalPercentSlider(
             val corner = CornerRadius(trackWidthPx / 2f)
 
             drawRoundRect(
-                color = scheme.surfaceVariant,
+                color = scheme.panelRaised,
                 topLeft = Offset(trackLeft, track.trackTop),
                 size = Size(trackWidthPx, track.trackHeight),
                 cornerRadius = corner,
@@ -115,14 +116,14 @@ internal fun VerticalPercentSlider(
         }
         Text(
             text = "100%",
-            style = MaterialTheme.typography.labelSmall,
-            color = scheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.caption,
+            color = scheme.textMuted,
             modifier = Modifier.align(Alignment.TopCenter),
         )
         Text(
             text = "0%",
-            style = MaterialTheme.typography.labelSmall,
-            color = scheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.caption,
+            color = scheme.textMuted,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
     }

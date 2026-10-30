@@ -486,7 +486,7 @@ private fun CustomOnlyButton(
         color = if (selected) colors.first else colors.first.copy(alpha = 0.4f),
         border = androidx.compose.foundation.BorderStroke(
             1.dp,
-            if (selected) colors.second else MaterialTheme.colorScheme.outlineVariant,
+            if (selected) colors.second else LocalAppTokens.current.colors.border,
         ),
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -610,7 +610,7 @@ private fun FoodResultsHost(
                 )
             }
         }
-        val boundaryColor = MaterialTheme.colorScheme.tertiary
+        val boundaryColor = LocalAppTokens.current.colors.warning
         val readyBoundary = boundaryState as? FoodListBoundaryState.Ready
         Box(
             modifier = Modifier
@@ -676,7 +676,7 @@ private fun CategorySidebar(state: NutritionUiState, viewModel: NutritionViewMod
     Surface(
         modifier = modifier.fillMaxWidth().fillMaxHeight(),
         shape = RoundedCornerShape(6.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.3f),
     ) {
         if (children.isEmpty()) {
             CategoryRootList(state, viewModel, Modifier.fillMaxWidth().padding(2.dp))
@@ -708,7 +708,7 @@ private fun CategoryRootList(state: NutritionUiState, viewModel: NutritionViewMo
             modifier = Modifier.fillMaxWidth().height(28.dp).clickable(onClick = viewModel::toggleCustomOnly),
             shape = RoundedCornerShape(6.dp),
             color = if (state.customOnly) colors.first else colors.first.copy(alpha = 0.4f),
-            border = androidx.compose.foundation.BorderStroke(1.dp, if (state.customOnly) colors.second else MaterialTheme.colorScheme.outlineVariant),
+            border = androidx.compose.foundation.BorderStroke(1.dp, if (state.customOnly) colors.second else LocalAppTokens.current.colors.border),
         ) {
             Box(modifier = Modifier.padding(horizontal = 2.dp), contentAlignment = Alignment.Center) {
                 TextOverflowText(stringResource(state.selectedKind.customLabelRes()), style = TextStyle(fontSize = FontTokens.body), color = colors.second, maxLines = 1)
@@ -755,9 +755,9 @@ private fun CategoryLabel(text: String) {
 
 @Composable
 private fun TagRow(title: String, tags: List<Pair<String, String>>, selected: Set<String>, onToggle: (String) -> Unit, onAdd: (() -> Unit)? = null) {
-    Surface(modifier = Modifier.fillMaxWidth().height(44.dp).padding(bottom = 4.dp), shape = RoundedCornerShape(6.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) {
+    Surface(modifier = Modifier.fillMaxWidth().height(44.dp).padding(bottom = 4.dp), shape = RoundedCornerShape(6.dp), color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.3f)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight().padding(horizontal = 4.dp)) {
-            Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(title, style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted)
             Row(modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) { tags.forEach { (id, label) -> CompactFilterChip(id in selected, { onToggle(id) }) { Text(label, style = TextStyle(fontSize = FontTokens.body)) } } }
             onAdd?.let { IconButton(onClick = it, modifier = Modifier.size(28.dp)) { Icon(Icons.Filled.Add, stringResource(R.string.nutrition_add_tag)) } }
         }
@@ -769,8 +769,8 @@ private fun CompactFilterChip(selected: Boolean, onClick: () -> Unit, modifier: 
     Surface(
         modifier = modifier.height(28.dp).clickable(onClick = onClick),
         shape = RoundedCornerShape(6.dp),
-        color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        border = androidx.compose.foundation.BorderStroke(1.dp, if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outlineVariant),
+        color = if (selected) LocalAppTokens.current.colors.primaryContainer else LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.45f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (selected) LocalAppTokens.current.colors.textMuted else LocalAppTokens.current.colors.border),
     ) {
         Box(modifier = Modifier.padding(horizontal = 2.dp), contentAlignment = Alignment.Center) { label() }
     }
@@ -795,7 +795,7 @@ private fun FoodCardNameHeader(
                 Icons.Filled.Edit,
                 contentDescription = stringResource(R.string.nutrition_custom_marker),
                 modifier = Modifier.size(AppSpacingDefault.s4),
-                tint = MaterialTheme.colorScheme.primary,
+                tint = LocalAppTokens.current.colors.primary,
             )
             Spacer(Modifier.width(AppSpacingDefault.s1))
         }
@@ -849,7 +849,7 @@ private fun FoodCardMetadataHeader(food: FoodCardMetadata) {
     CopyableFoodNameArea(copyText) {
         Row(verticalAlignment = Alignment.CenterVertically) {
         if (food.isCustom) {
-            Icon(Icons.Filled.Edit, stringResource(R.string.nutrition_custom_marker), Modifier.size(14.dp), tint = MaterialTheme.colorScheme.primary)
+            Icon(Icons.Filled.Edit, stringResource(R.string.nutrition_custom_marker), Modifier.size(14.dp), tint = LocalAppTokens.current.colors.primary)
             Spacer(Modifier.width(2.dp))
         }
         Surface(modifier = Modifier.fillMaxWidth(0.8f).height(28.dp), shape = RoundedCornerShape(6.dp), color = colors.first) {
@@ -928,10 +928,10 @@ private fun FoodRow(
     Surface(
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
         shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f),
+        color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.34f),
         border = androidx.compose.foundation.BorderStroke(
             2.dp,
-            MaterialTheme.colorScheme.primary.copy(alpha = highlight.value),
+            LocalAppTokens.current.colors.primary.copy(alpha = highlight.value),
         ),
     ) {
     Row(modifier = Modifier.fillMaxWidth().clickable { onClick(fullFood) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -945,20 +945,20 @@ private fun FoodRow(
         Spacer(Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
                 FoodCardMetadataHeader(food)
-            Text(stringResource(R.string.nutrition_energy_per_100g, food.energyPer100g), style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.nutrition_energy_per_100g, food.energyPer100g), style = LocalAppTokens.current.type.body)
             secondaryLine?.let {
-                TextOverflowText(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                TextOverflowText(it, style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted)
             }
             food.categoryLabels.takeIf { it.isNotEmpty() }?.let { labels ->
                 TextOverflowText(
                     text = labels.joinToString(" / "),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalAppTokens.current.type.caption,
+                    color = LocalAppTokens.current.colors.textMuted,
                 )
             }
         }
         if (showGlycemicIndicator) GlycemicGlass(glycemicLevel(food.glycemicIndex, food.glycemicLoadPer100g))
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = LocalAppTokens.current.colors.textMuted)
     }
     }
     if (previewing) FoodImagePreview(previewImage, onDismiss = { previewing = false })
@@ -970,9 +970,9 @@ private fun GlycemicGlass(level: com.woshiwangnima.healthdietpro.model.food.Glyc
         GlycemicClassification.Low -> androidx.compose.ui.graphics.Color(0xFF2E7D32)
         GlycemicClassification.Medium -> androidx.compose.ui.graphics.Color(0xFFF9A825)
         GlycemicClassification.High -> androidx.compose.ui.graphics.Color(0xFFC62828)
-        null -> MaterialTheme.colorScheme.outlineVariant
+        null -> LocalAppTokens.current.colors.border
     }
-    val background = MaterialTheme.colorScheme.surfaceVariant
+    val background = LocalAppTokens.current.colors.panelRaised
     Box(Modifier.width(20.dp).height(30.dp), contentAlignment = Alignment.Center) {
     androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
         val path = glycemicDropPath(size.width, size.height)
@@ -984,7 +984,7 @@ private fun GlycemicGlass(level: com.woshiwangnima.healthdietpro.model.food.Glyc
         }
         drawPath(path, color = color, style = Stroke(1.5f))
     }
-    if (level == null) Text("?", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    if (level == null) Text("?", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold), color = LocalAppTokens.current.colors.textMuted)
     }
 }
 
@@ -1329,7 +1329,7 @@ private fun FoodDetailContent(
             confirmButton = {
                 androidx.compose.material3.TextButton(
                     onClick = { confirmingDelete = false; viewModel.deleteCustomFood(food.id) },
-                    colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = LocalAppTokens.current.colors.danger),
                 ) { Text(stringResource(R.string.nutrition_editor_delete)) }
             },
             dismissButton = { androidx.compose.material3.TextButton({ confirmingDelete = false }) { Text(stringResource(R.string.body_record_cancel)) } },
@@ -1395,7 +1395,7 @@ private fun FoodHeaderPages(
 ) {
     AnimatedPageContent(page, modifier.fillMaxWidth(), direction = { _, _ -> direction }) { currentPage ->
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-            val textStyle = MaterialTheme.typography.bodySmall
+            val textStyle = LocalAppTokens.current.type.bodyS
             if (currentPage == 0) {
                 Text(
                     food.displayDescription(language).ifBlank { stringResource(R.string.nutrition_header_introduction_empty) },
@@ -1471,7 +1471,7 @@ private fun FoodSourcesSection(food: FoodItem, textStyle: androidx.compose.ui.te
         Text(
             stringResource(R.string.nutrition_sources_empty),
             style = textStyle,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = LocalAppTokens.current.colors.textMuted,
         )
     } else {
         food.sources.forEach { source -> SourceLink(source.dataset, source.reference, textStyle) }
@@ -1620,7 +1620,7 @@ private fun KindInfoSection(
     viewModel: NutritionViewModel,
     language: String,
     onOpenFood: (FoodItem) -> Unit,
-    textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
+    textStyle: androidx.compose.ui.text.TextStyle = LocalAppTokens.current.type.body,
 ) {
     food.botanicalTaxonomy?.let { taxonomy ->
         val labels = viewModel.botanicalTaxonomy()
@@ -1688,11 +1688,11 @@ private fun DishRecipeSection(dish: Dish, viewModel: NutritionViewModel, languag
         AppSectionCard(R.drawable.ic_list, stringResource(R.string.nutrition_ingredient_list)) {
             val (auxiliary, main) = dish.components.partition { c -> viewModel.foodById(c.foodId)?.let { viewModel.isAuxiliary(it) } == true }
             if (main.isNotEmpty()) {
-                Text(stringResource(R.string.nutrition_ingredient_main), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = AppSpacingDefault.s1))
+                Text(stringResource(R.string.nutrition_ingredient_main), style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted, modifier = Modifier.padding(top = AppSpacingDefault.s1))
                 main.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
             }
             if (auxiliary.isNotEmpty()) {
-                Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = AppSpacingDefault.s2))
+                Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted, modifier = Modifier.padding(top = AppSpacingDefault.s2))
                 auxiliary.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
             }
         }
@@ -1728,7 +1728,7 @@ private fun FoodRecipeSection(food: PreparedFood, viewModel: NutritionViewModel,
             }
             main.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
             if (auxiliary.isNotEmpty()) {
-                Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = AppSpacingDefault.s2))
+                Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted, modifier = Modifier.padding(top = AppSpacingDefault.s2))
                 auxiliary.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
             }
         }
@@ -1782,7 +1782,7 @@ private fun IngredientJumpLine(
 private fun FoodNavigationLink(
     text: String,
     modifier: Modifier = Modifier,
-    textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
+    textStyle: androidx.compose.ui.text.TextStyle = LocalAppTokens.current.type.body,
     onClick: () -> Unit,
 ) {
     val tokens = LocalAppTokens.current
@@ -1793,7 +1793,7 @@ private fun FoodNavigationLink(
         TextOverflowText(
             text = text,
             style = textStyle.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
-            color = MaterialTheme.colorScheme.primary,
+            color = LocalAppTokens.current.colors.primary,
             maxLines = 1,
         )
     }
@@ -1922,7 +1922,7 @@ private fun RelatedDishRow(
 }
 
 @Composable
-private fun SourceLink(dataset: String, reference: String, textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium) {
+private fun SourceLink(dataset: String, reference: String, textStyle: androidx.compose.ui.text.TextStyle = LocalAppTokens.current.type.body) {
     val context = LocalContext.current
     val tokens = LocalAppTokens.current
     Column(Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s1)) {
@@ -2085,7 +2085,7 @@ private fun PauseBars(contentDescription: String) {
 }
 
 @Composable
-private fun InfoLine(label: String, value: String, textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium) {
+private fun InfoLine(label: String, value: String, textStyle: androidx.compose.ui.text.TextStyle = LocalAppTokens.current.type.body) {
     val tokens = LocalAppTokens.current
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s1)) {
         Text(label, style = textStyle, color = tokens.colors.textMuted)
@@ -2188,7 +2188,7 @@ private fun HealthMetricsTable(
 @Composable
 private fun HealthMetricHeader(text: String, modifier: Modifier) {
     Box(modifier.padding(horizontal = AppSpacingDefault.s1, vertical = AppSpacingDefault.s1), contentAlignment = Alignment.Center) {
-        Text(text, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, maxLines = 2)
+        Text(text, style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted, textAlign = TextAlign.Center, maxLines = 2)
     }
 }
 
@@ -2474,7 +2474,7 @@ private fun GlycemicClassificationText(classification: GlycemicClassification) {
         GlycemicClassification.Medium -> R.string.nutrition_classification_medium
         GlycemicClassification.High -> R.string.nutrition_classification_high
     }
-    Text(stringResource(labelRes), style = MaterialTheme.typography.bodySmall, color = color)
+    Text(stringResource(labelRes), style = LocalAppTokens.current.type.bodyS, color = color)
 }
 
 @Composable
@@ -2550,8 +2550,8 @@ private fun FoodServingSelector(
             Text(
                 text = stringResource(R.string.nutrition_serving_edible_grams, formatGrams(edibleGrams)),
                 modifier = Modifier.fillMaxWidth().padding(top = AppSpacingDefault.s1),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.caption,
+                color = LocalAppTokens.current.colors.textMuted,
                 textAlign = TextAlign.End,
             )
         }
@@ -2635,7 +2635,7 @@ private fun NrvReferenceHeader(
                     imageVector = Icons.Filled.ArrowDropDown,
                     contentDescription = null,
                     modifier = Modifier.size(tokens.spacing.s4),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = LocalAppTokens.current.colors.textMuted,
                 )
             }
         }
@@ -2667,7 +2667,7 @@ private fun ExerciseExpenditureScreen(request: NutritionExerciseRequest, onBack:
             request.servings.forEach { serving ->
                 Text(
                     text = stringResource(R.string.nutrition_energy_for_basis, serving.kilocalories, 1.0, serving.label),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = LocalAppTokens.current.type.body,
                     modifier = Modifier.padding(vertical = AppSpacingDefault.s1),
                 )
             }
@@ -2750,7 +2750,7 @@ private fun FoodComparisonScreen(
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
     BaseScreen(title = stringResource(food.kind.comparisonTitleRes()), onBack = onBack, includeStatusBarPadding = false) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(food.displayName(language), style = MaterialTheme.typography.titleMedium)
+            Text(food.displayName(language), style = LocalAppTokens.current.type.titleS)
             EqualWidthSegmentedTabs(
                 tabs = listOf<FoodKind?>(null, FoodKind.INGREDIENT, FoodKind.FOOD, FoodKind.DISH).map { kind ->
                     EqualWidthTab.text(if (kind == null) stringResource(R.string.nutrition_compare_all) else stringResource(kind.detailTitleRes()))
@@ -2759,7 +2759,7 @@ private fun FoodComparisonScreen(
                 onSelected = { kindFilter = listOf<FoodKind?>(null, FoodKind.INGREDIENT, FoodKind.FOOD, FoodKind.DISH)[it] },
             )
             OutlinedTextField(query, { query = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, label = { Text(stringResource(R.string.nutrition_compare_search)) })
-            Text(stringResource(R.string.nutrition_compare_candidates), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.nutrition_compare_candidates), style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted)
             AppDataTable(
                 rows = opponents,
                 rowKey = { _, candidate -> candidate.id },
@@ -2777,7 +2777,7 @@ private fun FoodComparisonScreen(
                 onRowClick = { opponentId = it.id },
             )
             if (opponent == null) {
-                Text(stringResource(R.string.nutrition_compare_choose_target), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.nutrition_compare_choose_target), color = LocalAppTokens.current.colors.textMuted)
             } else {
                 val left = runCatching { resolve(food) }.getOrNull()
                 val right = runCatching { resolve(opponent) }.getOrNull()
@@ -2787,9 +2787,9 @@ private fun FoodComparisonScreen(
                     .filter { it in metaByCode }
                     .sortedBy { nutrientMetas.indexOf(metaByCode.getValue(it)) }
                     .map { code -> ComparisonRow(metaByCode.getValue(code), left?.nutrients?.get(code), right?.nutrients?.get(code)) }
-                Surface(modifier = Modifier.fillMaxWidth().weight(1f), shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) {
+                Surface(modifier = Modifier.fillMaxWidth().weight(1f), shape = RoundedCornerShape(8.dp), color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.3f)) {
                     Column(Modifier.padding(6.dp)) {
-                        Text(stringResource(R.string.nutrition_compare_results), style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.nutrition_compare_results), style = LocalAppTokens.current.type.titleS)
                         AppDataTable(
                             rows = rows,
                             rowKey = { _, row -> row.meta.code },
@@ -2816,7 +2816,7 @@ private fun ComparisonValue(value: com.woshiwangnima.healthdietpro.model.food.Fo
     val isHigher = value != null && (other == null || value.value > other.value)
     Text(
         text = value?.let { "${it.value.formatTableValue()} ${it.unitId}" } ?: "-",
-        style = if (isHigher) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium,
+        style = if (isHigher) LocalAppTokens.current.type.titleS else LocalAppTokens.current.type.body,
         fontWeight = if (isHigher) FontWeight.Bold else FontWeight.Normal,
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
@@ -2828,16 +2828,16 @@ private fun NutritionActionButton(iconRes: Int, text: String, onClick: () -> Uni
     Surface(
         modifier = Modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(6.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.45f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, LocalAppTokens.current.colors.border),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(painterResource(iconRes), null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(painterResource(iconRes), null, modifier = Modifier.size(16.dp), tint = LocalAppTokens.current.colors.textMuted)
             Spacer(Modifier.width(4.dp))
-            Text(text, style = TextStyle(fontSize = FontTokens.body), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text, style = TextStyle(fontSize = FontTokens.body), color = LocalAppTokens.current.colors.textMuted)
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.container.CircleShape
 import com.woshiwangnima.healthdietpro.model.container.CrossSectionShape
 import com.woshiwangnima.healthdietpro.model.container.IrregularShape
@@ -43,14 +44,14 @@ internal fun CrossSectionPreview(
     showDimensions: Boolean = true,
     annotation: PreviewAnnotation = PreviewAnnotation.NONE,
 ) {
-    val scheme = MaterialTheme.colorScheme
+    val scheme = LocalAppTokens.current.colors
     val fill = scheme.primary.copy(alpha = 0.22f)
     val stroke = scheme.primary
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
                 .size(width = 96.dp, height = 72.dp)
-                .border(1.dp, scheme.outlineVariant, RoundedCornerShape(8.dp)),
+                .border(1.dp, scheme.border, RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center,
         ) {
             Canvas(Modifier.matchParentSize().padding(10.dp)) {
@@ -65,8 +66,8 @@ internal fun CrossSectionPreview(
         if (showDimensions) {
             Text(
                 text = shape.paramSummary(),
-                style = MaterialTheme.typography.bodySmall,
-                color = scheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.bodyS,
+                color = scheme.textMuted,
             )
         }
     }

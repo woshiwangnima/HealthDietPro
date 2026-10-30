@@ -31,6 +31,9 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -47,6 +50,9 @@ import com.woshiwangnima.healthdietpro.R
  * 约定：标题 `body`、图标 20 dp 主色、行高 ≥ 56 dp。
  * - [tooltip]：**不恒显**的说明。行里只留标题与当前值，用户长按该行时才在行旁弹出文字提示
  *   （[AppTooltipPopup]），列表因此保持一行一项的节奏，不会因为每行带一句解释而变成两行。
+ *   凡是「这个选项/这项设置是干什么的」一类解释，一律走这里，不要塞进 [subtitle]。
+ * - [subtitle]：只在确实有**随状态变化**的内容（当前取值、前置条件、失效原因）时才用；
+ *   一组行里只有一行带副标题，会让它高出一截，读者会误以为它在被强调。
  * - [showChevron] 只给「点了会进下一层」的行；[expanded] 非空时改用可旋转的下箭头，
  *   表示这一行就地展开内容（如「来源与参考」下面直接列出 DRIs / WHO）。
  * - [trailingValue] 是这一行当前的值；有值无箭头的那一行一定不切页面，而是就地改值或弹确认框。
@@ -182,7 +188,11 @@ fun AppListRow(
  *
  * [horizontalPadding] 默认取 `space.3`（贴在卡片里）；放进对话框等自带内容内边距的容器时传 `0.dp`，
  * 否则选项会比标题多缩一截。
+ *
+ * [subtitle] 只放「这个选项当前的取值/条件」，解释这个选项是什么请用 [tooltip]：
+ * 一组单选项里如果只有一个带副标题，那一项会莫名其妙地比其他项高一截，读者还会以为它在被推荐。
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppRadioRow(
     title: String,
@@ -190,14 +200,33 @@ fun AppRadioRow(
     onSelect: () -> Unit,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    tooltip: String? = null,
     horizontalPadding: Dp? = null,
 ) {
     val tokens = LocalAppTokens.current
+    val hasTooltip = !tooltip.isNullOrBlank()
+    val tooltipState = rememberAppTooltipState()
+    val tooltipLabel = stringResource(R.string.common_tooltip_long_press)
+    // 有 tooltip 时改用 combinedClickable：点按仍是「选中」，长按才是「解释这个选项」。
+    // role / selected 语义手动补回，否则读屏会把单选读成普通按钮。
+    val interaction = if (hasTooltip) {
+        Modifier
+            .combinedClickable(
+                role = Role.RadioButton,
+                onLongClickLabel = tooltipLabel,
+                onLongClick = { tooltipState.show() },
+                onClick = onSelect,
+            )
+            .semantics { this.selected = selected }
+    } else {
+        Modifier.selectable(selected = selected, onClick = onSelect)
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = tokens.spacing.rowMinHeight)
-            .selectable(selected = selected, onClick = onSelect)
+            .onGloballyPositioned { tooltipState.updateAnchor(it.boundsInWindow()) }
+            .then(interaction)
             .padding(
                 horizontal = horizontalPadding ?: tokens.spacing.s3,
                 vertical = tokens.spacing.s2,
@@ -231,6 +260,10 @@ fun AppRadioRow(
                 )
             }
         }
+    }
+
+    if (hasTooltip) {
+        AppTooltipPopup(state = tooltipState, text = tooltip.orEmpty())
     }
 }
 

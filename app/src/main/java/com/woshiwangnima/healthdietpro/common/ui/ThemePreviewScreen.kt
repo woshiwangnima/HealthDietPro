@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 
 @Composable
@@ -31,7 +32,7 @@ fun ThemePreviewScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            color = MaterialTheme.colorScheme.surface,
+            color = LocalAppTokens.current.colors.panel,
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -40,8 +41,8 @@ fun ThemePreviewScreen(
             ) {
                 Text(
                     text = stringResource(R.string.compose_theme_preview_body),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodyLarge,
+                    color = LocalAppTokens.current.colors.text,
+                    style = LocalAppTokens.current.type.body,
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 if (onOpenSettings != null) {

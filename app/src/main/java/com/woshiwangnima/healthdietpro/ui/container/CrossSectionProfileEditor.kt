@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
@@ -90,11 +91,11 @@ internal fun CrossSectionProfileEditor(
     }
 
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("容器截面定义", style = MaterialTheme.typography.titleMedium)
+        Text("容器截面定义", style = LocalAppTokens.current.type.titleS)
         Text(
             "输入容器总高与关键转折处的截面即可：只输一个截面按「面积×高度」计容积；相邻同形截面（圆/方/矩形同比例）按直壁圆台积分，异形或过渡截面线性插值，首尾两端平行延伸。侧视图宽度 ∝ √面积。",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.bodyS,
+            color = LocalAppTokens.current.colors.textMuted,
         )
 
         Row(
@@ -134,8 +135,8 @@ internal fun CrossSectionProfileEditor(
         if (sliceArea != null) {
             Text(
                 "红线处截面面积: %.2f cm²".format(sliceArea),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.bodyS,
+                color = LocalAppTokens.current.colors.textMuted,
             )
         }
 
@@ -167,16 +168,16 @@ internal fun CrossSectionProfileEditor(
                                 fromBaseCm(item.lowerHeight, lengthUnitId), unit, item.lowerArea,
                                 fromBaseCm(item.upperHeight, lengthUnitId), unit, item.upperArea,
                             ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.tertiary,
+                        style = LocalAppTokens.current.type.bodyS,
+                        color = LocalAppTokens.current.colors.warning,
                     )
                 }
                 is CrossSectionValidation.ZeroAreaAtMiddle -> {
                     Text(
                         "❌ %.1f %s 高度面积为 0，仅允许用于底部（尖底）或顶部（密封收口）。"
                             .format(fromBaseCm(item.heightCm, lengthUnitId), unit),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
+                        style = LocalAppTokens.current.type.bodyS,
+                        color = LocalAppTokens.current.colors.danger,
                     )
                 }
             }
@@ -188,12 +189,12 @@ internal fun CrossSectionProfileEditor(
         ) {
             Text(
                 "总容积: ${volume?.let { "%.1f ml".format(it) } ?: "-"}",
-                style = MaterialTheme.typography.titleSmall,
+                style = LocalAppTokens.current.type.titleS,
             )
             Text(
                 "总高: ${totalHeightCm?.let { "%.1f $unit".format(fromBaseCm(it, lengthUnitId)) } ?: "-"}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalAppTokens.current.type.bodyS,
+                color = LocalAppTokens.current.colors.textMuted,
             )
         }
     }

@@ -19,7 +19,6 @@ internal fun TestLandingScreen(
     onOpenFeatures: () -> Unit,
     onOpenCommonUi: () -> Unit,
     onOpenCrossSection: () -> Unit,
-    onOpenMealIcons: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BaseScreen(title = "测试", includeStatusBarPadding = false) { padding ->
@@ -29,11 +28,10 @@ internal fun TestLandingScreen(
         ) {
             ActionSectionCard(title = "开发验证", titleIconRes = R.drawable.ic_nav_test) {
                 AppIconTextButton("测试指令", R.drawable.ic_settings, onOpenCommands, Modifier.fillMaxWidth())
-                AppIconTextButton("组件与设计令牌", R.drawable.ic_settings, onOpenFeatures, Modifier.fillMaxWidth())
+                AppIconTextButton("设计令牌", R.drawable.ic_settings, onOpenFeatures, Modifier.fillMaxWidth())
                 AppIconTextButton("通用UI功能测试", R.drawable.ic_nav_test, onOpenCommonUi, Modifier.fillMaxWidth())
                 AppIconTextButton("截面形状系统", R.drawable.ic_nav_test, onOpenCrossSection, Modifier.fillMaxWidth())
             }
-            AppIconTextButton("Meal icon candidates", R.drawable.ic_diet, onOpenMealIcons, Modifier.fillMaxWidth())
         }
     }
 }

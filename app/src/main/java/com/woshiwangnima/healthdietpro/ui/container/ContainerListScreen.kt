@@ -1,25 +1,25 @@
 package com.woshiwangnima.healthdietpro.ui.container
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,15 +35,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppFilterChip
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppPillIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppRadiiDefault
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSpacingDefault
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTypeDefault
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.concentricRadius
 import com.woshiwangnima.healthdietpro.model.container.ContainerCategory
 import com.woshiwangnima.healthdietpro.model.container.ContainerRecord
 import com.woshiwangnima.healthdietpro.model.container.ContainerRepository
@@ -55,6 +65,15 @@ import kotlinx.coroutines.isActive
 
 private const val CONTAINER_IMAGE_ROTATION_MS = 3_000L
 
+/**
+ * 容器列表：添加 → 两组筛选 → 卡片列表。
+ *
+ * 旧版把两组筛选各自封进一条 40 dp 的 `Surface` 灰条，条内再塞一个 28 dp 的小胶囊，
+ * 结果是「条 → 胶囊」两层底叠加、标签比选项还显眼，且 28 dp 的可点高度低于 §2.2 的 48 dp。
+ * 现在标签退成 `caption` 小字，选项直接用 `AppFilterChip`（视觉 32 dp、热区 48 dp）。
+ *
+ * 空态分两种：一条都没有（去添加）、筛完没有（改筛选），文案与出口都不同。
+ */
 @Composable
 internal fun ContainerListScreen(
     containers: List<ContainerRecord>,
@@ -70,6 +89,7 @@ internal fun ContainerListScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val tokens = LocalAppTokens.current
     var pendingDelete by remember { mutableStateOf<ContainerRecord?>(null) }
     val context = LocalContext.current
     val filtered = remember(containers, selectedCategories, selectedScenarioTags) {
@@ -81,22 +101,39 @@ internal fun ContainerListScreen(
     BaseScreen(
         title = stringResource(R.string.container_title),
         onBack = onBack,
-        actions = { IconButton(onClick = onSettings) { Icon(painterResource(R.drawable.ic_settings), stringResource(R.string.container_settings_title)) } },
+        actions = {
+            AppPillIconTextButton(
+                text = stringResource(R.string.container_settings_title),
+                iconRes = R.drawable.ic_settings,
+                onClick = onSettings,
+            )
+        },
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            AppIconTextButton(stringResource(R.string.container_add), R.drawable.ic_add, onAdd, Modifier.fillMaxWidth())
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(tokens.colors.bg)
+                .padding(padding)
+                .padding(horizontal = tokens.spacing.page),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+        ) {
+            AppIconTextButton(
+                stringResource(R.string.container_add),
+                R.drawable.ic_add,
+                onAdd,
+                Modifier.fillMaxWidth(),
+            )
             val categoryTags = ContainerCategory.entries
                 .filter { it != ContainerCategory.CUSTOM }
                 .map { it.name to stringResource(it.labelRes()) }
-            ContainerFilterChipRow(
+            ContainerFilterRow(
                 title = stringResource(R.string.container_system_categories),
                 tags = categoryTags,
                 selected = selectedCategories.map { it.name }.toSet(),
                 onToggle = { onToggleCategory(ContainerCategory.valueOf(it)) },
-                chipWidth = SystemCategoryChipWidth,
             )
             if (scenarioTags.isNotEmpty()) {
-                ContainerFilterChipRow(
+                ContainerFilterRow(
                     title = stringResource(R.string.container_scenario_tags),
                     tags = scenarioTags.map { it to it },
                     selected = selectedScenarioTags,
@@ -104,12 +141,25 @@ internal fun ContainerListScreen(
                 )
             }
             if (filtered.isEmpty()) {
-                Text(
-                    text = stringResource(if (containers.isEmpty()) R.string.container_empty else R.string.container_filter_empty),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                val emptyAll = containers.isEmpty()
+                AppEmptyState(
+                    title = stringResource(if (emptyAll) R.string.container_empty else R.string.container_filter_empty),
+                    description = stringResource(
+                        if (emptyAll) R.string.container_empty_hint else R.string.container_filter_empty_hint,
+                    ),
+                    iconRes = R.drawable.ic_container,
+                    action = if (emptyAll) {
+                        { AppIconTextButton(stringResource(R.string.container_add), R.drawable.ic_add, onAdd) }
+                    } else {
+                        null
+                    },
                 )
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(bottom = tokens.spacing.s4),
+                    verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+                ) {
                     items(filtered, key = { it.id }) { container ->
                         ContainerListCard(container, onEdit, { pendingDelete = container })
                     }
@@ -121,63 +171,61 @@ internal fun ContainerListScreen(
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
             title = { Text(stringResource(R.string.container_delete_confirm_title)) },
-            text = { Text(stringResource(R.string.container_delete_confirm_message, container.name.ifBlank { context.getString(container.category.labelRes()) })) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.container_delete_confirm_message,
+                        container.name.ifBlank { context.getString(container.category.labelRes()) },
+                    ),
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     onDelete(container.id)
                     pendingDelete = null
-                }) { Text(stringResource(R.string.body_record_delete), color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.body_record_delete), color = tokens.colors.danger) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.compose_confirm_dialog_cancel)) }
+                TextButton(onClick = { pendingDelete = null }) {
+                    Text(stringResource(R.string.compose_confirm_dialog_cancel))
+                }
             },
         )
     }
 }
 
+/** 一组筛选：一行 `caption` 标签 + 一行可横滚的 `AppFilterChip`。 */
 @Composable
-private fun ContainerFilterChipRow(
+private fun ContainerFilterRow(
     title: String,
     tags: List<Pair<String, String>>,
     selected: Set<String>,
     onToggle: (String) -> Unit,
     modifier: Modifier = Modifier,
-    chipWidth: androidx.compose.ui.unit.Dp? = null,
 ) {
-    Surface(modifier = modifier.fillMaxWidth().height(40.dp), shape = RoundedCornerShape(6.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight().padding(horizontal = 4.dp)) {
-            Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Row(modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                tags.forEach { (id, label) ->
-                    ContainerFilterChip(
-                        selected = id in selected,
-                        onClick = { onToggle(id) },
-                        fixedWidth = chipWidth,
-                        label = { Text(label, style = MaterialTheme.typography.bodySmall) },
-                    )
-                }
+    val tokens = LocalAppTokens.current
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = tokens.type.caption,
+            color = tokens.colors.textMuted,
+            modifier = Modifier.padding(start = tokens.spacing.s1),
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            tags.forEach { (id, label) ->
+                AppFilterChip(
+                    text = label,
+                    selected = id in selected,
+                    onClick = { onToggle(id) },
+                )
             }
         }
-    }
-}
-
-private val SystemCategoryChipWidth = 64.dp
-
-@Composable
-private fun ContainerFilterChip(
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    fixedWidth: androidx.compose.ui.unit.Dp? = null,
-    label: @Composable () -> Unit,
-) {
-    Surface(
-        modifier = modifier.then(if (fixedWidth != null) Modifier.width(fixedWidth) else Modifier).height(28.dp).clickable(onClick = onClick),
-        shape = RoundedCornerShape(6.dp),
-        color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        border = androidx.compose.foundation.BorderStroke(1.dp, if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Box(modifier = Modifier.fillMaxSize().padding(horizontal = 2.dp), contentAlignment = Alignment.Center) { label() }
     }
 }
 
@@ -187,12 +235,27 @@ private fun ContainerListCard(
     onEdit: (ContainerRecord) -> Unit,
     onRequestDelete: (ContainerRecord) -> Unit,
 ) {
-    Card(onClick = { onEdit(container) }, modifier = Modifier.fillMaxWidth()) {
+    val tokens = LocalAppTokens.current
+    val shape = RoundedCornerShape(tokens.radii.container)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(tokens.colors.panelRaised)
+            .border(tokens.radii.highlight, tokens.colors.border, shape)
+            .then(Modifier.clickable { onEdit(container) }),
+    ) {
         ContainerCardRow(container, showDelete = true, onRequestDelete = { onRequestDelete(container) })
     }
 }
 
-/** Reusable 记容器卡片内容：缩略图 + 名称/分类/容量/质量/场景标签，可选删除按钮。 */
+/**
+ * 记容器卡片内容：缩略图 + 名称 / 分类 / 容量 / 质量 / 场景标签，可选删除按钮。
+ *
+ * **共享组件**（容器设置、记饮食的容器选择抽屉都用它），因此颜色只读 `MaterialTheme`、
+ * 间距与字号只读与主题无关的 `AppSpacingDefault` / `AppTypeDefault`：
+ * 迁到 `AppTheme` 的屏取到令牌值，没迁的屏取到旧主题值，两边都不会串色（§8.1 的共享组件规则）。
+ */
 @Composable
 internal fun ContainerCardRow(
     container: ContainerRecord,
@@ -203,42 +266,68 @@ internal fun ContainerCardRow(
     val volumeUnit = AppPrefs.getUnit(context, UnitCategoryType.Volume.id, UnitCategoryType.Volume.defaultUnitId)
     val weightUnit = AppPrefs.getUnit(context, UnitCategoryType.Weight.id, UnitCategoryType.Weight.defaultUnitId)
     val capacityMl = container.capacityMlAtHeightPercent(100.0) ?: container.capacityMl
+    val mutedColor = LocalAppTokens.current.colors.textMuted
     Row(
-        Modifier.fillMaxWidth().padding(10.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(AppSpacingDefault.s3),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacingDefault.s3),
     ) {
         ContainerThumbnail(container)
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(container.name.ifBlank { context.getString(container.category.labelRes()) }, style = MaterialTheme.typography.titleSmall)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AppSpacingDefault.s1)) {
             Text(
-                stringResource(container.category.labelRes()),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = container.name.ifBlank { context.getString(container.category.labelRes()) },
+                style = AppTypeDefault.body,
+                color = LocalAppTokens.current.colors.text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
-                stringResource(R.string.container_capacity_value, fromMl(capacityMl, volumeUnit), volumeUnitSymbol(volumeUnit)),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = stringResource(container.category.labelRes()),
+                style = AppTypeDefault.caption,
+                color = mutedColor,
+                maxLines = 1,
+            )
+            Text(
+                text = stringResource(
+                    R.string.container_capacity_value,
+                    fromMl(capacityMl, volumeUnit),
+                    volumeUnitSymbol(volumeUnit),
+                ),
+                style = AppTypeDefault.caption,
+                color = mutedColor,
+                maxLines = 1,
             )
             container.emptyMassGrams?.let { grams ->
                 Text(
-                    stringResource(R.string.container_empty_mass_value, fromGrams(grams, weightUnit), weightUnitSymbol(weightUnit)),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = stringResource(
+                        R.string.container_empty_mass_value,
+                        fromGrams(grams, weightUnit),
+                        weightUnitSymbol(weightUnit),
+                    ),
+                    style = AppTypeDefault.caption,
+                    color = mutedColor,
+                    maxLines = 1,
                 )
             }
             if (container.scenarioTags.isNotEmpty()) {
                 Text(
-                    container.scenarioTags.joinToString(" · "),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    text = container.scenarioTags.joinToString(" · "),
+                    style = AppTypeDefault.caption,
+                    color = LocalAppTokens.current.colors.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
         if (showDelete) {
             IconButton(onClick = { onRequestDelete?.invoke() }) {
-                Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.body_record_delete), tint = MaterialTheme.colorScheme.error)
+                Icon(
+                    painter = painterResource(R.drawable.ic_delete),
+                    contentDescription = stringResource(R.string.body_record_delete),
+                    tint = LocalAppTokens.current.colors.danger,
+                )
             }
         }
     }
@@ -256,17 +345,19 @@ private fun ContainerThumbnail(container: ContainerRecord) {
             }
         }
     }
+    // 缩略图与卡片同心圆角：外 4 dp 卡角、内缩 0，内层取 4 dp（§2.5 同心圆角）。
+    val thumbShape = RoundedCornerShape(concentricRadius(AppRadiiDefault.container, 0.dp))
     if (paths.isEmpty()) {
-        Surface(Modifier.size(56.dp), color = MaterialTheme.colorScheme.surfaceVariant) {}
+        Surface(Modifier.size(ContainerThumbSize).clip(thumbShape), color = LocalAppTokens.current.colors.panelRaised) {}
         return
     }
     val currentPath = paths[index.coerceIn(0, paths.size - 1)]
     val context = LocalContext.current
     val repository = remember { ContainerRepository.fromContext(context) }
     val bitmap = remember(currentPath) { repository.loadImage(currentPath) }
-    Box(Modifier.size(56.dp)) {
+    Box(Modifier.size(ContainerThumbSize).clip(thumbShape)) {
         if (bitmap == null) {
-            Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceVariant) {}
+            Surface(Modifier.fillMaxSize(), color = LocalAppTokens.current.colors.panelRaised) {}
         } else {
             Image(
                 bitmap = bitmap.asImageBitmap(),
@@ -277,6 +368,9 @@ private fun ContainerThumbnail(container: ContainerRecord) {
         }
     }
 }
+
+/** 列表缩略图边长：与两行文字的卡片高度接近，不抢标题。 */
+private val ContainerThumbSize = 56.dp
 
 internal fun ContainerCategory.labelRes(): Int = when (this) {
     ContainerCategory.CUP -> R.string.container_category_cup

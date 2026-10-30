@@ -15,6 +15,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.rememberAppDarkTheme
 import com.woshiwangnima.healthdietpro.model.container.ContainerRecord
 import com.woshiwangnima.healthdietpro.util.UnitConverter
 import com.woshiwangnima.healthdietpro.ui.container.ContainerViewModel
@@ -26,7 +28,14 @@ class ContainerRecordActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         UnitConverter.init(this)
-        setContent { HealthDietProTheme { ContainerRoute(::finish, intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false)) } }
+        setContent {
+            // 外层保住字号倍率（LocalDensity），内层提供设计令牌（§8.14 的固定组合）。
+            HealthDietProTheme {
+                AppTheme(darkTheme = rememberAppDarkTheme()) {
+                    ContainerRoute(::finish, intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false))
+                }
+            }
+        }
     }
 }
 

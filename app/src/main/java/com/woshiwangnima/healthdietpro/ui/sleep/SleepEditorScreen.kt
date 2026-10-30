@@ -1,5 +1,7 @@
 package com.woshiwangnima.healthdietpro.ui.sleep
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,18 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,9 +34,15 @@ import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDateTimePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.DiscardChangesDialog
 import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
+import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
+import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRowDivider
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSwitchRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.sleep.NocturiaRecord
 import com.woshiwangnima.healthdietpro.model.sleep.SleepKind
 import com.woshiwangnima.healthdietpro.model.sleep.SleepPrefs
@@ -54,6 +53,13 @@ import com.woshiwangnima.healthdietpro.model.sleep.generateDefaultNocturia
 private val NAP_TIMER_MINUTES = listOf(10, 20, 30, 45, 60)
 private val NIGHT_TIMER_MINUTES = listOf(15, 30, 45, 60)
 
+/**
+ * 记一条睡眠。
+ *
+ * 五块语义各一张卡：类别切换（置顶分段控件）→ 入睡与醒来 → 夜尿（仅夜间睡眠）→ 备注 → 计时器（仅醒来时间在未来）。
+ * 旧版把它们平铺成一个 12 dp 间距的纵向列表，标题、字段、开关混在同一层，一屏看不出哪里到哪算一块；
+ * 现在每块自带卡标题，夜间睡眠额外的夜尿时段退到独立的无名分组卡里，不与主字段平级。
+ */
 @Composable
 internal fun SleepEditorScreen(
     existing: SleepRecord?,
@@ -63,6 +69,7 @@ internal fun SleepEditorScreen(
     onCreateTimer: (label: String, minutes: Int, notifyViaSystem: Boolean) -> com.woshiwangnima.healthdietpro.common.timer.TimerInstance,
     modifier: Modifier = Modifier,
 ) {
+    val tokens = LocalAppTokens.current
     val now = System.currentTimeMillis()
     var kind by rememberSaveable(existing?.id) { mutableStateOf(existing?.kind ?: SleepKind.NIGHT_SLEEP) }
     var sleepStartAt by rememberSaveable(existing?.id) { mutableStateOf(existing?.sleepStartAt ?: 0L) }
@@ -142,91 +149,175 @@ internal fun SleepEditorScreen(
         title = stringResource(if (existing == null) R.string.sleep_add else R.string.sleep_edit),
         onBack = ::requestBack,
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(tokens.colors.bg)
+                .padding(padding),
+        ) {
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
             ) {
                 item {
-                    Text(stringResource(R.string.sleep_kind_title), style = MaterialTheme.typography.titleSmall)
-                    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                        SleepKind.entries.forEachIndexed { index, option ->
-                            SegmentedButton(
-                                selected = kind == option,
-                                onClick = { kind = option; timerMinutes = NAP_TIMER_MINUTES.first(); applyKindDefaults(option) },
-                                shape = SegmentedButtonDefaults.itemShape(index, SleepKind.entries.size),
-                                label = { Text(stringResource(option.labelRes())) },
+                    EqualWidthSegmentedTabs(
+                        tabs = SleepKind.entries.map { EqualWidthTab.text(stringResource(it.labelRes())) },
+                        selectedIndex = SleepKind.entries.indexOf(kind),
+                        onSelected = { index ->
+                            val option = SleepKind.entries[index]
+                            kind = option
+                            timerMinutes = NAP_TIMER_MINUTES.first()
+                            applyKindDefaults(option)
+                        },
+                    )
+                }
+                item {
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_sleep,
+                        title = stringResource(R.string.sleep_time_section),
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2)) {
+                            RecordTimePickerField(
+                                title = stringResource(R.string.sleep_start_time),
+                                valueMillis = sleepStartAt,
+                                precision = RecordTimePrecision.MINUTE,
+                                onClick = { pickField = SleepTimeField.START },
+                            )
+                            RecordTimePickerField(
+                                title = stringResource(R.string.sleep_wake_time),
+                                valueMillis = wakeUpAt,
+                                precision = RecordTimePrecision.MINUTE,
+                                onClick = { pickField = SleepTimeField.WAKE },
+                                emptyText = stringResource(R.string.sleep_wake_time_empty),
                             )
                         }
                     }
                 }
-                item { RecordTimePickerField(stringResource(R.string.sleep_start_time), sleepStartAt, RecordTimePrecision.MINUTE, { pickField = SleepTimeField.START }) }
-                item { RecordTimePickerField(stringResource(R.string.sleep_wake_time), wakeUpAt, RecordTimePrecision.MINUTE, { pickField = SleepTimeField.WAKE }, emptyText = stringResource(R.string.sleep_wake_time_empty)) }
                 if (kind == SleepKind.NIGHT_SLEEP) {
                     item {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(stringResource(R.string.sleep_nocturia_title), style = MaterialTheme.typography.titleSmall)
-                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                IconButton(onClick = { nocturiaCount = (nocturiaCount - 1).coerceAtLeast(0) }) {
-                                    Icon(painterResource(R.drawable.ic_minus), stringResource(R.string.sleep_nocturia_decrease))
-                                }
-                                Text(stringResource(R.string.sleep_nocturia_count), modifier = Modifier.padding(horizontal = 8.dp))
-                                Text("$nocturiaCount", style = MaterialTheme.typography.titleMedium)
-                                IconButton(onClick = { nocturiaCount += 1 }) {
-                                    Icon(Icons.Filled.Add, stringResource(R.string.sleep_nocturia_increase))
-                                }
-                            }
-                            OutlinedButton(
-                                onClick = ::regenerateNocturia,
+                        AppSectionCard(
+                            iconRes = R.drawable.ic_daily_record,
+                            title = stringResource(R.string.sleep_nocturia_title),
+                        ) {
+                            Row(
                                 modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                TextOverflowText(
-                                    text = stringResource(R.string.sleep_nocturia_generate),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.fillMaxWidth(),
+                                IconButton(onClick = { nocturiaCount = (nocturiaCount - 1).coerceAtLeast(0) }) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_minus),
+                                        contentDescription = stringResource(R.string.sleep_nocturia_decrease),
+                                        tint = tokens.colors.primary,
+                                    )
+                                }
+                                Text(
+                                    text = stringResource(R.string.sleep_nocturia_count),
+                                    style = tokens.type.body,
+                                    color = tokens.colors.text,
+                                    modifier = Modifier.padding(horizontal = tokens.spacing.s2),
                                 )
+                                Text(
+                                    text = "$nocturiaCount",
+                                    style = tokens.type.numeric,
+                                    color = tokens.colors.text,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                IconButton(onClick = { nocturiaCount += 1 }) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_add),
+                                        contentDescription = stringResource(R.string.sleep_nocturia_increase),
+                                        tint = tokens.colors.primary,
+                                    )
+                                }
                             }
+                            TextOverflowText(
+                                text = stringResource(R.string.sleep_nocturia_generate),
+                                style = tokens.type.bodyS,
+                                color = tokens.colors.primary,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = tokens.spacing.s2)
+                                    .clickable(onClick = ::regenerateNocturia),
+                            )
                         }
                     }
                     nocturia.forEachIndexed { index, entry ->
-                        item {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Text(stringResource(R.string.sleep_nocturia_item, index + 1), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                RecordTimePickerField(stringResource(R.string.sleep_nocturia_start_time), entry.startAt, RecordTimePrecision.MINUTE, { pickField = SleepTimeField.NOCTURIA_START(index) })
-                                RecordTimePickerField(stringResource(R.string.sleep_nocturia_end_time), entry.endAt, RecordTimePrecision.MINUTE, { pickField = SleepTimeField.NOCTURIA_END(index) })
+                        item(key = "nocturia-$index") {
+                            AppSectionCard(
+                                iconRes = R.drawable.ic_time,
+                                title = stringResource(R.string.sleep_nocturia_item, index + 1),
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2)) {
+                                    RecordTimePickerField(
+                                        title = stringResource(R.string.sleep_nocturia_start_time),
+                                        valueMillis = entry.startAt,
+                                        precision = RecordTimePrecision.MINUTE,
+                                        onClick = { pickField = SleepTimeField.NOCTURIA_START(index) },
+                                    )
+                                    RecordTimePickerField(
+                                        title = stringResource(R.string.sleep_nocturia_end_time),
+                                        valueMillis = entry.endAt,
+                                        precision = RecordTimePrecision.MINUTE,
+                                        onClick = { pickField = SleepTimeField.NOCTURIA_END(index) },
+                                    )
+                                }
                             }
                         }
                     }
                 }
-                item { EditorTextField(stringResource(R.string.sleep_note), note, { note = it }, required = false, supportingTextOverride = { Text(stringResource(R.string.sleep_note_hint), color = MaterialTheme.colorScheme.onSurfaceVariant) }) }
+                item {
+                    AppSectionCard(
+                        iconRes = R.drawable.ic_description,
+                        title = stringResource(R.string.sleep_note),
+                    ) {
+                        EditorTextField(
+                            label = stringResource(R.string.sleep_note),
+                            value = note,
+                            onValueChange = { note = it },
+                            required = false,
+                            supportingTextOverride = {
+                                Text(
+                                    text = stringResource(R.string.sleep_note_hint),
+                                    style = tokens.type.caption,
+                                    color = tokens.colors.textMuted,
+                                )
+                            },
+                        )
+                    }
+                }
                 if (timerVisible) {
                     item {
-                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) {
-                                Text(stringResource(R.string.sleep_start_timer), style = MaterialTheme.typography.bodyMedium)
-                                Text(stringResource(R.string.sleep_start_timer_hint), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            Switch(checked = startTimerEnabled, onCheckedChange = { startTimerEnabled = it })
-                        }
-                    }
-                    if (startTimerEnabled) {
-                        item {
-                            val options = if (kind == SleepKind.NAP) NAP_TIMER_MINUTES else NIGHT_TIMER_MINUTES
-                            AppDropdownField(
-                                label = stringResource(R.string.sleep_timer_duration),
-                                value = stringResource(R.string.sleep_timer_duration_value, timerMinutes),
-                                options = options.map { AppDropdownOption(it.toString(), stringResource(R.string.sleep_timer_duration_value, it)) },
-                                onSelect = { timerMinutes = it.id.toInt() },
+                        AppSectionCard(
+                            iconRes = R.drawable.ic_time,
+                            title = stringResource(R.string.sleep_timer_section),
+                        ) {
+                            AppSwitchRow(
+                                title = stringResource(R.string.sleep_start_timer),
+                                tooltip = stringResource(R.string.sleep_start_timer_hint),
+                                checked = startTimerEnabled,
+                                onCheckedChange = { startTimerEnabled = it },
                             )
-                        }
-                        item {
-                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.sleep_timer_system), style = MaterialTheme.typography.bodyMedium)
-                                    Text(stringResource(R.string.sleep_timer_system_hint), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                                Switch(checked = notifyViaSystem, onCheckedChange = { notifyViaSystem = it })
+                            if (startTimerEnabled) {
+                                AppListRowDivider(leadingInset = false)
+                                AppDropdownField(
+                                    label = stringResource(R.string.sleep_timer_duration),
+                                    value = stringResource(R.string.sleep_timer_duration_value, timerMinutes),
+                                    options = (if (kind == SleepKind.NAP) NAP_TIMER_MINUTES else NIGHT_TIMER_MINUTES)
+                                        .map { AppDropdownOption(it.toString(), stringResource(R.string.sleep_timer_duration_value, it)) },
+                                    onSelect = { timerMinutes = it.id.toInt() },
+                                )
+                                AppSwitchRow(
+                                    title = stringResource(R.string.sleep_timer_system),
+                                    tooltip = stringResource(R.string.sleep_timer_system_hint),
+                                    checked = notifyViaSystem,
+                                    onCheckedChange = { notifyViaSystem = it },
+                                )
                             }
                         }
                     }

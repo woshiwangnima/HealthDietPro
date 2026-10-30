@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -86,6 +87,12 @@ private fun priceUnitPresets(language: String): List<String> = if (language.star
 } else {
     listOf("CNY", "USD", "EUR", "JPY", "HKD")
 }
+
+/**
+ * 两格单位之间的连接符，与 [PriceRecord.priceDisplay]（「元/斤」）同源。
+ * 语言无关符号，不进文案资源；改这里等于改全站的单价读法，要把列表/详情一起看。
+ */
+private const val PRICE_UNIT_SEPARATOR = "/"
 
 /**
  * 记物价编辑器。
@@ -389,24 +396,43 @@ internal fun PriceEditorScreen(
                             ErrorHint(stringResource(R.string.price_value_range_invalid))
                         }
                         Spacer(Modifier.height(spacing.s3))
+                        // 顺序必须跟保存后的写法一致：`PriceRecord.priceDisplay` 是「物价单位/售卖单位」
+                        // （列表与详情页也是这一串），所以这里左格放物价单位、右格放售卖单位，中间用同一个斜杠连起来。
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(spacing.s2),
                             verticalAlignment = Alignment.Top,
                         ) {
-                            EditorTextField(
-                                label = stringResource(R.string.price_sell_unit),
-                                value = sellUnit,
-                                onValueChange = { sellUnit = it },
-                                required = true,
-                                modifier = Modifier.weight(1f),
-                            )
                             AppDropdownField(
                                 label = stringResource(R.string.price_unit),
                                 value = priceUnit,
                                 options = priceUnitPresets(language).map { AppDropdownOption(it, it) },
                                 onSelect = { priceUnit = it.id },
                                 modifier = Modifier.weight(0.72f),
+                            )
+                            // 斜杠是两格之间的连接符：单独一个小 Box 竖向往输入框正中对齐，
+                            // 不吃两格的宽度权重，只占一个字号的宽。
+                            // 再往下挪 4 dp：行盒里带了整段降部留白，纯居中会让「/」的墨迹浮在
+                            // 输入框文字的上面一截（实测高 13 px），这里按字形补回来。
+                            Box(
+                                modifier = Modifier
+                                    .width(spacing.s5)
+                                    .align(Alignment.CenterVertically)
+                                    .offset(y = spacing.s1),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = PRICE_UNIT_SEPARATOR,
+                                    style = tokens.type.body,
+                                    color = colors.textMuted,
+                                )
+                            }
+                            EditorTextField(
+                                label = stringResource(R.string.price_sell_unit),
+                                value = sellUnit,
+                                onValueChange = { sellUnit = it },
+                                required = true,
+                                modifier = Modifier.weight(1f),
                             )
                         }
                         Spacer(Modifier.height(spacing.s2))

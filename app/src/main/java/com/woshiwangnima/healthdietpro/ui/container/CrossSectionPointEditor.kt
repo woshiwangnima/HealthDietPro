@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
@@ -53,7 +54,7 @@ internal fun CrossSectionPointEditor(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scheme = MaterialTheme.colorScheme
+    val scheme = LocalAppTokens.current.colors
     val unit = lengthUnitSymbol(lengthUnitId)
     val totalHeightDisplay = fromBaseCm(totalHeightCm, lengthUnitId)
 
@@ -103,8 +104,8 @@ internal fun CrossSectionPointEditor(
                 )
                 Text(
                     text = "转折点：输入容器在某一高度处的截面；顶部（容器口）未填写时按同截面平行延伸。",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = scheme.onSurfaceVariant,
+                    style = LocalAppTokens.current.type.bodyS,
+                    color = scheme.textMuted,
                 )
 
                 CrossSectionShapeSelector(kind, { newKind ->
@@ -233,8 +234,8 @@ internal fun CrossSectionPointEditor(
                         )
                         Text(
                             text = "请将容器水平切开，测量并填入切面实际面积。",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = scheme.onSurfaceVariant,
+                            style = LocalAppTokens.current.type.bodyS,
+                            color = scheme.textMuted,
                         )
                     }
                 }
@@ -256,17 +257,17 @@ internal fun CrossSectionPointEditor(
                         )
                         Spacer(Modifier.width(12.dp))
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text("面积: %.2f cm²".format(point.shape.area), style = MaterialTheme.typography.bodySmall)
+                            Text("面积: %.2f cm²".format(point.shape.area), style = LocalAppTokens.current.type.bodyS)
                             Text(
                                 "周长: ${point.shape.perimeter?.let { "%.2f $unit".format(fromBaseCm(it, lengthUnitId)) } ?: "-"}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = scheme.onSurfaceVariant,
+                                style = LocalAppTokens.current.type.bodyS,
+                                color = scheme.textMuted,
                             )
                         }
                     }
                     if (canDelete) {
                         TextButton(onClick = onDelete) {
-                            Text("删除", color = scheme.error)
+                            Text("删除", color = scheme.danger)
                         }
                     }
                 }

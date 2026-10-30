@@ -27,6 +27,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
 import com.woshiwangnima.healthdietpro.common.time.formatRecordTimestamp
@@ -53,6 +55,7 @@ internal fun DietMealDetailScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val tokens = LocalAppTokens.current
     val mealTotals = remember(record) { sumNutrients(listOf(record)) }
     var activeSorts by remember { mutableStateOf(emptyList<Pair<String, SortOrder>>()) }
     val sortOptions = listOf(
@@ -74,18 +77,18 @@ internal fun DietMealDetailScreen(
     ) { padding ->
         LazyColumn(
             modifier = modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(tokens.spacing.page),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
         ) {
             item { MealTimeCard(record) }
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2), modifier = Modifier.fillMaxWidth()) {
                     SectionTitle(R.drawable.ic_diet, stringResource(R.string.diet_meal_summary))
                     NutrientSummaryVisuals(mealTotals, goals)
                 }
             }
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2), modifier = Modifier.fillMaxWidth()) {
                     SectionTitle(R.drawable.ic_nutrients, stringResource(R.string.diet_meal_nutrient_list))
                     MealNutrientTable(
                         records = listOf(record),
@@ -107,9 +110,9 @@ internal fun DietMealDetailScreen(
             }
             if (record.note.isNotBlank()) {
                 item {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.diet_note), style = MaterialTheme.typography.titleMedium)
-                        Text(record.note, style = MaterialTheme.typography.bodyMedium)
+                    Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1), modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.diet_note), style = tokens.type.titleS)
+                        Text(record.note, style = LocalAppTokens.current.type.body)
                     }
                 }
             }
@@ -119,24 +122,24 @@ internal fun DietMealDetailScreen(
 
 @Composable
 private fun MealTimeCard(record: DietRecord) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    val tokens = LocalAppTokens.current
+    AppSectionGroup {
+        Column(
+            Modifier.padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s3),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
+        ) {
             Text(
                 text = stringResource(
                     R.string.diet_meal_time_range,
                     formatRecordTimestamp(record.mealStartAt, RecordTimePrecision.MINUTE),
                     formatRecordTimestamp(record.mealEndAt, RecordTimePrecision.MINUTE),
                 ),
-                style = MaterialTheme.typography.bodyMedium,
+                style = tokens.type.body,
             )
             Text(
                 text = stringResource(R.string.diet_meal_detail_meta, record.entries.size, formatGrams(record.entries.sumOf(DietFoodEntry::netWeightGrams))),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
             )
         }
     }
@@ -144,16 +147,18 @@ private fun MealTimeCard(record: DietRecord) {
 
 @Composable
 private fun MealEntryRow(entry: DietFoodEntry, mealTotals: DayNutrients, onOpenFood: (DietFoodEntry) -> Unit) {
+    val tokens = LocalAppTokens.current
     val (container, onContainer) = foodKindColors(entry.foodKind)
     Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
+        color = tokens.colors.panelRaised,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(tokens.radii.container),
+        border = androidx.compose.foundation.BorderStroke(tokens.radii.stroke, tokens.colors.border),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
-            Modifier.padding(12.dp),
+            Modifier.padding(tokens.spacing.s3),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
         ) {
             Surface(
                 onClick = { onOpenFood(entry) },
@@ -169,14 +174,14 @@ private fun MealEntryRow(entry: DietFoodEntry, mealTotals: DayNutrients, onOpenF
                     Text(
                         text = entry.foodName,
                         color = onContainer,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = LocalAppTokens.current.type.body,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = formatGrams(entry.netWeightGrams),
                         color = onContainer.copy(alpha = 0.85f),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = LocalAppTokens.current.type.bodyS,
                         maxLines = 1,
                     )
                 }
@@ -201,23 +206,23 @@ private fun FoodNutrientBarRow(metric: NutrientMetric, value: Double, mealTotal:
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         TextOverflowText(
             text = stringResource(metric.labelRes),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.bodyS,
+            color = LocalAppTokens.current.colors.textMuted,
             maxLines = 1,
             modifier = Modifier.width(FoodNutrientNameWidth),
         )
         LinearProgressWithPercent(
             progress = { fraction },
             color = MetricColor(metric),
-            trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            trackColor = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.5f),
             percentText = "$percent%",
             modifier = Modifier.weight(1f),
         )
         Spacer(Modifier.width(6.dp))
         TextOverflowText(
             text = formatCalories(value) + " " + metric.unit,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalAppTokens.current.type.bodyS,
+            color = LocalAppTokens.current.colors.textMuted,
             maxLines = 1,
             modifier = Modifier.width(FoodNutrientValueWidth),
         )

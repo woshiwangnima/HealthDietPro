@@ -184,8 +184,16 @@ internal fun FoodCategoryFilterRows(
 
 @Composable
 private fun CategoryFilterRow(label: String, chips: @Composable () -> Unit) {
+    val tokens = com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens.current
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, modifier = Modifier.width(56.dp).padding(end = 8.dp), style = MaterialTheme.typography.labelMedium)
+        // 「一级标签 / 二级标签」是这一组 chip 的分类名。用正文色而非主色：
+        // 主色是「可操作 / 被选中」的语义，分类名是静态标签，染成主色会被误读成可点的 chip。
+        Text(
+            label,
+            modifier = Modifier.width(56.dp).padding(end = 8.dp),
+            style = tokens.type.caption,
+            color = tokens.colors.text,
+        )
         Row(Modifier.weight(1f).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { chips() }
     }
 }

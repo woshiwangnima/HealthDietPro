@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
@@ -34,6 +35,8 @@ import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ColumnWidth
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppPillIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
 import com.woshiwangnima.healthdietpro.common.ui.chart.BaseChartEvent
@@ -85,7 +88,7 @@ internal fun BodyMetricDetailScreen(
         )
     }
     val content: @Composable (Modifier) -> Unit = { contentModifier ->
-        Column(modifier = contentModifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Column(modifier = contentModifier.fillMaxSize().background(LocalAppTokens.current.colors.bg)) {
             Box(modifier = Modifier.weight(1f)) {
                 when (selectedTab) {
                     0 -> BodyMetricChart(title, unitId, category, records, chartState, chartViewModel.chartStateKey) { chartViewModel.onChartEvent(BaseChartEvent.StateChanged(it)) }
@@ -219,12 +222,24 @@ private fun BodyMetricRecordTable(
     rows: List<BodyMetricTableRow>, unitId: String, category: String,
     onAdd: () -> Unit, onEdit: (BodyMetricTableRow) -> Unit, onDelete: (BodyMetricTableRow) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    val tokens = LocalAppTokens.current
+    Column(
+        modifier = Modifier.fillMaxSize().padding(tokens.spacing.s3),
+        verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+    ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(stringResource(R.string.body_record_count, rows.size), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.body_record_count, rows.size), style = tokens.type.titleS)
             AppIconTextButton(stringResource(R.string.body_record_add), R.drawable.ic_add, onAdd)
         }
-        AppDataTable(
+        if (rows.isEmpty()) {
+            AppEmptyState(
+                title = stringResource(R.string.record_no_data),
+                description = stringResource(R.string.body_record_empty_hint),
+                iconRes = if (unitId == "cm") R.drawable.ic_height else R.drawable.ic_weight,
+                action = { AppPillIconTextButton(stringResource(R.string.body_record_add), onAdd, iconRes = R.drawable.ic_add) },
+            )
+        } else {
+            AppDataTable(
             rows = rows,
             rowKey = { _, row -> row.record.id.orEmpty() },
             columns = listOf(
@@ -236,7 +251,8 @@ private fun BodyMetricRecordTable(
             actionsHeader = { AppDataTableHeaderText(stringResource(R.string.body_record_delete)) },
             rowActions = { AppDataTableDeleteAction(stringResource(R.string.body_record_delete), onClick = { onDelete(it) }) },
             onRowClick = onEdit,
-        )
+            )
+        }
     }
 }
 

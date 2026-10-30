@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.model.archive.stableJsonString
 import kotlinx.coroutines.Dispatchers
@@ -54,8 +55,8 @@ internal fun PlainTextPreviewScreen(title: String, content: String, onBack: () -
     // This preview is rendered inside MainActivity's Scaffold, which already consumes status bars.
     BaseScreen(title = title, onBack = onBack, includeStatusBarPadding = false) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
-            Text("${lines.size} ${androidx.compose.ui.res.stringResource(R.string.plain_text_preview_lines)} · ${formatted.length} ${androidx.compose.ui.res.stringResource(R.string.plain_text_preview_characters)}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Surface(modifier = Modifier.fillMaxSize().padding(top = 8.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)) {
+            Text("${lines.size} ${androidx.compose.ui.res.stringResource(R.string.plain_text_preview_lines)} · ${formatted.length} ${androidx.compose.ui.res.stringResource(R.string.plain_text_preview_characters)}", style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted)
+            Surface(modifier = Modifier.fillMaxSize().padding(top = 8.dp), color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.4f)) {
                 val horizontalScroll = rememberScrollState()
                 LazyColumn(Modifier.fillMaxSize()) {
                     itemsIndexed(visibleLines, key = { _, lineIndex -> lineIndex }) { _, index ->
@@ -63,12 +64,12 @@ internal fun PlainTextPreviewScreen(title: String, content: String, onBack: () -
                         val foldEnd = foldRanges[index]
                         Row(Modifier.fillMaxWidth().horizontalScroll(horizontalScroll).padding(vertical = 1.dp)) {
                             if (foldEnd != null) {
-                                Icon(if (index in collapsedStarts) Icons.AutoMirrored.Filled.KeyboardArrowRight else Icons.Filled.KeyboardArrowDown, null, modifier = Modifier.width(20.dp).clickable { collapsedStarts = if (index in collapsedStarts) collapsedStarts - index else collapsedStarts + index }, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Icon(if (index in collapsedStarts) Icons.AutoMirrored.Filled.KeyboardArrowRight else Icons.Filled.KeyboardArrowDown, null, modifier = Modifier.width(20.dp).clickable { collapsedStarts = if (index in collapsedStarts) collapsedStarts - index else collapsedStarts + index }, tint = LocalAppTokens.current.colors.textMuted)
                             } else {
                                 Text("", modifier = Modifier.width(20.dp))
                             }
-                            Text((index + 1).toString(), modifier = Modifier.width(44.dp).background(MaterialTheme.colorScheme.surfaceVariant).padding(end = 8.dp), fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(displayLine(line), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
+                            Text((index + 1).toString(), modifier = Modifier.width(44.dp).background(LocalAppTokens.current.colors.panelRaised).padding(end = 8.dp), fontFamily = FontFamily.Monospace, color = LocalAppTokens.current.colors.textMuted)
+                            Text(displayLine(line), fontFamily = FontFamily.Monospace, style = LocalAppTokens.current.type.bodyS)
                         }
                     }
                 }

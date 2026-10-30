@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,20 +28,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.PlainTooltip
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -62,6 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -104,7 +97,16 @@ import com.woshiwangnima.healthdietpro.common.ui.SingleChoiceSegmentedSelector
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
 import com.woshiwangnima.healthdietpro.common.ui.DiscardChangesDialog
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
-import com.woshiwangnima.healthdietpro.common.ui.SettingRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRowDivider
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppRadioRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSwitchRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.rememberAppDarkTheme
 import com.woshiwangnima.healthdietpro.common.ui.recordLatestUpdatePrefix
 import com.woshiwangnima.healthdietpro.common.range.UnitRange
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
@@ -181,14 +183,18 @@ class BloodGlucoseActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             HealthDietProTheme {
-                BloodGlucoseScreen(
-                    viewModel = viewModel,
-                    eventViewModel = eventViewModel,
-                    onBack = ::finish,
-                    onOpenRecordAction = ::openRecordAction,
-                    onOpenDietDetail = ::openDietDetail,
-                    openEditorInitially = intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false),
-                )
+                // 本文件下的子屏（设置 / 来源 / 提醒 / 目标范围 / 录入）都已迁到 AppTheme，
+                // 在 Activity 里套一层即可，不必每个子屏各套一次。
+                AppTheme(darkTheme = rememberAppDarkTheme()) {
+                    BloodGlucoseScreen(
+                        viewModel = viewModel,
+                        eventViewModel = eventViewModel,
+                        onBack = ::finish,
+                        onOpenRecordAction = ::openRecordAction,
+                        onOpenDietDetail = ::openDietDetail,
+                        openEditorInitially = intent.getBooleanExtra(EXTRA_OPEN_EDITOR, false),
+                    )
+                }
             }
         }
     }
@@ -389,7 +395,8 @@ private fun BloodGlucoseScreen(
             }
         },
     ) { padding ->
-        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
+        val tokens = LocalAppTokens.current
+        Column(Modifier.fillMaxSize().background(tokens.colors.bg).padding(padding)) {
             AnimatedPageContent(
                 targetState = selectedTab,
                 modifier = Modifier.weight(1f),
@@ -454,18 +461,34 @@ private enum class BloodGlucoseRoute { Records, Settings, Targets, Reminders, So
 
 @Composable
 private fun BloodGlucoseDataInfoScreen(onBack: () -> Unit) {
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.blood_glucose_data_info_title), onBack = onBack) { padding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxSize().background(tokens.colors.bg).padding(padding),
+            contentPadding = PaddingValues(
+                start = tokens.spacing.page,
+                end = tokens.spacing.page,
+                top = tokens.spacing.s4,
+                bottom = tokens.spacing.s4,
+            ),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
         ) {
             item { BloodGlucoseDataInfoSection(R.string.blood_glucose_glucose, R.string.blood_glucose_data_info_glucose) }
             item { BloodGlucoseDataInfoSection(R.string.blood_glucose_hb_a1c, R.string.blood_glucose_data_info_hb_a1c) }
             item { BloodGlucoseDataInfoSection(R.string.blood_glucose_ogtt_full, R.string.blood_glucose_data_info_ogtt) }
             item {
-                Text(stringResource(R.string.blood_glucose_data_info_disclaimer), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(stringResource(R.string.blood_glucose_data_info_source), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1)) {
+                    Text(
+                        text = stringResource(R.string.blood_glucose_data_info_disclaimer),
+                        style = tokens.type.caption,
+                        color = tokens.colors.textMuted,
+                    )
+                    Text(
+                        text = stringResource(R.string.blood_glucose_data_info_source),
+                        style = tokens.type.caption,
+                        color = tokens.colors.textMuted,
+                    )
+                }
             }
         }
     }
@@ -476,43 +499,75 @@ private fun BloodGlucoseDataInfoSection(
     @androidx.annotation.StringRes title: Int,
     @androidx.annotation.StringRes text: Int,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(stringResource(title), style = MaterialTheme.typography.titleMedium)
-        Text(stringResource(text), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    val tokens = LocalAppTokens.current
+    AppSectionGroup {
+        Column(
+            modifier = Modifier.padding(tokens.spacing.s3),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
+        ) {
+            Text(
+                text = stringResource(title),
+                style = tokens.type.body.copy(fontWeight = FontWeight.SemiBold),
+                color = tokens.colors.text,
+            )
+            Text(
+                text = stringResource(text),
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
+            )
+        }
     }
 }
 
 @Composable
 private fun BloodGlucoseSettingsScreen(onBack: () -> Unit, onOpenTargets: () -> Unit, onOpenReminders: () -> Unit, onOpenSources: () -> Unit) {
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.blood_glucose_settings_title), onBack = onBack) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            SettingRow(
-                title = stringResource(R.string.blood_glucose_target_range_settings),
-                subtitle = stringResource(R.string.blood_glucose_target_range_settings_desc),
-                leadingIconRes = R.drawable.ic_blood_glucose,
-                onClick = onOpenTargets,
-            )
-            HorizontalDivider()
-            SettingRow(
-                title = stringResource(R.string.blood_glucose_source_settings),
-                subtitle = stringResource(R.string.blood_glucose_source_settings_desc),
-                leadingIconRes = R.drawable.ic_edit,
-                onClick = onOpenSources,
-            )
-            HorizontalDivider()
-            SettingRow(
-                title = stringResource(R.string.blood_glucose_reminder_settings),
-                subtitle = stringResource(R.string.blood_glucose_reminder_settings_desc),
-                leadingIconRes = R.drawable.ic_notification,
-                onClick = onOpenReminders,
-            )
-            HorizontalDivider()
-            SettingRow(
-                title = stringResource(R.string.blood_glucose_do_not_disturb_settings),
-                subtitle = stringResource(R.string.blood_glucose_do_not_disturb_settings_desc),
-                leadingIconRes = R.drawable.ic_do_not_disturb,
-                onClick = {},
-            )
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(tokens.colors.bg)
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+        ) {
+            AppSectionGroup {
+                AppListRow(
+                    title = stringResource(R.string.blood_glucose_target_range_settings),
+                    tooltip = stringResource(R.string.blood_glucose_target_range_settings_desc),
+                    iconRes = R.drawable.ic_blood_glucose,
+                    showChevron = true,
+                    onClick = onOpenTargets,
+                )
+                AppListRowDivider()
+                AppListRow(
+                    title = stringResource(R.string.blood_glucose_source_settings),
+                    tooltip = stringResource(R.string.blood_glucose_source_settings_desc),
+                    iconRes = R.drawable.ic_edit,
+                    showChevron = true,
+                    onClick = onOpenSources,
+                )
+                AppListRowDivider()
+                AppListRow(
+                    title = stringResource(R.string.blood_glucose_reminder_settings),
+                    tooltip = stringResource(R.string.blood_glucose_reminder_settings_desc),
+                    iconRes = R.drawable.ic_notification,
+                    showChevron = true,
+                    onClick = onOpenReminders,
+                )
+                AppListRowDivider()
+                // 免打扰还没有实现，不给箭头也不接收点击：带箭头却点不动比没有箭头更让人困惑。
+                AppListRow(
+                    title = stringResource(R.string.blood_glucose_do_not_disturb_settings),
+                    tooltip = stringResource(R.string.blood_glucose_do_not_disturb_settings_desc),
+                    iconRes = R.drawable.ic_do_not_disturb,
+                )
+            }
         }
     }
 }
@@ -532,13 +587,25 @@ private fun BloodGlucoseSourceSettingsScreen(
     var deleting by remember { mutableStateOf<BloodGlucoseSource?>(null) }
     var deletingData by remember { mutableStateOf<BloodGlucoseSource?>(null) }
     var orderedSources by remember(sources) { mutableStateOf(sources) }
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.blood_glucose_source_settings), onBack = onBack) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(tokens.colors.bg)
+                .padding(padding)
+                .padding(tokens.spacing.page),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+        ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                 AppIconTextButton(stringResource(R.string.blood_glucose_source_add), R.drawable.ic_add, onAdd)
             }
             if (orderedSources.isEmpty()) {
-                Text(stringResource(R.string.blood_glucose_source_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                AppEmptyState(
+                    title = stringResource(R.string.blood_glucose_source_empty),
+                    description = stringResource(R.string.blood_glucose_source_settings_desc),
+                    iconRes = R.drawable.ic_edit,
+                )
             } else {
                 AppDataTable(
                     rows = orderedSources,
@@ -614,10 +681,19 @@ private fun BloodGlucoseSourceEditorScreen(
     var showDiscardDialog by rememberSaveable(source?.id) { mutableStateOf(false) }
     fun save() { current?.let { onSave(source?.id, it) } }
     fun requestBack() { if (hasChanges) showDiscardDialog = true else onBack() }
+    val tokens = LocalAppTokens.current
     BackHandler(onBack = ::requestBack)
     BaseScreen(title = stringResource(if (source == null) R.string.blood_glucose_source_add else R.string.blood_glucose_source_edit), onBack = ::requestBack) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp)) {
+        Column(Modifier.fillMaxSize().background(tokens.colors.bg).padding(padding)) {
+            LazyColumn(
+                Modifier.weight(1f),
+                contentPadding = PaddingValues(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+            ) {
                 item {
                     TextInputField(
                         label = stringResource(R.string.blood_glucose_source_note),
@@ -650,16 +726,23 @@ private fun BloodGlucoseReminderSettingsScreen(
         }
     }
     BaseScreen(title = stringResource(R.string.blood_glucose_reminder_settings), onBack = onBack) { padding ->
+        val tokens = LocalAppTokens.current
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxSize().background(tokens.colors.bg).padding(padding),
+            contentPadding = PaddingValues(
+                start = tokens.spacing.page,
+                end = tokens.spacing.page,
+                top = tokens.spacing.s4,
+                bottom = tokens.spacing.s4,
+            ),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
         ) {
             item {
-                BloodGlucoseReminderCard {
-                    BloodGlucoseReminderToggle(stringResource(R.string.blood_glucose_alert_high_enabled), settings.highEnabled) {
-                        requestPermissionWhenEnabled(it); update(settings.copy(highEnabled = it))
-                    }
+                BloodGlucoseReminderCard(
+                    title = stringResource(R.string.blood_glucose_alert_high_enabled),
+                    checked = settings.highEnabled,
+                    onCheckedChange = { requestPermissionWhenEnabled(it); update(settings.copy(highEnabled = it)) },
+                ) {
                     AppNumericStepperField(
                         label = stringResource(R.string.blood_glucose_alert_high_threshold),
                         value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, settings.highThresholdMmolPerL, unitId),
@@ -670,10 +753,11 @@ private fun BloodGlucoseReminderSettingsScreen(
                 }
             }
             item {
-                BloodGlucoseReminderCard {
-                    BloodGlucoseReminderToggle(stringResource(R.string.blood_glucose_alert_low_enabled), settings.lowEnabled) {
-                        requestPermissionWhenEnabled(it); update(settings.copy(lowEnabled = it))
-                    }
+                BloodGlucoseReminderCard(
+                    title = stringResource(R.string.blood_glucose_alert_low_enabled),
+                    checked = settings.lowEnabled,
+                    onCheckedChange = { requestPermissionWhenEnabled(it); update(settings.copy(lowEnabled = it)) },
+                ) {
                     AppNumericStepperField(
                         label = stringResource(R.string.blood_glucose_alert_low_threshold),
                         value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, settings.lowThresholdMmolPerL, unitId),
@@ -684,10 +768,11 @@ private fun BloodGlucoseReminderSettingsScreen(
                 }
             }
             item {
-                BloodGlucoseReminderCard {
-                    BloodGlucoseReminderToggle(stringResource(R.string.blood_glucose_alert_emergency_low_enabled), settings.emergencyLowEnabled) {
-                        requestPermissionWhenEnabled(it); update(settings.copy(emergencyLowEnabled = it))
-                    }
+                BloodGlucoseReminderCard(
+                    title = stringResource(R.string.blood_glucose_alert_emergency_low_enabled),
+                    checked = settings.emergencyLowEnabled,
+                    onCheckedChange = { requestPermissionWhenEnabled(it); update(settings.copy(emergencyLowEnabled = it)) },
+                ) {
                     AppNumericStepperField(
                         label = stringResource(R.string.blood_glucose_alert_emergency_low_threshold),
                         value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, settings.emergencyLowThresholdMmolPerL, unitId),
@@ -728,30 +813,27 @@ private fun BloodGlucoseReminderSettingsScreen(
 }
 
 @Composable
-private fun BloodGlucoseReminderCard(content: @Composable () -> Unit) {
-    androidx.compose.material3.Surface(
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            content()
+private fun BloodGlucoseReminderCard(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    // 卡内零内边距：开关行自带 s3 水平内边距，字段区再单独补，否则开关会比输入框多缩进一截。
+    AppSectionGroup(contentPadding = PaddingValues(0.dp)) {
+        Column(Modifier.padding(vertical = tokens.spacing.s1)) {
+            AppSwitchRow(
+                title = title,
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+            )
+            Column(
+                modifier = Modifier.padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s2),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                content = content,
+            )
         }
-    }
-}
-
-@Composable
-private fun BloodGlucoseReminderSection(content: @Composable () -> Unit) {
-    BloodGlucoseReminderCard {
-        content()
-    }
-}
-
-@Composable
-private fun BloodGlucoseReminderToggle(title: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
 
@@ -767,8 +849,11 @@ private fun BloodGlucoseTrendReminderSection(
     onIntervalChange: (Int) -> Unit,
     onDurationChange: (Int) -> Unit,
 ) {
-    BloodGlucoseReminderSection {
-        BloodGlucoseReminderToggle(toggleTitle, enabled, onEnabledChange)
+    BloodGlucoseReminderCard(
+        title = toggleTitle,
+        checked = enabled,
+        onCheckedChange = onEnabledChange,
+    ) {
         AppDropdownField(
             label = stringResource(R.string.blood_glucose_alert_mode),
             value = stringResource(mode.labelRes()),
@@ -798,46 +883,57 @@ private fun BloodGlucoseTargetRangeScreen(
     val unitLabel = glucoseUnitOptions().firstOrNull { it.id == unitId }?.label ?: unitId
     var showTypePicker by remember { mutableStateOf(false) }
     val targetRange = diabetesType.targetRange(unitId)
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.blood_glucose_target_range_settings), onBack = onBack) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            SettingRow(
-                title = stringResource(R.string.blood_glucose_diabetes_type),
-                subtitle = stringResource(R.string.blood_glucose_diabetes_type_desc),
-                leadingIconRes = R.drawable.ic_medical_history,
-                trailingValue = stringResource(diabetesType.labelRes()),
-                onClick = { showTypePicker = true },
-            )
-            HorizontalDivider()
-            SettingRow(
-                title = stringResource(R.string.blood_glucose_glucose_reference_range),
-                subtitle = stringResource(R.string.blood_glucose_target_range_desc),
-                leadingIconRes = R.drawable.ic_blood_glucose,
-                trailingValue = rangeText(targetRange, unitLabel),
-                onClick = {},
-                clickable = false,
-            )
-            HorizontalDivider()
-            SettingRow(
-                title = stringResource(R.string.blood_glucose_hb_a1c_reference_range),
-                subtitle = stringResource(R.string.blood_glucose_target_range_desc),
-                leadingIconRes = R.drawable.ic_blood_glucose,
-                trailingValue = rangeText(diabetesType.hbA1cReferenceRange, "%"),
-                onClick = {},
-                clickable = false,
-            )
-            HorizontalDivider()
+        Column(Modifier.fillMaxSize().background(tokens.colors.bg).padding(padding)) {
+            AppSectionGroup(
+                modifier = Modifier.padding(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                ),
+            ) {
+                AppListRow(
+                    title = stringResource(R.string.blood_glucose_diabetes_type),
+                    tooltip = stringResource(R.string.blood_glucose_diabetes_type_desc),
+                    iconRes = R.drawable.ic_medical_history,
+                    trailingValue = stringResource(diabetesType.labelRes()),
+                    showChevron = true,
+                    onClick = { showTypePicker = true },
+                )
+                AppListRowDivider()
+                AppListRow(
+                    title = stringResource(R.string.blood_glucose_glucose_reference_range),
+                    tooltip = stringResource(R.string.blood_glucose_target_range_desc),
+                    iconRes = R.drawable.ic_blood_glucose,
+                    trailingValue = rangeText(targetRange, unitLabel),
+                )
+                AppListRowDivider()
+                AppListRow(
+                    title = stringResource(R.string.blood_glucose_hb_a1c_reference_range),
+                    tooltip = stringResource(R.string.blood_glucose_target_range_desc),
+                    iconRes = R.drawable.ic_blood_glucose,
+                    trailingValue = rangeText(diabetesType.hbA1cReferenceRange, "%"),
+                )
+            }
             Text(
                 text = stringResource(R.string.blood_glucose_target_range_recommendations),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                style = tokens.type.bodyS.copy(fontWeight = FontWeight.SemiBold),
+                color = tokens.colors.text,
+                modifier = Modifier.padding(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s2,
+                ),
             )
             AppDataTable(
                 rows = BloodGlucoseDiabetesType.entries.toList(),
                 rowKey = { _, type -> type.name },
                 columns = listOf(
                     AppDataTableColumn("type", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_diabetes_type)) }, ColumnWidth.Fixed(180.dp)) { AppDataTableText(stringResource(it.labelRes())) },
-                    AppDataTableColumn("glucoseRange", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_glucose_reference_range)) }, ColumnWidth.Fixed(180.dp)) { AppDataTableText(rangeText(it.targetRange(unitId), unitLabel)) },
-                    AppDataTableColumn("hbA1cRange", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_hb_a1c_reference_range)) }, ColumnWidth.Fixed(180.dp)) { AppDataTableText(rangeText(it.hbA1cReferenceRange, "%")) },
+                    AppDataTableColumn("glucoseRange", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_glucose_reference_range)) }, ColumnWidth.Fixed(180.dp)) { AppDataTableText(rangeText(it.targetRange(unitId), unitLabel), numeric = true) },
+                    AppDataTableColumn("hbA1cRange", { AppDataTableHeaderText(stringResource(R.string.blood_glucose_hb_a1c_reference_range)) }, ColumnWidth.Fixed(180.dp)) { AppDataTableText(rangeText(it.hbA1cReferenceRange, "%"), numeric = true) },
                 ),
                 showRowNumber = false,
                 showPager = false,
@@ -846,6 +942,7 @@ private fun BloodGlucoseTargetRangeScreen(
         }
     }
     if (showTypePicker) {
+        val dialogTokens = LocalAppTokens.current
         BackHandler { showTypePicker = false }
         AlertDialog(
             onDismissRequest = { showTypePicker = false },
@@ -860,8 +957,16 @@ private fun BloodGlucoseTargetRangeScreen(
                         ) {
                             RadioButton(selected = type == diabetesType, onClick = null, enabled = type.available)
                             Column(Modifier.padding(start = 8.dp)) {
-                                Text(stringResource(type.labelRes()), color = if (type.available) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
-                                if (!type.available) Text(stringResource(R.string.blood_glucose_diabetes_type_unavailable), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    stringResource(type.labelRes()),
+                                    style = dialogTokens.type.body,
+                                    color = if (type.available) dialogTokens.colors.text else dialogTokens.colors.textMuted,
+                                )
+                                if (!type.available) Text(
+                                    stringResource(R.string.blood_glucose_diabetes_type_unavailable),
+                                    style = dialogTokens.type.caption,
+                                    color = dialogTokens.colors.textMuted,
+                                )
                             }
                         }
                     }
@@ -909,6 +1014,7 @@ private fun BloodGlucoseChart(
     onPredictionFormulaDismissed: () -> Unit,
 ) {
     var displayedPredictionFormula by remember { mutableStateOf<com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionFormula?>(null) }
+    val tokens = LocalAppTokens.current
     LaunchedEffect(predictionFormula, predictionGenerating) {
         if (!predictionGenerating && predictionFormula != null) {
             displayedPredictionFormula = predictionFormula
@@ -943,9 +1049,9 @@ private fun BloodGlucoseChart(
             predictionStatusRes?.let { statusRes ->
                 Text(
                     stringResource(statusRes),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.End).padding(bottom = 4.dp),
+                    style = tokens.type.caption,
+                    color = tokens.colors.danger,
+                    modifier = Modifier.align(Alignment.End).padding(bottom = tokens.spacing.s1),
                 )
             }
             BloodGlucoseFixedWindowChart(
@@ -970,15 +1076,15 @@ private fun BloodGlucoseChart(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)),
+                    .background(tokens.colors.panel.copy(alpha = 0.72f)),
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator()
                     TextOverflowText(
                         text = stringResource(R.string.blood_glucose_prediction_generating),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = 12.dp),
+                        style = tokens.type.body,
+                        modifier = Modifier.padding(top = tokens.spacing.s3),
                     )
                 }
             }
@@ -1111,32 +1217,30 @@ private fun PredictionFormulaSection(
     algebraExplanation: List<String>,
     substitutedFormula: String?,
 ) {
-    androidx.compose.material3.Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+    val tokens = LocalAppTokens.current
+    AppSectionGroup {
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.padding(tokens.spacing.s3),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
         ) {
-            Text(title, style = MaterialTheme.typography.titleSmall)
-            Text(originalFormula, style = MaterialTheme.typography.labelSmall)
-            androidx.compose.material3.Surface(
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.55f),
-                shape = MaterialTheme.shapes.extraSmall,
-                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+            Text(
+                text = title,
+                style = tokens.type.bodyS.copy(fontWeight = FontWeight.SemiBold),
+                color = tokens.colors.text,
+            )
+            Text(text = originalFormula, style = tokens.type.caption, color = tokens.colors.textMuted)
+            // 推导步骤只缩进、不再套第二层底：两层底在同一张卡里会出现一条多余的分界线。
+            Column(
+                modifier = Modifier.padding(start = tokens.spacing.s2),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
             ) {
-                Column(
-                    modifier = Modifier.padding(start = 8.dp, top = 6.dp, end = 8.dp, bottom = 6.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    algebraExplanation.forEach { explanation ->
-                        Text(explanation, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+                algebraExplanation.forEach { explanation ->
+                    Text(text = explanation, style = tokens.type.caption, color = tokens.colors.textMuted)
                 }
             }
-            substitutedFormula?.let { Text(it, style = MaterialTheme.typography.labelSmall) }
+            substitutedFormula?.let {
+                Text(text = it, style = tokens.type.caption, color = tokens.colors.text)
+            }
         }
     }
 }
@@ -1166,7 +1270,16 @@ private fun BloodGlucoseDataPage(
         EqualWidthTab.text(stringResource(R.string.blood_glucose_hb_a1c)),
         EqualWidthTab.text(stringResource(R.string.blood_glucose_ogtt)),
     )
-    Column(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(LocalAppTokens.current.colors.bg)
+            .padding(
+                horizontal = LocalAppTokens.current.spacing.page,
+                vertical = LocalAppTokens.current.spacing.s3,
+            ),
+        verticalArrangement = Arrangement.spacedBy(LocalAppTokens.current.spacing.s3),
+    ) {
         EqualWidthSegmentedTabs(
             tabs = recordTypeLabels,
             selectedIndex = selectedRecordType,
@@ -1211,6 +1324,7 @@ private fun GlucoseRecordList(
 ) {
     val sourceNames = remember(sources) { sources.associate { it.id to it.note } }
     val noSource = stringResource(R.string.data_source_none)
+    val tokens = LocalAppTokens.current
     val latestRecords = remember(records) { records.sortedByDescending(BloodGlucoseRecord::timestamp).take(2) }
     val latestRecord = latestRecords.firstOrNull()
     val particleLevel = remember(latestRecords) {
@@ -1221,7 +1335,7 @@ private fun GlucoseRecordList(
     val latestUpdatePrefix = latestRecord?.let { recordLatestUpdatePrefix(it.timestamp) }
         ?: stringResource(R.string.record_no_data)
     var showTrendIndicatorInfo by rememberSaveable { mutableStateOf(false) }
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -1239,16 +1353,20 @@ private fun GlucoseRecordList(
             )
             Text(
                 latestUpdatePrefix,
-                modifier = Modifier.weight(1f).padding(start = 8.dp, end = 8.dp),
+                modifier = Modifier.weight(1f).padding(start = tokens.spacing.s2, end = tokens.spacing.s2),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
             )
             AppIconTextButton(stringResource(R.string.body_record_add), R.drawable.ic_add, onAdd)
         }
         if (records.isEmpty()) {
-            Text(stringResource(R.string.blood_glucose_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            AppEmptyState(
+                title = stringResource(R.string.blood_glucose_empty),
+                description = stringResource(R.string.blood_glucose_data_info_glucose),
+                iconRes = R.drawable.ic_blood_glucose,
+            )
         } else {
             AppDataTable(
                 rows = records,
@@ -1291,17 +1409,19 @@ private fun GlucoseRecordList(
 
 @Composable
 private fun BloodGlucoseTrendIndicatorInfoDialog(onDismiss: () -> Unit) {
+    val tokens = LocalAppTokens.current
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.blood_glucose_trend_indicator_info_title)) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
             ) {
                 Text(
                     stringResource(R.string.blood_glucose_trend_indicator_info_description),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = tokens.type.body,
+                    color = tokens.colors.textMuted,
                 )
                 listOf(4, 3, 2, 1, 0, -1, -2, -3, -4).forEach { level ->
                     val band = bloodGlucoseTrendRateRanges.first { it.value == abs(level) }
@@ -1314,12 +1434,16 @@ private fun BloodGlucoseTrendIndicatorInfoDialog(onDismiss: () -> Unit) {
                             color = bloodGlucoseTrendColor(level),
                             modifier = Modifier.size(44.dp),
                         )
-                        Column(modifier = Modifier.weight(1f).padding(start = 8.dp)) {
-                            Text(stringResource(bloodGlucoseTrendLabelRes(level)))
+                        Column(modifier = Modifier.weight(1f).padding(start = tokens.spacing.s2)) {
+                            Text(
+                                stringResource(bloodGlucoseTrendLabelRes(level)),
+                                style = tokens.type.body,
+                                color = tokens.colors.text,
+                            )
                             Text(
                                 bloodGlucoseTrendRangeText(band),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = tokens.type.caption,
+                                color = tokens.colors.textMuted,
                             )
                         }
                     }
@@ -1369,13 +1493,22 @@ private fun HbA1cRecordList(
 ) {
     val sourceNames = remember(sources) { sources.associate { it.id to it.note } }
     val noSource = stringResource(R.string.data_source_none)
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(stringResource(R.string.body_record_count, records.size), style = MaterialTheme.typography.titleMedium)
+    val tokens = LocalAppTokens.current
+    Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                stringResource(R.string.body_record_count, records.size),
+                style = tokens.type.bodyS.copy(fontWeight = FontWeight.SemiBold),
+                color = tokens.colors.text,
+            )
             AppIconTextButton(stringResource(R.string.body_record_add), R.drawable.ic_add, onAdd)
         }
         if (records.isEmpty()) {
-            Text(stringResource(R.string.blood_glucose_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            AppEmptyState(
+                title = stringResource(R.string.blood_glucose_empty),
+                description = stringResource(R.string.blood_glucose_data_info_hb_a1c),
+                iconRes = R.drawable.ic_blood_glucose,
+            )
         } else {
             AppDataTable(
                 rows = records,
@@ -1413,9 +1546,10 @@ private fun HbA1cRecordList(
 
 @Composable
 private fun ReferenceRangeTableHeader(title: String, rangeText: String) {
+    val tokens = LocalAppTokens.current
     Column {
         AppDataTableHeaderText(title)
-        Text(rangeText, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(rangeText, style = tokens.type.caption, color = tokens.colors.textMuted)
     }
 }
 
@@ -1429,9 +1563,11 @@ private fun <T> ReferenceRangeValue(
 ) where T : Comparable<T> {
     val isLow = range.min?.let { minimum -> value < minimum || value == minimum && !range.minInclusive } == true
     val isHigh = range.max?.let { maximum -> value > maximum || value == maximum && !range.maxInclusive } == true
-    val color = if (isLow || isHigh) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+    val tokens = LocalAppTokens.current
+    val color = if (isLow || isHigh) tokens.colors.danger else tokens.colors.text
     Row(verticalAlignment = Alignment.CenterVertically) {
-        AppDataTableText(text, color = color)
+        // 数值列统一等宽：血糖 5.60 与 12.30 的小数点必须在同一竖线上，靠右的箭头才不会跳。
+        AppDataTableText(text, color = color, numeric = true)
         if (isLow || isHigh) {
             Icon(
                 imageVector = if (isHigh) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
@@ -1444,7 +1580,11 @@ private fun <T> ReferenceRangeValue(
 
 @Composable
 private fun OgttRecordPlaceholder() {
-    Text(stringResource(R.string.blood_glucose_ogtt_unavailable), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    AppEmptyState(
+        title = stringResource(R.string.blood_glucose_ogtt_unavailable),
+        description = stringResource(R.string.blood_glucose_data_info_ogtt),
+        iconRes = R.drawable.ic_blood_glucose,
+    )
 }
 
 @Composable
@@ -1540,117 +1680,149 @@ var relativeMinutes by rememberSaveable(record?.id) { mutableStateOf(record?.rel
     }
 
     BackHandler(enabled = true, onBack = ::requestBack)
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.blood_glucose_add_title), onBack = ::requestBack) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
+        Column(Modifier.fillMaxSize().background(tokens.colors.bg).padding(padding)) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
             ) {
+                // 卡 1：时间 + 数值。两者是「这次测的什么时候、多少」，拆开会让用户先填数再想起改时间。
                 item {
-                    RecordTimePickerField(
-                        title = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_time)),
-                        valueMillis = timestamp,
-                        precision = RecordTimePrecision.SECOND,
-                        onClick = { showDateTimePicker = true },
-                        resetOffset = timeResetOffset,
-                        resetLabel = timeResetLabel,
-                        onResetClick = { showTimeResetDialog = true },
-                    )
-                }
-                item {
-                    // Align the centers of the two outlined input boxes, not the composite helpers below them.
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
-                            NumericInputField(
-                                label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_value)),
-                                value = value,
-                                onValueChange = { value = it },
-                                spec = NumericInputSpec(
-                                    kind = NumericInputKind.Decimal,
-                                    range = glucoseRange,
-                                    example = if (unitId == "mg_dl") "100.00" else "5.60",
-                                    decimalPlaces = glucoseDecimals,
-                                    step = glucoseStep,
-                                    showSupportingText = false,
-                                ),
+                    AppSectionGroup {
+                        Column(
+                            modifier = Modifier.padding(tokens.spacing.s3),
+                            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                        ) {
+                            RecordTimePickerField(
+                                title = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_time)),
+                                valueMillis = timestamp,
+                                precision = RecordTimePrecision.SECOND,
+                                onClick = { showDateTimePicker = true },
+                                resetOffset = timeResetOffset,
+                                resetLabel = timeResetLabel,
+                                onResetClick = { showTimeResetDialog = true },
                             )
+                            // 两个输入框的中心对齐，而不是各自下面那串提示对齐。
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Box(Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
+                                    NumericInputField(
+                                        label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_value)),
+                                        value = value,
+                                        onValueChange = { value = it },
+                                        spec = NumericInputSpec(
+                                            kind = NumericInputKind.Decimal,
+                                            range = glucoseRange,
+                                            example = if (unitId == "mg_dl") "100.00" else "5.60",
+                                            decimalPlaces = glucoseDecimals,
+                                            step = glucoseStep,
+                                            showSupportingText = false,
+                                        ),
+                                    )
+                                }
+                                Box(Modifier.weight(.72f), contentAlignment = Alignment.TopStart) {
+                                    AppDropdownField(
+                                        label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_value_unit)),
+                                        value = glucoseUnitOptions().firstOrNull { it.id == unitId }?.label ?: unitId,
+                                        options = glucoseUnitOptions(),
+                                        onSelect = { selected ->
+                                            value.toDoubleOrNull()?.let { current -> value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, UnitConverter.toBase(UnitCategoryType.Glucose.id, current.toFloat(), unitId), selected.id).toString() }
+                                            unitId = selected.id
+                                            AppPrefs.setUnit(context, UnitCategoryType.Glucose.id, unitId)
+                                        },
+                                    )
+                                }
+                            }
+                            // 格式要求与参考范围属于「填的时候要看」的信息，跟输入框同一张卡常显；
+                            // 不用 tooltip——填数值的过程中没有长按的余裕。
+                            Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1)) {
+                                Text(
+                                    text = if (invalidValue) {
+                                        stringResource(R.string.blood_glucose_value_invalid)
+                                    } else {
+                                        stringResource(
+                                            R.string.blood_glucose_effective_range_example,
+                                            glucoseRangeText,
+                                            if (unitId == "mg_dl") "100.00" else "5.60",
+                                            glucoseUnit,
+                                        )
+                                    },
+                                    style = tokens.type.caption,
+                                    color = if (invalidValue) tokens.colors.danger else tokens.colors.textMuted,
+                                )
+                                Text(
+                                    text = stringResource(R.string.blood_glucose_reference_range, glucoseReferenceRangeText),
+                                    style = tokens.type.caption,
+                                    color = tokens.colors.textMuted,
+                                )
+                            }
                         }
-                        Box(Modifier.weight(.72f), contentAlignment = Alignment.TopStart) {
+                    }
+                }
+                // 卡 2：时段。锚点 + 前后关系 + 分钟数是一句话的三段，分开摆会读成三个独立设置。
+                item {
+                    AppSectionGroup {
+                        Column(
+                            modifier = Modifier.padding(tokens.spacing.s3),
+                            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                        ) {
                             AppDropdownField(
-                                label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_value_unit)),
-                                value = glucoseUnitOptions().firstOrNull { it.id == unitId }?.label ?: unitId,
-                                options = glucoseUnitOptions(),
-                                onSelect = { selected ->
-                                    value.toDoubleOrNull()?.let { current -> value = UnitConverter.fromBase(UnitCategoryType.Glucose.id, UnitConverter.toBase(UnitCategoryType.Glucose.id, current.toFloat(), unitId), selected.id).toString() }
-                                    unitId = selected.id
-                                    AppPrefs.setUnit(context, UnitCategoryType.Glucose.id, unitId)
-                                },
+                                label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_period_anchor)),
+                                value = anchor?.let { stringResource(it.labelRes()) }.orEmpty(),
+                                options = BloodGlucoseTimingAnchor.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
+                                onSelect = { anchor = BloodGlucoseTimingAnchor.valueOf(it.id) },
+                            )
+                            AppDropdownField(
+                                label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_period_relation)),
+                                value = stringResource(timingRelation.labelRes()),
+                                options = BloodGlucoseTimingRelation.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
+                                onSelect = { timingRelation = BloodGlucoseTimingRelation.valueOf(it.id) },
+                            )
+                            if (timingRelation != BloodGlucoseTimingRelation.At) {
+                                NumericInputField(
+                                    label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_minutes)),
+                                    value = relativeMinutes,
+                                    onValueChange = { relativeMinutes = it },
+                                    spec = NumericInputSpec(kind = NumericInputKind.Integer),
+                                )
+                            }
+                        }
+                    }
+                }
+                // 卡 3：来源与备注。都是「补充说明」，放在一起，图表和列表里也只读这两项。
+                item {
+                    AppSectionGroup {
+                        Column(
+                            modifier = Modifier.padding(tokens.spacing.s3),
+                            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                        ) {
+                            if (sources.isNotEmpty()) {
+                                val source = sources.firstOrNull { it.id == sourceId }
+                                AppDropdownField(
+                                    label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.data_source)),
+                                    value = source?.note ?: stringResource(R.string.data_source_none),
+                                    options = listOf(AppDropdownOption("__none__", stringResource(R.string.data_source_none))) + sources.map { AppDropdownOption(it.id, it.note) },
+                                    onSelect = { sourceId = if (it.id == "__none__") null else it.id },
+                                )
+                            }
+                            TextInputField(
+                                label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_note)),
+                                value = note,
+                                onValueChange = { note = it },
+                                tooltip = stringResource(R.string.blood_glucose_note_hint),
                             )
                         }
                     }
-                    Text(
-                        text = if (invalidValue) {
-                            stringResource(R.string.blood_glucose_value_invalid)
-                        } else {
-                            stringResource(
-                                R.string.blood_glucose_effective_range_example,
-                                glucoseRangeText,
-                                if (unitId == "mg_dl") "100.00" else "5.60",
-                                glucoseUnit,
-                            )
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (invalidValue) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                    Text(
-                        text = stringResource(R.string.blood_glucose_reference_range, glucoseReferenceRangeText),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
-                }
-                item {
-                    AppDropdownField(
-                        label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_period_anchor)),
-                        value = anchor?.let { stringResource(it.labelRes()) }.orEmpty(),
-                        options = BloodGlucoseTimingAnchor.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
-                        onSelect = { anchor = BloodGlucoseTimingAnchor.valueOf(it.id) },
-                    )
-                }
-                item {
-                    AppDropdownField(
-                        label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_period_relation)),
-                        value = stringResource(timingRelation.labelRes()),
-                        options = BloodGlucoseTimingRelation.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
-                        onSelect = { timingRelation = BloodGlucoseTimingRelation.valueOf(it.id) },
-                    )
-                }
-                if (timingRelation != BloodGlucoseTimingRelation.At) item {
-                    NumericInputField(
-                        label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_minutes)),
-                        value = relativeMinutes,
-                        onValueChange = { relativeMinutes = it },
-                        spec = NumericInputSpec(kind = NumericInputKind.Integer),
-                    )
-                }
-                if (sources.isNotEmpty()) item {
-                    val source = sources.firstOrNull { it.id == sourceId }
-                    AppDropdownField(
-                        label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.data_source)),
-                        value = source?.note ?: stringResource(R.string.data_source_none),
-                        options = listOf(AppDropdownOption("__none__", stringResource(R.string.data_source_none))) + sources.map { AppDropdownOption(it.id, it.note) },
-                        onSelect = { sourceId = if (it.id == "__none__") null else it.id },
-                    )
-                }
-                item {
-                    TextInputField(
-                        label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_note)),
-                        value = note,
-                        onValueChange = { note = it },
-                        tooltip = stringResource(R.string.blood_glucose_note_hint),
-                    )
                 }
             }
             FormSaveBar(
@@ -1695,29 +1867,6 @@ var relativeMinutes by rememberSaveable(record?.id) { mutableStateOf(record?.rel
             saveEnabled = saveEnabled,
         )
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BloodGlucoseNoteField(note: String, onValueChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = note,
-        onValueChange = onValueChange,
-        label = { Text(stringResource(R.string.blood_glucose_note)) },
-        trailingIcon = {
-            TooltipBox(
-                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                tooltip = { PlainTooltip { Text(stringResource(R.string.blood_glucose_note_hint)) } },
-                state = rememberTooltipState(),
-            ) {
-                IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.ic_info), contentDescription = stringResource(R.string.blood_glucose_note_hint))
-                }
-            }
-        },
-        modifier = Modifier.fillMaxWidth(),
-        minLines = 3,
-    )
 }
 
 internal data class BloodGlucoseEditorDraft(
@@ -1876,102 +2025,130 @@ private fun BloodHbA1cEditorScreen(
     }
 
     BackHandler(enabled = true, onBack = ::requestBack)
+    val tokens = LocalAppTokens.current
     BaseScreen(title = stringResource(R.string.blood_glucose_hb_a1c_add_title), onBack = ::requestBack) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
+        Column(Modifier.fillMaxSize().background(tokens.colors.bg).padding(padding)) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s4,
+                    bottom = tokens.spacing.s4,
+                ),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
             ) {
                 item {
-                    RecordTimePickerField(
-                        title = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_source_time)),
-                        valueMillis = timestamp,
-                        precision = RecordTimePrecision.SECOND,
-                        onClick = { showDateTimePicker = true },
-                    )
-                }
-                item {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        NumericInputField(
-                            label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.hb_a1c_value_label)),
-                            value = value,
-                            onValueChange = { value = it },
-                            spec = NumericInputSpec(
-                                kind = NumericInputKind.Decimal,
-                                range = hbA1cInputRange,
-                                example = "5.50",
-                                decimalPlaces = 2,
-                                step = hbA1cStep,
-                                tooltip = hbA1cRangeText,
-                                showSupportingText = false,
-                            ),
-                            modifier = Modifier.weight(1f),
-                        )
-                        Text(
-                            text = "%",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                    AppSectionGroup {
+                        Column(
+                            modifier = Modifier.padding(tokens.spacing.s3),
+                            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                        ) {
+                            RecordTimePickerField(
+                                title = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_source_time)),
+                                valueMillis = timestamp,
+                                precision = RecordTimePrecision.SECOND,
+                                onClick = { showDateTimePicker = true },
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                NumericInputField(
+                                    label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.hb_a1c_value_label)),
+                                    value = value,
+                                    onValueChange = { value = it },
+                                    spec = NumericInputSpec(
+                                        kind = NumericInputKind.Decimal,
+                                        range = hbA1cInputRange,
+                                        example = "5.50",
+                                        decimalPlaces = 2,
+                                        step = hbA1cStep,
+                                        tooltip = hbA1cRangeText,
+                                        showSupportingText = false,
+                                    ),
+                                    modifier = Modifier.weight(1f),
+                                )
+                                // 16 sp：与输入框里的数字同高，读起来是「5.50 %」一个整体。
+                                Text(
+                                    text = "%",
+                                    style = tokens.type.body,
+                                    color = tokens.colors.textMuted,
+                                )
+                            }
+                            Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1)) {
+                                Text(
+                                    text = if (invalidValue) stringResource(R.string.hb_a1c_value_invalid) else stringResource(
+                                        R.string.blood_glucose_effective_range_example,
+                                        hbA1cRangeText,
+                                        "5.50",
+                                        "%",
+                                    ),
+                                    style = tokens.type.caption,
+                                    color = if (invalidValue) tokens.colors.danger else tokens.colors.textMuted,
+                                )
+                                Text(
+                                    text = hbA1cReferenceRangeText,
+                                    style = tokens.type.caption,
+                                    color = tokens.colors.textMuted,
+                                )
+                            }
+                        }
                     }
-                    Text(
-                        text = if (invalidValue) stringResource(R.string.hb_a1c_value_invalid) else stringResource(
-                            R.string.blood_glucose_effective_range_example,
-                            hbA1cRangeText,
-                            "5.50",
-                            "%",
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (invalidValue) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                    Text(
-                        text = hbA1cReferenceRangeText,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
                 }
                 item {
-                    AppDropdownField(
-                        label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_period_anchor)),
-                        value = anchor?.let { stringResource(it.labelRes()) }.orEmpty(),
-                        options = BloodGlucoseTimingAnchor.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
-                        onSelect = { anchor = BloodGlucoseTimingAnchor.valueOf(it.id) },
-                    )
+                    AppSectionGroup {
+                        Column(
+                            modifier = Modifier.padding(tokens.spacing.s3),
+                            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                        ) {
+                            AppDropdownField(
+                                label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_period_anchor)),
+                                value = anchor?.let { stringResource(it.labelRes()) }.orEmpty(),
+                                options = BloodGlucoseTimingAnchor.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
+                                onSelect = { anchor = BloodGlucoseTimingAnchor.valueOf(it.id) },
+                            )
+                            AppDropdownField(
+                                label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_period_relation)),
+                                value = stringResource(timingRelation.labelRes()),
+                                options = BloodGlucoseTimingRelation.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
+                                onSelect = { timingRelation = BloodGlucoseTimingRelation.valueOf(it.id) },
+                            )
+                            if (timingRelation != BloodGlucoseTimingRelation.At) {
+                                NumericInputField(
+                                    label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_minutes)),
+                                    value = relativeMinutes,
+                                    onValueChange = { relativeMinutes = it },
+                                    spec = NumericInputSpec(kind = NumericInputKind.Integer),
+                                )
+                            }
+                        }
+                    }
                 }
                 item {
-                    AppDropdownField(
-                        label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_period_relation)),
-                        value = stringResource(timingRelation.labelRes()),
-                        options = BloodGlucoseTimingRelation.entries.map { AppDropdownOption(it.name, stringResource(it.labelRes())) },
-                        onSelect = { timingRelation = BloodGlucoseTimingRelation.valueOf(it.id) },
-                    )
-                }
-                if (timingRelation != BloodGlucoseTimingRelation.At) item {
-                    NumericInputField(
-                        label = stringResource(R.string.nutrition_editor_field_required, stringResource(R.string.blood_glucose_minutes)),
-                        value = relativeMinutes,
-                        onValueChange = { relativeMinutes = it },
-                        spec = NumericInputSpec(kind = NumericInputKind.Integer),
-                    )
-                }
-                if (sources.isNotEmpty()) item {
-                    val source = sources.firstOrNull { it.id == sourceId }
-                    AppDropdownField(
-                        label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.data_source)),
-                        value = source?.note ?: stringResource(R.string.data_source_none),
-                        options = listOf(AppDropdownOption("__none__", stringResource(R.string.data_source_none))) + sources.map { AppDropdownOption(it.id, it.note) },
-                        onSelect = { sourceId = if (it.id == "__none__") null else it.id },
-                    )
-                }
-                item {
-                    TextInputField(
-                        label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_note)),
-                        value = note,
-                        onValueChange = { note = it },
-                        tooltip = stringResource(R.string.blood_glucose_note_hint),
-                    )
+                    AppSectionGroup {
+                        Column(
+                            modifier = Modifier.padding(tokens.spacing.s3),
+                            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
+                        ) {
+                            if (sources.isNotEmpty()) {
+                                val source = sources.firstOrNull { it.id == sourceId }
+                                AppDropdownField(
+                                    label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.data_source)),
+                                    value = source?.note ?: stringResource(R.string.data_source_none),
+                                    options = listOf(AppDropdownOption("__none__", stringResource(R.string.data_source_none))) + sources.map { AppDropdownOption(it.id, it.note) },
+                                    onSelect = { sourceId = if (it.id == "__none__") null else it.id },
+                                )
+                            }
+                            TextInputField(
+                                label = stringResource(R.string.nutrition_editor_field_optional, stringResource(R.string.blood_glucose_note)),
+                                value = note,
+                                onValueChange = { note = it },
+                                tooltip = stringResource(R.string.blood_glucose_note_hint),
+                            )
+                        }
+                    }
                 }
             }
             FormSaveBar(

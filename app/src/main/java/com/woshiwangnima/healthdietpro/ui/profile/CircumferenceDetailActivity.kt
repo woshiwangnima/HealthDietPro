@@ -10,18 +10,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRow
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRowDivider
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.BaseActivity
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
-import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.model.profile.BodyRecord
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 
@@ -116,15 +120,30 @@ private fun CircumferenceMetricPicker(
     onBack: () -> Unit,
     onMetricSelected: (CircumferenceMetric) -> Unit,
 ) {
+    val tokens = LocalAppTokens.current
     BaseScreen(title = androidx.compose.ui.res.stringResource(R.string.circumference_title), onBack = onBack) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            CircumferenceMetric.entries.forEach { metric ->
-                SettingRow(
-                    title = androidx.compose.ui.res.stringResource(metric.titleRes),
-                    subtitle = "",
-                    leadingIconRes = R.drawable.ic_circumference,
-                    onClick = { onMetricSelected(metric) },
-                )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(androidx.compose.foundation.rememberScrollState())
+                .padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s4),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s4),
+        ) {
+            AppSectionCard(
+                iconRes = R.drawable.ic_circumference,
+                title = androidx.compose.ui.res.stringResource(R.string.circumference_title),
+                tooltip = androidx.compose.ui.res.stringResource(R.string.circumference_pick_hint),
+            ) {
+                CircumferenceMetric.entries.forEachIndexed { index, metric ->
+                    if (index > 0) AppListRowDivider()
+                    AppListRow(
+                        title = androidx.compose.ui.res.stringResource(metric.titleRes),
+                        iconRes = R.drawable.ic_circumference,
+                        showChevron = true,
+                        onClick = { onMetricSelected(metric) },
+                    )
+                }
             }
         }
     }
