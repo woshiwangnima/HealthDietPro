@@ -9,12 +9,16 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,9 +26,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -48,7 +52,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
@@ -56,6 +59,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -83,9 +87,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -95,6 +102,7 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.format.formatGroupedInteger
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTable
 import com.woshiwangnima.healthdietpro.common.ui.AppDataTableColumn
@@ -106,20 +114,32 @@ import com.woshiwangnima.healthdietpro.common.ui.ColumnWidth
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthSegmentedTabs
 import com.woshiwangnima.healthdietpro.common.ui.EqualWidthTab
 import com.woshiwangnima.healthdietpro.common.ui.FontTokens
-import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
 import com.woshiwangnima.healthdietpro.common.ui.SearchActivityPanel
+import com.woshiwangnima.healthdietpro.common.ui.SearchPanelDismissLayer
+import com.woshiwangnima.healthdietpro.common.ui.SearchPanelMaxHeight
 import com.woshiwangnima.healthdietpro.common.ui.RecentSearchItem
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
 import com.woshiwangnima.healthdietpro.common.ui.ImageVariant
 import com.woshiwangnima.healthdietpro.common.ui.FilterCollapseAxis
 import com.woshiwangnima.healthdietpro.common.ui.FilterCollapseButton
-import com.woshiwangnima.healthdietpro.common.ui.AppInfoDialog
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
-import com.woshiwangnima.healthdietpro.common.ui.NutrientOtherColor
+import com.woshiwangnima.healthdietpro.common.ui.MarqueeRow
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
-import com.woshiwangnima.healthdietpro.common.ui.nutrientColor
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppBottomSheet
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppFoodKindCurrent
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppRadiiDefault
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSearchField
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSheetHeight
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSpacingDefault
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.concentricRadius
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTypeDefault
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.rememberAppDarkTheme
 import com.woshiwangnima.healthdietpro.common.range.RangeBand
 import com.woshiwangnima.healthdietpro.model.food.CategorizedFood
 import com.woshiwangnima.healthdietpro.model.food.Dish
@@ -186,18 +206,12 @@ private fun FoodKind.comparisonTitleRes(): Int = when (this) {
 
 /**
  * Kind-specific (container, content) colors for the rounded name background and matching chips.
- * Fixed appetizing hues that stay identical in light/dark and contrast strongly with the green theme:
- * 食材=鲜叶绿, 食物=暖橙, 菜肴=番茄红。文字统一用白色保证对比度。
+ * 取值统一来自设计令牌 AppFoodKindCurrent（食材=叶绿, 食物=橙, 菜肴=番茄红），深浅色一致。
  */
-private val IngredientContainer = androidx.compose.ui.graphics.Color(0xFF43A047) // leaf green
-private val FoodContainer = androidx.compose.ui.graphics.Color(0xFFF57C00) // appetizing orange
-private val DishContainer = androidx.compose.ui.graphics.Color(0xFFE53935) // tomato red
-private val KindOnContainer = androidx.compose.ui.graphics.Color(0xFFFFFFFF)
-
 private fun FoodKind.nameColors(): Pair<androidx.compose.ui.graphics.Color, androidx.compose.ui.graphics.Color> = when (this) {
-    FoodKind.INGREDIENT -> IngredientContainer to KindOnContainer
-    FoodKind.FOOD -> FoodContainer to KindOnContainer
-    FoodKind.DISH -> DishContainer to KindOnContainer
+    FoodKind.INGREDIENT -> AppFoodKindCurrent.ingredient to AppFoodKindCurrent.onKind
+    FoodKind.FOOD -> AppFoodKindCurrent.preparedFood to AppFoodKindCurrent.onKind
+    FoodKind.DISH -> AppFoodKindCurrent.dish to AppFoodKindCurrent.onKind
 }
 
 @Composable
@@ -226,15 +240,23 @@ private fun FoodImageWithSystemTags(
         if (isRecent) add("recent")
     }.distinct().mapNotNull { systemTagPresentation(it) }
     Box(modifier = modifier) {
-        FoodImage(image, Modifier.fillMaxSize())
+        // 方形缩略图槽位统一 1:1 居中裁切（移动规范 06 §三），原图是竖图或横图都不会在槽内留黑边。
+        FoodImage(image, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         if (tags.isNotEmpty()) {
-            Row(
-                modifier = Modifier.align(Alignment.TopStart).fillMaxWidth().padding(horizontal = 1.dp, vertical = 2.dp),
-                horizontalArrangement = Arrangement.spacedBy(1.dp),
+            MarqueeRow(
+                modifier = Modifier.align(Alignment.TopStart).fillMaxWidth().padding(vertical = AppSpacingDefault.s1),
+                horizontalArrangement = Arrangement.spacedBy(AppSpacingDefault.s1),
             ) {
                 tags.forEach { (label, color) ->
-                    Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(4.dp), color = color) {
-                        TextOverflowText(text = label, modifier = Modifier.fillMaxWidth().padding(horizontal = 1.dp), style = TextStyle(fontSize = 9.sp), color = androidx.compose.ui.graphics.Color.White, maxLines = 1, textAlign = TextAlign.Center)
+                    Surface(shape = RoundedCornerShape(AppRadiiDefault.container), color = color) {
+                        Text(
+                            text = label,
+                            modifier = Modifier.padding(horizontal = AppSpacingDefault.s1, vertical = 1.dp),
+                            style = AppTypeDefault.caption,
+                            color = androidx.compose.ui.graphics.Color.White,
+                            maxLines = 1,
+                            softWrap = false,
+                        )
                     }
                 }
             }
@@ -264,14 +286,16 @@ internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier =
             isFavorite = requireNotNull(state.selectedFood).id in state.favoriteFoodIds,
             isRecent = requireNotNull(state.selectedFood).id in state.recentFoodIds,
             viewModel = viewModel,
-            showGlycemicIndicator = state.showGlycemicIndicator,
             nrvReference = state.nrvReference,
             nrvReferences = state.nrvReferences,
             onNrvReferenceSelected = viewModel::selectNrvReference,
             onOpenExerciseExpenditure = viewModel::openExerciseExpenditure,
             onBack = viewModel::closeFood,
         ) { viewModel.openComparison(NutritionDestination.FoodDetail) }
-        else -> FoodBrowseScreen(state, viewModel, ingredientListState, foodListState, dishListState, modifier)
+        // 浏览页与本页其它子屏（详情/编辑/对比）一样落在 AppTheme 上，搜索框、空态与卡片才共用一套令牌。
+        else -> AppTheme(darkTheme = rememberAppDarkTheme()) {
+            FoodBrowseScreen(state, viewModel, ingredientListState, foodListState, dishListState, modifier)
+        }
     }
 }
 
@@ -319,70 +343,125 @@ private fun FoodBrowseScreen(
             FoodKind.DISH -> Unit
         }
     }
-    val showSearchActivity = searchFocused && state.keyword.isBlank() &&
-        (state.searchHistory.isNotEmpty() || state.recentFoodIds.isNotEmpty())
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val contentModifier = if (showSearchActivity) {
-        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(10.dp)
-    } else {
-        modifier.fillMaxSize().padding(10.dp)
-    }
-    Column(modifier = contentModifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        FoodSearchField(state.keyword, viewModel::setKeyword, stringResource(R.string.nutrition_search_food), onSearch = { }, onFocusChanged = { searchFocused = it })
+    // 同记录页：聚焦且为空即展开，输入即消失。
+    val showSearchActivity = searchFocused && state.keyword.isBlank()
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxSize()
+            .background(LocalAppTokens.current.colors.bg),
+    ) {
+        val tokens = LocalAppTokens.current
+        val pagePadding = 10.dp
+        // 下拉面板叠在分类栏与结果列表之上：展开时不参与排版，不再把下方内容挤成一条缝。
+        val panelTop = pagePadding + tokens.spacing.hitMin + 8.dp
+        val collapseSearch = {
+            searchFocused = false
+            focusManager.clearFocus()
+        }
+        // 返回键先收起面板，而不是直接退出浏览页（§5.3）。
+        BackHandler(enabled = showSearchActivity) { collapseSearch() }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(pagePadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // 输入即过滤；回车才把这次关键词记进历史（旧版 onSearch 传的是空 lambda，等于给了一个死按钮）。
+            AppSearchField(
+                value = state.keyword,
+                onValueChange = viewModel::setKeyword,
+                placeholder = stringResource(R.string.nutrition_search_food),
+                onSearch = { viewModel.commitSearch() },
+                onFocusChanged = { searchFocused = it },
+            )
+            KindSegmenter(state.selectedKind, viewModel::selectKind)
+            val browseAreaModifier = Modifier.weight(1f)
+            Column(modifier = browseAreaModifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (state.selectedKind == FoodKind.DISH) {
+                    if (tagsExpanded) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
+                            BrowseFilterControls(state.selectedKind, true, false, toggleTags, {}, Modifier.width(80.dp).height(88.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
+                            TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
+                        }
+                    } else {
+                        BrowseFilterControls(state.selectedKind, false, false, toggleTags, {}, Modifier.fillMaxWidth().height(30.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
+                    }
+                } else if (tagsExpanded) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
+                        BrowseFilterControls(state.selectedKind, true, categoriesExpanded, toggleTags, toggleCategories, Modifier.width(80.dp).height(88.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
+                        TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
+                    }
+                } else if (!categoriesExpanded) {
+                    BrowseFilterControls(state.selectedKind, false, false, toggleTags, toggleCategories, Modifier.fillMaxWidth().height(30.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
+                }
+                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (state.selectedKind == FoodKind.DISH) {
+                        FoodResultsHost(foods, language, viewModel, state.selectedKind, state.showGlycemicIndicator, state, dishListState, Modifier.weight(1f))
+                    } else {
+                    if (!tagsExpanded && showSidebar && categoriesExpanded) {
+                        Column(modifier = Modifier.width(80.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            BrowseFilterControls(state.selectedKind, false, true, toggleTags, toggleCategories, Modifier.fillMaxWidth().height(88.dp), onAddCustom = { viewModel.openEditor(state.selectedKind) })
+                            CategorySidebar(state, viewModel, Modifier.weight(1f))
+                        }
+                    } else if (tagsExpanded && showSidebar && categoriesExpanded) {
+                        CategorySidebar(state, viewModel, Modifier.width(80.dp))
+                    }
+                    FoodResultsHost(
+                        foods = foods,
+                        language = language,
+                        viewModel = viewModel,
+                        kind = state.selectedKind,
+                        showGlycemicIndicator = state.showGlycemicIndicator,
+                        state = state,
+                        listState = when (state.selectedKind) {
+                            FoodKind.INGREDIENT -> ingredientListState
+                            FoodKind.FOOD -> foodListState
+                            FoodKind.DISH -> dishListState
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    }
+                }
+            }
+        }
+
         if (showSearchActivity) {
             val recent = state.recentFoodIds.mapNotNull { id -> viewModel.foodById(id) }.map { food ->
                 RecentSearchItem(food.id, food.displayName(language), when (food.kind) { FoodKind.INGREDIENT -> R.drawable.ic_food_ingredient; FoodKind.FOOD -> R.drawable.ic_nav_nutrition; FoodKind.DISH -> R.drawable.ic_food_dish })
             }
-            SearchActivityPanel(state.searchHistory, recent, stringResource(R.string.nutrition_search_history), stringResource(R.string.nutrition_click_history), { viewModel.setKeyword(it) }, viewModel::removeSearchHistory, viewModel::clearSearchHistory, { item -> viewModel.foodById(item.id)?.let(viewModel::openFood) }, { item -> viewModel.removeRecentFood(item.id) }, viewModel::clearRecentFoods, { searchFocused = false; focusManager.clearFocus() })
-        }
-        KindSegmenter(state.selectedKind, viewModel::selectKind)
-        val browseAreaModifier = if (showSearchActivity) Modifier.height(screenHeight) else Modifier.weight(1f)
-        Column(modifier = browseAreaModifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (state.selectedKind == FoodKind.DISH) {
-                if (tagsExpanded) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
-                        BrowseFilterControls(state.selectedKind, true, false, toggleTags, {}, Modifier.width(80.dp).height(88.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
-                        TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
-                    }
-                } else {
-                    BrowseFilterControls(state.selectedKind, false, false, toggleTags, {}, Modifier.fillMaxWidth().height(30.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
-                }
-            } else if (tagsExpanded) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
-                    BrowseFilterControls(state.selectedKind, true, categoriesExpanded, toggleTags, toggleCategories, Modifier.width(80.dp).height(88.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
-                    TagFilters(state, viewModel, { addingTag = true }, Modifier.weight(1f))
-                }
-            } else if (!categoriesExpanded) {
-                BrowseFilterControls(state.selectedKind, false, false, toggleTags, toggleCategories, Modifier.fillMaxWidth().height(30.dp), { viewModel.openEditor(state.selectedKind) }, state.customOnly, { viewModel.toggleCustomOnly() })
-            }
-            Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                if (state.selectedKind == FoodKind.DISH) {
-                    FoodResultsHost(foods, language, viewModel, state.selectedKind, state.showGlycemicIndicator, state, dishListState, Modifier.weight(1f))
-                } else {
-                if (!tagsExpanded && showSidebar && categoriesExpanded) {
-                    Column(modifier = Modifier.width(80.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        BrowseFilterControls(state.selectedKind, false, true, toggleTags, toggleCategories, Modifier.fillMaxWidth().height(88.dp), onAddCustom = { viewModel.openEditor(state.selectedKind) })
-                        CategorySidebar(state, viewModel, Modifier.weight(1f))
-                    }
-                } else if (tagsExpanded && showSidebar && categoriesExpanded) {
-                    CategorySidebar(state, viewModel, Modifier.width(80.dp))
-                }
-                FoodResultsHost(
-                    foods = foods,
-                    language = language,
-                    viewModel = viewModel,
-                    kind = state.selectedKind,
-                    showGlycemicIndicator = state.showGlycemicIndicator,
-                    state = state,
-                    listState = when (state.selectedKind) {
-                        FoodKind.INGREDIENT -> ingredientListState
-                        FoodKind.FOOD -> foodListState
-                        FoodKind.DISH -> dishListState
-                    },
-                    modifier = Modifier.weight(1f),
-                )
-                }
-            }
+            // 320 dp 上限之外再按可用高度的一半封顶：横屏或大号键盘时不会顶出屏幕。
+            val panelMaxHeight = minOf(
+                SearchPanelMaxHeight,
+                maxHeight * 0.55f,
+                maxHeight - panelTop - pagePadding,
+            ).coerceAtLeast(160.dp)
+
+            SearchPanelDismissLayer(
+                onDismiss = { collapseSearch() },
+                modifier = Modifier.padding(top = panelTop),
+            )
+            SearchActivityPanel(
+                history = state.searchHistory,
+                recentItems = recent,
+                historyTitle = stringResource(R.string.nutrition_search_history),
+                recentsTitle = stringResource(R.string.nutrition_click_history),
+                onSelectHistory = {
+                    viewModel.setKeyword(it)
+                    viewModel.commitSearch()
+                    collapseSearch()
+                },
+                onRemoveHistory = viewModel::removeSearchHistory,
+                onClearHistory = viewModel::clearSearchHistory,
+                onOpenRecent = { item -> viewModel.foodById(item.id)?.let(viewModel::openFood) },
+                onRemoveRecent = { item -> viewModel.removeRecentFood(item.id) },
+                onClearRecents = viewModel::clearRecentFoods,
+                onCollapse = { collapseSearch() },
+                maxHeight = panelMaxHeight,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = pagePadding, end = pagePadding, top = panelTop),
+            )
         }
     }
     if (addingTag) AddTagDialog({ addingTag = false }) { viewModel.addUserTag(it); addingTag = false }
@@ -472,8 +551,23 @@ private fun FoodResultsHost(
     listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
-    if (foods.isEmpty()) Text(stringResource(R.string.nutrition_no_foods), modifier = modifier.padding(top = 20.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-    else {
+    if (foods.isEmpty()) {
+        // 空结果按原因分开说：搜索没命中就提示换词，筛选筛空了就给「清除筛选」的出口（§6.2）。
+        val searching = state.keyword.isNotBlank()
+        AppEmptyState(
+            title = stringResource(if (searching) R.string.nutrition_search_empty_title else R.string.nutrition_filter_empty_title),
+            description = stringResource(
+                if (searching) R.string.nutrition_search_empty_hint else R.string.nutrition_no_foods,
+            ),
+            iconRes = if (searching) R.drawable.ic_search_empty else R.drawable.ic_list,
+            action = {
+                TextButton(onClick = viewModel::clearFilters) {
+                    Text(stringResource(R.string.price_filter_clear))
+                }
+            },
+            modifier = modifier,
+        )
+    } else {
         var activeHighlightToken by remember { mutableStateOf<Long?>(null) }
         LaunchedEffect(state.listHighlightToken, state.listHighlightFoodId) {
             if (state.listHighlightFoodId != null && state.listHighlightToken > 0) {
@@ -692,6 +786,7 @@ private fun FoodCardNameHeader(
     modifier: Modifier = Modifier,
 ) {
     val colors = food.kind.nameColors()
+    val aliases = food.allNames(language).drop(1).filter(String::isNotBlank)
     val copyText = buildFoodNameText(food.displayName(language), cookingSuffix, food.allNames(language).drop(1))
     CopyableFoodNameArea(copyText, modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -699,30 +794,36 @@ private fun FoodCardNameHeader(
             Icon(
                 Icons.Filled.Edit,
                 contentDescription = stringResource(R.string.nutrition_custom_marker),
-                modifier = Modifier.size(14.dp),
+                modifier = Modifier.size(AppSpacingDefault.s4),
                 tint = MaterialTheme.colorScheme.primary,
             )
-            Spacer(Modifier.width(2.dp))
+            Spacer(Modifier.width(AppSpacingDefault.s1))
         }
-        Surface(modifier = Modifier.fillMaxWidth(0.8f).height(28.dp), shape = RoundedCornerShape(6.dp), color = colors.first) {
-            Row(Modifier.padding(horizontal = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.weight(0.6f)) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(0.8f).heightIn(min = AppSpacingDefault.s6),
+            shape = RoundedCornerShape(AppRadiiDefault.label),
+            color = colors.first,
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = AppSpacingDefault.s2, vertical = AppSpacingDefault.s1),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(if (aliases.isEmpty()) Modifier.weight(1f) else Modifier.weight(0.6f)) {
                     TextOverflowText(
                         text = food.displayName(language),
                         modifier = Modifier.fillMaxWidth(),
-                        style = TextStyle(fontSize = FontTokens.subtitle),
+                        style = AppTypeDefault.titleS,
                         color = colors.second,
                         maxLines = 1,
                         textAlign = TextAlign.Center,
                     )
                 }
-                cookingSuffix?.let { Text(" ($it)", style = TextStyle(fontSize = FontTokens.subtitle), color = colors.second, maxLines = 1, softWrap = false) }
-                val aliases = food.allNames(language).drop(1).joinToString(" / ")
+                cookingSuffix?.let { Text(" ($it)", style = AppTypeDefault.titleS, color = colors.second, maxLines = 1, softWrap = false) }
                 if (aliases.isNotEmpty()) {
                     TextOverflowText(
-                        text = aliases,
+                        text = aliases.joinToString(" / "),
                         modifier = Modifier.weight(0.4f),
-                        style = TextStyle(fontSize = FontTokens.body),
+                        style = AppTypeDefault.bodyS,
                         color = colors.second.copy(alpha = 0.9f),
                         maxLines = 1,
                         textAlign = TextAlign.Center,
@@ -941,7 +1042,35 @@ private fun FoodDetailScreen(
     isFavorite: Boolean,
     isRecent: Boolean,
     viewModel: NutritionViewModel,
-    showGlycemicIndicator: Boolean,
+    nrvReference: NrvReference?,
+    nrvReferences: List<NrvReference>,
+    onNrvReferenceSelected: (String) -> Unit,
+    onOpenExerciseExpenditure: (List<NutritionExerciseServing>) -> Unit,
+    onBack: () -> Unit,
+    onCompare: () -> Unit,
+) {
+    AppTheme(darkTheme = rememberAppDarkTheme()) {
+        FoodDetailContent(
+            food = food,
+            isFavorite = isFavorite,
+            isRecent = isRecent,
+            viewModel = viewModel,
+            nrvReference = nrvReference,
+            nrvReferences = nrvReferences,
+            onNrvReferenceSelected = onNrvReferenceSelected,
+            onOpenExerciseExpenditure = onOpenExerciseExpenditure,
+            onBack = onBack,
+            onCompare = onCompare,
+        )
+    }
+}
+
+@Composable
+private fun FoodDetailContent(
+    food: FoodItem,
+    isFavorite: Boolean,
+    isRecent: Boolean,
+    viewModel: NutritionViewModel,
     nrvReference: NrvReference?,
     nrvReferences: List<NrvReference>,
     onNrvReferenceSelected: (String) -> Unit,
@@ -957,11 +1086,14 @@ private fun FoodDetailScreen(
     val servings = remember(food.id, resolved) { food.defaultServings(resolved) }
     var selectedServingId by remember(food.id, servings) { mutableStateOf(servings.first().id) }
     var previewing by remember { mutableStateOf(false) }
-    var showHealthMetricsHelp by remember { mutableStateOf(false) }
+    var helpTopic by remember(food.id) { mutableStateOf<NutritionHelpTopic?>(null) }
     var confirmingDelete by remember { mutableStateOf(false) }
     val relatedDishes = remember(food.id) { viewModel.relatedDishes(food.id) }
     val isCustom = viewModel.isCustom(food.id)
-    val language = LocalConfiguration.current.locales[0]?.language ?: "en"
+    val configuration = LocalConfiguration.current
+    val language = configuration.locales[0]?.language ?: "en"
+    // 营养素表在页内单独滚动（§4.8 允许一层嵌套）：高度跟随屏高，短屏也不会把页面挤到只剩半屏。
+    val nutrientTableMaxHeight = (configuration.screenHeightDp * 0.45f).coerceIn(240f, 480f).dp
     val detailImage = imageStore.rememberImage(food.imageKey(), ImageVariant.DETAIL)
     val defaultServingLabel = stringResource(R.string.nutrition_serving_100g_edible)
     val cookingSuffix: String? = (food as? PreparedFood)?.let {
@@ -976,8 +1108,13 @@ private fun FoodDetailScreen(
         onBack = onBack,
         includeStatusBarPadding = false,
     ) { padding ->
-    Column(Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
-        Row(modifier = Modifier.height(96.dp), verticalAlignment = Alignment.Top) {
+    val tokens = LocalAppTokens.current
+    val colors = tokens.colors
+    val spacing = tokens.spacing
+    Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = spacing.page, vertical = spacing.s3)) {
+        DetailPanel {
+        // 高 104 = 两排 48 dp 图标按钮 + 8 dp 间距：相邻热区之间留够 8 dp，避免连带误触（规范 01 §三、07 检查项 04）。
+        Row(modifier = Modifier.height(104.dp), verticalAlignment = Alignment.Top) {
             FoodImageWithSystemTags(
                 food = food,
                 image = detailImage,
@@ -985,7 +1122,7 @@ private fun FoodDetailScreen(
                 isRecent = isRecent,
                 modifier = Modifier.size(96.dp).clickable { previewing = true },
             )
-            Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f).fillMaxHeight()) {
+            Spacer(Modifier.width(spacing.s3)); Column(Modifier.weight(1f).fillMaxHeight()) {
                 FoodCardNameHeader(
                     food = food,
                     language = language,
@@ -998,30 +1135,28 @@ private fun FoodDetailScreen(
                     language = language,
                     page = headerPage,
                     direction = headerDirection,
-                    onPrevious = {
-                        headerDirection = -1
-                        headerPage = if (headerPage == 0) 2 else headerPage - 1
-                    },
-                    onNext = {
-                        headerDirection = 1
-                        headerPage = (headerPage + 1) % 3
-                    },
                     modifier = Modifier.weight(1f),
                 ) { viewModel.openFood(it) }
             }
             Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.SpaceBetween) {
                 if (isCustom) {
-                    Row {
-                        IconButton(onClick = { viewModel.openEditor(food.kind, food.id) }) { Icon(Icons.Filled.Edit, stringResource(R.string.nutrition_editor_edit)) }
-                        IconButton(onClick = { confirmingDelete = true }) { Icon(Icons.Filled.Delete, stringResource(R.string.nutrition_editor_delete)) }
+                    Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
+                        IconButton(onClick = { viewModel.openEditor(food.kind, food.id) }) {
+                            Icon(Icons.Filled.Edit, stringResource(R.string.nutrition_editor_edit), tint = colors.textMuted)
+                        }
+                        // 删除是不可逆操作，允许使用危险色（§2.3），与「编辑」区分。
+                        IconButton(onClick = { confirmingDelete = true }) {
+                            Icon(Icons.Filled.Delete, stringResource(R.string.nutrition_editor_delete), tint = colors.danger)
+                        }
                     }
                 }
-                Row {
+                Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
                     IconButton(onClick = { viewModel.toggleFavorite(food) }) {
                         Icon(
                             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                             contentDescription = stringResource(R.string.nutrition_favorite),
-                            tint = if (isFavorite) androidx.compose.ui.graphics.Color(0xFFC62828) else MaterialTheme.colorScheme.onSurface,
+                            // 收藏是正向状态，按 §2.3 不得借用危险色（danger 只用于删除 / 不可逆操作）。
+                            tint = if (isFavorite) colors.warning else colors.textMuted,
                         )
                     }
                         IconButton(onClick = onCompare) {
@@ -1029,6 +1164,19 @@ private fun FoodDetailScreen(
                         }
                 }
             }
+        }
+        FoodHeaderPager(
+            page = headerPage,
+            pageCount = 3,
+            onPrevious = {
+                headerDirection = -1
+                headerPage = if (headerPage == 0) 2 else headerPage - 1
+            },
+            onNext = {
+                headerDirection = 1
+                headerPage = (headerPage + 1) % 3
+            },
+        )
         }
         EqualWidthSegmentedTabs(
             tabs = listOf(
@@ -1038,101 +1186,197 @@ private fun FoodDetailScreen(
             ),
             selectedIndex = tab,
             onSelected = { tab = it },
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = spacing.s4),
         )
-        if (tab == 0) Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
-            MacronutrientEnergyChart(resolved, Modifier.padding(top = 12.dp))
-            DetailSectionTitle(R.drawable.ic_health_metrics, stringResource(R.string.nutrition_health_metrics)) {
-                IconButton(onClick = { showHealthMetricsHelp = true }) {
-                    Icon(painterResource(R.drawable.ic_help), contentDescription = stringResource(R.string.nutrition_health_metrics_help))
-                }
-            }
-            HealthMetricsTable(resolved?.healthMetrics ?: food.healthMetrics, stringResource(R.string.nutrition_metric_no_data))
-            DetailSectionTitle(R.drawable.ic_nutrients, stringResource(R.string.nutrition_nutrients), Modifier.padding(top = 12.dp))
-            FoodServingSelector(
-                servings = servings,
-                selectedServingId = selectedServingId,
-                onSelected = { selectedServingId = it },
-            )
+        if (tab == 0) Column(
+            modifier = Modifier.weight(1f).padding(top = spacing.s3).verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(spacing.s4),
+        ) {
             val selectedServing = servings.first { it.id == selectedServingId }
             val selectedServingLabel = if (selectedServing.id == "per_100g") {
                 stringResource(R.string.nutrition_serving_100g_edible)
             } else {
                 selectedServing.displayLabel(language)
             }
-            NutritionEnergyAndExercise(
-                resolved = resolved,
-                serving = selectedServing,
-                onClick = {
-                    onOpenExerciseExpenditure(servings.map { serving ->
-                        NutritionExerciseServing(
-                            label = if (serving.id == "per_100g") defaultServingLabel else serving.displayLabel(language),
-                            kilocalories = resolved.energyKilocalories(serving.ratioToTable) ?: 0.0,
-                        )
-                    })
+            val nutrientRowItems = remember(resolved, selectedServing, nrvReference, language) {
+                nutrientRows(resolved, selectedServing, viewModel.nutrientMetas(), language, nrvReference)
+            }
+            // 供能 / 健康指标 / 营养信息三张区块卡：标题随卡，卡底用 panelRaised（与纯黑底 2 级明度差，§2.7-1）。
+            AppSectionCard(
+                iconRes = R.drawable.ic_energy_distribution,
+                title = stringResource(R.string.nutrition_macronutrient_energy),
+                action = {
+                    HelpIconButton(
+                        description = stringResource(R.string.nutrition_energy_help),
+                        onClick = { helpTopic = NutritionHelpTopic.Energy },
+                    )
                 },
-            )
-            AppDataTable(
-                rows = nutrientRows(resolved, selectedServing, viewModel.nutrientMetas(), language, nrvReference),
-                columns = listOf(
-                    AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 105.dp)) { AppDataTableText(it.labelText ?: stringResource(requireNotNull(it.labelRes))) },
-                    AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount_for_serving, selectedServingLabel)) }, ColumnWidth.Flex(1f, 130.dp)) { AppDataTableText(it.value) },
-                    AppDataTableColumn("nrv", {
-                        NrvReferenceHeader(nrvReference, nrvReferences, onNrvReferenceSelected)
-                    }, ColumnWidth.Fixed(82.dp)) { AppDataTableText(it.nrvPercent ?: "-") },
-                ),
-                rowKey = { _, row -> row.key },
-                showRowNumber = false,
-                showPager = false,
-                modifier = Modifier.fillMaxWidth().height(240.dp),
-            )
+            ) {
+                MacronutrientEnergyChart(resolved)
+            }
+            AppSectionCard(
+                iconRes = R.drawable.ic_health_metrics,
+                title = stringResource(R.string.nutrition_health_metrics),
+                action = {
+                    HelpIconButton(
+                        description = stringResource(R.string.nutrition_health_metrics_help),
+                        onClick = { helpTopic = NutritionHelpTopic.HealthMetrics },
+                    )
+                },
+                // 指标表带完整网格线，铺满卡宽时最外圈单元格线会与卡片描边叠成双线，故左右内缩一档。
+                contentPadding = PaddingValues(start = spacing.s3, end = spacing.s3, bottom = spacing.s3),
+            ) {
+                HealthMetricsTable(resolved?.healthMetrics ?: food.healthMetrics, stringResource(R.string.nutrition_metric_no_data))
+            }
+            AppSectionCard(
+                iconRes = R.drawable.ic_nutrients,
+                title = stringResource(R.string.nutrition_nutrients),
+                action = {
+                    HelpIconButton(
+                        description = stringResource(R.string.nutrition_nutrients_help),
+                        onClick = { helpTopic = NutritionHelpTopic.Nutrients },
+                    )
+                },
+                contentPadding = PaddingValues(bottom = spacing.s3),
+            ) {
+                Column(Modifier.padding(horizontal = spacing.s3)) {
+                    FoodServingSelector(
+                        servings = servings,
+                        selectedServingId = selectedServingId,
+                        tableBasisGrams = resolved?.takeIf { it.basis.unitId.equals("g", ignoreCase = true) }?.basis?.value,
+                        onSelected = { selectedServingId = it },
+                    )
+                    NutritionEnergyAndExercise(
+                        resolved = resolved,
+                        serving = selectedServing,
+                        onClick = {
+                            onOpenExerciseExpenditure(servings.map { serving ->
+                                NutritionExerciseServing(
+                                    label = if (serving.id == "per_100g") defaultServingLabel else serving.displayLabel(language),
+                                    kilocalories = resolved.energyKilocalories(serving.ratioToTable) ?: 0.0,
+                                )
+                            })
+                        },
+                    )
+                }
+                // 空态：解析失败或该条目没有营养素表时不留一张只有表头的空表（§6.2）。
+                if (nutrientRowItems.isEmpty()) {
+                    DetailEmptyState(
+                        iconRes = R.drawable.ic_nutrients,
+                        title = stringResource(R.string.nutrition_profile_empty_title),
+                        description = stringResource(R.string.nutrition_profile_empty_hint),
+                        modifier = Modifier.padding(horizontal = spacing.s3),
+                    )
+                } else {
+                    AppDataTable(
+                        rows = nutrientRowItems,
+                        columns = listOf(
+                            AppDataTableColumn("nutrient", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 96.dp)) { AppDataTableText(it.labelText ?: stringResource(requireNotNull(it.labelRes))) },
+                            AppDataTableColumn("amount", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_amount_for_serving, selectedServingLabel)) }, ColumnWidth.Flex(1f, 116.dp), alignment = Alignment.CenterEnd) { AppDataTableText(it.value, numeric = true) },
+                            AppDataTableColumn("nrv", {
+                                NrvReferenceHeader(nrvReference, nrvReferences, onNrvReferenceSelected)
+                            }, ColumnWidth.Fixed(72.dp), alignment = Alignment.CenterEnd) { AppDataTableText(it.nrvPercent ?: "-", numeric = true) },
+                        ),
+                        rowKey = { _, row -> row.key },
+                        showRowNumber = false,
+                        showPager = false,
+                        modifier = Modifier.fillMaxWidth(),
+                        maxBodyHeight = nutrientTableMaxHeight,
+                        // 表体渐隐要融进卡片底色，否则会在卡内出现一条比卡底更暗的色带。
+                        fadeColor = colors.panelRaised,
+                    )
+                }
+            }
             if (relatedDishes.isNotEmpty()) {
-                DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_related_dishes), Modifier.padding(top = 12.dp))
-                relatedDishes.forEach { dish -> FoodNavigationLink(dish.displayName(language)) { viewModel.openFood(dish) } }
+                RelatedDishesSection(
+                    dishes = relatedDishes,
+                    language = language,
+                    viewModel = viewModel,
+                    onOpen = { viewModel.openFood(it) },
+                )
             }
         }
         else if (tab == 1 && food is Dish) {
-            Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier.weight(1f).padding(top = spacing.s3).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(spacing.s4),
+            ) {
                 DishRecipeSection(food, viewModel, language) { viewModel.openFood(it) }
             }
         } else if (tab == 1 && food is PreparedFood && food.components.isNotEmpty()) {
-            Column(Modifier.weight(1f).padding(top = 12.dp).verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier.weight(1f).padding(top = spacing.s3).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(spacing.s4),
+            ) {
                 FoodRecipeSection(food, viewModel, language) { viewModel.openFood(it) }
             }
         } else {
-            Text(stringResource(R.string.nutrition_detail_placeholder), modifier = Modifier.padding(top = 24.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Column(Modifier.weight(1f).padding(top = spacing.s3).verticalScroll(rememberScrollState())) {
+                DetailEmptyState(
+                    iconRes = R.drawable.ic_list,
+                    title = stringResource(R.string.nutrition_detail_placeholder),
+                    description = stringResource(R.string.nutrition_detail_empty_hint),
+                )
+            }
         }
     }
     if (previewing) FoodImagePreview(detailImage, onDismiss = { previewing = false })
     if (confirmingDelete) {
         AlertDialog(
             onDismissRequest = { confirmingDelete = false },
-            title = { Text(stringResource(R.string.nutrition_editor_delete)) },
+            title = { Text(stringResource(R.string.nutrition_editor_delete_title, stringResource(food.kind.customLabelRes()))) },
             text = { Text(stringResource(R.string.nutrition_editor_delete_confirm)) },
-            confirmButton = { androidx.compose.material3.TextButton({ confirmingDelete = false; viewModel.deleteCustomFood(food.id) }) { Text(stringResource(R.string.nutrition_editor_delete)) } },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { confirmingDelete = false; viewModel.deleteCustomFood(food.id) },
+                    colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) { Text(stringResource(R.string.nutrition_editor_delete)) }
+            },
             dismissButton = { androidx.compose.material3.TextButton({ confirmingDelete = false }) { Text(stringResource(R.string.body_record_cancel)) } },
         )
     }
-    if (showHealthMetricsHelp) {
-        AppInfoDialog(
-            title = stringResource(R.string.nutrition_health_metrics_help),
-            onDismiss = { showHealthMetricsHelp = false },
+    helpTopic?.let { topic ->
+        // 三处问号共用一套浮层：80% 底部抽屉 + 一板块一张卡，标题固定、只滚内容区。
+        // 说明型长图文只需要 Full 一档，不做 Peek/Half 停靠（内容量不足以分档阅读）。
+        AppBottomSheet(
+            title = stringResource(topic.titleRes),
+            subtitle = stringResource(topic.subtitleRes),
+            snapPoints = listOf(AppSheetHeight.Full),
+            initialSnap = AppSheetHeight.Full,
+            onDismiss = { helpTopic = null },
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                HealthMetricInfoSection(
-                    title = stringResource(R.string.nutrition_metric_gi),
-                    description = stringResource(R.string.nutrition_metric_gi_help),
-                    bands = glycemicIndexClassificationBands(),
-                )
-                HealthMetricInfoSection(
-                    title = stringResource(R.string.nutrition_metric_gl),
-                    description = stringResource(R.string.nutrition_metric_gl_help),
-                    bands = glycemicLoadClassificationBands(),
-                )
-                HealthMetricInfoSection(
-                    title = stringResource(R.string.nutrition_metric_inflammatory_potential),
-                    description = stringResource(R.string.nutrition_metric_inflammatory_potential_help),
-                )
+            when (topic) {
+                NutritionHelpTopic.HealthMetrics -> {
+                    HealthMetricInfoCard(
+                        iconRes = R.drawable.ic_blood_glucose,
+                        title = stringResource(R.string.nutrition_metric_gi),
+                        description = stringResource(R.string.nutrition_metric_gi_help),
+                        bands = glycemicIndexClassificationBands(),
+                    )
+                    HealthMetricInfoCard(
+                        iconRes = R.drawable.ic_energy_distribution,
+                        title = stringResource(R.string.nutrition_metric_gl),
+                        description = stringResource(R.string.nutrition_metric_gl_help),
+                        bands = glycemicLoadClassificationBands(),
+                    )
+                    HealthMetricInfoCard(
+                        iconRes = R.drawable.ic_shield,
+                        title = stringResource(R.string.nutrition_metric_inflammatory_potential),
+                        description = stringResource(R.string.nutrition_metric_inflammatory_potential_help),
+                        note = stringResource(R.string.nutrition_health_metrics_help_no_scale),
+                    )
+                }
+
+                NutritionHelpTopic.Nutrients -> {
+                    EnergyUnitHelpCard()
+                    EdiblePortionHelpCard()
+                    NrvHelpCard()
+                }
+
+                NutritionHelpTopic.Energy -> {
+                    EnergyShareHelpCard()
+                    EnergyUnitHelpCard()
+                }
             }
         }
     }
@@ -1146,47 +1390,78 @@ private fun FoodHeaderPages(
     language: String,
     page: Int,
     direction: Int,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
     modifier: Modifier,
     onOpenFood: (FoodItem) -> Unit,
 ) {
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier.width(24.dp).clickable(onClick = onPrevious),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                stringResource(R.string.nutrition_header_previous),
-                modifier = Modifier.size(20.dp),
-            )
-        }
-        AnimatedPageContent(page, Modifier.weight(1f), direction = { _, _ -> direction }) { currentPage ->
-            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-                val textStyle = MaterialTheme.typography.bodySmall
-                if (currentPage == 0) {
-                    Text(
-                        food.displayDescription(language).ifBlank { stringResource(R.string.nutrition_header_introduction_empty) },
-                        style = textStyle,
-                    )
-                } else if (currentPage == 1) {
-                    KindInfoSection(food, viewModel, language, onOpenFood, textStyle)
-                } else {
-                    FoodSourcesSection(food, textStyle)
-                }
+    AnimatedPageContent(page, modifier.fillMaxWidth(), direction = { _, _ -> direction }) { currentPage ->
+        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            val textStyle = MaterialTheme.typography.bodySmall
+            if (currentPage == 0) {
+                Text(
+                    food.displayDescription(language).ifBlank { stringResource(R.string.nutrition_header_introduction_empty) },
+                    style = textStyle,
+                )
+            } else if (currentPage == 1) {
+                KindInfoSection(food, viewModel, language, onOpenFood, textStyle)
+            } else {
+                FoodSourcesSection(food, textStyle)
             }
         }
-        Box(
-            modifier = Modifier.width(24.dp).clickable(onClick = onNext),
-            contentAlignment = Alignment.Center,
+    }
+}
+
+@Composable
+private fun FoodHeaderPager(
+    page: Int,
+    pageCount: Int,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    Row(
+        modifier = Modifier.fillMaxWidth().height(tokens.spacing.hitMin),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        HeaderPagerButton(
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+            description = stringResource(R.string.nutrition_header_previous),
+            onClick = onPrevious,
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                stringResource(R.string.nutrition_header_next),
-                modifier = Modifier.size(20.dp),
-            )
+            repeat(pageCount) { index ->
+                val active = index == page
+                Box(
+                    modifier = Modifier
+                        .size(if (active) tokens.spacing.s2 else tokens.spacing.s1)
+                        .clip(CircleShape)
+                        .background(if (active) tokens.colors.text else tokens.colors.borderStrong),
+                )
+            }
         }
+        HeaderPagerButton(
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            description = stringResource(R.string.nutrition_header_next),
+            onClick = onNext,
+        )
+    }
+}
+
+@Composable
+private fun HeaderPagerButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    description: String,
+    onClick: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    Box(
+        modifier = Modifier.size(tokens.spacing.hitMin).clip(CircleShape).clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon, description, modifier = Modifier.size(tokens.spacing.s5), tint = tokens.colors.text)
     }
 }
 
@@ -1251,11 +1526,21 @@ private fun nutrientEnergyLabel(nutrientId: String, percent: Double): String = w
 }
 
 @Composable
-private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?, modifier: Modifier = Modifier) {
-    val items = resolved.nutrientEnergyItems() ?: return
-    val totalKcal = resolved.energyKilocalories() ?: return
-    val totalItemsKcal = items.sumOf { it.kcal }
-    if (totalItemsKcal <= 0.0) return
+private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?) {
+    val tokens = LocalAppTokens.current
+    val items = resolved.nutrientEnergyItems()
+    val totalKcal = resolved.energyKilocalories()
+    val totalItemsKcal = items?.sumOf { it.kcal } ?: 0.0
+    if (items == null || totalKcal == null || totalItemsKcal <= 0.0) {
+        Text(
+            text = stringResource(R.string.nutrition_energy_empty),
+            modifier = Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s3),
+            style = tokens.type.caption,
+            color = tokens.colors.textMuted,
+            textAlign = TextAlign.Center,
+        )
+        return
+    }
     val top = items.take(3)
     val otherKcal = items.drop(3).sumOf { it.kcal }
     val legendItems = buildList {
@@ -1265,7 +1550,7 @@ private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?, modifier: Mod
                     id = item.nutrientId,
                     label = nutrientEnergyLabel(item.nutrientId, item.kcal / totalItemsKcal * 100.0),
                     value = item.kcal,
-                    color = nutrientColor(item.nutrientId),
+                    color = tokens.chart.forNutrient(item.nutrientId),
                 ),
             )
         }
@@ -1275,15 +1560,14 @@ private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?, modifier: Mod
                     id = "other",
                     label = stringResource(R.string.nutrition_energy_other, otherKcal / totalItemsKcal * 100.0),
                     value = otherKcal,
-                    color = NutrientOtherColor,
+                    color = tokens.chart.other,
                 ),
             )
         }
     }
-    DetailSectionTitle(R.drawable.ic_energy_distribution, stringResource(R.string.nutrition_macronutrient_energy), modifier)
     AnimatedDonutChart(
         segments = legendItems.map { DonutChartSegment(it.id, it.label, it.value.toFloat(), it.color) },
-        centerValue = stringResource(R.string.nutrition_energy_kcal_value, totalKcal),
+        centerValue = stringResource(R.string.nutrition_energy_kcal_value, formatGroupedInteger(totalKcal)),
         centerLabel = stringResource(R.string.nutrition_macronutrient_energy_center),
         modifier = Modifier.fillMaxWidth(),
         showLegend = false,
@@ -1298,49 +1582,36 @@ private data class MacronutrientLegendItem(
     val color: androidx.compose.ui.graphics.Color,
 )
 
+/**
+ * 供能图例：文字统一取 `font.caption`（12 sp 下限，见 §2.4、§11.1），
+ * 不再按数值大小分 15 / 12 / 9 sp —— 9 sp 低于最小字号，且同屏字号层级会超 4 级。
+ * 数值大小差异由环形图面积与标签内置百分比表达（颜色不是唯一载体）。
+ */
 @Composable
 private fun MacronutrientEnergyLegend(items: List<MacronutrientLegendItem>) {
-    val sizes = macronutrientLegendTextSizes(items)
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+    val tokens = LocalAppTokens.current
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+    ) {
         items.forEach { item ->
-            Box(
-                modifier = Modifier.weight(1f).height(40.dp),
-                contentAlignment = Alignment.Center,
+            Row(
+                modifier = Modifier.weight(1f).heightIn(min = tokens.spacing.s6),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                    val textSize = sizes.getValue(item.id)
-                    androidx.compose.foundation.Canvas(Modifier.size(macronutrientLegendDotSize(textSize))) { drawCircle(item.color) }
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = item.label,
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = textSize),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                    )
-                }
+                androidx.compose.foundation.Canvas(Modifier.size(tokens.spacing.s2)) { drawCircle(item.color) }
+                Spacer(Modifier.width(tokens.spacing.s1))
+                Text(
+                    text = item.label,
+                    style = tokens.type.caption,
+                    color = tokens.colors.textMuted,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                )
             }
         }
     }
-}
-
-private fun macronutrientLegendTextSizes(items: List<MacronutrientLegendItem>): Map<String, androidx.compose.ui.unit.TextUnit> {
-    val distinctValues = items.map(MacronutrientLegendItem::value).distinct().sortedDescending()
-    if (distinctValues.size < 2) return items.associate { it.id to 12.sp }
-    val maximum = distinctValues.first()
-    if (maximum <= 0.0 || (maximum - distinctValues.last()) / maximum < 0.12) return items.associate { it.id to 12.sp }
-    val tierCount = minOf(3, distinctValues.size)
-    val tiers = listOf(15.sp, 12.sp, 9.sp).take(tierCount)
-    val sizesByValue = distinctValues.associateWith { value ->
-        tiers[(distinctValues.indexOf(value) * tierCount / distinctValues.size).coerceAtMost(tiers.lastIndex)]
-    }
-    return items.associate { it.id to requireNotNull(sizesByValue[it.value]) }
-}
-
-private fun macronutrientLegendDotSize(textSize: androidx.compose.ui.unit.TextUnit): androidx.compose.ui.unit.Dp = when (textSize) {
-    15.sp -> 14.dp
-    12.sp -> 10.dp
-    else -> 7.dp
 }
 
 @Composable
@@ -1404,51 +1675,68 @@ private fun DishInfoSection(
 /** 菜肴的食材清单与菜谱在「制作步骤」页签中呈现。 */
 @Composable
 private fun DishRecipeSection(dish: Dish, viewModel: NutritionViewModel, language: String, onOpenFood: (FoodItem) -> Unit) {
-    DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_basic_information))
-    dish.techniqueId?.let { viewModel.cookingMethodFor(it)?.let { method -> InfoLine(stringResource(R.string.nutrition_editor_technique), method.displayLabel(language)) } }
-    dish.difficulty?.let { StarRatingLine(stringResource(R.string.nutrition_dish_difficulty), it) }
-    dish.servesPeople?.let { InfoLine(stringResource(R.string.nutrition_dish_serves), stringResource(R.string.nutrition_dish_serves_value, it)) }
-    // 食材清单：辅料（调味品或油脂）判定，主料在前、辅料在后。
-    DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_ingredient_list), Modifier.padding(top = 8.dp))
-    val (auxiliary, main) = dish.components.partition { c -> viewModel.foodById(c.foodId)?.let { viewModel.isAuxiliary(it) } == true }
-    if (main.isNotEmpty()) {
-        Text(stringResource(R.string.nutrition_ingredient_main), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 2.dp))
-        main.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+    val hasBasicInfo = dish.techniqueId != null || dish.difficulty != null || dish.servesPeople != null
+    if (hasBasicInfo) {
+        AppSectionCard(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_basic_information)) {
+            dish.techniqueId?.let { viewModel.cookingMethodFor(it)?.let { method -> InfoLine(stringResource(R.string.nutrition_editor_technique), method.displayLabel(language)) } }
+            dish.difficulty?.let { StarRatingLine(stringResource(R.string.nutrition_dish_difficulty), it) }
+            dish.servesPeople?.let { InfoLine(stringResource(R.string.nutrition_dish_serves), stringResource(R.string.nutrition_dish_serves_value, it)) }
+        }
     }
-    if (auxiliary.isNotEmpty()) {
-        Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary, modifier = Modifier.padding(top = 4.dp))
-        auxiliary.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+    // 食材清单：辅料（调味品或油脂）判定，主料在前、辅料在后。
+    if (dish.components.isNotEmpty()) {
+        AppSectionCard(R.drawable.ic_list, stringResource(R.string.nutrition_ingredient_list)) {
+            val (auxiliary, main) = dish.components.partition { c -> viewModel.foodById(c.foodId)?.let { viewModel.isAuxiliary(it) } == true }
+            if (main.isNotEmpty()) {
+                Text(stringResource(R.string.nutrition_ingredient_main), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = AppSpacingDefault.s1))
+                main.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+            }
+            if (auxiliary.isNotEmpty()) {
+                Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = AppSpacingDefault.s2))
+                auxiliary.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+            }
+        }
     }
 
     // 制作教程/菜谱，逐步显示序号 + 可选计时器。
     if (dish.recipeSteps.isNotEmpty()) {
-        DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_title), Modifier.padding(top = 8.dp))
-        dish.recipeSteps.forEachIndexed { index, step ->
-            RecipeStepRow(index + 1, step)
+        AppSectionCard(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_title)) {
+            dish.recipeSteps.forEachIndexed { index, step ->
+                RecipeStepRow(index + 1, step)
+            }
         }
     }
 }
 
 @Composable
 private fun FoodRecipeSection(food: PreparedFood, viewModel: NutritionViewModel, language: String, onOpenFood: (FoodItem) -> Unit) {
-    food.techniqueId?.let { techniqueId ->
-        viewModel.cookingMethodFor(techniqueId)?.let { method ->
-            InfoLine(stringResource(R.string.nutrition_editor_technique), method.displayLabel(language))
+    val hasBasicInfo = food.techniqueId != null || food.servesPeople != null
+    if (hasBasicInfo) {
+        AppSectionCard(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_basic_information)) {
+            food.techniqueId?.let { techniqueId ->
+                viewModel.cookingMethodFor(techniqueId)?.let { method ->
+                    InfoLine(stringResource(R.string.nutrition_editor_technique), method.displayLabel(language))
+                }
+            }
+            food.servesPeople?.let { InfoLine(stringResource(R.string.nutrition_dish_serves), stringResource(R.string.nutrition_dish_serves_value, it)) }
         }
     }
-    food.servesPeople?.let { InfoLine(stringResource(R.string.nutrition_dish_serves), stringResource(R.string.nutrition_dish_serves_value, it)) }
-    DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_ingredient_list), Modifier.padding(top = 8.dp))
-    val (auxiliary, main) = food.components.partition { component ->
-        viewModel.foodById(component.foodId)?.let(viewModel::isAuxiliary) == true
-    }
-    main.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
-    if (auxiliary.isNotEmpty()) {
-        Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.tertiary)
-        auxiliary.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+    if (food.components.isNotEmpty()) {
+        AppSectionCard(R.drawable.ic_list, stringResource(R.string.nutrition_ingredient_list)) {
+            val (auxiliary, main) = food.components.partition { component ->
+                viewModel.foodById(component.foodId)?.let(viewModel::isAuxiliary) == true
+            }
+            main.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+            if (auxiliary.isNotEmpty()) {
+                Text(stringResource(R.string.nutrition_ingredient_auxiliary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = AppSpacingDefault.s2))
+                auxiliary.forEach { component -> DishComponentLine(component, viewModel, language, onOpenFood) }
+            }
+        }
     }
     if (food.recipeSteps.isNotEmpty()) {
-        DetailSectionTitle(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_title), Modifier.padding(top = 8.dp))
-        food.recipeSteps.forEachIndexed { index, step -> RecipeStepRow(index + 1, step) }
+        AppSectionCard(R.drawable.ic_list, stringResource(R.string.nutrition_recipe_title)) {
+            food.recipeSteps.forEachIndexed { index, step -> RecipeStepRow(index + 1, step) }
+        }
     }
 }
 
@@ -1462,13 +1750,14 @@ private fun DishComponentLine(
 ) {
     val item = viewModel.foodById(component.foodId)
     val amount = stringResource(R.string.nutrition_component_amount, component.quantity.value, component.quantity.unitId)
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+    val tokens = LocalAppTokens.current
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s1), verticalAlignment = Alignment.CenterVertically) {
         if (item != null) {
             FoodNavigationLink(item.displayName(language), Modifier.weight(1f)) { onOpenFood(item) }
-            Text(amount, style = MaterialTheme.typography.bodyMedium)
+            Text(amount, style = tokens.type.numeric)
         } else {
-            Text(component.foodId, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-            Text(amount, style = MaterialTheme.typography.bodyMedium)
+            Text(component.foodId, modifier = Modifier.weight(1f), style = tokens.type.body)
+            Text(amount, style = tokens.type.numeric)
         }
     }
 }
@@ -1481,9 +1770,10 @@ private fun IngredientJumpLine(
     textStyle: androidx.compose.ui.text.TextStyle,
     onClick: () -> Unit,
 ) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, style = textStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.width(8.dp))
+    val tokens = LocalAppTokens.current
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s1), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, style = textStyle, color = tokens.colors.textMuted)
+        Spacer(Modifier.width(tokens.spacing.s2))
         FoodNavigationLink(value, Modifier.weight(1f), textStyle, onClick)
     }
 }
@@ -1495,45 +1785,178 @@ private fun FoodNavigationLink(
     textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
     onClick: () -> Unit,
 ) {
-    TextOverflowText(
-        text = text,
-        modifier = modifier.clickable(onClick = onClick),
-        style = textStyle.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
-        color = MaterialTheme.colorScheme.primary,
-        maxLines = 1,
-    )
+    val tokens = LocalAppTokens.current
+    Box(
+        modifier = modifier.heightIn(min = tokens.spacing.hitMin).clickable(onClick = onClick),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        TextOverflowText(
+            text = text,
+            style = textStyle.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
+            color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
+        )
+    }
+}
+
+/**
+ * 相关菜肴：与其他板块一致，标题与列表都收进同一张区块卡（`AppSectionCard`）。
+ * 卡内不再套二级卡片——卡中卡在纯黑 + 2 dp 描边下会出现两圈弧线；
+ * 改用「无底色行 + 发丝分隔线」的移动端列表惯用式，行内整套 48 dp 热区仍然可点。
+ * 同一食材可以出现在几十道菜里（鸡蛋尤甚），按常见度取前 [RelatedDishLimit] 道，其余只在标题右侧报总数。
+ */
+@Composable
+private fun RelatedDishesSection(
+    dishes: List<Dish>,
+    language: String,
+    viewModel: NutritionViewModel,
+    onOpen: (Dish) -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val shown = remember(dishes) {
+        dishes.sortedByDescending { it.commonness }.take(RelatedDishLimit)
+    }
+    AppSectionCard(
+        iconRes = R.drawable.ic_food_dish,
+        title = stringResource(R.string.nutrition_related_dishes),
+        action = {
+            Text(
+                text = stringResource(R.string.nutrition_related_dishes_count, dishes.size),
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
+                modifier = Modifier.padding(end = tokens.spacing.s2),
+            )
+        },
+        // 左右内边距交给每一行，分隔线才能与文字对齐内缩。
+        contentPadding = PaddingValues(bottom = tokens.spacing.s2),
+    ) {
+        shown.forEachIndexed { index, dish ->
+            if (index > 0) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = tokens.spacing.s3),
+                    thickness = tokens.radii.highlight,
+                    color = tokens.colors.border,
+                )
+            }
+            RelatedDishRow(
+                dish = dish,
+                language = language,
+                viewModel = viewModel,
+                onClick = { onOpen(dish) },
+            )
+        }
+        if (dishes.size > shown.size) {
+            Text(
+                text = stringResource(R.string.nutrition_related_dishes_more, dishes.size - shown.size),
+                style = tokens.type.caption,
+                color = tokens.colors.textMuted,
+                modifier = Modifier.padding(
+                    start = tokens.spacing.s3,
+                    end = tokens.spacing.s3,
+                    top = tokens.spacing.s2,
+                ),
+            )
+        }
+    }
+}
+
+private const val RelatedDishLimit = 6
+
+/** 单行菜肴：48 dp 1:1 缩略图 + 菜名 + 「热量 / 组分」一行元信息，整行可点，最小高 56 dp。 */
+@Composable
+private fun RelatedDishRow(
+    dish: Dish,
+    language: String,
+    viewModel: NutritionViewModel,
+    onClick: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val image = viewModel.foodImages.rememberImage(dish.imageKey(), ImageVariant.THUMB)
+    val resolved = remember(dish.id) { runCatching { viewModel.resolvePer100g(dish) }.getOrNull() }
+    val energyLabel = resolved.energyKilocalories()?.let {
+        stringResource(R.string.nutrition_energy_per_100g, it)
+    }
+    val componentLabel = if (dish.components.isNotEmpty()) {
+        stringResource(R.string.nutrition_dish_components) + " " + dish.components.size
+    } else {
+        null
+    }
+    val meta = listOfNotNull(energyLabel, componentLabel).joinToString(" · ")
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .heightIn(min = 56.dp)
+            .padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s2),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        FoodImage(image, Modifier.size(48.dp), contentScale = ContentScale.Crop)
+        Spacer(Modifier.width(tokens.spacing.s3))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = dish.displayName(language),
+                style = tokens.type.body,
+                color = tokens.colors.text,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (meta.isNotEmpty()) {
+                Text(
+                    text = meta,
+                    style = tokens.type.caption,
+                    color = tokens.colors.textMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = tokens.spacing.s1),
+                )
+            }
+        }
+        Spacer(Modifier.width(tokens.spacing.s2))
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            modifier = Modifier.size(tokens.spacing.s5),
+            tint = tokens.colors.textMuted,
+        )
+    }
 }
 
 @Composable
 private fun SourceLink(dataset: String, reference: String, textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium) {
     val context = LocalContext.current
-    Column(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
-        TextOverflowText(dataset, style = textStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        TextOverflowText(
-            reference,
-            modifier = Modifier.clickable {
-                val query = android.net.Uri.encode("$dataset $reference")
-                context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.google.com/search?q=$query")))
-            },
-            style = textStyle.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
-            color = MaterialTheme.colorScheme.primary,
-        )
+    val tokens = LocalAppTokens.current
+    Column(Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s1)) {
+        TextOverflowText(dataset, style = textStyle, color = tokens.colors.textMuted)
+        // 可点击区域补足 48 dp 热区（§4.1-3 移动端最小热区）。
+        Box(modifier = Modifier.fillMaxWidth().heightIn(min = tokens.spacing.hitMin), contentAlignment = Alignment.CenterStart) {
+            TextOverflowText(
+                reference,
+                modifier = Modifier.clickable {
+                    val query = android.net.Uri.encode("$dataset $reference")
+                    context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.google.com/search?q=$query")))
+                },
+                style = textStyle.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline),
+                color = tokens.colors.primary,
+            )
+        }
     }
 }
 
-/** 难度星级：10 星整数展示。 */
+/** 难度星级：10 星整数展示。填充星取正文色、空星取描边色，不使用语义色（§2.3：语义色只表达状态）。 */
 @Composable
 private fun StarRatingLine(label: String, rating: Int) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.width(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+    val tokens = LocalAppTokens.current
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s1), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, style = tokens.type.body, color = tokens.colors.textMuted)
+        Spacer(Modifier.width(tokens.spacing.s2))
+        Row(horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s1)) {
             repeat(10) { i ->
                 Icon(
                     imageVector = Icons.Filled.Star,
                     contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = if (i < rating) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.25f),
+                    modifier = Modifier.size(tokens.spacing.s4),
+                    // 空星用次要文字的 45% 透明度：卡片底已提亮到 panelRaised，原 border 色（#2B2B2B）几乎看不见刻度。
+                    tint = if (i < rating) tokens.colors.text else tokens.colors.textMuted.copy(alpha = 0.45f),
                 )
             }
         }
@@ -1542,15 +1965,16 @@ private fun StarRatingLine(label: String, rating: Int) {
 
 @Composable
 private fun RecipeStepRow(number: Int, step: com.woshiwangnima.healthdietpro.model.food.RecipeStep) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    val tokens = LocalAppTokens.current
+    Column(Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s1), verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1)) {
         Row {
-            Text(stringResource(R.string.nutrition_recipe_step, number), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.width(8.dp))
-            Text(step.text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.nutrition_recipe_step, number), style = tokens.type.bodyS, color = tokens.colors.primary)
+            Spacer(Modifier.width(tokens.spacing.s2))
+            Text(step.text, style = tokens.type.body, modifier = Modifier.weight(1f))
         }
-        step.heatLevel?.let { Text(stringResource(heatLabelRes(it)), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        step.waterTemperatureC?.let { Text(stringResource(R.string.nutrition_water_temperature_value, it), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        step.oilTemperatureC?.let { Text(stringResource(R.string.nutrition_oil_temperature_value, it), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        step.heatLevel?.let { Text(stringResource(heatLabelRes(it)), style = tokens.type.caption, color = tokens.colors.textMuted) }
+        step.waterTemperatureC?.let { Text(stringResource(R.string.nutrition_water_temperature_value, it), style = tokens.type.caption, color = tokens.colors.textMuted) }
+        step.oilTemperatureC?.let { Text(stringResource(R.string.nutrition_oil_temperature_value, it), style = tokens.type.caption, color = tokens.colors.textMuted) }
         step.minutes?.let { StepTimer(it) }
     }
 }
@@ -1566,6 +1990,7 @@ private fun heatLabelRes(id: String): Int = when (id) {
 
 @Composable
 private fun StepTimer(minutes: Int) {
+    val tokens = LocalAppTokens.current
     val totalSeconds = minutes * 60
     var remaining by remember(minutes) { mutableIntStateOf(totalSeconds) }
     var running by remember(minutes) { mutableStateOf(false) }
@@ -1578,30 +2003,33 @@ private fun StepTimer(minutes: Int) {
     }
     val finished = remaining == 0
     Surface(
-        shape = RoundedCornerShape(10.dp),
-        color = if (finished) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer,
-        modifier = Modifier.padding(top = 4.dp),
+        shape = RoundedCornerShape(tokens.radii.container),
+        // 计时器位于区块卡内，卡底已是 panelRaised；这里改用叠加色，否则与卡底同色、控件边界消失。
+        color = if (finished) tokens.colors.dangerFill else tokens.colors.text.copy(alpha = 0.06f),
+        border = androidx.compose.foundation.BorderStroke(tokens.radii.highlight, tokens.colors.text.copy(alpha = 0.16f)),
+        modifier = Modifier.padding(top = tokens.spacing.s1),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = tokens.spacing.s2, vertical = tokens.spacing.s1),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
         ) {
             // 固定长宽的时间显示（HH:MM:SS，等宽字体，宽度不随数字变化）。
-            Box(modifier = Modifier.width(124.dp), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.width(StepTimerTextWidth), contentAlignment = Alignment.Center) {
                 Text(
                     text = "%02d:%02d:%02d".format(remaining / 3600, (remaining % 3600) / 60, remaining % 60),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontFeatureSettings = "tnum",
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                    ),
-                    color = if (finished) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer,
+                    style = tokens.type.numeric.copy(fontSize = tokens.type.titleS.fontSize, lineHeight = tokens.type.titleS.lineHeight),
+                    color = if (finished) tokens.colors.onDangerFill else tokens.colors.text,
                     maxLines = 1,
                 )
             }
             if (running) {
-                IconButton(onClick = { running = false }, enabled = !finished, modifier = Modifier.size(32.dp)) {
-                    PauseBars()
+                IconButton(
+                    onClick = { running = false },
+                    enabled = !finished,
+                    modifier = Modifier.size(tokens.spacing.hitMin),
+                ) {
+                    PauseBars(stringResource(R.string.nutrition_timer_pause))
                 }
             } else {
                 TimerIconButton(icon = Icons.Filled.PlayArrow, contentDescription = stringResource(R.string.nutrition_timer_start), enabled = !finished) { running = true }
@@ -1614,6 +2042,10 @@ private fun StepTimer(minutes: Int) {
     }
 }
 
+/** 等宽时间显示所需的最小宽度：8 个字符（含冒号）在 monospace 下的安全值。 */
+private val StepTimerTextWidth = 124.dp
+
+/** 搜索面板限高：给下方分类栏与结果列表留出空间，超出部分在面板内滚动。 */
 private fun FoodItem.rankingTabLabelRes(): Int = when (kind) {
     FoodKind.INGREDIENT -> R.string.nutrition_tab_ingredient_ranking
     FoodKind.FOOD -> R.string.nutrition_tab_ranking
@@ -1627,21 +2059,26 @@ private fun TimerIconButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(32.dp)) {
-        Icon(icon, contentDescription = contentDescription, modifier = Modifier.size(20.dp))
+    val tokens = LocalAppTokens.current
+    IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(tokens.spacing.hitMin)) {
+        Icon(icon, contentDescription = contentDescription, modifier = Modifier.size(tokens.spacing.s5), tint = tokens.colors.text)
     }
 }
 
 /** 暂停图标（两竖条），核心图标集无 Pause 时的替代。 */
 @Composable
-private fun PauseBars() {
-    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+private fun PauseBars(contentDescription: String) {
+    val tokens = LocalAppTokens.current
+    Row(
+        modifier = Modifier.semantics { this.contentDescription = contentDescription },
+        horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
+    ) {
         repeat(2) {
             Box(
                 modifier = Modifier
-                    .width(4.dp)
-                    .height(16.dp)
-                    .background(MaterialTheme.colorScheme.onSecondaryContainer, RoundedCornerShape(1.dp)),
+                    .width(tokens.spacing.s1)
+                    .height(tokens.spacing.s5)
+                    .background(tokens.colors.text, RoundedCornerShape(tokens.radii.highlight)),
             )
         }
     }
@@ -1649,20 +2086,53 @@ private fun PauseBars() {
 
 @Composable
 private fun InfoLine(label: String, value: String, textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
-        Text(label, style = textStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.width(8.dp))
-        Text(value, style = textStyle)
+    val tokens = LocalAppTokens.current
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s1)) {
+        Text(label, style = textStyle, color = tokens.colors.textMuted)
+        Spacer(Modifier.width(tokens.spacing.s2))
+        // 值列占满剩余宽度，长文本换行而不是被裁掉。
+        Text(value, style = textStyle, modifier = Modifier.weight(1f))
     }
 }
 
+/** 头部身份卡（无标题区）。底材与 [DetailSectionCard] 一致，避免同一屏出现两种卡片明度。 */
 @Composable
-private fun DetailSectionTitle(iconRes: Int, title: String, modifier: Modifier = Modifier, action: @Composable (() -> Unit)? = null) {
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Icon(painterResource(iconRes), contentDescription = null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
-        Spacer(Modifier.width(6.dp))
-        Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-        action?.invoke()
+private fun DetailPanel(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(AppSpacingDefault.s3),
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val shape = RoundedCornerShape(tokens.radii.container)
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(tokens.colors.panelRaised)
+            .border(tokens.radii.stroke, tokens.colors.border, shape)
+            .padding(contentPadding),
+        content = content,
+    )
+}
+
+/** 详情空态：说明「为什么空、下一步做什么」，不留一片空白（§6.2）。 */
+@Composable
+private fun DetailEmptyState(
+    iconRes: Int,
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier,
+) {
+    val tokens = LocalAppTokens.current
+    Column(
+        modifier = modifier.fillMaxWidth().padding(vertical = tokens.spacing.s5),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(painterResource(iconRes), contentDescription = null, modifier = Modifier.size(tokens.spacing.s6), tint = tokens.colors.disabled)
+        Spacer(Modifier.height(tokens.spacing.s3))
+        Text(title, style = tokens.type.body, color = tokens.colors.text, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(tokens.spacing.s1))
+        Text(description, style = tokens.type.caption, color = tokens.colors.textMuted, textAlign = TextAlign.Center)
     }
 }
 
@@ -1682,34 +2152,34 @@ private fun HealthMetricsTable(
 ) {
     val gi = metrics.glycemicIndex
     val gl = metrics.glycemicLoadPer100g
-    val border = MaterialTheme.colorScheme.outlineVariant
-    Surface(
-        modifier = Modifier.fillMaxWidth().height(184.dp),
-        shape = RoundedCornerShape(6.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .42f),
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth().height(40.dp).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .72f)),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                HealthMetricHeader(stringResource(R.string.nutrition_profile_item), Modifier.weight(1.3f))
-                HealthMetricHeader(stringResource(R.string.nutrition_profile_amount), Modifier.weight(.9f))
-                HealthMetricHeader(stringResource(R.string.nutrition_profile_classification), Modifier.weight(.5f))
-                HealthMetricHeader(stringResource(R.string.nutrition_metric_glycemic_icon), Modifier.width(64.dp))
+    val tokens = LocalAppTokens.current
+    val border = tokens.colors.border
+    // 外框由所属区块卡提供，这里只画表头底色与网格线，避免卡内卡的双层描边（§2.7 结构层）。
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = tokens.spacing.s7)
+                .background(tokens.colors.text.copy(alpha = 0.06f)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            HealthMetricHeader(stringResource(R.string.nutrition_profile_item), Modifier.weight(1.3f))
+            HealthMetricHeader(stringResource(R.string.nutrition_profile_amount), Modifier.weight(.9f))
+            HealthMetricHeader(stringResource(R.string.nutrition_profile_classification), Modifier.weight(.5f))
+            HealthMetricHeader(stringResource(R.string.nutrition_metric_glycemic_icon), Modifier.width(tokens.spacing.s8))
+        }
+        // 高度由内容撑开（IntrinsicSize.Min），字号放大到 150% 时不再被固定 184 dp 裁切。
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+            Column(Modifier.weight(1f)) {
+                HealthMetricDataRow(stringResource(R.string.nutrition_metric_gi), gi?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, gi?.let { classifyGlycemicIndex(it.value) }, border)
+                HealthMetricDataRow(stringResource(R.string.nutrition_metric_gl), gl?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, gl?.let { classifyGlycemicLoad(it.value) }, border)
+                HealthMetricDataRow(stringResource(R.string.nutrition_metric_inflammatory_potential), metrics.inflammatoryPotential?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, null, border)
             }
-            Row(Modifier.fillMaxWidth().weight(1f)) {
-                Column(Modifier.weight(1f)) {
-                    HealthMetricDataRow(stringResource(R.string.nutrition_metric_gi), gi?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, gi?.let { classifyGlycemicIndex(it.value) }, border)
-                    HealthMetricDataRow(stringResource(R.string.nutrition_metric_gl), gl?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, gl?.let { classifyGlycemicLoad(it.value) }, border)
-                    HealthMetricDataRow(stringResource(R.string.nutrition_metric_inflammatory_potential), metrics.inflammatoryPotential?.let { "${it.value.formatTableValue()} ${it.unit}" } ?: noData, null, border)
+            Column(Modifier.width(tokens.spacing.s8).fillMaxHeight()) {
+                Box(Modifier.weight(2f).fillMaxWidth().border(tokens.radii.highlight, border), contentAlignment = Alignment.Center) {
+                    GlycemicGlass(glycemicLevel(gi?.value, gl?.value))
                 }
-                Column(Modifier.width(64.dp)) {
-                    Box(Modifier.height(96.dp).fillMaxWidth().border(1.dp, border), contentAlignment = Alignment.Center) {
-                        GlycemicGlass(glycemicLevel(gi?.value, gl?.value))
-                    }
-                    Box(Modifier.height(48.dp).fillMaxWidth().border(1.dp, border))
-                }
+                Box(Modifier.weight(1f).fillMaxWidth().border(tokens.radii.highlight, border))
             }
         }
     }
@@ -1717,16 +2187,20 @@ private fun HealthMetricsTable(
 
 @Composable
 private fun HealthMetricHeader(text: String, modifier: Modifier) {
-    Box(modifier, contentAlignment = Alignment.Center) {
-        Text(text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, maxLines = 2)
+    Box(modifier.padding(horizontal = AppSpacingDefault.s1, vertical = AppSpacingDefault.s1), contentAlignment = Alignment.Center) {
+        Text(text, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, maxLines = 2)
     }
 }
 
 @Composable
 private fun HealthMetricDataRow(label: String, value: String, classification: GlycemicClassification?, border: androidx.compose.ui.graphics.Color) {
-    Row(modifier = Modifier.fillMaxWidth().height(48.dp).border(1.dp, border), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, modifier = Modifier.weight(1.3f).padding(horizontal = 12.dp), style = MaterialTheme.typography.bodyMedium)
-        Text(value, modifier = Modifier.weight(.9f).padding(horizontal = 6.dp), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center, maxLines = 1)
+    val tokens = LocalAppTokens.current
+    Row(
+        modifier = Modifier.fillMaxWidth().heightIn(min = tokens.spacing.s7).border(tokens.radii.highlight, border),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, modifier = Modifier.weight(1.3f).padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s1), style = tokens.type.bodyS, maxLines = 2)
+        Text(value, modifier = Modifier.weight(.9f).padding(horizontal = tokens.spacing.s1), style = tokens.type.numeric, textAlign = TextAlign.Center, maxLines = 1)
         Box(Modifier.weight(.5f), contentAlignment = Alignment.Center) {
             classification?.let { GlycemicClassificationText(it) }
         }
@@ -1734,38 +2208,253 @@ private fun HealthMetricDataRow(label: String, value: String, classification: Gl
 }
 
 @Composable
-private fun HealthMetricInfoSection(
+private fun HealthMetricInfoCard(
+    @androidx.annotation.DrawableRes iconRes: Int,
     title: String,
     description: String,
     bands: List<RangeBand<Double, GlycemicClassification>>? = null,
+    note: String? = null,
 ) {
-    Column {
-        Text(title, style = MaterialTheme.typography.titleSmall)
-        Text(description, modifier = Modifier.padding(top = 2.dp))
-        bands?.let { MetricClassificationTable(it, Modifier.padding(top = 8.dp)) }
+    val tokens = LocalAppTokens.current
+    AppSectionCard(iconRes = iconRes, title = title) {
+        Text(description, style = tokens.type.bodyS, color = tokens.colors.textMuted)
+        bands?.let { MetricClassificationTable(it, Modifier.padding(top = tokens.spacing.s2)) }
+        note?.let {
+            Text(
+                text = it,
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
+                modifier = Modifier.padding(top = tokens.spacing.s2),
+            )
+        }
     }
 }
 
+/** 详情页三处问号各自对应一张说明抽屉：标题与副标题只在这里定，避免三处各写一遍。 */
+private enum class NutritionHelpTopic(
+    @StringRes val titleRes: Int,
+    @StringRes val subtitleRes: Int,
+) {
+    HealthMetrics(R.string.nutrition_health_metrics_help, R.string.nutrition_health_metrics_help_intro),
+    Nutrients(R.string.nutrition_help_nutrients_title, R.string.nutrition_help_nutrients_intro),
+    Energy(R.string.nutrition_help_energy_title, R.string.nutrition_help_energy_intro),
+}
+
+/** 区块卡标题右侧的问号按钮：热区 48 dp（移动规范 01 §三），三处统一用同一个图标与色调。 */
+@Composable
+private fun HelpIconButton(description: String, onClick: () -> Unit) {
+    val tokens = LocalAppTokens.current
+    IconButton(onClick = onClick, modifier = Modifier.size(tokens.spacing.hitMin)) {
+        Icon(
+            painter = painterResource(R.drawable.ic_help),
+            contentDescription = description,
+            modifier = Modifier.size(tokens.spacing.s5),
+            tint = tokens.colors.textMuted,
+        )
+    }
+}
+
+/**
+ * 说明板块：一张区块卡讲清一个概念，顺序固定为「定义 → 要点 → 公式 → 举例 → 备注」。
+ * 公式用等宽字体加叠色底，举例单独成块，便于对照自己手上的数字。
+ */
+@Composable
+private fun HelpSectionCard(
+    @androidx.annotation.DrawableRes iconRes: Int,
+    title: String,
+    paragraphs: List<String> = emptyList(),
+    bullets: List<String> = emptyList(),
+    formula: String? = null,
+    example: String? = null,
+    note: String? = null,
+) {
+    val tokens = LocalAppTokens.current
+    AppSectionCard(iconRes = iconRes, title = title) {
+        paragraphs.forEachIndexed { index, text ->
+            Text(
+                text = text,
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
+                modifier = Modifier.padding(top = if (index == 0) 0.dp else tokens.spacing.s2),
+            )
+        }
+        bullets.forEach { text ->
+            Row(modifier = Modifier.fillMaxWidth().padding(top = tokens.spacing.s2)) {
+                Text("·", style = tokens.type.bodyS, color = tokens.colors.textMuted)
+                Text(
+                    text = text,
+                    style = tokens.type.bodyS,
+                    color = tokens.colors.text,
+                    modifier = Modifier.padding(start = tokens.spacing.s2),
+                )
+            }
+        }
+        formula?.let {
+            HelpFormulaBlock(it, Modifier.padding(top = tokens.spacing.s3))
+        }
+        example?.let {
+            HelpExampleBlock(
+                label = stringResource(R.string.nutrition_help_example_label),
+                text = it,
+                modifier = Modifier.padding(top = tokens.spacing.s2),
+            )
+        }
+        note?.let {
+            Text(
+                text = it,
+                style = tokens.type.caption,
+                color = tokens.colors.textMuted,
+                modifier = Modifier.padding(top = tokens.spacing.s2),
+            )
+        }
+    }
+}
+
+@Composable
+private fun HelpFormulaBlock(text: String, modifier: Modifier = Modifier) {
+    val tokens = LocalAppTokens.current
+    val shape = RoundedCornerShape(concentricRadius(tokens.radii.container, tokens.spacing.s3))
+    Text(
+        text = text,
+        style = tokens.type.numeric.copy(
+            fontSize = tokens.type.bodyS.fontSize,
+            lineHeight = tokens.type.bodyS.lineHeight,
+        ),
+        color = tokens.colors.text,
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(tokens.colors.text.copy(alpha = 0.06f))
+            .border(tokens.radii.highlight, tokens.colors.border, shape)
+            .padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s2),
+    )
+}
+
+/** 举例块：用主色 8% 底 + 35% 描边，与灰色的公式块区分开，读者一眼能找到「代入数字」的那段。 */
+@Composable
+private fun HelpExampleBlock(label: String, text: String, modifier: Modifier = Modifier) {
+    val tokens = LocalAppTokens.current
+    val shape = RoundedCornerShape(concentricRadius(tokens.radii.container, tokens.spacing.s3))
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(tokens.colors.primary.copy(alpha = 0.08f))
+            .border(tokens.radii.highlight, tokens.colors.primary.copy(alpha = 0.35f), shape)
+            .padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s2),
+    ) {
+        Text(label, style = tokens.type.caption, color = tokens.colors.primary)
+        Text(
+            text = text,
+            style = tokens.type.bodyS,
+            color = tokens.colors.text,
+            modifier = Modifier.padding(top = tokens.spacing.s1),
+        )
+    }
+}
+
+@Composable
+private fun EnergyShareHelpCard() {
+    HelpSectionCard(
+        iconRes = R.drawable.ic_energy_distribution,
+        title = stringResource(R.string.nutrition_help_energy_ratio_title),
+        paragraphs = listOf(stringResource(R.string.nutrition_help_energy_ratio_definition)),
+        bullets = listOf(stringResource(R.string.nutrition_help_energy_ratio_guideline)),
+        formula = stringResource(R.string.nutrition_help_energy_ratio_formula),
+        example = stringResource(R.string.nutrition_help_energy_ratio_example),
+        note = stringResource(R.string.nutrition_help_energy_ratio_note),
+    )
+}
+
+/** 能量单位说明：营养信息与营养素供能两个抽屉共用同一张卡，避免两处各写一份、日后改漏。 */
+@Composable
+private fun EnergyUnitHelpCard() {
+    HelpSectionCard(
+        iconRes = R.drawable.ic_description,
+        title = stringResource(R.string.nutrition_help_unit_title),
+        paragraphs = listOf(
+            stringResource(R.string.nutrition_help_unit_kcal),
+            stringResource(R.string.nutrition_help_unit_kj),
+        ),
+        bullets = listOf(stringResource(R.string.nutrition_help_unit_conversion)),
+        example = stringResource(R.string.nutrition_help_unit_example),
+    )
+}
+
+@Composable
+private fun EdiblePortionHelpCard() {
+    HelpSectionCard(
+        iconRes = R.drawable.ic_weight,
+        title = stringResource(R.string.nutrition_help_edible_title),
+        paragraphs = listOf(stringResource(R.string.nutrition_help_edible_meaning)),
+        bullets = listOf(stringResource(R.string.nutrition_help_edible_record)),
+        formula = stringResource(R.string.nutrition_help_edible_formula),
+        example = stringResource(R.string.nutrition_help_edible_example),
+        note = stringResource(R.string.nutrition_help_edible_note),
+    )
+}
+
+@Composable
+private fun NrvHelpCard() {
+    HelpSectionCard(
+        iconRes = R.drawable.ic_nutrients,
+        title = stringResource(R.string.nutrition_help_nrv_title),
+        paragraphs = listOf(
+            stringResource(R.string.nutrition_help_nrv_meaning),
+            stringResource(R.string.nutrition_help_nrv_percent),
+        ),
+        formula = stringResource(R.string.nutrition_help_nrv_formula),
+        example = stringResource(R.string.nutrition_help_nrv_example),
+        note = stringResource(R.string.nutrition_help_nrv_note),
+    )
+}
+
+/** 分级表：不铺自己的底，只用叠加透明度画表头与行线，放在任何卡底上都不会与卡底同色（同 `AppDataTable`）。 */
 @Composable
 private fun MetricClassificationTable(
     bands: List<RangeBand<Double, GlycemicClassification>>,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(6.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+    val tokens = LocalAppTokens.current
+    // 同心圆角：外框 4 dp、内边距 12 dp，内层取 0，避免内外两圈弧线各画各的（规范 07 检查项 11）。
+    val shape = RoundedCornerShape(concentricRadius(tokens.radii.container, tokens.spacing.s3))
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .border(tokens.radii.highlight, tokens.colors.border, shape),
     ) {
-        Column {
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 5.dp)) {
-                Text(stringResource(R.string.nutrition_profile_range), modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
-                Text(stringResource(R.string.nutrition_profile_classification), modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(tokens.colors.text.copy(alpha = 0.06f))
+                .padding(horizontal = tokens.spacing.s2, vertical = tokens.spacing.s1),
+        ) {
+            Text(
+                text = stringResource(R.string.nutrition_profile_range),
+                modifier = Modifier.weight(1f),
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
+            )
+            Text(
+                text = stringResource(R.string.nutrition_profile_classification),
+                modifier = Modifier.weight(1f),
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
+            )
+        }
+        bands.forEachIndexed { index, band ->
+            if (index > 0) {
+                HorizontalDivider(color = tokens.colors.border, thickness = tokens.radii.highlight)
             }
-            bands.forEach { band ->
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(metricRangeText(band), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
-                    Box(modifier = Modifier.weight(1f)) { GlycemicClassificationText(band.value) }
-                }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = tokens.spacing.s2, vertical = tokens.spacing.s1),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(metricRangeText(band), modifier = Modifier.weight(1f), style = tokens.type.bodyS, color = tokens.colors.text)
+                Box(modifier = Modifier.weight(1f)) { GlycemicClassificationText(band.value) }
             }
         }
     }
@@ -1773,10 +2462,12 @@ private fun MetricClassificationTable(
 
 @Composable
 private fun GlycemicClassificationText(classification: GlycemicClassification) {
+    val tokens = LocalAppTokens.current
+    // 语义色只表达状态（§2.3）：低 = success，中 = warning，高 = danger；文字标签同时存在，不靠颜色单独承载。
     val color = when (classification) {
-        GlycemicClassification.Low -> MaterialTheme.colorScheme.primary
-        GlycemicClassification.Medium -> MaterialTheme.colorScheme.secondary
-        GlycemicClassification.High -> MaterialTheme.colorScheme.error
+        GlycemicClassification.Low -> tokens.colors.success
+        GlycemicClassification.Medium -> tokens.colors.warning
+        GlycemicClassification.High -> tokens.colors.danger
     }
     val labelRes = when (classification) {
         GlycemicClassification.Low -> R.string.nutrition_classification_low
@@ -1826,7 +2517,12 @@ private fun nutrientRows(
 private fun Double.formatTableValue(): String = "%.1f".format(java.util.Locale.ROOT, this)
 
 @Composable
-private fun FoodServingSelector(servings: List<FoodServing>, selectedServingId: String, onSelected: (String) -> Unit) {
+private fun FoodServingSelector(
+    servings: List<FoodServing>,
+    selectedServingId: String,
+    tableBasisGrams: Double?,
+    onSelected: (String) -> Unit,
+) {
     val language = LocalConfiguration.current.locales[0]?.language ?: "en"
     val selectedServing = servings.first { it.id == selectedServingId }
     val selectedLabel = if (selectedServing.id == "per_100g") {
@@ -1840,32 +2536,73 @@ private fun FoodServingSelector(servings: List<FoodServing>, selectedServingId: 
             label = if (serving.id == "per_100g") stringResource(R.string.nutrition_serving_100g_edible) else serving.displayLabel(language),
         )
     }
-    AppDropdownField(
-        label = stringResource(R.string.nutrition_measurement_basis),
-        value = selectedLabel,
-        options = options,
-        onSelect = { onSelected(it.id) },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        showOptionDividers = true,
-    )
+    Column(Modifier.fillMaxWidth()) {
+        AppDropdownField(
+            label = stringResource(R.string.nutrition_measurement_basis),
+            value = selectedLabel,
+            options = options,
+            onSelect = { onSelected(it.id) },
+            modifier = Modifier.fillMaxWidth().padding(top = AppSpacingDefault.s2),
+            showOptionDividers = true,
+        )
+        tableBasisGrams?.let { basisGrams ->
+            val edibleGrams = basisGrams * selectedServing.ratioToTable
+            Text(
+                text = stringResource(R.string.nutrition_serving_edible_grams, formatGrams(edibleGrams)),
+                modifier = Modifier.fillMaxWidth().padding(top = AppSpacingDefault.s1),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.End,
+            )
+        }
+    }
+}
+
+/** 克重展示：整数带千分位，非整数保留一位小数。 */
+private fun formatGrams(grams: Double): String {
+    val rounded = kotlin.math.round(grams)
+    return if (kotlin.math.abs(grams - rounded) < 0.05) {
+        formatGroupedInteger(rounded)
+    } else {
+        "%.1f".format(java.util.Locale.ROOT, grams)
+    }
 }
 
 @Composable
 private fun NutritionEnergyAndExercise(resolved: ResolvedNutrition?, serving: FoodServing, onClick: () -> Unit) {
-    val kcal = resolved.energyKilocalories(serving.ratioToTable) ?: return
-    val kilojoules = UnitConverter.fromBase("energy", kcal.toFloat(), "kj").toDouble()
-    val steps = (kcal / 0.04).toInt().coerceAtLeast(0)
+    val tokens = LocalAppTokens.current
+    val kcal = resolved.energyKilocalories(serving.ratioToTable)
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = tokens.spacing.s2),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(R.string.nutrition_energy_kcal_kj, kcal, kilojoules), style = MaterialTheme.typography.titleSmall)
+        if (kcal == null) {
+            Text(
+                text = stringResource(R.string.nutrition_energy_empty),
+                modifier = Modifier.padding(vertical = tokens.spacing.s2),
+                style = tokens.type.caption,
+                color = tokens.colors.textMuted,
+                textAlign = TextAlign.Center,
+            )
+            return@Column
+        }
+        val kilojoules = UnitConverter.fromBase("energy", kcal.toFloat(), "kj").toDouble()
+        val steps = (kcal / 0.04).toInt().coerceAtLeast(0)
+        Text(
+            stringResource(
+                R.string.nutrition_energy_kcal_kj,
+                formatGroupedInteger(kcal),
+                formatGroupedInteger(kilojoules),
+            ),
+            style = tokens.type.numeric.copy(fontSize = tokens.type.titleS.fontSize, lineHeight = tokens.type.titleS.lineHeight),
+            color = tokens.colors.text,
+        )
         Row(
-            modifier = Modifier.clickable(onClick = onClick),
+            modifier = Modifier.heightIn(min = tokens.spacing.hitMin).clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(stringResource(R.string.nutrition_exercise_consumption_steps, steps), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.nutrition_exercise_consumption), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.nutrition_exercise_consumption_steps, formatGroupedInteger(steps)), style = tokens.type.caption, color = tokens.colors.textMuted)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.nutrition_exercise_consumption), modifier = Modifier.size(16.dp), tint = tokens.colors.textMuted)
         }
     }
 }
@@ -1877,13 +2614,30 @@ private fun NrvReferenceHeader(
     onSelected: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val tokens = LocalAppTokens.current
+    val canSwitch = references.size > 1
     Box {
         Row(
-            modifier = Modifier.clickable(enabled = references.size > 1) { expanded = true },
+            // 整个表头单元格可点，热区补到 48 dp（移动规范 01 §三）。
+            // 原来只有「NRV + 箭头」那一条 42×20 dp 的文字可点，手指基本点不中。
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = tokens.spacing.hitMin)
+                .clickable(enabled = canSwitch, role = androidx.compose.ui.semantics.Role.DropdownList) {
+                    expanded = true
+                },
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AppDataTableHeaderText(stringResource(R.string.nutrition_profile_nrv))
-            if (references.size > 1) Icon(Icons.Filled.ArrowDropDown, contentDescription = null, modifier = Modifier.size(14.dp))
+            if (canSwitch) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(tokens.spacing.s4),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             references.forEach { reference ->
@@ -1909,11 +2663,12 @@ private fun ExerciseExpenditureScreen(request: NutritionExerciseRequest, onBack:
         onBack = onBack,
         includeStatusBarPadding = false,
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(12.dp)) {
+        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = AppSpacingDefault.page, vertical = AppSpacingDefault.s3)) {
             request.servings.forEach { serving ->
                 Text(
                     text = stringResource(R.string.nutrition_energy_for_basis, serving.kilocalories, 1.0, serving.label),
                     style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = AppSpacingDefault.s1),
                 )
             }
         }
@@ -1923,31 +2678,35 @@ private fun ExerciseExpenditureScreen(request: NutritionExerciseRequest, onBack:
 
 @Composable
 private fun FoodImagePreview(image: ImageBitmap, onDismiss: () -> Unit) {
+    val tokens = LocalAppTokens.current
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(0.96f).fillMaxHeight(0.92f),
-            shape = RoundedCornerShape(2.dp),
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 0.dp,
+            shape = RoundedCornerShape(tokens.radii.container),
+            color = tokens.colors.panel,
+            border = androidx.compose.foundation.BorderStroke(tokens.radii.stroke, tokens.colors.border),
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize().clickable(onClick = onDismiss).padding(2.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+            Column(Modifier.fillMaxSize().padding(tokens.spacing.s3)) {
+                // 灯箱必须给出可见的关闭入口（§5.5.7、§7.3），不只靠点按背景与返回键。
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(R.string.nutrition_image_preview_close_hint),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 4.dp),
+                        style = tokens.type.caption,
+                        color = tokens.colors.textMuted,
+                        modifier = Modifier.weight(1f),
                     )
-                    FoodImage(image, Modifier.fillMaxWidth().weight(1f))
+                    IconButton(onClick = onDismiss, modifier = Modifier.size(tokens.spacing.hitMin)) {
+                        Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.nutrition_image_preview_close), tint = tokens.colors.text)
+                    }
+                }
+                Box(
+                    modifier = Modifier.fillMaxWidth().weight(1f).clickable(onClick = onDismiss),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    FoodImage(image, Modifier.fillMaxSize())
                 }
             }
         }
@@ -1955,12 +2714,16 @@ private fun FoodImagePreview(image: ImageBitmap, onDismiss: () -> Unit) {
 }
 
 @Composable
-internal fun FoodImage(image: ImageBitmap, modifier: Modifier = Modifier) {
+internal fun FoodImage(
+    image: ImageBitmap,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit,
+) {
     androidx.compose.foundation.Image(
         bitmap = image,
         contentDescription = stringResource(R.string.nutrition_food_image),
-        modifier = modifier.clip(RoundedCornerShape(8.dp)),
-        contentScale = ContentScale.Fit,
+        modifier = modifier.clip(RoundedCornerShape(AppRadiiDefault.label)),
+        contentScale = contentScale,
         alignment = Alignment.Center,
     )
 }

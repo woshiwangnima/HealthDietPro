@@ -277,7 +277,7 @@ internal fun DietFoodSheet(
                             }
                         }
                         item {
-                            FoodSearchField(keyword, { keyword = it }, stringResource(R.string.diet_food_search_hint), onSearch = { })
+                            FoodSearchField(keyword, { keyword = it }, stringResource(R.string.diet_food_search_hint))
                         }
                         if (selectedKind != FoodKind.DISH) {
                             item {

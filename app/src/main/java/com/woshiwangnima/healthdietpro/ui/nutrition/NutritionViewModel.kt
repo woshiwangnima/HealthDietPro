@@ -39,6 +39,7 @@ import com.woshiwangnima.healthdietpro.model.disease.stableId
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserItemCollectionRepository
 import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
+import com.woshiwangnima.healthdietpro.model.prefs.pushSearchHistory
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.common.ui.FoodImageStore
 import com.woshiwangnima.healthdietpro.common.cache.FoodCardMetadataCache
@@ -230,6 +231,32 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         )
     }
     fun setKeyword(value: String) { _state.value = _state.value.copy(keyword = value) }
+
+    /**
+     * 把当前关键词记进搜索历史。过滤随输入实时发生，这里只负责「这次搜索值得记住」，
+     * 由回车、点历史、点开某个食物触发，避免每敲一个字就写一次偏好。
+     */
+    fun commitSearch() {
+        val keyword = _state.value.keyword.trim()
+        if (keyword.isBlank()) return
+        val history = historyWith(keyword)
+        _state.value = _state.value.copy(searchHistory = history)
+        saveSearchHistory(history)
+    }
+
+    /** 空结果时的出口：清掉关键词与全部筛选，回到完整列表（§6.2）。 */
+    fun clearFilters() {
+        _state.value = _state.value.copy(
+            keyword = "",
+            selectedRoots = emptySet(),
+            selectedChildren = emptySet(),
+            selectedSystemTags = emptySet(),
+            customOnly = false,
+        )
+    }
+
+    private fun historyWith(keyword: String): List<String> =
+        pushSearchHistory(_state.value.searchHistory, keyword)
     fun removeSearchHistory(value: String) {
         val history = _state.value.searchHistory - value
         _state.value = _state.value.copy(searchHistory = history)
@@ -311,9 +338,8 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     }
     fun openFood(food: FoodItem) {
         val keyword = _state.value.keyword.trim()
-        val history = if (keyword.isBlank()) _state.value.searchHistory else {
-            (listOf(keyword) + _state.value.searchHistory.filterNot { it.equals(keyword, true) })
-        }
+        // 点开某个结果 = 这次搜索确实有用，顺手记进历史（与回车同一条路径）。
+        val history = if (keyword.isBlank()) _state.value.searchHistory else historyWith(keyword)
         val collections = foodCollections.recordRecent(food.id, foodsById.keys)
         _state.value = _state.value.copy(
             selectedFood = food,

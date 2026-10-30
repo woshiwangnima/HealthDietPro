@@ -11,6 +11,10 @@
     <string name="nutrition_user_tags">我的标签</string>
     <string name="nutrition_collapse_tags">收起标签筛选</string>
     <string name="nutrition_image_preview_close_hint">再次点击以关闭窗口</string>
+    <string name="nutrition_image_preview_close">关闭图片预览</string>
+    <string name="nutrition_profile_empty_title">暂无营养素数据</string>
+    <string name="nutrition_profile_empty_hint">该条目没有可解析的营养素表。请返回列表重新打开，或把它添加为自定义条目后手动填写。</string>
+    <string name="nutrition_detail_empty_hint">可先查看「营养档案」页签中的营养素与健康指标，此页签内容仍在整理中。</string>
     <string name="nutrition_expand_tags">展开标签筛选</string>
     <string name="nutrition_collapse_categories">收起分类筛选</string>
     <string name="nutrition_expand_categories">展开分类筛选</string>
@@ -54,7 +58,7 @@
     <string name="nutrition_add_custom_food">添加自定义食物</string>
     <string name="nutrition_custom_food">自定义食物</string>
     <string name="nutrition_health_metrics">健康指标</string>
-    <string name="nutrition_nutrients">营养素</string>
+    <string name="nutrition_nutrients">营养信息</string>
     <string name="nutrition_sources_empty">该条目暂无数据来源。</string>
     <string name="nutrition_macronutrient_energy">营养素供能</string>
     <string name="nutrition_macronutrient_energy_center">供能构成</string>
@@ -65,7 +69,7 @@
     <string name="nutrition_energy_alcohol">酒精供能 %.1f%%</string>
     <string name="nutrition_energy_organic_acid">有机酸供能 %.1f%%</string>
     <string name="nutrition_energy_other">其他供能 %.1f%%</string>
-    <string name="nutrition_energy_kcal_value">%.0f 千卡</string>
+    <string name="nutrition_energy_kcal_value">%1$s 千卡</string>
     <string name="nutrition_profile_item">项目</string>
     <string name="nutrition_profile_amount">含量</string>
     <string name="nutrition_profile_amount_for_serving">每 %1$s</string>
@@ -74,9 +78,11 @@
     <string name="nutrition_nrv_adult_standard">成人标准</string>
     <string name="nutrition_serving_100g_edible">100克可食部</string>
     <string name="nutrition_measurement_basis">营养计量基准</string>
-    <string name="nutrition_energy_kcal_kj">%1$.0f千卡 / %2$.0f千焦</string>
+    <string name="nutrition_serving_edible_grams">可食部：%1$s 克</string>
+    <string name="nutrition_energy_kcal_kj">%1$s千卡 / %2$s千焦</string>
+    <string name="nutrition_energy_empty">暂无可计算的供能数据</string>
     <string name="nutrition_exercise_consumption">运动消耗</string>
-    <string name="nutrition_exercise_consumption_steps">大约需走%1$d步</string>
+    <string name="nutrition_exercise_consumption_steps">大约需走%1$s步</string>
     <string name="nutrition_profile_classification">分类</string>
     <string name="nutrition_profile_range">范围</string>
     <string name="nutrition_classification_low">低</string>
@@ -91,9 +97,51 @@
     <string name="nutrition_metric_gl">血糖负荷（GL）/ 100 克</string>
     <string name="nutrition_metric_inflammatory_potential">炎症指数</string>
     <string name="nutrition_health_metrics_help">健康指标说明</string>
+    <string name="common_close">关闭</string>
+    <string name="nutrition_health_metrics_help_intro">三项指标都用于横向比较食物，都是参考值，不构成医疗建议。</string>
+    <string name="nutrition_health_metrics_help_no_scale">不设分级：该指数没有针对单一食物的公认阈值，只作为数值参考。</string>
     <string name="nutrition_metric_gi_help">升糖指数用于比较等量可利用碳水化合物引起血糖升高的相对速度。品种、成熟度、加工、烹调方式及同餐食物都会影响实际反应。</string>
     <string name="nutrition_metric_gl_help">血糖负荷将碳水化合物含量与升糖指数结合，按本表所列可食基准计算，近似为可利用碳水化合物乘以 GI 后除以 100。</string>
     <string name="nutrition_metric_inflammatory_potential_help">炎症指数是用于研究的膳食指数估算值，不是诊断指标。它应结合整体膳食模式理解，不应视为某一种食物的固有属性。</string>
+
+    <!-- 营养信息 / 营养素供能 说明浮层 -->
+    <string name="nutrition_energy_help">营养素供能说明</string>
+    <string name="nutrition_nutrients_help">营养信息说明</string>
+    <string name="nutrition_help_example_label">举例</string>
+
+    <string name="nutrition_help_energy_title">营养素供能说明</string>
+    <string name="nutrition_help_energy_intro">三大产能营养素怎样折算成能量，以及供能比的含义。</string>
+    <string name="nutrition_help_energy_ratio_title">供能比说明</string>
+    <string name="nutrition_help_energy_ratio_definition">蛋白质、脂肪、碳水化合物在体内氧化时释放能量。本页按 Atwater 系数折算：蛋白质 4 千卡/克、脂肪 9 千卡/克、可利用碳水 4 千卡/克、膳食纤维 2 千卡/克、酒精 7 千卡/克、有机酸 3 千卡/克。</string>
+    <string name="nutrition_help_energy_ratio_formula">供能比 = 某营养素提供的能量 ÷ 总能量 × 100%</string>
+    <string name="nutrition_help_energy_ratio_guideline">中国居民膳食指南建议：碳水化合物 50%～65%、脂肪 20%～30%、蛋白质 10%～15%。</string>
+    <string name="nutrition_help_energy_ratio_example">一份 500 千卡的菜含蛋白质 20 克：20 × 4 = 80 千卡，供能比为 80 ÷ 500 = 16%。</string>
+    <string name="nutrition_help_energy_ratio_note">供能比只说明能量来自哪类营养素，不代表食物好坏；总量与整体膳食搭配更重要。</string>
+
+    <string name="nutrition_help_unit_title">能量单位说明</string>
+    <string name="nutrition_help_unit_kcal">千卡（kcal，也称大卡）：把 1 千克水升高 1 ℃ 所需的热量，日常与多数食品标签最常用。</string>
+    <string name="nutrition_help_unit_kj">千焦（kJ）：国际单位制的能量单位，也是中国食品营养标签的法定标示单位。</string>
+    <string name="nutrition_help_unit_conversion">1 千卡 = 4.184 千焦；1 千焦 ≈ 0.239 千卡。</string>
+    <string name="nutrition_help_unit_example">200 千卡 ≈ 837 千焦；8400 千焦 = 2000 千卡，即成人每日能量参考值。</string>
+
+    <string name="nutrition_help_nutrients_title">营养信息说明</string>
+    <string name="nutrition_help_nutrients_intro">表格中的含量按可食部计算，NRV% 表示这一份占一天参考值的比例。</string>
+    <string name="nutrition_help_edible_title">可食部说明</string>
+    <string name="nutrition_help_edible_meaning">可食部是去掉皮、核、骨、壳等不可食用部分后剩下的部分。本页所有营养数据都按「每 100 克可食部」计算。</string>
+    <string name="nutrition_help_edible_record">称重时若带皮带骨，先按可食部比例折算，再乘以食谱用量。</string>
+    <string name="nutrition_help_edible_formula">可食部重量 = 带皮带骨称重 × 可食部比例</string>
+    <string name="nutrition_help_edible_example">带骨鸡腿 150 克，可食部约 70%，实际摄入约 105 克。</string>
+    <string name="nutrition_help_edible_note">若食谱已按净重记录，直接使用即可，不再折算。</string>
+
+    <string name="nutrition_help_nrv_title">NRV 及 NRV% 说明</string>
+    <string name="nutrition_help_nrv_meaning">NRV（营养素参考值）是《预包装食品营养标签通则》（GB 28050）给出的成人每日参考值，例如能量 8400 千焦、蛋白质 60 克、脂肪 ≤60 克、碳水化合物 300 克、膳食纤维 25 克、钠 2000 毫克。</string>
+    <string name="nutrition_help_nrv_percent">NRV% 是一份食物提供的某营养素占 NRV 的百分比，用来快速判断「吃这一份用掉一天多少额度」。</string>
+    <string name="nutrition_help_nrv_formula">NRV% = 该份含量 ÷ NRV × 100%</string>
+    <string name="nutrition_help_nrv_example">一份含蛋白质 15 克：15 ÷ 60 × 100% = 25% NRV。</string>
+    <string name="nutrition_help_nrv_note">NRV 是通用成人参考值，不分性别、年龄与体力活动；个体需求请以营养师或医生建议为准。</string>
+
+    <string name="nutrition_related_dishes_count">%1$d 道</string>
+    <string name="nutrition_related_dishes_more">另有 %1$d 道菜用到它</string>
     <!-- 营养编辑器 -->
     <string name="nutrition_editor_field_required">%1$s（*必填）</string>
     <string name="nutrition_editor_field_optional">%1$s（|选填）</string>
@@ -125,6 +173,7 @@
     <string name="nutrition_nutrient_fiber">膳食纤维</string>
     <string name="nutrition_nutrient_other">其他营养素</string>
     <string name="data_table_scroll_hint">左右滑动可查看全部列</string>
+    <string name="data_table_vertical_scroll_hint">上下滑动可查看全部行</string>
     <string name="food_category_staple">主食</string>
     <string name="food_category_vegetable">蔬菜</string>
     <string name="food_category_fruit">水果</string>
@@ -213,6 +262,7 @@
     <string name="nutrition_editor_delete">删除</string>
     <string name="nutrition_editor_edit">编辑</string>
     <string name="nutrition_editor_delete_confirm">删除该自定义条目？此操作不可撤销。</string>
+    <string name="nutrition_editor_delete_title">删除%1$s？</string>
     <string name="nutrition_editor_select">选择</string>
     <string name="nutrition_editor_none_selected">未选择</string>
     <string name="nutrition_editor_empty_components">请至少添加一个组分。</string>
@@ -547,25 +597,27 @@
     <string name="blood_glucose_prediction_formula_title">预测公式</string>
     <string name="blood_glucose_prediction_formula_total_title">预测线</string>
     <string name="blood_glucose_prediction_formula_total_original">预测线(t) = 基准线G_Baseline(t) + 饮食升糖线G_Meal(t) + 用药降糖线G_Drug(t) + 睡眠修正线G_Sleep(t) + 运动修正线G_Exercise(t)</string>
-    <string name="blood_glucose_prediction_formula_total_algebra">饮食升糖线使用拟合出的碳水响应；用药、睡眠和运动修正线当前为 0。</string>
+    <string name="blood_glucose_prediction_formula_total_algebra">预测值由基准线、饮食升糖线、用药降糖线、睡眠修正线和运动修正线相加得到。历史数据用于拟合各线参数；只有预测开始时仍处于作用窗口内的事件才参与预测。</string>
     <string name="blood_glucose_prediction_formula_baseline_title">基准线</string>
-    <string name="blood_glucose_prediction_formula_baseline_original">G_Baseline(t) = G_Base + (G_Start - G_Base) × exp(-K_Baseline × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_baseline_original">G_Baseline(t) = G_Base + (G_Start - G_Base) × exp(-0.5 × K_Baseline × t_minutes / 60)</string>
     <string name="blood_glucose_prediction_formula_baseline_base_algebra">G_Base：历史基准血糖值。</string>
     <string name="blood_glucose_prediction_formula_baseline_start_algebra">G_Start：当前时段对应的历史血糖值。</string>
     <string name="blood_glucose_prediction_formula_baseline_decay_algebra">K_Baseline：拟合出的每小时衰减系数。</string>
-    <string name="blood_glucose_prediction_formula_baseline_substituted">%1$s + (%2$s - %3$s) × exp(-%4$s × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_baseline_substituted">G_Baseline(t) = %1$s + (%2$s - %3$s) × exp(-0.5 × %4$s × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_baseline_profile_algebra">每个未来时刻只使用预测开始前、与该时刻本地时间段匹配的历史血糖。依次优先使用近 7、30、60、90 天，至少有两条才采用，否则退化到全部历史；求平均前会剔除极端值。</string>
     <string name="blood_glucose_prediction_formula_meal_title">饮食升糖线</string>
-    <string name="blood_glucose_prediction_formula_meal_original">G_Meal(t) = K_Carbs × Carbs × (t_minutes / T_Meal_Peak) × exp(1 - t_minutes / T_Meal_Peak)</string>
+    <string name="blood_glucose_prediction_formula_meal_original">G_Meal(t) = W_Meal × K_Carbs × Carbs × x² × exp(2 × (1 - x))，x = t_minutes / T_Meal_Peak</string>
     <string name="blood_glucose_prediction_formula_meal_carbs_algebra">K_Carbs：每克碳水对应的拟合升糖幅度。</string>
     <string name="blood_glucose_prediction_formula_meal_peak_algebra">T_Meal_Peak：拟合出的餐后达峰时间。</string>
-    <string name="blood_glucose_prediction_formula_meal_window_algebra">餐后 0 至 240 分钟仅用于拟合；生成时从餐食发生起持续衰减。</string>
-    <string name="blood_glucose_prediction_formula_meal_substituted">%1$s × Carbs × (t_minutes / %2$s) × exp(1 - t_minutes / %2$s)，t_minutes ≥ 0；拟合窗口：0 ≤ t_minutes ≤ 240</string>
+    <string name="blood_glucose_prediction_formula_meal_window_algebra">餐后 0 至 240 分钟仅用于拟合。峰值归一化二阶 Gamma 响应会在 T_Meal_Peak 严格达到峰值；生成时只纳入预测开始时仍处于作用窗口的餐食，并使用 0.125 响应缩放。</string>
+    <string name="blood_glucose_prediction_formula_meal_substituted">%1$s × %2$s × Carbs × x² × exp(2 × (1 - x))，x = t_minutes / %3$s，t_minutes ≥ 0</string>
     <string name="blood_glucose_prediction_formula_drug_title">用药降糖线</string>
-    <string name="blood_glucose_prediction_formula_drug_original">G_Drug(t) = -K_Drug × Dose × (t_minutes / T_Drug_Peak) × exp(1 - t_minutes / T_Drug_Peak)，20 ≤ t_minutes ≤ 480；否则为 0</string>
+    <string name="blood_glucose_prediction_formula_drug_original">G_Drug(t) = -W_Drug × K_Drug × Dose × (1 - exp(-x)) × exp(-x / 2)，x = ln(3) × t_minutes / T_Drug_Peak</string>
     <string name="blood_glucose_prediction_formula_drug_coefficient_algebra">K_Drug：该药品每单位剂量的拟合降糖幅度。</string>
     <string name="blood_glucose_prediction_formula_drug_peak_algebra">T_Drug_Peak：该药品拟合出的药效达峰时间。</string>
-    <string name="blood_glucose_prediction_formula_drug_window_algebra">用药后 20 至 480 分钟仅用于拟合；生成时从用药发生起持续衰减。</string>
-    <string name="blood_glucose_prediction_formula_drug_substituted">%1$s：-%2$s × %3$s × (t_minutes / %4$s) × exp(1 - t_minutes / %4$s)，t_minutes ≥ 0；拟合窗口：20 ≤ t_minutes ≤ 480</string>
+    <string name="blood_glucose_prediction_formula_drug_duration_algebra">T_Drug_Duration：根据用药频率自动计算的作用时长，即计划用药之间的间隔。</string>
+    <string name="blood_glucose_prediction_formula_drug_window_algebra">用药后 20 分钟至 T_Drug_Duration 用于拟合。至少需要 3 条有效样本；生成时只纳入预测开始时仍处于作用窗口的用药，并使用 0.125 响应缩放。</string>
+    <string name="blood_glucose_prediction_formula_drug_substituted">%1$s：-%2$s × %3$s × 剂量 × (1 - exp(-x)) × exp(-x / 2)，x = ln(3) × t_minutes / %4$s，剂量 ∈ %5$s，0 ≤ t_minutes ≤ %6$s 分钟</string>
     <string name="blood_glucose_prediction_formula_drug_no_data">没有拟合出符合条件的药品公式。</string>
     <string name="blood_glucose_prediction_formula_sleep_title">睡眠修正线</string>
     <string name="blood_glucose_prediction_formula_sleep_original">G_Sleep(t) = G_Sleep_Slow（睡眠期间）；G_Sleep_Stress(t) = K_Sleep_Stress × max(0, 8 - H_Sleep) × exp(-K_Sleep_Decay × (t_minutes / 60))（醒来后，0 ≤ t_minutes ≤ 360）；否则为 0</string>
@@ -574,6 +626,7 @@
     <string name="blood_glucose_prediction_formula_sleep_hours_algebra">H_Sleep：睡眠时长，单位为小时。</string>
     <string name="blood_glucose_prediction_formula_sleep_decay_algebra">K_Sleep_Decay：醒后应激消退速率；醒后 t_minutes 从醒来时刻重新计算，最多生效 360 分钟。</string>
     <string name="blood_glucose_prediction_formula_sleep_substituted">%1$s（睡眠期间）；%2$s × max(0, 8 - H_Sleep) × exp(-%3$s × (t_minutes / 60))（醒来后，0 ≤ t_minutes ≤ 360）</string>
+    <string name="blood_glucose_prediction_formula_sleep_no_data">0（当前只有 %1$d 条有效睡眠样本，至少需要 5 条才拟合）</string>
     <string name="blood_glucose_prediction_formula_exercise_title">运动修正线</string>
     <string name="blood_glucose_prediction_formula_exercise_original">运动修正线G_Exercise(t) = 运动修正(t)</string>
     <string name="blood_glucose_prediction_formula_exercise_algebra">本次预测未启用运动修正模型。</string>
@@ -792,7 +845,7 @@
     <string name="settings_update_url" translatable="false">https://github.com/woshiwangnima/HealthDietPro/releases</string>
     <string name="settings_confirm">确认</string>
     <string name="settings_sources_and_references">来源与参考</string>
-    <string name="settings_sources_and_references_desc">DRIs 与 ICD-11 资料</string>
+    <string name="settings_sources_and_references_desc">DRIs 与 WHO 资料引用</string>
     <string name="settings_dris">中国居民膳食营养素参考摄入量（DRIs）</string>
     <string name="settings_dris_url" translatable="false">https://www.cnsoc.org/notice/2023/0922/225.html</string>
     <string name="settings_icd11">WHO ICD-11</string>
@@ -833,7 +886,7 @@
     <string name="settings_monday">周一</string>
     <string name="settings_sunday">周日</string>
     <string name="settings_dark_mode">深色模式</string>
-    <string name="settings_dark_mode_desc">点击循环切换跟随系统、深色和浅色</string>
+    <string name="settings_dark_mode_desc">跟随系统、深色或浅色</string>
     <string name="settings_dark_mode_system">跟随系统</string>
     <string name="settings_dark_mode_on">深色模式</string>
     <string name="settings_dark_mode_off">浅色模式</string>
@@ -1155,8 +1208,9 @@
     <string name="profile_age_years">%1$d岁</string>
     <string name="profile_age_unknown">年龄未知</string>
     <string name="profile_birthday_unknown">出生年月未知</string>
-    <string name="profile_separator"> | </string>
+    <string name="profile_separator"> · </string>
     <string name="profile_switch_user">切换用户</string>
+    <string name="profile_settings_button">设置</string>
     <string name="profile_user_info">个人信息</string>
     <string name="profile_user_settings">用户设置</string>
     <string name="profile_user_settings_desc">个人偏好和提醒设置</string>
@@ -1209,6 +1263,11 @@
     <string name="profile_delete_user_confirm">删除</string>
     <string name="profile_delete_user_cancel">取消</string>
     <string name="profile_edit_title">个人信息</string>
+    <string name="profile_edit_section_avatar">头像</string>
+    <string name="profile_edit_avatar_hint">支持 JPG / PNG，自动裁成正方形</string>
+    <string name="profile_edit_section_basic">基本信息</string>
+    <string name="profile_edit_section_body">身体数据</string>
+    <string name="profile_edit_body_hint">点进每一项可以查看趋势、增删历史记录</string>
     <string name="profile_edit_avatar_change">点击更换头像</string>
     <string name="profile_edit_name">姓名</string>
     <string name="profile_edit_name_required">请输入姓名</string>
@@ -1256,6 +1315,15 @@
     <string name="bmi_overweight">超重</string>
     <string name="bmi_obese">肥胖</string>
     <string name="bmi_unknown">未知</string>
+    <string name="bmi_latest_section">最新 BMI</string>
+    <string name="bmi_latest_source">身高 %1$s · 体重 %2$s</string>
+    <string name="bmi_latest_change">较上次 %1$s</string>
+    <string name="bmi_chart_section">BMI 趋势</string>
+    <string name="bmi_records_section">记录明细</string>
+    <string name="bmi_reference_section">BMI 分级</string>
+    <string name="bmi_reference_note">依据中国成人 BMI 标准（WS/T 428-2013）。BMI 只用于筛查，不替代临床诊断。</string>
+    <string name="bmi_empty_hint">在【个人信息】里记录身高和体重，之后每次新记录都会在这里生成一个点。</string>
+    <string name="bmi_calculator_hint">填入身高和体重后自动计算</string>
     <string name="bmi_calculator_title">BMI 计算器</string>
     <string name="bmi_calculator_help">BMI = 体重（kg）÷ 身高（m）的平方。BMI 仅用于筛查参考，不能替代临床诊断。</string>
     <string name="bmi_height_label">身高 (cm)</string>
@@ -1656,4 +1724,121 @@
     <string name="diet_event_analysis_post_meal_peak">餐后最高血糖值</string>
     <string name="diet_event_analysis_time_to_peak">餐后达峰用时</string>
     <string name="diet_event_analysis_time_to_recovery">恢复餐前血糖值用时</string>
+    <string name="design_preview_section_title">设计令牌对照</string>
+    <string name="design_preview_section_hint">对照通用 UI 规范核对项目令牌取值，对比度按令牌色值实时计算。</string>
+    <string name="design_preview_theme_dark">深色</string>
+    <string name="design_preview_theme_light">浅色</string>
+    <string name="design_preview_colors_title">颜色令牌</string>
+    <string name="design_preview_food_kind_title">食物分类色</string>
+    <string name="design_preview_food_kind_current">现有值（白字）</string>
+    <string name="design_preview_food_kind_suggested">建议值（白字）</string>
+    <string name="design_preview_spacing_title">间距令牌</string>
+    <string name="design_preview_type_title">字号阶梯</string>
+    <string name="design_preview_type_sample">血糖 6.4 mmol/L</string>
+    <string name="design_preview_surfaces_title">面板</string>
+    <string name="design_preview_surface_panel">普通面板</string>
+    <string name="design_preview_surface_raised">悬浮面板</string>
+    <string name="design_preview_motion_title">动效令牌</string>
+    <string name="design_preview_buttons_title">按钮状态</string>
+    <string name="design_preview_variant_primary">主按钮</string>
+    <string name="design_preview_variant_secondary">次按钮</string>
+    <string name="design_preview_variant_ghost">幽灵按钮</string>
+    <string name="design_preview_variant_danger">危险按钮</string>
+    <string name="design_preview_state_default">默认</string>
+    <string name="design_preview_state_pressed">按下</string>
+    <string name="design_preview_state_selected">选中</string>
+    <string name="design_preview_state_disabled">禁用</string>
+    <string name="design_preview_state_loading">加载</string>
+    <string name="design_preview_need_ratio">需 ≥ %1$.1f:1</string>
+    <!-- 记物价 -->
+    <string name="record_action_price">记物价</string>
+    <string name="price_title">记物价</string>
+    <string name="price_add">添加物价记录</string>
+    <string name="price_edit">编辑物价</string>
+    <string name="price_save">保存</string>
+    <string name="price_search_hint">搜索物品名称</string>
+    <string name="price_empty">还没有物价记录</string>
+    <string name="price_filter_empty">没有符合筛选条件的记录</string>
+    <string name="price_filter_region_all">全部地区</string>
+    <string name="price_delete_confirm_title">删除这条物价记录？</string>
+    <string name="price_delete_confirm_message">%1$s（%2$s）删除后不可恢复。</string>
+    <string name="price_section_item">物品</string>
+    <string name="price_section_price">价格</string>
+    <string name="price_section_place_time">地区与日期</string>
+    <string name="price_section_note">备注</string>
+    <string name="price_item">物品</string>
+    <string name="price_item_hint">选择已有食材，或直接输入名称</string>
+    <string name="price_item_pick_title">选择物品</string>
+    <string name="price_item_search_hint">搜索食材、菜肴，或输入自定义名称</string>
+    <string name="price_item_use_custom">用「%1$s」这个名称</string>
+    <string name="price_item_no_match">没有匹配的物品</string>
+    <string name="price_item_kind_ingredient">食材</string>
+    <string name="price_item_kind_food">食物</string>
+    <string name="price_item_kind_dish">菜肴</string>
+    <string name="price_item_kind_custom">自定义</string>
+    <string name="price_unit">物价单位</string>
+    <string name="price_sell_unit">售卖单位</string>
+    <string name="price_region">地区</string>
+    <string name="price_region_unset">未设置地区</string>
+    <string name="price_date">日期</string>
+    <string name="price_date_today">今天</string>
+    <string name="price_note">备注</string>
+    <string name="price_region_pick_title">选择地区</string>
+    <string name="price_region_step_province">选择省份</string>
+    <string name="price_region_use_location">使用当前定位</string>
+    <string name="price_region_locating">定位中…</string>
+    <string name="price_region_only_province">只记录到省份</string>
+    <string name="price_region_only_city">只记录到城市</string>
+    <string name="price_region_location_failed">定位失败，请手动选择地区</string>
+    <string name="price_region_location_failed_unknown">无法识别所在地区，请手动选择</string>
+    <string name="price_region_permission_denied">未授予定位权限，请手动选择地区</string>
+    <string name="record_search_alias_price">价格 菜价 单价 市场价 超市</string>
+    <string name="price_recent_same_item">该物品最近的价格</string>
+    <string name="price_filter_section">查找与筛选</string>
+    <string name="price_section_records">物价记录</string>
+    <string name="price_count">共 %1$d 条</string>
+    <string name="price_empty_hint">记下某地某天的单价，之后能按物品对比不同地区、不同日期的价格变化。</string>
+    <string name="price_filter_empty_hint">换个关键词、或取消地区筛选后再看看。</string>
+    <string name="price_filter_clear">清除筛选</string>
+    <string name="price_item_free_hint">从食材库选一项，或直接输入名称</string>
+
+    <string name="price_value_min">最低价</string>
+    <string name="price_value_max">最高价</string>
+    <string name="price_value_invalid">请输入数字</string>
+    <string name="price_value_range_invalid">最高价不能低于最低价</string>
+    <string name="price_price_hint">至少填一格：只填一个数即单值，填两个数表示当天看到的价格范围（最低–最高）。同地区、同日期、同物品、同单位的多条会合并成一条区间。</string>
+    <string name="price_merge_preview">该条件下已有 %1$d 条记录，保存后会合并显示为 %2$s。</string>
+    <string name="price_group_count">合并 %1$d 条</string>
+    <string name="price_delete_group_message">%1$s（%2$s）这张卡片合并了 %3$d 条记录，删除后不可恢复。</string>
+    <string name="price_region_use_profile">使用资料中的地区</string>
+    <string name="price_region_source_hint">默认使用个人资料里的地区；临时在外地时，可在选择器里改用当前定位。</string>
+
+    <string name="price_tab_statistics">统计</string>
+    <string name="price_tab_records">记录</string>
+    <string name="price_stats_section">物品价格</string>
+    <string name="price_stats_count">共 %1$d 种</string>
+    <string name="price_stats_regions">%1$d 个地区</string>
+    <string name="price_stats_records">%1$d 条记录</string>
+    <string name="price_stats_more_units">另有 %1$d 种单位</string>
+    <string name="price_stats_empty">还没有可统计的物价</string>
+    <string name="price_stats_empty_hint">先在【记录】里记几笔，这里会把同一种物品跨地区、跨日期的价格汇总成区间。</string>
+    <string name="price_stats_filtered_by">当前筛选：%1$s</string>
+    <string name="price_stats_hint">统计只按物品合并；同一物品的不同售卖单位价格不可比，分行显示，不做换算。</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_tooltip_long_press">查看说明</string>
+    <string name="search_activity_clear">清除</string>
+    <string name="search_activity_clear_title">清空%1$s？</string>
+    <string name="search_activity_clear_message">清空后无法恢复。</string>
+    <string name="record_search_empty">没有匹配的功能项</string>
+    <string name="record_search_empty_hint">「%1$s」没有对应的记录入口，换个关键词试试。</string>
+    <string name="record_search_clear">清空搜索</string>
+    <string name="nutrition_search_empty_title">没有找到食物</string>
+    <string name="nutrition_filter_empty_title">没有符合筛选条件的食物</string>
+    <string name="nutrition_search_empty_hint">换个关键词，或清除筛选后再看看。</string>
+    <string name="search_activity_remove">移除这一条</string>
+    <string name="search_activity_hint">点选下面的标签即可填入搜索框</string>
+    <string name="user_settings_record_features">记录功能启用</string>
+    <string name="user_settings_record_features_desc">按分类决定记录中心里出现哪些功能</string>
+    <string name="record_features_hint">关闭的功能会从记录中心隐藏，随时可以重新开启。</string>
+    <string name="search_activity_empty">还没有搜索记录，直接输入关键词即可搜索。</string>
 </resources>

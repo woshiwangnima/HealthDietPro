@@ -1,5 +1,6 @@
 package com.woshiwangnima.healthdietpro.common.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
@@ -28,18 +30,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -137,12 +148,23 @@ fun <T> AppDataTable(
     onEditSelected: ((List<T>) -> Unit)? = null,
     reorder: AppDataTableReorder<T>? = null,
     style: AppDataTableStyle = AppDataTableStyle(),
+    /**
+     * 非空时表格不再撑满父容器，而是按行数自适应高度；行数超过该高度后在表体内滚动。
+     * 滚动提示按通用规范 §4.8：表头固定、上下边缘渐隐、滚动条随滚动出现。
+     * 用于嵌在可滚动页面里的长表格（嵌套滚动只此一层）。
+     */
+    maxBodyHeight: Dp? = null,
+    /** 表体滚动渐隐用的底色：应与表格所在容器的底色一致，默认取 `surface`。 */
+    fadeColor: Color? = null,
 ) {
     require(reorder == null || rowKey != null) { "Reorderable tables require rowKey." }
     require(reorder == null || !showPager) { "Reorderable tables cannot paginate." }
     require(reorder == null || !selectionEnabled) { "Reorderable tables cannot enable selection." }
     require(reorder == null || layoutPolicy is AppDataTableLayoutPolicy.HorizontalScroll) {
         "Reorderable tables require HorizontalScroll layout."
+    }
+    require(maxBodyHeight == null || layoutPolicy is AppDataTableLayoutPolicy.HorizontalScroll) {
+        "Wrap-content tables require HorizontalScroll layout."
     }
     if (reorder != null) {
         val keys = rows.mapIndexed { index, row -> requireNotNull(rowKey)(index, row) }
@@ -162,8 +184,8 @@ fun <T> AppDataTable(
     val pageRows = (pageStart until pageEnd).map { index -> IndexedValue(index, rows[index]) }
     val enableSelection = selectionEnabled && onEditSelected != null
 
-    Column(modifier = modifier.fillMaxSize()) {
-    BoxWithConstraints(modifier = Modifier.weight(1f)) {
+    Column(modifier = if (maxBodyHeight == null) modifier.fillMaxSize() else modifier.fillMaxWidth()) {
+    BoxWithConstraints(modifier = if (maxBodyHeight == null) Modifier.weight(1f) else Modifier.fillMaxWidth()) {
         if (
             layoutPolicy is AppDataTableLayoutPolicy.Responsive &&
             maxWidth < layoutPolicy.compactAt
@@ -197,6 +219,8 @@ fun <T> AppDataTable(
                 onToggleSelection = { index -> selectedRows = selectedRows.toggle(index) },
                 reorder = reorder,
                 style = style,
+                maxBodyHeight = maxBodyHeight,
+                fadeColor = fadeColor,
             )
         }
     }
@@ -242,12 +266,18 @@ fun AppDataTableText(
     color: Color = MaterialTheme.colorScheme.onSurface,
     overflow: ColumnOverflow = ColumnOverflow.Ellipsis,
     maxLines: Int = 1,
+    numeric: Boolean = false,
 ) {
+    val style = if (numeric) {
+        MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+    } else {
+        MaterialTheme.typography.bodyMedium
+    }
     when (overflow) {
         ColumnOverflow.Clip -> Text(
             text = text,
             modifier = modifier,
-            style = MaterialTheme.typography.bodyMedium,
+            style = style,
             color = color,
             maxLines = maxLines,
             overflow = TextOverflow.Clip,
@@ -257,7 +287,7 @@ fun AppDataTableText(
         ColumnOverflow.Ellipsis -> TextOverflowText(
             text = text,
             modifier = modifier,
-            style = MaterialTheme.typography.bodyMedium,
+            style = style,
             color = color,
             maxLines = maxLines,
         )
@@ -265,7 +295,7 @@ fun AppDataTableText(
         ColumnOverflow.Wrap -> Text(
             text = text,
             modifier = modifier,
-            style = MaterialTheme.typography.bodyMedium,
+            style = style,
             color = color,
             overflow = TextOverflow.Clip,
             softWrap = true,
@@ -291,6 +321,8 @@ private fun <T> HorizontalDataTable(
     onToggleSelection: (Int) -> Unit,
     reorder: AppDataTableReorder<T>?,
     style: AppDataTableStyle,
+    maxBodyHeight: Dp?,
+    fadeColor: Color?,
 ) {
     val horizontalScroll = rememberScrollState()
     val lazyListState = rememberLazyListState()
@@ -308,13 +340,15 @@ private fun <T> HorizontalDataTable(
     val contentWidth = (sequenceWidth + widths.fold(0.dp) { acc, width -> acc + width } + if (hasActions) actionsWidth else 0.dp + handleWidth)
         .coerceAtLeast(maxWidth)
         .coerceAtLeast(minTableWidth)
-    val rowEven = MaterialTheme.colorScheme.surface
-    val rowOdd = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f)
-    val border = MaterialTheme.colorScheme.outlineVariant
+    // 表格不再自铺底色，改为在父容器上叠加 onSurface 透明度：无论放在 panel、panelRaised 还是白色卡片里，
+    // 表头、斑马纹与分隔线都保持同样的相对层级（原写法绑定 surfaceVariant，卡片提亮后表头会与卡底同色而消失）。
+    val rowEven = Color.Transparent
+    val rowOdd = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f)
+    val border = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f)
     val isHorizontallyScrollable = contentWidth > maxWidth
     val scope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = if (maxBodyHeight == null) Modifier.fillMaxSize() else Modifier.fillMaxWidth()) {
         if (isHorizontallyScrollable) {
             HorizontalScrollHandle(
                 maxWidth = maxWidth,
@@ -328,7 +362,7 @@ private fun <T> HorizontalDataTable(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(horizontalScroll)
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)),
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)),
         ) {
             Row(
                 modifier = Modifier
@@ -358,12 +392,20 @@ private fun <T> HorizontalDataTable(
             }
         }
 
+        Box(
+            modifier = if (maxBodyHeight == null) {
+                Modifier.fillMaxWidth().heightIn(min = 0.dp).weight(1f)
+            } else {
+                Modifier.fillMaxWidth()
+            },
+        ) {
         LazyColumn(
             state = lazyListState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 0.dp)
-                .weight(1f),
+            modifier = if (maxBodyHeight == null) {
+                Modifier.fillMaxSize()
+            } else {
+                Modifier.fillMaxWidth().heightIn(max = maxBodyHeight)
+            },
         ) {
             itemsIndexed(
                 items = rows,
@@ -450,8 +492,104 @@ private fun <T> HorizontalDataTable(
                 }
             }
         }
+
+        if (maxBodyHeight != null) {
+            TableVerticalScrollHints(
+                state = lazyListState,
+                fadeColor = fadeColor ?: MaterialTheme.colorScheme.surface,
+                modifier = Modifier.matchParentSize(),
+            )
+        }
+        }
     }
 }
+
+/**
+ * 表体滚动提示（通用规范 §4.8）：上下边缘各 24 px 渐隐，加 8 px 滚动条（滑块不短于 32 px，滚动时出现）。
+ * 不再使用原来那条「上下滑动」文字条——它会占掉一行高度，且滚动结束后仍留在页面上。
+ */
+@Composable
+private fun TableVerticalScrollHints(
+    state: LazyListState,
+    fadeColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    val scrollHint = stringResource(com.woshiwangnima.healthdietpro.R.string.data_table_vertical_scroll_hint)
+    val metrics by remember(state) {
+        derivedStateOf {
+            val info = state.layoutInfo
+            val total = info.totalItemsCount
+            val visible = info.visibleItemsInfo.size
+            if (total <= visible || visible == 0) {
+                null
+            } else {
+                val thumbFraction = (visible.toFloat() / total).coerceIn(0.08f, 1f)
+                val scrollFraction = info.visibleItemsInfo.first().index.toFloat() / (total - visible)
+                thumbFraction to scrollFraction.coerceIn(0f, 1f)
+            }
+        }
+    }
+    var showThumb by remember(state) { mutableStateOf(false) }
+    LaunchedEffect(state) {
+        snapshotFlow { state.isScrollInProgress }.collect { scrolling ->
+            if (scrolling) {
+                showThumb = true
+            } else {
+                kotlinx.coroutines.delay(900)
+                showThumb = false
+            }
+        }
+    }
+    val thumbAlpha by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (showThumb) 1f else 0f,
+        animationSpec = androidx.compose.animation.core.tween(durationMillis = 200),
+        label = "tableScrollThumbAlpha",
+    )
+    val thumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.34f)
+    val currentMetrics = metrics
+    androidx.compose.foundation.Canvas(
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics { contentDescription = scrollHint },
+    ) {
+        val fadePx = TABLE_EDGE_FADE.toPx()
+        if (state.canScrollBackward) {
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(fadeColor, fadeColor.copy(alpha = 0f)),
+                    startY = 0f,
+                    endY = fadePx,
+                ),
+            )
+        }
+        if (state.canScrollForward) {
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(fadeColor.copy(alpha = 0f), fadeColor),
+                    startY = size.height - fadePx,
+                    endY = size.height,
+                ),
+            )
+        }
+        if (currentMetrics != null && thumbAlpha > 0.01f) {
+            val (thumbFraction, scrollFraction) = currentMetrics
+            val barWidth = TABLE_SCROLLBAR_WIDTH.toPx()
+            val thumbHeight = (size.height * thumbFraction).coerceAtLeast(TABLE_SCROLLBAR_MIN_THUMB.toPx())
+            val travel = (size.height - thumbHeight).coerceAtLeast(0f)
+            drawRoundRect(
+                color = thumbColor.copy(alpha = thumbColor.alpha * thumbAlpha),
+                topLeft = Offset(size.width - barWidth - TABLE_SCROLLBAR_INSET.toPx(), travel * scrollFraction),
+                size = Size(barWidth, thumbHeight),
+                cornerRadius = CornerRadius(barWidth / 2f),
+            )
+        }
+    }
+}
+
+private val TABLE_EDGE_FADE = 24.dp
+private val TABLE_SCROLLBAR_WIDTH = 4.dp
+private val TABLE_SCROLLBAR_MIN_THUMB = 32.dp
+private val TABLE_SCROLLBAR_INSET = 2.dp
 
 @Composable
 private fun HorizontalScrollHandle(
@@ -467,7 +605,7 @@ private fun HorizontalScrollHandle(
     val offsetFraction = if (scrollMax == 0) 0f else scrollValue.toFloat() / scrollMax
     val thumbOffset = travel * offsetFraction
     Column(
-        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)).padding(horizontal = 12.dp, vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)).padding(horizontal = 12.dp, vertical = 4.dp),
     ) {
         Text(
             text = stringResource(com.woshiwangnima.healthdietpro.R.string.data_table_scroll_hint),
@@ -506,16 +644,16 @@ private fun <T> CompactDataTable(
     compactRow: @Composable AppDataTableRowScope<T>.(T) -> Unit,
     style: AppDataTableStyle,
 ) {
-    val rowEven = MaterialTheme.colorScheme.surface
-    val rowOdd = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f)
-    val border = MaterialTheme.colorScheme.outlineVariant
+    val rowEven = Color.Transparent
+    val rowOdd = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f)
+    val border = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f)
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         if (compactHeader != null) {
             item {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f))
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
                         .padding(horizontal = style.cellHorizontalPadding, vertical = style.headerVerticalPadding),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {

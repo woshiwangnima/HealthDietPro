@@ -11,11 +11,14 @@ import com.woshiwangnima.healthdietpro.model.disease.curatedId
 import com.woshiwangnima.healthdietpro.model.disease.customId
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.diet.DietRepository
+import com.woshiwangnima.healthdietpro.model.price.PriceRepository
 import com.woshiwangnima.healthdietpro.model.water.WaterRepository
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
+import com.woshiwangnima.healthdietpro.model.prefs.RecordFeaturePrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.deserializeSearchHistory
+import com.woshiwangnima.healthdietpro.model.prefs.pushSearchHistory
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.model.unit.formatGlucoseValue
@@ -37,13 +40,17 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
 
     fun setQuery(query: String) { _uiState.value = _uiState.value.copy(query = query) }
 
-    fun submitQuery(query: String = _uiState.value.query) {
+    /**
+     * 把当前输入记进搜索历史。过滤是随输入实时发生的，这里只负责「这次搜索值得记住」，
+     * 所以只在回车、或点开某条搜索结果时调用。
+     */
+    fun commitSearch(query: String = _uiState.value.query) {
         val normalized = query.trim()
-        val history = if (normalized.isBlank()) _uiState.value.searchHistory else {
-            (listOf(normalized) + _uiState.value.searchHistory.filterNot { it.equals(normalized, true) })
-        }
-        _uiState.value = _uiState.value.copy(query = query, submittedQuery = normalized, searchHistory = history)
-        if (normalized.isNotBlank()) saveSearchHistory(history)
+        if (normalized.isBlank()) return
+        // 历史是个定长栈：最新一条进栈，超出 10 条的最旧一条出栈（与搜索面板展示上限同一个数）。
+        val history = pushSearchHistory(_uiState.value.searchHistory, normalized)
+        _uiState.value = _uiState.value.copy(searchHistory = history)
+        saveSearchHistory(history)
     }
 
     fun removeSearchHistory(value: String) {
@@ -94,6 +101,7 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
         val sleep = com.woshiwangnima.healthdietpro.model.sleep.SleepRepository.fromContext(context)
             .load().records.maxByOrNull { it.sleepStartAt }
         val diet = DietRepository.fromContext(context).load().records.maxByOrNull { it.mealStartAt }
+        val price = PriceRepository.fromContext(context).load().records.maxByOrNull { it.recordedAt }
         val latest = mapOf(
             RecordActionId.Height to profile.heightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, "${it.value} cm") },
             RecordActionId.Weight to profile.weightRecords.maxByOrNull { it.recordedAtMillis }?.let { RecordLatest(it.recordedAtMillis, String.format(Locale.getDefault(), "%.2f kg", it.value)) },
@@ -134,19 +142,27 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
                 val period = context.getString(record.mealPeriod.displayRes())
                 RecordLatest(record.mealStartAt, "$period ${formatCalories(totalKcal)} kcal")
             },
+            RecordActionId.Price to price?.let { record ->
+                RecordLatest(record.recordedAt, "${record.itemName} ${record.priceDisplay}")
+            },
         )
         val prefs = UserPrefs.current(context)
         val history = deserializeSearchHistory(prefs.getString(SEARCH_HISTORY_KEY, "[]"))
         val recentActions = deserializeSearchHistory(prefs.getString(RECENT_ACTIONS_KEY, "[]"))
             .mapNotNull { name -> RecordActionId.entries.firstOrNull { it.name == name } }
+        // 用户在「用户设置 - 记录设置 - 功能启用」里关掉的功能直接不进列表：
+        // 关掉是为了精简界面，不是留个灰块；最近使用里也要一并剔掉，否则搜索面板还能点进去。
+        val disabledActions = RecordFeaturePrefs.disabledFeatureIds(context)
+            .mapNotNull { name -> RecordActionId.entries.firstOrNull { it.name == name } }
+            .toSet()
         _uiState.value = _uiState.value.copy(
-            sections = defaultRecordSections().map { section ->
+            sections = defaultRecordSections().withoutDisabledActions(disabledActions).map { section ->
                 section.copy(items = section.items.map { item ->
                     latest[item.id]?.let { item.copy(latestTimestamp = it.timestamp, latestValue = it.value) } ?: item
                 })
             },
             searchHistory = history,
-            recentActionIds = recentActions,
+            recentActionIds = recentActions.filterNot { it in disabledActions },
         )
     }
 

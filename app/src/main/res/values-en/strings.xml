@@ -11,6 +11,10 @@
     <string name="nutrition_user_tags">My tags</string>
     <string name="nutrition_collapse_tags">Collapse tag filters</string>
     <string name="nutrition_image_preview_close_hint">Tap again to close the window</string>
+    <string name="nutrition_image_preview_close">Close image preview</string>
+    <string name="nutrition_profile_empty_title">No nutrient data</string>
+    <string name="nutrition_profile_empty_hint">This item has no readable nutrient table. Go back and reopen it, or add it as a custom item and fill the values in manually.</string>
+    <string name="nutrition_detail_empty_hint">The nutrient profile tab already lists nutrients and health metrics; this section is still being prepared.</string>
     <string name="nutrition_expand_tags">Expand tag filters</string>
     <string name="nutrition_collapse_categories">Collapse category filters</string>
     <string name="nutrition_expand_categories">Expand category filters</string>
@@ -54,7 +58,7 @@
     <string name="nutrition_add_custom_food">Add custom food</string>
     <string name="nutrition_custom_food">Custom foods</string>
     <string name="nutrition_health_metrics">Health metrics</string>
-    <string name="nutrition_nutrients">Nutrients</string>
+    <string name="nutrition_nutrients">Nutrition info</string>
     <string name="nutrition_sources_empty">No source is available for this item.</string>
     <string name="nutrition_macronutrient_energy">Nutrient energy</string>
     <string name="nutrition_macronutrient_energy_center">Energy contribution</string>
@@ -65,7 +69,7 @@
     <string name="nutrition_energy_alcohol">Alcohol %.1f%%</string>
     <string name="nutrition_energy_organic_acid">Organic acid %.1f%%</string>
     <string name="nutrition_energy_other">Other %.1f%%</string>
-    <string name="nutrition_energy_kcal_value">%.0f kcal</string>
+    <string name="nutrition_energy_kcal_value">%1$s kcal</string>
     <string name="nutrition_profile_item">Item</string>
     <string name="nutrition_profile_amount">Amount</string>
     <string name="nutrition_profile_amount_for_serving">Per %1$s</string>
@@ -74,9 +78,11 @@
     <string name="nutrition_nrv_adult_standard">Adult standard</string>
     <string name="nutrition_serving_100g_edible">100 g edible portion</string>
     <string name="nutrition_measurement_basis">Nutrition measurement basis</string>
-    <string name="nutrition_energy_kcal_kj">%1$.0f kcal / %2$.0f kJ</string>
+    <string name="nutrition_serving_edible_grams">Edible portion: %1$s g</string>
+    <string name="nutrition_energy_kcal_kj">%1$s kcal / %2$s kJ</string>
+    <string name="nutrition_energy_empty">No energy data available</string>
     <string name="nutrition_exercise_consumption">Exercise expenditure</string>
-    <string name="nutrition_exercise_consumption_steps">About %1$d steps needed</string>
+    <string name="nutrition_exercise_consumption_steps">About %1$s steps needed</string>
     <string name="nutrition_profile_classification">Classification</string>
     <string name="nutrition_profile_range">Range</string>
     <string name="nutrition_classification_low">Low</string>
@@ -91,9 +97,51 @@
     <string name="nutrition_metric_gl">Glycemic load (GL) / 100 g</string>
     <string name="nutrition_metric_inflammatory_potential">Inflammation index</string>
     <string name="nutrition_health_metrics_help">About health metrics</string>
+    <string name="common_close">Close</string>
+    <string name="nutrition_health_metrics_help_intro">All three metrics are reference values for comparing foods. They are not medical advice.</string>
+    <string name="nutrition_health_metrics_help_no_scale">No grading: there is no accepted threshold for a single food, so only the value is shown.</string>
     <string name="nutrition_metric_gi_help">Glycemic index ranks the rise in blood glucose after a fixed amount of available carbohydrate. It is affected by food variety, ripeness, processing, cooking, and the rest of the meal.</string>
     <string name="nutrition_metric_gl_help">Glycemic load combines carbohydrate amount and glycemic index for the listed edible basis. It is approximately available carbohydrate multiplied by GI divided by 100.</string>
     <string name="nutrition_metric_inflammatory_potential_help">The inflammation index is a research-oriented dietary index estimate, not a diagnosis. Interpret it with the overall dietary pattern rather than as an inherent property of one food.</string>
+
+    <!-- Nutrition info / nutrient energy help sheet -->
+    <string name="nutrition_energy_help">About nutrient energy</string>
+    <string name="nutrition_nutrients_help">About nutrition info</string>
+    <string name="nutrition_help_example_label">Example</string>
+
+    <string name="nutrition_help_energy_title">About nutrient energy</string>
+    <string name="nutrition_help_energy_intro">How the energy-yielding nutrients add up, and what the energy share means.</string>
+    <string name="nutrition_help_energy_ratio_title">Energy share</string>
+    <string name="nutrition_help_energy_ratio_definition">Protein, fat and carbohydrate release energy when oxidised. This page uses Atwater factors: protein 4 kcal/g, fat 9 kcal/g, available carbohydrate 4 kcal/g, dietary fibre 2 kcal/g, alcohol 7 kcal/g, organic acid 3 kcal/g.</string>
+    <string name="nutrition_help_energy_ratio_formula">Energy share = energy from one nutrient ÷ total energy × 100%</string>
+    <string name="nutrition_help_energy_ratio_guideline">Chinese dietary guidelines suggest carbohydrate 50–65%, fat 20–30% and protein 10–15% of energy.</string>
+    <string name="nutrition_help_energy_ratio_example">A 500 kcal dish with 20 g protein: 20 × 4 = 80 kcal, so protein provides 80 ÷ 500 = 16% of the energy.</string>
+    <string name="nutrition_help_energy_ratio_note">Energy share shows where the energy comes from, not whether a food is good; total intake and the whole diet matter more.</string>
+
+    <string name="nutrition_help_unit_title">Energy units</string>
+    <string name="nutrition_help_unit_kcal">Kilocalorie (kcal, also called Calorie): the heat needed to raise 1 kg of water by 1 °C. It is the unit used in everyday talk and on most labels.</string>
+    <string name="nutrition_help_unit_kj">Kilojoule (kJ): the SI unit of energy and the legally required unit on Chinese nutrition labels.</string>
+    <string name="nutrition_help_unit_conversion">1 kcal = 4.184 kJ; 1 kJ ≈ 0.239 kcal.</string>
+    <string name="nutrition_help_unit_example">200 kcal ≈ 837 kJ; 8400 kJ = 2000 kcal, the adult daily energy reference value.</string>
+
+    <string name="nutrition_help_nutrients_title">About nutrition info</string>
+    <string name="nutrition_help_nutrients_intro">Values are per edible portion; NRV% shows how much of a day\'s reference intake one serving uses.</string>
+    <string name="nutrition_help_edible_title">Edible portion</string>
+    <string name="nutrition_help_edible_meaning">The edible portion is what remains after peel, core, bone or shell is removed. All values on this page are per 100 g of edible portion.</string>
+    <string name="nutrition_help_edible_record">If you weighed the food with bone or peel, convert it to edible weight before multiplying by the recipe amount.</string>
+    <string name="nutrition_help_edible_formula">Edible weight = weight with bone or peel × edible ratio</string>
+    <string name="nutrition_help_edible_example">A 150 g chicken drumstick with bone, about 70% edible, gives roughly 105 g of edible meat.</string>
+    <string name="nutrition_help_edible_note">If the recipe already uses net (edible) weight, use it as it is.</string>
+
+    <string name="nutrition_help_nrv_title">NRV and NRV%</string>
+    <string name="nutrition_help_nrv_meaning">NRV (Nutrient Reference Value) is the adult daily reference used by GB 28050 for nutrition labelling, e.g. energy 8400 kJ, protein 60 g, fat ≤60 g, carbohydrate 300 g, dietary fibre 25 g, sodium 2000 mg.</string>
+    <string name="nutrition_help_nrv_percent">NRV% is the share of that reference provided by one serving, so you can see how much of a day\'s allowance it uses.</string>
+    <string name="nutrition_help_nrv_formula">NRV% = amount per serving ÷ NRV × 100%</string>
+    <string name="nutrition_help_nrv_example">A serving with 15 g protein: 15 ÷ 60 × 100% = 25% NRV.</string>
+    <string name="nutrition_help_nrv_note">NRV is a general adult reference and does not vary by sex, age or activity level; ask a dietitian or doctor for personal targets.</string>
+
+    <string name="nutrition_related_dishes_count">%1$d dishes</string>
+    <string name="nutrition_related_dishes_more">%1$d more dishes use it</string>
     <!-- Nutrition editor -->
     <string name="nutrition_editor_field_required">%1$s (* required)</string>
     <string name="nutrition_editor_field_optional">%1$s (| optional)</string>
@@ -213,6 +261,7 @@
     <string name="nutrition_editor_delete">Delete</string>
     <string name="nutrition_editor_edit">Edit</string>
     <string name="nutrition_editor_delete_confirm">Delete this custom entry? This cannot be undone.</string>
+    <string name="nutrition_editor_delete_title">Delete %1$s?</string>
     <string name="nutrition_editor_select">Select</string>
     <string name="nutrition_editor_none_selected">Not selected</string>
     <string name="nutrition_editor_empty_components">Add at least one component.</string>
@@ -547,25 +596,27 @@
     <string name="blood_glucose_prediction_formula_title">Prediction formula</string>
     <string name="blood_glucose_prediction_formula_total_title">Prediction line</string>
     <string name="blood_glucose_prediction_formula_total_original">Prediction(t) = G_Baseline(t) + G_Meal(t) + G_Drug(t) + G_Sleep(t) + G_Exercise(t)</string>
-    <string name="blood_glucose_prediction_formula_total_algebra">G_Meal(t) uses the fitted carbohydrate response. G_Drug(t), G_Sleep(t), and G_Exercise(t) are currently zero.</string>
+    <string name="blood_glucose_prediction_formula_total_algebra">The prediction is the sum of the baseline, meal, medication, sleep, and exercise correction lines. Historical data is used to fit their parameters; only events already active at prediction time contribute to the forecast.</string>
     <string name="blood_glucose_prediction_formula_baseline_title">Baseline line</string>
-    <string name="blood_glucose_prediction_formula_baseline_original">G_Baseline(t) = G_Base + (G_Start - G_Base) × exp(-K_Baseline × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_baseline_original">G_Baseline(t) = G_Base + (G_Start - G_Base) × exp(-0.5 × K_Baseline × t_minutes / 60)</string>
     <string name="blood_glucose_prediction_formula_baseline_base_algebra">G_Base: historical baseline glucose.</string>
     <string name="blood_glucose_prediction_formula_baseline_start_algebra">G_Start: historical glucose for the matching time of day.</string>
     <string name="blood_glucose_prediction_formula_baseline_decay_algebra">K_Baseline: fitted hourly decay coefficient.</string>
-    <string name="blood_glucose_prediction_formula_baseline_substituted">G_Baseline(t) = %1$s + (%2$s - %3$s) × exp(-%4$s × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_baseline_substituted">G_Baseline(t) = %1$s + (%2$s - %3$s) × exp(-0.5 × %4$s × t_minutes / 60)</string>
+    <string name="blood_glucose_prediction_formula_baseline_profile_algebra">For each future point, use glucose records before prediction time from the matching local-time bucket. Prefer 7, 30, 60, or 90 days when at least two values exist, then fall back to all history; trim extreme values before averaging.</string>
     <string name="blood_glucose_prediction_formula_meal_title">Meal glucose-rise line</string>
-    <string name="blood_glucose_prediction_formula_meal_original">G_Meal(t) = K_Carbs × Carbs × (t_minutes / T_Meal_Peak) × exp(1 - t_minutes / T_Meal_Peak)</string>
+    <string name="blood_glucose_prediction_formula_meal_original">G_Meal(t) = W_Meal × K_Carbs × Carbs × x² × exp(2 × (1 - x)), x = t_minutes / T_Meal_Peak</string>
     <string name="blood_glucose_prediction_formula_meal_carbs_algebra">K_Carbs: fitted glucose rise per gram of carbohydrate.</string>
     <string name="blood_glucose_prediction_formula_meal_peak_algebra">T_Meal_Peak: fitted time to the post-meal peak.</string>
-    <string name="blood_glucose_prediction_formula_meal_window_algebra">The 0 to 240 minute range is used only for fitting; generation starts at the meal and decays continuously.</string>
-    <string name="blood_glucose_prediction_formula_meal_substituted">%1$s × Carbs × (t_minutes / %2$s) × exp(1 - t_minutes / %2$s), t_minutes ≥ 0; fitting window: 0 ≤ t_minutes ≤ 240</string>
+    <string name="blood_glucose_prediction_formula_meal_window_algebra">The 0 to 240 minute range is used only for fitting. The peak-normalized second-order Gamma response reaches its peak at T_Meal_Peak; generation includes only meals active at prediction start and uses a 0.125 response scale.</string>
+    <string name="blood_glucose_prediction_formula_meal_substituted">%1$s × %2$s × Carbs × x² × exp(2 × (1 - x)), x = t_minutes / %3$s; t_minutes ≥ 0</string>
     <string name="blood_glucose_prediction_formula_drug_title">Medication glucose-lowering line</string>
-    <string name="blood_glucose_prediction_formula_drug_original">G_Drug(t) = -K_Drug × Dose × (t_minutes / T_Drug_Peak) × exp(1 - t_minutes / T_Drug_Peak), 20 ≤ t_minutes ≤ 480; otherwise 0</string>
+    <string name="blood_glucose_prediction_formula_drug_original">G_Drug(t) = -W_Drug × K_Drug × Dose × (1 - exp(-x)) × exp(-x / 2), x = ln(3) × t_minutes / T_Drug_Peak</string>
     <string name="blood_glucose_prediction_formula_drug_coefficient_algebra">K_Drug: fitted glucose lowering per dose unit for this medication.</string>
     <string name="blood_glucose_prediction_formula_drug_peak_algebra">T_Drug_Peak: fitted time to peak medication effect.</string>
-    <string name="blood_glucose_prediction_formula_drug_window_algebra">The 20 to 480 minute range is used only for fitting; generation starts at intake and decays continuously.</string>
-    <string name="blood_glucose_prediction_formula_drug_substituted">%1$s: -%2$s × %3$s × (t_minutes / %4$s) × exp(1 - t_minutes / %4$s), t_minutes ≥ 0; fitting window: 20 ≤ t_minutes ≤ 480</string>
+    <string name="blood_glucose_prediction_formula_drug_duration_algebra">T_Drug_Duration: the effect duration derived from medication frequency as the interval between scheduled doses.</string>
+    <string name="blood_glucose_prediction_formula_drug_window_algebra">The 20 minute to T_Drug_Duration range is used for fitting. At least three valid samples are required; generation includes only medication active at prediction start and uses a 0.125 response scale.</string>
+    <string name="blood_glucose_prediction_formula_drug_substituted">%1$s: -%2$s × %3$s × dose × (1 - exp(-x)) × exp(-x / 2), x = ln(3) × t_minutes / %4$s, dose ∈ %5$s, 0 ≤ t_minutes ≤ %6$s minutes</string>
     <string name="blood_glucose_prediction_formula_drug_no_data">No eligible medication formula was fitted.</string>
     <string name="blood_glucose_prediction_formula_sleep_title">Sleep correction line</string>
     <string name="blood_glucose_prediction_formula_sleep_original">G_Sleep(t) = G_Sleep_Slow during sleep; G_Sleep_Stress(t) = K_Sleep_Stress × max(0, 8 - H_Sleep) × exp(-K_Sleep_Decay × (t_minutes / 60)) after waking, 0 ≤ t_minutes ≤ 360; otherwise 0</string>
@@ -574,6 +625,7 @@
     <string name="blood_glucose_prediction_formula_sleep_hours_algebra">H_Sleep: sleep duration in hours.</string>
     <string name="blood_glucose_prediction_formula_sleep_decay_algebra">K_Sleep_Decay: post-waking stress decay rate; post-waking t_minutes starts at wake time and lasts up to 360 minutes.</string>
     <string name="blood_glucose_prediction_formula_sleep_substituted">During sleep: %1$s. After waking: %2$s × max(0, 8 - H_Sleep) × exp(-%3$s × (t_minutes / 60)), 0 ≤ t_minutes ≤ 360</string>
+    <string name="blood_glucose_prediction_formula_sleep_no_data">0 (only %1$d valid sleep samples; at least 5 are required for fitting)</string>
     <string name="blood_glucose_prediction_formula_exercise_title">Exercise correction line</string>
     <string name="blood_glucose_prediction_formula_exercise_original">G_Exercise(t) = exercise correction(t)</string>
     <string name="blood_glucose_prediction_formula_exercise_algebra">The exercise correction model is disabled for this prediction.</string>
@@ -792,7 +844,7 @@
     <string name="settings_update_url" translatable="false">https://github.com/woshiwangnima/HealthDietPro/releases</string>
     <string name="settings_confirm">OK</string>
     <string name="settings_sources_and_references">Sources and references</string>
-    <string name="settings_sources_and_references_desc">DRIs and ICD-11 resources</string>
+    <string name="settings_sources_and_references_desc">DRIs and WHO resources</string>
     <string name="settings_dris">Chinese DRIs</string>
     <string name="settings_dris_url" translatable="false">https://www.cnsoc.org/notice/2023/0922/225.html</string>
     <string name="settings_icd11">WHO ICD-11</string>
@@ -833,7 +885,7 @@
     <string name="settings_monday">Monday</string>
     <string name="settings_sunday">Sunday</string>
     <string name="settings_dark_mode">Dark mode</string>
-    <string name="settings_dark_mode_desc">Tap to cycle system, dark, and light modes</string>
+    <string name="settings_dark_mode_desc">Follow system, dark, or light</string>
     <string name="settings_dark_mode_system">Follow system</string>
     <string name="settings_dark_mode_on">Dark</string>
     <string name="settings_dark_mode_off">Light</string>
@@ -1155,8 +1207,9 @@
     <string name="profile_age_years">%1$d years old</string>
     <string name="profile_age_unknown">Age unknown</string>
     <string name="profile_birthday_unknown">Birth date unknown</string>
-    <string name="profile_separator"> | </string>
+    <string name="profile_separator"> · </string>
     <string name="profile_switch_user">Switch user</string>
+    <string name="profile_settings_button">Settings</string>
     <string name="profile_user_info">User information</string>
     <string name="profile_user_settings">User settings</string>
     <string name="profile_user_settings_desc">Personal preferences and reminder settings</string>
@@ -1209,6 +1262,11 @@
     <string name="profile_delete_user_confirm">Delete</string>
     <string name="profile_delete_user_cancel">Cancel</string>
     <string name="profile_edit_title">Personal information</string>
+    <string name="profile_edit_section_avatar">Avatar</string>
+    <string name="profile_edit_avatar_hint">JPG or PNG; cropped to a square automatically</string>
+    <string name="profile_edit_section_basic">Basic information</string>
+    <string name="profile_edit_section_body">Body data</string>
+    <string name="profile_edit_body_hint">Open an item to see its trend and edit its history</string>
     <string name="profile_edit_avatar_change">Tap to change avatar</string>
     <string name="profile_edit_name">Name</string>
     <string name="profile_edit_name_required">Please enter name</string>
@@ -1256,6 +1314,15 @@
     <string name="bmi_overweight">Overweight</string>
     <string name="bmi_obese">Obese</string>
     <string name="bmi_unknown">Unknown</string>
+    <string name="bmi_latest_section">Latest BMI</string>
+    <string name="bmi_latest_source">Height %1$s · weight %2$s</string>
+    <string name="bmi_latest_change">%1$s since last</string>
+    <string name="bmi_chart_section">BMI trend</string>
+    <string name="bmi_records_section">Records</string>
+    <string name="bmi_reference_section">BMI categories</string>
+    <string name="bmi_reference_note">Based on the Chinese adult BMI standard (WS/T 428-2013). BMI is a screening tool, not a diagnosis.</string>
+    <string name="bmi_empty_hint">Record height and weight in Profile; each new record adds a point here.</string>
+    <string name="bmi_calculator_hint">Enter height and weight to see the result</string>
     <string name="bmi_calculator_title">BMI calculator</string>
     <string name="bmi_calculator_help">BMI is calculated as weight in kilograms divided by height in metres squared. It is a screening reference, not a diagnosis.</string>
     <string name="bmi_height_label">Height (cm)</string>
@@ -1656,4 +1723,121 @@
     <string name="diet_event_analysis_post_meal_peak">Post-meal peak glucose</string>
     <string name="diet_event_analysis_time_to_peak">Time to post-meal peak</string>
     <string name="diet_event_analysis_time_to_recovery">Time to pre-meal glucose recovery</string>
+    <string name="design_preview_section_title">Design tokens</string>
+    <string name="design_preview_section_hint">Checks the project token values against the generic UI spec. Contrast ratios are computed from the token colors.</string>
+    <string name="design_preview_theme_dark">Dark</string>
+    <string name="design_preview_theme_light">Light</string>
+    <string name="design_preview_colors_title">Color tokens</string>
+    <string name="design_preview_food_kind_title">Food kind colors</string>
+    <string name="design_preview_food_kind_current">Current (white text)</string>
+    <string name="design_preview_food_kind_suggested">Suggested (white text)</string>
+    <string name="design_preview_spacing_title">Spacing tokens</string>
+    <string name="design_preview_type_title">Type scale</string>
+    <string name="design_preview_type_sample">Glucose 6.4 mmol/L</string>
+    <string name="design_preview_surfaces_title">Surfaces</string>
+    <string name="design_preview_surface_panel">panel</string>
+    <string name="design_preview_surface_raised">panelRaised</string>
+    <string name="design_preview_motion_title">Motion tokens</string>
+    <string name="design_preview_buttons_title">Button states</string>
+    <string name="design_preview_variant_primary">Primary</string>
+    <string name="design_preview_variant_secondary">Secondary</string>
+    <string name="design_preview_variant_ghost">Ghost</string>
+    <string name="design_preview_variant_danger">Danger</string>
+    <string name="design_preview_state_default">Default</string>
+    <string name="design_preview_state_pressed">Pressed</string>
+    <string name="design_preview_state_selected">Selected</string>
+    <string name="design_preview_state_disabled">Disabled</string>
+    <string name="design_preview_state_loading">Loading</string>
+    <string name="design_preview_need_ratio">needs ≥ %1$.1f:1</string>
+    <!-- Price log -->
+    <string name="record_action_price">Prices</string>
+    <string name="price_title">Price log</string>
+    <string name="price_add">Add a price record</string>
+    <string name="price_edit">Edit price</string>
+    <string name="price_save">Save</string>
+    <string name="price_search_hint">Search item name</string>
+    <string name="price_empty">No price records yet</string>
+    <string name="price_filter_empty">No records match the filters</string>
+    <string name="price_filter_region_all">All regions</string>
+    <string name="price_delete_confirm_title">Delete this price record?</string>
+    <string name="price_delete_confirm_message">%1$s (%2$s) cannot be recovered after deletion.</string>
+    <string name="price_section_item">Item</string>
+    <string name="price_section_price">Price</string>
+    <string name="price_section_place_time">Region and date</string>
+    <string name="price_section_note">Note</string>
+    <string name="price_item">Item</string>
+    <string name="price_item_hint">Pick a food, or type a name</string>
+    <string name="price_item_pick_title">Pick an item</string>
+    <string name="price_item_search_hint">Search foods and dishes, or type a custom name</string>
+    <string name="price_item_use_custom">Use the name “%1$s”</string>
+    <string name="price_item_no_match">No matching item</string>
+    <string name="price_item_kind_ingredient">Ingredient</string>
+    <string name="price_item_kind_food">Food</string>
+    <string name="price_item_kind_dish">Dish</string>
+    <string name="price_item_kind_custom">Custom</string>
+    <string name="price_unit">Currency</string>
+    <string name="price_sell_unit">Selling unit</string>
+    <string name="price_region">Region</string>
+    <string name="price_region_unset">No region set</string>
+    <string name="price_date">Date</string>
+    <string name="price_date_today">Today</string>
+    <string name="price_note">Note</string>
+    <string name="price_region_pick_title">Choose a region</string>
+    <string name="price_region_step_province">Choose a province</string>
+    <string name="price_region_use_location">Use current location</string>
+    <string name="price_region_locating">Locating…</string>
+    <string name="price_region_only_province">Record province only</string>
+    <string name="price_region_only_city">Record city only</string>
+    <string name="price_region_location_failed">Location failed, pick a region manually</string>
+    <string name="price_region_location_failed_unknown">Could not resolve the region, pick one manually</string>
+    <string name="price_region_permission_denied">Location permission denied, pick a region manually</string>
+    <string name="record_search_alias_price">price cost unit price market price</string>
+    <string name="price_recent_same_item">Recent prices for this item</string>
+    <string name="price_filter_section">Search and filters</string>
+    <string name="price_section_records">Price records</string>
+    <string name="price_count">%1$d records</string>
+    <string name="price_empty_hint">Log what an item costs in one place on one day, then compare regions and dates for the same item.</string>
+    <string name="price_filter_empty_hint">Try another keyword, or clear the region filter.</string>
+    <string name="price_filter_clear">Clear filters</string>
+    <string name="price_item_free_hint">Pick a food, or type a name</string>
+
+    <string name="price_value_min">Lowest price</string>
+    <string name="price_value_max">Highest price</string>
+    <string name="price_value_invalid">Enter a number</string>
+    <string name="price_value_range_invalid">Highest price can\'t be lower than the lowest</string>
+    <string name="price_price_hint">Fill at least one box: one number for a single value, or both for the range you saw that day. Entries with the same place, date, item and unit merge into one range.</string>
+    <string name="price_merge_preview">%1$d entries already exist for this condition; they will merge into %2$s.</string>
+    <string name="price_group_count">%1$d merged</string>
+    <string name="price_delete_group_message">%1$s (%2$s) merges %3$d entries. Deleting removes all of them permanently.</string>
+    <string name="price_region_use_profile">Use profile region</string>
+    <string name="price_region_source_hint">Uses the region from your profile by default; pick current location in the selector when you are away.</string>
+
+    <string name="price_tab_statistics">Statistics</string>
+    <string name="price_tab_records">Records</string>
+    <string name="price_stats_section">Item prices</string>
+    <string name="price_stats_count">%1$d items</string>
+    <string name="price_stats_regions">%1$d regions</string>
+    <string name="price_stats_records">%1$d entries</string>
+    <string name="price_stats_more_units">%1$d more units</string>
+    <string name="price_stats_empty">Nothing to summarize yet</string>
+    <string name="price_stats_empty_hint">Add a few entries under Records first; this tab merges the same item across places and dates into ranges.</string>
+    <string name="price_stats_filtered_by">Filtered by: %1$s</string>
+    <string name="price_stats_hint">Statistics groups by item only. Prices in different selling units aren\'t comparable, so they are listed on separate lines without conversion.</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_tooltip_long_press">Show explanation</string>
+    <string name="search_activity_clear">Clear</string>
+    <string name="search_activity_clear_title">Clear %1$s?</string>
+    <string name="search_activity_clear_message">This cannot be undone.</string>
+    <string name="record_search_empty">No matching items</string>
+    <string name="record_search_empty_hint">Nothing matches “%1$s”. Try a different keyword.</string>
+    <string name="record_search_clear">Clear search</string>
+    <string name="nutrition_search_empty_title">No foods found</string>
+    <string name="nutrition_filter_empty_title">No foods match the filters</string>
+    <string name="nutrition_search_empty_hint">Try a different keyword, or clear the filters.</string>
+    <string name="search_activity_remove">Remove this entry</string>
+    <string name="search_activity_hint">Tap a tag to fill the search field</string>
+    <string name="user_settings_record_features">Record features</string>
+    <string name="user_settings_record_features_desc">Choose which features show up in Record Center</string>
+    <string name="record_features_hint">Turned-off features are hidden from Record Center. You can turn them back on at any time.</string>
+    <string name="search_activity_empty">No searches yet. Type a keyword to search.</string>
 </resources>

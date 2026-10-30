@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  扫帚（清理 / 清除缓存）：竖放。长柄 + 一道箍 + 扇形帚头，底部切三缕帚毛。
+  帚头顶宽取 6（此前 3.8，读成鸡尾酒杯/锤子），底宽 10，高 8——宽扁的梯形才是扫帚头。
+  与记录页「排便」用的 ic_broom 分开——那枚是拖把/刷子的形状，共用会让两处语义对不上。
+  画法同 §8.18：24 视口 / 实心 / 视觉粗细 2 / 外接 3–21。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 柄 -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M11.4,3H12.6V12.2H11.4V3Z" />
+    <!-- 箍：把柄和帚头连起来 -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M9.6,11.6H14.4V13.2H9.6V11.6Z" />
+    <!-- 帚头：宽扁梯形 + 三条竖缝（evenOdd 挖空，缝底伸出轮廓外，避免与外轮廓共边留毛刺） -->
+    <path
+        android:fillColor="@android:color/white"
+        android:fillType="evenOdd"
+        android:pathData="M9,13H15L17,21H7L9,13ZM9.4,17.4H10.5V21.4H9.4V17.4ZM11.45,17.4H12.55V21.4H11.45V17.4ZM13.5,17.4H14.6V21.4H13.5V17.4Z" />
+</vector>

@@ -3,7 +3,6 @@ package com.woshiwangnima.healthdietpro.common.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,12 +14,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -34,27 +30,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.focus.onFocusChanged
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSearchField
 
+/**
+ * 保留旧名以兼容既有调用点，实现已统一到 [AppSearchField]：
+ * 放大镜在前、清空在后、回车即搜索。旧版尾部同时挂「清空」与「搜索」两个图标按钮，
+ * 其中过半调用点传的是空 lambda，等于给了一个按了没反应的按钮。
+ */
 @Composable
-internal fun FoodSearchField(value: String, onValueChange: (String) -> Unit, placeholder: String, onSearch: (() -> Unit)? = null, onFocusChanged: ((Boolean) -> Unit)? = null) {
-    OutlinedTextField(
+internal fun FoodSearchField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    onSearch: (() -> Unit)? = null,
+    onFocusChanged: ((Boolean) -> Unit)? = null,
+) {
+    AppSearchField(
         value = value,
         onValueChange = onValueChange,
-        singleLine = true,
-        trailingIcon = {
-            Row {
-                value.takeIf { it.isNotBlank() }?.let { IconButton(onClick = { onValueChange("") }) { Icon(Icons.Filled.Close, contentDescription = null) } }
-                onSearch?.let { search -> IconButton(onClick = search) { Icon(Icons.Filled.Search, contentDescription = null) } }
-            }
-        },
-        placeholder = { Text(placeholder) },
-        textStyle = TextStyle.Default,
-        modifier = Modifier.fillMaxWidth().onFocusChanged { onFocusChanged?.invoke(it.isFocused) },
+        placeholder = placeholder,
+        onSearch = onSearch,
+        onFocusChanged = onFocusChanged,
     )
 }
 

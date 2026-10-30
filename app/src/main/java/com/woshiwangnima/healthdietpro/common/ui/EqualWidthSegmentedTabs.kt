@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.Icon
 import androidx.compose.ui.unit.dp
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSpacingDefault
 
 data class EqualWidthTab(
     @param:StringRes val titleRes: Int,
@@ -37,7 +38,7 @@ fun EqualWidthSegmentedTabs(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth().height(44.dp),
+        modifier = modifier.fillMaxWidth().height(AppSpacingDefault.hitMin),
         color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
         AnimatedNavigationRow(

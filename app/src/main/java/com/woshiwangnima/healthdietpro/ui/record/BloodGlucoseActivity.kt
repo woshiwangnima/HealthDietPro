@@ -1041,6 +1041,7 @@ private fun PredictionFormulaDialog(
                     ),
                     substitutedFormula = stringResource(
                         R.string.blood_glucose_prediction_formula_meal_substituted,
+                        number(formula.mealResponseScale),
                         number(formula.carbsCoefficientPerGram),
                         number(formula.mealPeakMinutes),
                     ),
@@ -1051,18 +1052,19 @@ private fun PredictionFormulaDialog(
                     algebraExplanation = listOf(
                         stringResource(R.string.blood_glucose_prediction_formula_drug_coefficient_algebra),
                         stringResource(R.string.blood_glucose_prediction_formula_drug_peak_algebra),
+                        stringResource(R.string.blood_glucose_prediction_formula_drug_duration_algebra),
                         stringResource(R.string.blood_glucose_prediction_formula_drug_window_algebra),
                     ),
-                    substitutedFormula = formula.drugFormulas.flatMap { drug ->
-                        drug.doseValues.map { dose ->
-                            stringResource(
-                                R.string.blood_glucose_prediction_formula_drug_substituted,
-                                drug.medicationName,
-                                number(drug.coefficientPerDose),
-                                number(dose),
-                                number(drug.peakMinutes),
-                            )
-                        }
+                    substitutedFormula = formula.drugFormulas.filter { it.enabled }.map { drug ->
+                        stringResource(
+                            R.string.blood_glucose_prediction_formula_drug_substituted,
+                            drug.medicationName,
+                            number(drug.responseScale),
+                            number(drug.coefficientPerDose),
+                            number(drug.peakMinutes),
+                            drug.doseValues.distinct().joinToString(", ", prefix = "{", postfix = "}", transform = number),
+                            number(drug.durationMinutes),
+                        )
                     }.joinToString("\n").ifBlank {
                         stringResource(R.string.blood_glucose_prediction_formula_drug_no_data)
                     },
@@ -1076,11 +1078,14 @@ private fun PredictionFormulaDialog(
                         stringResource(R.string.blood_glucose_prediction_formula_sleep_hours_algebra),
                         stringResource(R.string.blood_glucose_prediction_formula_sleep_decay_algebra),
                     ),
-                    substitutedFormula = stringResource(
+                    substitutedFormula = if (formula.sleepFormula.enabled) stringResource(
                         R.string.blood_glucose_prediction_formula_sleep_substituted,
                         number(formula.sleepFormula.slowMmolPerL),
                         number(formula.sleepFormula.stressCoefficientMmolPerL),
                         number(formula.sleepFormula.stressDecayPerHour),
+                    ) else stringResource(
+                        R.string.blood_glucose_prediction_formula_sleep_no_data,
+                        formula.sleepFormula.sampleCount,
                     ),
                 )
                 PredictionFormulaSection(

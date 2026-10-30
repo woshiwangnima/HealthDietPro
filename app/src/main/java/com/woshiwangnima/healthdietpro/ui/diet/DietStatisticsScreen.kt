@@ -41,6 +41,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
 import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.format.formatGroupedInteger
 import com.woshiwangnima.healthdietpro.common.time.recordDateStartMillis
 import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
@@ -710,7 +711,7 @@ private fun NutrientEnergyDonut(totals: DayNutrients) {
                 color = if (id == "OTHER") NutrientOtherColor else nutrientColor(id),
             )
         },
-        centerValue = stringResource(R.string.nutrition_energy_kcal_value, total),
+        centerValue = stringResource(R.string.nutrition_energy_kcal_value, formatGroupedInteger(total)),
         centerLabel = stringResource(R.string.nutrition_macronutrient_energy_center),
         modifier = Modifier.fillMaxWidth(),
         showLegend = false,

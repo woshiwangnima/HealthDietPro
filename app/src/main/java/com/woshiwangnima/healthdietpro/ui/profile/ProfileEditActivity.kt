@@ -9,12 +9,15 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,13 +31,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,28 +50,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.base.DirtyFormActivity
-import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
-import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
-import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
-import com.woshiwangnima.healthdietpro.common.ui.AppInputLabel
-import com.woshiwangnima.healthdietpro.common.ui.AppInputTextFieldColors
-import com.woshiwangnima.healthdietpro.common.ui.RecordTimePickerField
-import com.woshiwangnima.healthdietpro.common.time.RecordTimePrecision
+import com.woshiwangnima.healthdietpro.common.ui.EditorTextField
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
-import com.woshiwangnima.healthdietpro.common.ui.HealthDietProTheme
-import com.woshiwangnima.healthdietpro.common.ui.SettingRow
 import com.woshiwangnima.healthdietpro.common.ui.AppTextIconButton
 import com.woshiwangnima.healthdietpro.common.ui.FormSaveBar
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppTheme
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.rememberAppDarkTheme
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.archive.resolveAvatarFile
 import com.woshiwangnima.healthdietpro.model.archive.userArchiveDirectory
@@ -166,7 +161,9 @@ class ProfileEditActivity : DirtyFormActivity() {
         locationProvider = CurrentLocationProvider(this)
         loadProfile()
         setContent {
-            HealthDietProTheme {
+            // 与详情页一致：局部套 AppTheme，让 MaterialTheme 与设计令牌同源，
+            // 顶栏 / 弹窗 / 输入框都拿到同一套配色，不再出现「页面深色、控件浅色」的混搭。
+            AppTheme(darkTheme = rememberAppDarkTheme()) {
                 ProfileEditScreen(
                     state = uiState,
                     dialogState = dialogState,
@@ -236,12 +233,31 @@ class ProfileEditActivity : DirtyFormActivity() {
             regionText = selectedRegion.takeIf { !it.isEmpty() }?.display() ?: getString(R.string.profile_edit_choose),
             heightText = latestHeight?.let { "%.1f cm".format(it.value) } ?: getString(R.string.profile_edit_no_record),
             weightText = latestWeight?.let { "%.2f kg".format(it.value) } ?: getString(R.string.profile_edit_no_record),
-            bmiText = if (bmi > 0f) "%.1f %s".format(bmi, BmiUtil.getBmiLabel(bmi)) else getString(R.string.profile_edit_no_record),
-            bmiColor = if (bmi > 0f) androidx.compose.ui.graphics.Color(BmiUtil.getBmiColor(bmi)).copy(alpha = 1f) else null,
+            bmiText = if (bmi > 0f) {
+                // 不用 BmiUtil.getBmiLabel：它返回资产里写死的中文标签，英文环境会中英混排。
+                "%.1f %s".format(bmi, bmiCategoryLabel(bmi))
+            } else {
+                getString(R.string.profile_edit_no_record)
+            },
             avatarFilePath = avatarFilePath(),
             avatarInitial = profileName.firstOrNull()?.toString() ?: "?",
             saveEnabled = hasChanges(),
         )
+    }
+
+    /** BMI 分级标签取自字符串资源，随语言切换（资产里的 label 是写死的中文）。 */
+    private fun bmiCategoryLabel(bmi: Float): String {
+        val bands = BmiUtil.loadBmiBands()
+        val index = bands.indexOfFirst { band ->
+            (band.min < 0f || bmi >= band.min) && (band.max == Float.MAX_VALUE || bmi < band.max)
+        }
+        return when (index) {
+            0 -> getString(R.string.bmi_underweight)
+            1 -> getString(R.string.bmi_normal)
+            2 -> getString(R.string.bmi_overweight)
+            3 -> getString(R.string.bmi_obese)
+            else -> getString(R.string.bmi_unknown)
+        }
     }
 
     private fun avatarFilePath(): String? =
@@ -523,7 +539,6 @@ private data class ProfileEditUiState(
     val heightText: String = "",
     val weightText: String = "",
     val bmiText: String = "",
-    val bmiColor: Color? = null,
     val avatarFilePath: String? = null,
     val avatarInitial: String = "?",
     val saveEnabled: Boolean = false,
@@ -583,6 +598,8 @@ private fun ProfileEditScreen(
     onSave: () -> Unit,
     onDismissDialog: () -> Unit,
 ) {
+    val tokens = LocalAppTokens.current
+    val spacing = tokens.spacing
     BaseScreen(
         title = stringResource(R.string.profile_edit_title),
         onBack = onBack,
@@ -590,84 +607,38 @@ private fun ProfileEditScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(tokens.colors.bg)
                 .padding(padding),
         ) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                contentPadding = PaddingValues(
+                    start = spacing.page,
+                    end = spacing.page,
+                    top = spacing.s3,
+                    bottom = spacing.s4,
+                ),
+                verticalArrangement = Arrangement.spacedBy(spacing.s4),
             ) {
+                item { ProfileAvatarCard(state = state, onAvatarClick = onAvatarClick) }
                 item {
-                    ProfileAvatarEditor(
+                    ProfileBasicInfoCard(
                         state = state,
-                        onAvatarClick = onAvatarClick,
+                        onNameChange = onNameChange,
+                        onGenderSelect = onGenderSelect,
+                        onBirthdayClick = onBirthdayClick,
+                        onRegionClick = onRegionClick,
                     )
                 }
                 item {
-                    OutlinedTextField(
-                        value = state.name,
-                        onValueChange = onNameChange,
-                        label = { AppInputLabel(stringResource(R.string.profile_edit_name)) },
-                        colors = AppInputTextFieldColors(),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
+                    ProfileBodyDataCard(
+                        state = state,
+                        onHeightClick = onHeightClick,
+                        onWeightClick = onWeightClick,
+                        onBmiClick = onBmiClick,
                     )
-                }
-                item {
-                    AppDropdownField(
-                        label = stringResource(R.string.profile_edit_gender_select),
-                        value = state.selectedGender.displayText(),
-                        options = listOf(
-                            AppDropdownOption(Gender.MALE.name, stringResource(R.string.profile_gender_male)),
-                            AppDropdownOption(Gender.FEMALE.name, stringResource(R.string.profile_gender_female)),
-                        ),
-                        onSelect = { option -> onGenderSelect(Gender.valueOf(option.id)) },
-                    )
-                }
-                item {
-                    RecordTimePickerField(
-                        title = stringResource(R.string.profile_edit_birthday),
-                        valueMillis = state.birthdayMillis,
-                        precision = RecordTimePrecision.DATE,
-                        emptyText = state.birthdayText,
-                        onClick = onBirthdayClick,
-                    )
-                }
-                item { ProfileClickableField(stringResource(R.string.profile_edit_region), state.regionText, onRegionClick) }
-                item {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surface,
-                        tonalElevation = 1.dp,
-                    ) {
-                        Column {
-                            SettingRow(
-                                title = stringResource(R.string.profile_edit_latest_height),
-                                subtitle = "",
-                                leadingIconRes = R.drawable.ic_height,
-                                trailingValue = state.heightText,
-                                onClick = onHeightClick,
-                            )
-                            SettingRow(
-                                title = stringResource(R.string.profile_edit_latest_weight),
-                                subtitle = "",
-                                leadingIconRes = R.drawable.ic_weight,
-                                trailingValue = state.weightText,
-                                onClick = onWeightClick,
-                            )
-                            SettingRow(
-                                title = stringResource(R.string.profile_edit_latest_bmi),
-                                subtitle = "",
-                                leadingIconRes = R.drawable.ic_chart,
-                                trailingValue = state.bmiText,
-                                trailingValueColor = state.bmiColor ?: MaterialTheme.colorScheme.onSurfaceVariant,
-                                onClick = onBmiClick,
-                            )
-                        }
-                    }
                 }
             }
             FormSaveBar(stringResource(R.string.profile_edit_save), state.saveEnabled, onSave)
@@ -714,22 +685,26 @@ private fun RegionChoiceDialog(
     state: ProfileEditDialogState.RegionChoice,
     onDismiss: () -> Unit,
 ) {
+    val tokens = LocalAppTokens.current
+    val spacing = tokens.spacing
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.profile_edit_select_region)) },
+        title = { Text(stringResource(R.string.profile_edit_select_region), style = tokens.type.titleS) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                AppIconTextButton(
-                    text = stringResource(R.string.profile_edit_use_current_location),
+            Column(Modifier.fillMaxWidth()) {
+                ProfileDialogOption(
                     iconRes = R.drawable.ic_placeholder,
+                    label = stringResource(R.string.profile_edit_use_current_location),
                     onClick = state.onUseLocation,
-                    modifier = Modifier.fillMaxWidth(),
                 )
-                AppIconTextButton(
-                    text = stringResource(R.string.profile_edit_select_region_manual),
+                HorizontalDivider(
+                    thickness = tokens.radii.highlight,
+                    color = tokens.colors.border,
+                )
+                ProfileDialogOption(
                     iconRes = R.drawable.ic_list,
+                    label = stringResource(R.string.profile_edit_select_region_manual),
                     onClick = state.onManual,
-                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         },
@@ -744,14 +719,55 @@ private fun RegionChoiceDialog(
     )
 }
 
+/** 弹层里的可选行：图标 + 文案 + 箭头，56 dp 高（§4.6-3）。 */
+@Composable
+private fun ProfileDialogOption(
+    @DrawableRes iconRes: Int,
+    label: String,
+    onClick: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val spacing = tokens.spacing
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .heightIn(min = spacing.rowMinHeight)
+            .padding(horizontal = spacing.s1, vertical = spacing.s1),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(spacing.s5),
+            tint = tokens.colors.primary,
+        )
+        Spacer(Modifier.width(spacing.s2))
+        Text(
+            text = label,
+            style = tokens.type.body,
+            color = tokens.colors.text,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_right),
+            contentDescription = null,
+            modifier = Modifier.size(spacing.s5),
+            tint = tokens.colors.textMuted,
+        )
+    }
+}
+
 @Composable
 private fun SelectionDialog(
     state: ProfileEditDialogState.Selection,
     onDismiss: () -> Unit,
 ) {
+    val tokens = LocalAppTokens.current
+    val spacing = tokens.spacing
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(state.title) },
+        title = { Text(state.title, style = tokens.type.titleS) },
         text = {
             LazyColumn(
                 modifier = Modifier
@@ -761,12 +777,19 @@ private fun SelectionDialog(
                 items(state.items) { item ->
                     Text(
                         text = item.label,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        style = tokens.type.body,
+                        color = tokens.colors.text,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(onClick = item.onClick)
-                            .padding(vertical = 14.dp),
+                            .heightIn(min = spacing.rowMinHeight)
+                            .padding(vertical = spacing.s2),
+                    )
+                    HorizontalDivider(
+                        thickness = tokens.radii.highlight,
+                        color = tokens.colors.border,
                     )
                 }
             }
@@ -790,9 +813,11 @@ private fun DiseasePickerDialog(
     var checkedIds by remember(state.items) {
         mutableStateOf(state.items.filter { it.checked }.map { it.id }.toSet())
     }
+    val tokens = LocalAppTokens.current
+    val spacing = tokens.spacing
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.profile_edit_select_disease)) },
+        title = { Text(stringResource(R.string.profile_edit_select_disease), style = tokens.type.titleS) },
         text = {
             LazyColumn(
                 modifier = Modifier
@@ -810,7 +835,8 @@ private fun DiseasePickerDialog(
                                     checkedIds + item.id
                                 }
                             }
-                            .padding(vertical = 8.dp),
+                            .heightIn(min = spacing.rowMinHeight)
+                            .padding(vertical = spacing.s1),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Checkbox(
@@ -820,15 +846,11 @@ private fun DiseasePickerDialog(
                                 checkedIds = if (checked) checkedIds + item.id else checkedIds - item.id
                             },
                         )
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(spacing.s2))
                         Text(
                             text = item.label,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = if (item.enabled) {
-                                MaterialTheme.colorScheme.onSurface
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f)
-                            },
+                            style = tokens.type.body,
+                            color = if (item.enabled) tokens.colors.text else tokens.colors.disabled,
                             textDecoration = if (item.enabled) null else TextDecoration.LineThrough,
                         )
                     }
@@ -856,10 +878,26 @@ private fun DiseasePickerDialog(
 private fun LocationProgressDialog(
     state: ProfileEditDialogState.LocationProgress,
 ) {
+    val tokens = LocalAppTokens.current
+    val spacing = tokens.spacing
     AlertDialog(
         onDismissRequest = state.onCancel,
-        title = { Text(stringResource(R.string.profile_edit_locating_title)) },
-        text = { Text(stringResource(R.string.profile_edit_locating_message)) },
+        title = { Text(stringResource(R.string.profile_edit_locating_title), style = tokens.type.titleS) },
+        text = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(spacing.s5),
+                    strokeWidth = 2.dp,
+                    color = tokens.colors.primary,
+                )
+                Spacer(Modifier.width(spacing.s3))
+                Text(
+                    text = stringResource(R.string.profile_edit_locating_message),
+                    style = tokens.type.bodyS,
+                    color = tokens.colors.text,
+                )
+            }
+        },
         confirmButton = {},
         dismissButton = {
             AppTextIconButton(
@@ -871,89 +909,297 @@ private fun LocationProgressDialog(
     )
 }
 
+/** 头像卡：整行可点即换图，右侧箭头与左下提示指向同一个动作。 */
 @Composable
-private fun ProfileAvatarEditor(
+private fun ProfileAvatarCard(
     state: ProfileEditUiState,
     onAvatarClick: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val bitmap = androidx.compose.runtime.remember(state.avatarFilePath) {
+    val tokens = LocalAppTokens.current
+    val colors = tokens.colors
+    val spacing = tokens.spacing
+    val bitmap = remember(state.avatarFilePath) {
         state.avatarFilePath?.let { BitmapFactory.decodeFile(it) }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onAvatarClick),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+
+    AppSectionCard(
+        iconRes = R.drawable.ic_photo,
+        title = stringResource(R.string.profile_edit_section_avatar),
+        contentPadding = PaddingValues(0.dp),
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .size(72.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center,
+                .fillMaxWidth()
+                .clickable(onClick = onAvatarClick)
+                .heightIn(min = spacing.rowMinHeight)
+                .padding(horizontal = spacing.s3, vertical = spacing.s2),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (bitmap != null) {
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                )
-            } else {
+            Box(
+                modifier = Modifier
+                    .size(spacing.s8)
+                    .clip(CircleShape)
+                    .background(colors.primary),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (bitmap != null) {
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(spacing.s8)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
+                    )
+                } else {
+                    // 首字母用 onPrimary 而不是白色：深色主题主色是浅蓝，白字只有 2.4:1。
+                    Text(
+                        text = state.avatarInitial,
+                        style = tokens.type.titleS,
+                        color = colors.onPrimary,
+                    )
+                }
+            }
+            Spacer(Modifier.width(spacing.s3))
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(spacing.s1),
+            ) {
                 Text(
-                    text = state.avatarInitial,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    text = stringResource(R.string.profile_edit_avatar_change),
+                    style = tokens.type.body,
+                    color = colors.primary,
+                )
+                Text(
+                    text = stringResource(R.string.profile_edit_avatar_hint),
+                    style = tokens.type.caption,
+                    color = colors.textMuted,
                 )
             }
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_right),
+                contentDescription = null,
+                modifier = Modifier.size(spacing.s5),
+                tint = colors.textMuted,
+            )
         }
+    }
+}
+
+/** 基本信息卡：姓名是唯一的输入控件（带描边），性别用片选，生日与地区走行内导航。 */
+@Composable
+private fun ProfileBasicInfoCard(
+    state: ProfileEditUiState,
+    onNameChange: (String) -> Unit,
+    onGenderSelect: (Gender) -> Unit,
+    onBirthdayClick: () -> Unit,
+    onRegionClick: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val colors = tokens.colors
+    val spacing = tokens.spacing
+
+    AppSectionCard(
+        iconRes = R.drawable.ic_nav_profile,
+        title = stringResource(R.string.profile_edit_section_basic),
+        contentPadding = PaddingValues(bottom = spacing.s2),
+    ) {
+        EditorTextField(
+            label = stringResource(R.string.profile_edit_name),
+            value = state.name,
+            onValueChange = onNameChange,
+            required = true,
+            modifier = Modifier.padding(horizontal = spacing.s3),
+        )
+        Spacer(Modifier.height(spacing.s3))
         Text(
-            text = stringResource(R.string.profile_edit_avatar_change),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.primary,
+            text = stringResource(R.string.profile_edit_gender),
+            style = tokens.type.caption,
+            color = colors.textMuted,
+            modifier = Modifier.padding(horizontal = spacing.s3),
+        )
+        Spacer(Modifier.height(spacing.s1))
+        Row(
+            modifier = Modifier.padding(horizontal = spacing.s3),
+            horizontalArrangement = Arrangement.spacedBy(spacing.s2),
+        ) {
+            ProfileGenderChip(
+                label = stringResource(R.string.profile_gender_male),
+                selected = state.selectedGender == Gender.MALE,
+                onClick = { onGenderSelect(Gender.MALE) },
+            )
+            ProfileGenderChip(
+                label = stringResource(R.string.profile_gender_female),
+                selected = state.selectedGender == Gender.FEMALE,
+                onClick = { onGenderSelect(Gender.FEMALE) },
+            )
+        }
+        Spacer(Modifier.height(spacing.s2))
+        ProfileDivider()
+        // 未填写时值显示为次要色：「点击选择」是提示，不是内容。
+        val chooseText = stringResource(R.string.profile_edit_choose)
+        ProfileNavRow(
+            label = stringResource(R.string.profile_edit_birthday),
+            value = state.birthdayText,
+            valueColor = if (state.birthdayText == chooseText) colors.textMuted else null,
+            onClick = onBirthdayClick,
+        )
+        ProfileDivider()
+        ProfileNavRow(
+            label = stringResource(R.string.profile_edit_region),
+            value = state.regionText,
+            valueColor = if (state.regionText == chooseText) colors.textMuted else null,
+            onClick = onRegionClick,
+        )
+    }
+}
+
+/** 身体数据卡：三项都是「点进去看历史」，所以统一成行内导航，不再套一层灰底输入框。 */
+@Composable
+private fun ProfileBodyDataCard(
+    state: ProfileEditUiState,
+    onHeightClick: () -> Unit,
+    onWeightClick: () -> Unit,
+    onBmiClick: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val spacing = tokens.spacing
+
+    AppSectionCard(
+        iconRes = R.drawable.ic_health_metrics,
+        title = stringResource(R.string.profile_edit_section_body),
+        contentPadding = PaddingValues(bottom = spacing.s2),
+    ) {
+        ProfileNavRow(
+            label = stringResource(R.string.profile_edit_latest_height),
+            value = state.heightText,
+            iconRes = R.drawable.ic_height,
+            onClick = onHeightClick,
+        )
+        ProfileDivider()
+        ProfileNavRow(
+            label = stringResource(R.string.profile_edit_latest_weight),
+            value = state.weightText,
+            iconRes = R.drawable.ic_weight,
+            onClick = onWeightClick,
+        )
+        ProfileDivider()
+        ProfileNavRow(
+            label = stringResource(R.string.profile_edit_latest_bmi),
+            value = state.bmiText,
+            iconRes = R.drawable.ic_chart,
+            onClick = onBmiClick,
+        )
+        Text(
+            text = stringResource(R.string.profile_edit_body_hint),
+            style = tokens.type.caption,
+            color = tokens.colors.textMuted,
+            modifier = Modifier.padding(horizontal = spacing.s3, vertical = spacing.s2),
         )
     }
 }
 
 @Composable
-private fun ProfileClickableField(
-    title: String,
+private fun ProfileDivider() {
+    val tokens = LocalAppTokens.current
+    HorizontalDivider(
+        modifier = Modifier.padding(horizontal = tokens.spacing.s3),
+        thickness = tokens.radii.highlight,
+        color = tokens.colors.border,
+    )
+}
+
+/**
+ * 卡内可点行：标签 + 当前值 + 右箭头，最小 56 dp（§4.6-3 触屏行高）。
+ * 卡底已经是 `panelRaised`，行里不再铺灰底，避免出现第二层浮起（§2.7）。
+ */
+@Composable
+private fun ProfileNavRow(
+    label: String,
     value: String,
     onClick: () -> Unit,
+    @DrawableRes iconRes: Int? = null,
+    valueColor: Color? = null,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f))
-                .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
+    val tokens = LocalAppTokens.current
+    val colors = tokens.colors
+    val spacing = tokens.spacing
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .heightIn(min = spacing.rowMinHeight)
+            .padding(horizontal = spacing.s3, vertical = spacing.s2),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (iconRes != null) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                modifier = Modifier.size(spacing.s5),
+                tint = colors.textMuted,
+            )
+            Spacer(Modifier.width(spacing.s2))
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(spacing.s1),
         ) {
             Text(
+                text = label,
+                style = tokens.type.caption,
+                color = colors.textMuted,
+            )
+            Text(
                 text = value,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = tokens.type.body,
+                color = valueColor ?: colors.text,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
             )
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        }
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_right),
+            contentDescription = null,
+            modifier = Modifier.size(spacing.s5),
+            tint = colors.textMuted,
+        )
+    }
+}
+
+/** 性别片选：视觉高度 30 dp 左右，外层补到 48 dp 热区。 */
+@Composable
+private fun ProfileGenderChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val colors = tokens.colors
+    val spacing = tokens.spacing
+
+    Box(
+        modifier = Modifier
+            .heightIn(min = spacing.hitMin)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Surface(
+            shape = RoundedCornerShape(tokens.radii.label),
+            color = if (selected) colors.primaryContainer else Color.Transparent,
+            border = BorderStroke(
+                width = if (selected) tokens.radii.stroke else tokens.radii.highlight,
+                color = if (selected) colors.primary else colors.border,
+            ),
+        ) {
+            Text(
+                text = label,
+                style = tokens.type.bodyS,
+                color = if (selected) colors.onPrimaryContainer else colors.textMuted,
+                maxLines = 1,
+                // 片选宽度不跟着字数走：两三个字太窄时点按会发抖，统一留出 24 dp 横向内边距。
+                modifier = Modifier.padding(horizontal = spacing.s5, vertical = spacing.s1),
             )
         }
     }

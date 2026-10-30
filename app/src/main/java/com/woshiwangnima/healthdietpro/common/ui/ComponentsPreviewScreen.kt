@@ -48,10 +48,12 @@ import com.woshiwangnima.healthdietpro.common.ui.chart.ChartDataPoint
 import com.woshiwangnima.healthdietpro.common.ui.chart.ChartDataSeries
 import com.woshiwangnima.healthdietpro.common.ui.chart.ChartValueExpression
 import com.woshiwangnima.healthdietpro.common.ui.chart.deriveChartDataSeries
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.DesignSystemPreviewSection
 
 @Composable
 fun ComponentsPreviewScreen(
     onBack: () -> Unit,
+    includeStatusBarPadding: Boolean = true,
 ) {
     LaunchedEffect(Unit) {
         Log.d(TAG, "ComponentsPreviewScreen composed")
@@ -77,6 +79,7 @@ fun ComponentsPreviewScreen(
     BaseScreen(
         title = stringResource(R.string.compose_components_preview_title),
         onBack = onBack,
+        includeStatusBarPadding = includeStatusBarPadding,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -86,6 +89,10 @@ fun ComponentsPreviewScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            DesignSystemPreviewSection()
+
+            HorizontalDivider()
+
             Text(
                 text = stringResource(R.string.compose_font_scale_section),
                 style = MaterialTheme.typography.titleLarge,

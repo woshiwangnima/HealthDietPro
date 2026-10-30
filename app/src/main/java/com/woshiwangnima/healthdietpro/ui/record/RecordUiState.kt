@@ -6,8 +6,8 @@ import com.woshiwangnima.healthdietpro.R
 
 data class RecordUiState(
     val sections: List<RecordSectionUiState> = emptyList(),
+    /** 输入框里的原文，列表实时按它过滤——不再另有「已提交」的一份拷贝。 */
     val query: String = "",
-    val submittedQuery: String = "",
     val searchHistory: List<String> = emptyList(),
     val recentActionIds: List<RecordActionId> = emptyList(),
 )
@@ -46,6 +46,7 @@ enum class RecordActionId {
     Habit,
     Feeling,
     Container,
+    Price,
     BloodType,
     Allergy,
     BodyFat,
@@ -56,10 +57,23 @@ enum class RecordActionId {
     Temperature,
 }
 
+/**
+ * 用户在「用户设置 - 记录设置 - 功能启用」里关掉的功能，整条从记录中心移除。
+ *
+ * 关掉是为了精简界面，不是留一个灰块，所以不做「禁用但可见」；分节被清空后由记录页跳过渲染。
+ */
+internal fun List<RecordSectionUiState>.withoutDisabledActions(
+    disabled: Set<RecordActionId>,
+): List<RecordSectionUiState> = if (disabled.isEmpty()) {
+    this
+} else {
+    map { section -> section.copy(items = section.items.filter { it.id !in disabled }) }
+}
+
 internal fun defaultRecordSections(): List<RecordSectionUiState> = listOf(
     RecordSectionUiState(
         titleRes = R.string.record_section_basic_profile,
-        titleIconRes = R.drawable.ic_pk,
+        titleIconRes = R.drawable.ic_basic_profile,
         items = listOf(
             RecordActionItemUiState(RecordActionId.BloodType, R.string.record_action_blood_type, R.drawable.ic_blood_type, false),
             RecordActionItemUiState(RecordActionId.Disease, R.string.record_action_disease, R.drawable.ic_medical_history, true),
@@ -92,7 +106,7 @@ internal fun defaultRecordSections(): List<RecordSectionUiState> = listOf(
     ),
     RecordSectionUiState(
         titleRes = R.string.record_section_daily,
-        titleIconRes = R.drawable.ic_list,
+        titleIconRes = R.drawable.ic_daily_record,
         items = listOf(
             RecordActionItemUiState(RecordActionId.Diet, R.string.record_action_diet, R.drawable.ic_diet, true),
             RecordActionItemUiState(RecordActionId.Water, R.string.record_action_water, R.drawable.ic_volume, true),
@@ -107,6 +121,14 @@ internal fun defaultRecordSections(): List<RecordSectionUiState> = listOf(
         titleIconRes = R.drawable.ic_bell,
         items = listOf(
             RecordActionItemUiState(RecordActionId.Container, R.string.record_action_container, R.drawable.ic_container, true, listOf(R.string.record_search_alias_container), showSummary = false),
+            // 物价属于「顺带记一笔」的杂项，不进日常三段；放在杂项首位，避免被两个禁用项挤到末尾。
+            RecordActionItemUiState(
+                RecordActionId.Price,
+                R.string.record_action_price,
+                R.drawable.ic_price,
+                true,
+                listOf(R.string.record_search_alias_price),
+            ),
             RecordActionItemUiState(RecordActionId.Habit, R.string.record_action_habit, R.drawable.ic_time, false),
             RecordActionItemUiState(RecordActionId.Feeling, R.string.record_action_feeling, R.drawable.ic_placeholder, false),
         ),

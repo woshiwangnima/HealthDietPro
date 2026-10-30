@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.R
-import com.woshiwangnima.healthdietpro.model.disease.DiseaseStatus
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseSubjectType
 import com.woshiwangnima.healthdietpro.model.disease.DiseaseRepository
 import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseRecordRepository
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.util.Locale
 import kotlin.math.abs
 
@@ -68,16 +66,14 @@ internal class ProfileUserInfoViewModel(
     private fun buildState(profile: UserProfile): ProfileUserInfoUiState {
         val app = getApplication<Application>()
         val displayName = profile.name.ifEmpty { app.getString(R.string.profile_name_unknown) }
-        val infoLine = formatProfileInfoLine(
+        val infoLine = formatProfileHeadline(
             gender = profile.gender.toDisplay(),
             age = profile.age,
-            birthday = profile.birthday?.date,
             labels = ProfileUserInfoLabels(
                 male = app.getString(R.string.profile_gender_male),
                 female = app.getString(R.string.profile_gender_female),
                 genderUnknown = app.getString(R.string.profile_gender_unknown),
                 ageUnknown = app.getString(R.string.profile_age_unknown),
-                birthdayUnknown = app.getString(R.string.profile_birthday_unknown),
                 separator = app.getString(R.string.profile_separator),
                 formatAge = { age -> app.getString(R.string.profile_age_years, age) },
             ),
@@ -128,30 +124,23 @@ internal class ProfileUserInfoViewModel(
         return regionDisplay
     }
 
-    private fun resolveDiseaseText(profile: UserProfile): String {
-        val repository = UserDiseaseRecordRepository.fromContext(getApplication())
-        val records = repository.load().filter {
-            it.subjectType == DiseaseSubjectType.SELF && it.status in setOf(DiseaseStatus.ACTIVE, DiseaseStatus.ONGOING_RISK)
-        }
-        if (records.isEmpty()) return ""
-        val diseaseRepository = DiseaseRepository.fromContext(getApplication())
-        val customDiseases = repository.loadCustomDiseases().associateBy { it.id }
-        val locale = Locale.getDefault()
-        return records.mapNotNull { record ->
-            record.disease.curatedId()?.let { diseaseRepository.findByReferenceId(it)?.displayName(locale) }
-                ?: record.disease.customId()?.let { customDiseases[it]?.name }
-        }.joinToString("、")
-    }
-
+    /**
+     * 卡片上的疾病标签。同一个病可能被录成多条（改过状态、重复添加），这里按名称去重：
+     * 同名的只留最近更新的那条，状态以最新一次为准，避免出现「高血压、高血压、高血压」。
+     */
     private fun resolveDiseases(): List<ProfileDiseaseDisplay> {
         val repository = UserDiseaseRecordRepository.fromContext(getApplication())
         val diseaseRepository = DiseaseRepository.fromContext(getApplication())
         val customDiseases = repository.loadCustomDiseases().associateBy { it.id }
         val locale = Locale.getDefault()
-        return repository.load().filter { it.subjectType == DiseaseSubjectType.SELF }.mapNotNull { record ->
-            val name = record.disease.curatedId()?.let { diseaseRepository.findByReferenceId(it)?.displayName(locale) }
-                ?: record.disease.customId()?.let { customDiseases[it]?.name }
-            name?.let { ProfileDiseaseDisplay(it, record.status) }
-        }
+        return repository.load()
+            .filter { it.subjectType == DiseaseSubjectType.SELF }
+            .sortedByDescending { it.updatedAt }
+            .mapNotNull { record ->
+                val name = record.disease.curatedId()?.let { diseaseRepository.findByReferenceId(it)?.displayName(locale) }
+                    ?: record.disease.customId()?.let { customDiseases[it]?.name }
+                name?.takeIf { it.isNotBlank() }?.let { ProfileDiseaseDisplay(it, record.status) }
+            }
+            .distinctBy { it.name.trim().lowercase(Locale.getDefault()) }
     }
 }

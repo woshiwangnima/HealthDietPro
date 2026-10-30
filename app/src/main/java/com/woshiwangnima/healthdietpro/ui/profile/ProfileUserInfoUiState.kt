@@ -14,8 +14,5 @@ internal data class ProfileUserInfoUiState(
     val infoLine: String = "",
     val birthdayText: String = "",
     val regionText: String = "",
-    val diseaseText: String = "",
     val diseases: List<ProfileDiseaseDisplay> = emptyList(),
-) {
-    val hasDiseaseText: Boolean get() = diseaseText.isNotBlank()
-}
+)

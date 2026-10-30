@@ -31,7 +31,6 @@ class ComposePreviewActivity : ComponentActivity() {
                         AppSettingsScreen(
                             onBack = { navController.popBackStack() },
                             onOpenTextDisplay = { },
-                            onOpenLanguage = { },
                             onOpenAbout = { },
                         )
                     }

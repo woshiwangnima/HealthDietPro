@@ -89,6 +89,7 @@ import com.woshiwangnima.healthdietpro.ui.record.BloodPressureActivity
 import com.woshiwangnima.healthdietpro.ui.record.DiseaseRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.WaterRecordActivity
 import com.woshiwangnima.healthdietpro.ui.container.ContainerRecordActivity
+import com.woshiwangnima.healthdietpro.ui.price.PriceRecordActivity
 import com.woshiwangnima.healthdietpro.ui.sleep.SleepRecordActivity
 import com.woshiwangnima.healthdietpro.ui.diet.DietRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.RecordActionId
@@ -510,7 +511,7 @@ class MainActivity : BaseActivity() {
                         onActionClick = ::handleRecordAction,
                         onAddActionClick = ::handleRecordAddAction,
                         onQueryChange = recordViewModel::setQuery,
-                        onSubmitQuery = recordViewModel::submitQuery,
+                        onCommitSearch = recordViewModel::commitSearch,
                         onRemoveSearchHistory = recordViewModel::removeSearchHistory,
                         onClearSearchHistory = recordViewModel::clearSearchHistory,
                         onOpenRecentAction = ::handleRecordAction,
@@ -547,9 +548,9 @@ class MainActivity : BaseActivity() {
                     val isVerified by testAccessViewModel.isVerified.collectAsState()
                     if (isVerified) {
                         when (testPage) {
-                            TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.CommonUi }, { testPage = TestPage.CrossSection }, { testPage = TestPage.MealIcons }, Modifier.fillMaxSize())
+                            TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.Features }, { testPage = TestPage.CommonUi }, { testPage = TestPage.CrossSection }, { testPage = TestPage.MealIcons }, Modifier.fillMaxSize())
                             TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTodayWaterRecords, ::addTestSearchHistories, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
-                            TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing })
+                            TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing }, includeStatusBarPadding = false)
                             TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
                             TestPage.CrossSection -> CrossSectionUiTestScreen(onBack = { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                             TestPage.MealIcons -> MealIconCandidatesScreen(onBack = { testPage = TestPage.Landing }, Modifier.fillMaxSize())
@@ -850,6 +851,7 @@ class MainActivity : BaseActivity() {
             RecordActionId.Waist -> openCircumferenceDetail()
             RecordActionId.Sleep -> startActivity(Intent(this, SleepRecordActivity::class.java))
             RecordActionId.Diet -> startActivity(Intent(this, DietRecordActivity::class.java))
+            RecordActionId.Price -> startActivity(Intent(this, PriceRecordActivity::class.java))
             RecordActionId.Period,
             RecordActionId.Exercise,
             RecordActionId.Bowel,
@@ -880,6 +882,7 @@ class MainActivity : BaseActivity() {
             RecordActionId.Container -> startActivity(Intent(this, ContainerRecordActivity::class.java).putExtra(ContainerRecordActivity.EXTRA_OPEN_EDITOR, true))
             RecordActionId.Sleep -> startActivity(Intent(this, SleepRecordActivity::class.java).putExtra(SleepRecordActivity.EXTRA_OPEN_EDITOR, true))
             RecordActionId.Diet -> startActivity(Intent(this, DietRecordActivity::class.java).putExtra(DietRecordActivity.EXTRA_OPEN_EDITOR, true))
+            RecordActionId.Price -> startActivity(Intent(this, PriceRecordActivity::class.java).putExtra(PriceRecordActivity.EXTRA_OPEN_EDITOR, true))
             else -> Unit
         }
     }

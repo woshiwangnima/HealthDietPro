@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  导入/导出：左箭头向上（导出）、右箭头向下（导入）。
+  两枚箭头等高对齐：竖向都占 3–21（18 dp），头在各自一端，横杠在各自尾端——
+  错位（左枚占上半、右枚占下半）会让整枚图标读成「两枚箭头交错」，看着歪。
+  横杠取箭头头宽的 0.75、比箭杆宽、与箭杆无缝相连：
+  留缝会让横杠像浮着的方块；与箭头等宽又会读成「⊥ / T」几何符号。
+  画法同 §8.18：24 视口 / 实心 / 视觉粗细 2 / 外接 3–21。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 左：向上箭头（占满 3–21）+ 尾端横杠 -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M6.5,3L10,8.4H7.6V18.8H9.1V21H3.9V18.8H5.4V8.4H3Z" />
+    <!-- 右：向下箭头（占满 3–21）+ 尾端横杠 -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M17.5,21L14,15.6H16.4V5.2H14.9V3H20.1V5.2H18.6V15.6H21Z" />
+</vector>

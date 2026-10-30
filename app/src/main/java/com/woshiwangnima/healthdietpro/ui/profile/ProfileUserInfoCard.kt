@@ -2,6 +2,8 @@ package com.woshiwangnima.healthdietpro.ui.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,8 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,15 +30,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
-import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 
+/**
+ * 个人卡片（§2.7-1 底材：`panelRaised` + 1 dp 描边，不叠阴影）。
+ *
+ * 旧版是 16 dp 圆角 + 2 dp 阴影 + 2 dp tonal 的 Material 默认卡，与本项目其它已重刷的卡片不是一套语言；
+ * 头像下方那颗「切换用户」还是填充主色按钮，比卡片主信息更抢眼，改成文本按钮后主次才回到姓名上。
+ */
 @Composable
 internal fun ProfileUserInfoCard(
     state: ProfileUserInfoUiState,
@@ -45,96 +52,99 @@ internal fun ProfileUserInfoCard(
     onSwitchUser: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 2.dp,
-        shadowElevation = 2.dp,
+    val tokens = LocalAppTokens.current
+    val colors = tokens.colors
+    val shape = RoundedCornerShape(tokens.radii.container)
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(colors.panelRaised)
+            .border(tokens.radii.highlight, colors.border, shape)
+            .padding(tokens.spacing.s3),
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 ProfileAvatar(state = state)
-                AppIconTextButton(
-                    text = stringResource(R.string.profile_switch_user),
-                    iconRes = R.drawable.ic_switch_user,
-                    onClick = onSwitchUser,
+                Spacer(Modifier.height(tokens.spacing.s1))
+                // 「图标 + 切换用户」包一层描边胶囊：原来是裸文本按钮，看着像一段可点文字而不是按钮。
+                // 图标与文字同为 primary，并各自 `CenterVertically`；图标本身的图形重心已在
+                // ic_switch_user.xml 里对到画布中线，不再靠视觉微调硬凑。
+                Row(
                     modifier = Modifier
-                        .height(36.dp),
-                )
+                        .heightIn(min = tokens.spacing.s6)
+                        .clip(RoundedCornerShape(tokens.radii.pill))
+                        .border(
+                            1.dp,
+                            colors.primary.copy(alpha = SwitchUserBorderAlpha),
+                            RoundedCornerShape(tokens.radii.pill),
+                        )
+                        .clickable(onClick = onSwitchUser)
+                        .padding(horizontal = tokens.spacing.s2),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_switch_user),
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = colors.primary,
+                    )
+                    Spacer(Modifier.width(tokens.spacing.s1))
+                    Text(
+                        text = stringResource(R.string.profile_switch_user),
+                        style = tokens.type.caption,
+                        color = colors.primary,
+                    )
+                }
             }
 
-            Spacer(Modifier.width(14.dp))
+            Spacer(Modifier.width(tokens.spacing.s3))
 
-            Column(
-                modifier = Modifier.weight(1f),
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = state.displayName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = tokens.type.titleS,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colors.text,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(tokens.spacing.s1))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    val infoSegments = state.infoLine
-                        .split("|")
-                        .map { it.trim() }
-                        .filter { it.isNotBlank() }
                     if (state.genderIcon.isNotBlank()) {
                         Text(
                             text = state.genderIcon,
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = tokens.type.bodyS,
                             color = state.genderTone.color(),
                         )
-                        Spacer(Modifier.width(2.dp))
+                        Spacer(Modifier.width(tokens.spacing.s1))
                     }
-                    infoSegments.take(2).forEachIndexed { index, segment ->
-                        if (index > 0) {
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.profile_separator),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Spacer(Modifier.width(8.dp))
-                        }
-                        TextOverflowText(
-                            text = segment,
-                            modifier = Modifier.weight(
-                                if (index == 0) 1f else 1.15f,
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    TextOverflowText(
+                        text = state.infoLine,
+                        modifier = Modifier.weight(1f),
+                        style = tokens.type.bodyS,
+                        color = colors.textMuted,
+                    )
                 }
-                Spacer(Modifier.height(4.dp))
-                ProfileInfoLabelRow(R.drawable.ic_birthday, state.birthdayText)
-                ProfileInfoLabelRow(R.drawable.ic_region, state.regionText)
-                if (state.diseases.isNotEmpty()) {
-                    ProfileDiseaseLabelRow(state.diseases)
+                Spacer(Modifier.height(tokens.spacing.s2))
+                Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1)) {
+                    ProfileInfoLabelRow(R.drawable.ic_cake, state.birthdayText)
+                    ProfileInfoLabelRow(R.drawable.ic_region, state.regionText)
+                    if (state.diseases.isNotEmpty()) {
+                        ProfileDiseaseLabelRow(state.diseases)
+                    }
                 }
             }
 
-            Spacer(Modifier.width(10.dp))
-
             IconButton(
                 onClick = onEditProfile,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(tokens.spacing.hitMin),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = stringResource(R.string.profile_user_info),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = colors.textMuted,
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }
@@ -143,9 +153,10 @@ internal fun ProfileUserInfoCard(
 
 @Composable
 private fun ProfileAvatar(state: ProfileUserInfoUiState) {
+    val tokens = LocalAppTokens.current
     Box(
         modifier = Modifier
-            .size(56.dp)
+            .size(AvatarSize)
             .clip(CircleShape)
             .background(state.avatarColor),
         contentAlignment = Alignment.Center,
@@ -155,40 +166,42 @@ private fun ProfileAvatar(state: ProfileUserInfoUiState) {
                 bitmap = state.avatarBitmap.asImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(AvatarSize)
                     .clip(CircleShape),
             )
         } else {
             Text(
                 text = state.avatarInitial,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
+                style = tokens.type.titleS,
+                fontWeight = FontWeight.SemiBold,
+                color = tokens.colors.onPrimary,
             )
         }
     }
 }
 
 @Composable
-private fun ProfileInfoLabelRow(iconRes: Int, text: String, tint: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+private fun ProfileInfoLabelRow(iconRes: Int, text: String) {
+    val tokens = LocalAppTokens.current
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
-            tint = tint,
             modifier = Modifier.size(16.dp),
+            tint = tokens.colors.textMuted,
         )
-        Spacer(Modifier.width(6.dp))
+        Spacer(Modifier.width(tokens.spacing.s2))
         TextOverflowText(
             text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = tint,
+            style = tokens.type.caption,
+            color = tokens.colors.textMuted,
         )
     }
 }
 
 @Composable
 private fun ProfileDiseaseLabelRow(diseases: List<ProfileDiseaseDisplay>) {
+    val tokens = LocalAppTokens.current
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -196,10 +209,10 @@ private fun ProfileDiseaseLabelRow(diseases: List<ProfileDiseaseDisplay>) {
         Icon(
             painter = painterResource(R.drawable.ic_medical_history),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(16.dp),
+            tint = tokens.colors.textMuted,
         )
-        Spacer(Modifier.width(6.dp))
+        Spacer(Modifier.width(tokens.spacing.s2))
         val text = buildAnnotatedString {
             diseases.forEachIndexed { index, disease ->
                 if (index > 0) append("、")
@@ -211,14 +224,24 @@ private fun ProfileDiseaseLabelRow(diseases: List<ProfileDiseaseDisplay>) {
         TextOverflowText(
             text = text,
             modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.bodySmall,
+            style = tokens.type.caption,
             maxLines = 1,
         )
     }
 }
 
-private fun ProfileGenderTone.color(): Color = when (this) {
-    ProfileGenderTone.Male -> Color(0xFF2196F3)
-    ProfileGenderTone.Female -> Color(0xFFE91E63)
-    ProfileGenderTone.Unknown -> Color.Unspecified
+@Composable
+private fun ProfileGenderTone.color(): Color {
+    val colors = LocalAppTokens.current.colors
+    return when (this) {
+        ProfileGenderTone.Male -> colors.primary
+        ProfileGenderTone.Female -> colors.info
+        ProfileGenderTone.Unknown -> colors.textMuted
+    }
 }
+
+/** 头像直径：比信息行字号大一档，保证姓名仍是卡片里最重的元素。 */
+private val AvatarSize = 56.dp
+
+/** 描边胶囊的边框透明度：主色描边压到 45%，只做「这是个按钮」的提示，不与姓名抢注意力。 */
+private const val SwitchUserBorderAlpha = 0.45f

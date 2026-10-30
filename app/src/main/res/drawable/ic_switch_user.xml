@@ -3,12 +3,13 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <!-- 右箭头（上排） -->
+    <!-- 右箭头（上排）：y 5..15 -->
     <path
-        android:fillColor="?attr/colorOnSurfaceVariant"
-        android:pathData="M13,7l5,5l-5,5l0,-4l-6,0l0,-2l6,0z" />
-    <!-- 左箭头（下排） -->
+        android:fillColor="#FF000000"
+        android:pathData="M13,5l5,5l-5,5l0,-4l-6,0l0,-2l6,0z" />
+    <!-- 左箭头（下排）：y 9..19。两枚箭头合起来的重心正好落在 24×24 画布中线（12），
+         原来是 y 7..17 / 12..22，整体偏下 2.5，与文字同行时就显得「图标比字低」。 -->
     <path
-        android:fillColor="?attr/colorOnSurfaceVariant"
-        android:pathData="M11,12l-5,5l5,5l0,-4l6,0l0,-2l-6,0z" />
+        android:fillColor="#FF000000"
+        android:pathData="M11,9l-5,5l5,5l0,-4l6,0l0,-2l-6,0z" />
 </vector>

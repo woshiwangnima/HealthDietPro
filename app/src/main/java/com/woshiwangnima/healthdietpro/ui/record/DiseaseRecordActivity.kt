@@ -277,7 +277,7 @@ internal fun DiseaseBrowsePanel(
     val customDiseases = state.customDiseases.takeIf { state.customOnly }.orEmpty()
         .filter { DiseaseReference(DiseaseSourceKind.CUSTOM, it.id.toCustomDiseaseId()) !in excludedReferences }
     Column(modifier.fillMaxSize().padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        FoodSearchField(state.query, onQueryChange, stringResource(R.string.disease_record_search), onSearch = { })
+        FoodSearchField(state.query, onQueryChange, stringResource(R.string.disease_record_search))
         DiseaseChipRow(stringResource(R.string.disease_record_department), departments.map { it.key to it.value }, state.selectedDepartmentIds, onDepartmentToggle)
         DiseaseChipRow(stringResource(R.string.disease_record_status), DiseaseStatus.entries.map { it.name to stringResource(it.labelRes()) }, state.selectedStatuses.map { it.name }.toSet()) { onStatusToggle(DiseaseStatus.valueOf(it)) }
         Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

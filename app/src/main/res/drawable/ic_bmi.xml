@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BMI：刻度盘 + 单根指针，表达「指数落在哪一档」，不再与折线图（ic_chart）共用。
+     盘底留 60° 缺口、只画一根指针：满环 + 单指针会被读成钟表（历史/时间），
+     缺口 + 指针才是仪表盘；指针顶到内圈，进一步拉开与「表盘」的距离。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@android:color/white"
+        android:fillType="evenOdd"
+        android:pathData="M16.5,19.79 A9,9 0 1 0 7.5,19.79 L8.7,17.71 A6.6,6.6 0 1 1 15.3,17.71 Z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M13.18,11.45 L10.56,5.83 L8.2,6.93 L10.82,12.55 Z" />
+</vector>

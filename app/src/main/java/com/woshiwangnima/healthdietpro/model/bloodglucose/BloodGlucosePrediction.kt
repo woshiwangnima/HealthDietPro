@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.bloodglucose
 
 import com.woshiwangnima.healthdietpro.model.diet.DietRecord
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
+import com.woshiwangnima.healthdietpro.model.medication.MedicationFrequency
+import com.woshiwangnima.healthdietpro.model.medication.MedicationFrequencyType
+import com.woshiwangnima.healthdietpro.model.medication.MedicationFrequencyUnit
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRecord
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -57,8 +60,10 @@ internal data class BloodGlucosePredictionFormula(
     val baseMmolPerL: Double,
     val startMmolPerL: Double,
     val baselineDecayPerHour: Double,
+    val baselineDecayScale: Double,
     val carbsCoefficientPerGram: Double,
     val mealPeakMinutes: Double,
+    val mealResponseScale: Double,
     val drugFormulas: List<BloodGlucoseDrugFormula>,
     val sleepFormula: BloodGlucoseSleepFormula,
 )
@@ -68,13 +73,19 @@ internal data class BloodGlucoseDrugFormula(
     val medicationName: String,
     val coefficientPerDose: Double,
     val peakMinutes: Double,
+    val durationMinutes: Double,
     val doseValues: List<Double>,
+    val sampleCount: Int,
+    val responseScale: Double,
+    val enabled: Boolean,
 )
 
 internal data class BloodGlucoseSleepFormula(
     val slowMmolPerL: Double,
     val stressCoefficientMmolPerL: Double,
     val stressDecayPerHour: Double,
+    val sampleCount: Int,
+    val enabled: Boolean,
 )
 
 internal fun isValidPredictionMeal(record: DietRecord): Boolean {
@@ -101,7 +112,7 @@ internal fun predictBloodGlucose(
     zoneId: ZoneId = ZoneId.systemDefault(),
 ): BloodGlucosePredictionResult? {
     val observed = records
-        .filter { it.timestamp > 0L && it.valueMmolPerL in 1.1..33.3 }
+        .filter { it.timestamp in 1L..nowMillis && it.valueMmolPerL in 1.1..33.3 }
         .distinctBy(BloodGlucoseRecord::timestamp)
         .sortedBy(BloodGlucoseRecord::timestamp)
     val eligibility = evaluatePredictionEligibility(records, medications, meals, sleepRecords)
@@ -111,23 +122,32 @@ internal fun predictBloodGlucose(
     val recent = observed.filter { it.timestamp >= nowMillis - 72 * 60 * 60_000L }.ifEmpty { observed.takeLast(12) }
     val base = estimateBaselineLevel(observed, nowMillis, zoneId)
     val startValue = estimatePredictionStart(observed, nowMillis, zoneId, base)
-    val validMeals = meals.filter(::isValidPredictionMeal)
-    val baselineRate = estimateBaselineDecayRate(observed, base, validMeals, medications, sleepRecords)
-    val mealFormula = fitMealFormula(observed, validMeals)
-    val drugFormulas = fitDrugFormulas(observed, medications)
-    val sleepFormula = fitSleepFormula(observed, sleepRecords, base)
+    val historicalMeals = meals.filter { it.mealStartAt <= nowMillis }.filter(::isValidPredictionMeal)
+    val historicalMedications = medications.filter { it.timestamp <= nowMillis }
+    val historicalSleepRecords = sleepRecords.filter { it.sleepStartAt <= nowMillis }
+    val baselineRate = estimateBaselineDecayRate(observed, base, historicalMeals, historicalMedications, historicalSleepRecords)
+    val mealFormula = fitMealFormula(observed, historicalMeals)
+    val drugFormulas = fitDrugFormulas(observed, historicalMedications)
+    val sleepFormula = fitSleepFormula(observed, historicalSleepRecords, base)
+    val activeMeals = historicalMeals.filter { it.mealStartAt >= nowMillis - ACTIVE_EVENT_WINDOW_MINUTES.toLong() * 60_000L }
+    val activeMedications = historicalMedications.filter { medication ->
+        medication.timestamp >= nowMillis - ACTIVE_EVENT_WINDOW_MINUTES.toLong() * 60_000L
+    }
+    val activeSleepRecords = historicalSleepRecords.filter { sleep ->
+        sleep.wakeUpAt == null || sleep.wakeUpAt >= nowMillis - SLEEP_WAKE_RESPONSE_MINUTES.toLong() * 60_000L
+    }
     val points = generateSequence(start) { timestamp -> (timestamp + PREDICTION_INTERVAL_MILLIS).takeIf { it <= end } }
         .map { timestamp ->
             val elapsedHours = (timestamp - nowMillis).coerceAtLeast(0L) / 3_600_000.0
-            val value = base + (startValue - base) * kotlin.math.exp(-baselineRate * elapsedHours)
-            val mealEffect = validMeals.sumOf { meal -> mealGlucoseEffect(meal, timestamp, mealFormula) }
-            val drugEffect = medications.sumOf { medication -> drugGlucoseEffect(medication, timestamp, drugFormulas) }
-            val sleepEffect = sleepGlucoseEffect(timestamp, sleepRecords, sleepFormula)
-            BloodGlucosePredictionPoint(timestamp, (value + mealEffect + drugEffect + sleepEffect).coerceIn(1.1, 33.3))
+            val baseline = base + (startValue - base) * kotlin.math.exp(-BASELINE_DECAY_SCALE * baselineRate * elapsedHours)
+            val mealEffect = activeMeals.sumOf { meal -> mealGlucoseEffect(meal, timestamp, mealFormula) }
+            val drugEffect = activeMedications.sumOf { medication -> drugGlucoseEffect(medication, timestamp, drugFormulas) }
+            val sleepEffect = sleepGlucoseEffect(timestamp, activeSleepRecords, sleepFormula)
+            BloodGlucosePredictionPoint(timestamp, (baseline + mealEffect + drugEffect + sleepEffect).coerceIn(1.1, 33.3))
         }
         .toList()
     val confidence = when {
-        recent.size >= 24 && validMeals.size >= 5 -> BloodGlucosePredictionConfidence.HIGH
+            recent.size >= 24 && historicalMeals.size >= 5 -> BloodGlucosePredictionConfidence.HIGH
         recent.size >= 8 -> BloodGlucosePredictionConfidence.MEDIUM
         else -> BloodGlucosePredictionConfidence.LOW
     }
@@ -138,8 +158,10 @@ internal fun predictBloodGlucose(
             baseMmolPerL = base,
             startMmolPerL = startValue,
             baselineDecayPerHour = baselineRate,
+            baselineDecayScale = BASELINE_DECAY_SCALE,
             carbsCoefficientPerGram = mealFormula.carbsCoefficientPerGram,
             mealPeakMinutes = mealFormula.peakMinutes,
+            mealResponseScale = MEAL_RESPONSE_SCALE,
             drugFormulas = drugFormulas,
             sleepFormula = sleepFormula,
         ),
@@ -147,6 +169,7 @@ internal fun predictBloodGlucose(
 }
 
 private const val BASELINE_DECAY_DEFAULT_PER_HOUR = 0.15
+private const val BASELINE_DECAY_SCALE = 0.50
 private const val BASELINE_DECAY_MIN_PER_HOUR = 0.01
 private const val BASELINE_DECAY_MAX_PER_HOUR = 1.50
 private const val BASELINE_RATE_MIN_GAP_MINUTES = 5.0
@@ -157,10 +180,16 @@ private const val BASELINE_NIGHT_END_MINUTE = 5 * 60
 private const val MEAL_RESPONSE_WINDOW_MINUTES = 240.0
 private const val MEAL_DEFAULT_CARBS_COEFFICIENT = 0.025
 private const val MEAL_DEFAULT_PEAK_MINUTES = 45.0
+private const val MEAL_RESPONSE_SCALE = 0.125
 private const val DRUG_DEFAULT_COEFFICIENT_PER_DOSE = 0.15
 private const val DRUG_DEFAULT_PEAK_MINUTES = 120.0
 private const val DRUG_RESPONSE_START_MINUTES = 20.0
-private const val DRUG_RESPONSE_END_MINUTES = 480.0
+private const val DRUG_DEFAULT_DURATION_MINUTES = 480.0
+private const val DRUG_RESPONSE_SCALE = 0.125
+private const val MIN_DRUG_RESPONSE_SAMPLES = 3
+private const val ACTIVE_EVENT_WINDOW_MINUTES = 4 * 60.0
+private const val MIN_SLEEP_RESPONSE_SAMPLES = 5
+private val RISE_DECAY_PEAK_NORMALIZER = ln(3.0)
 private const val SLEEP_WAKE_RESPONSE_MINUTES = 360.0
 private const val SLEEP_DEFAULT_SLOW_MG_DL = 0.0
 private const val SLEEP_DEFAULT_STRESS_COEFFICIENT_MG_DL = 0.15
@@ -269,8 +298,11 @@ private fun mealGlucoseEffect(
     val carbs = meal.entries.sumOf { it.resolvedNutrients["CHO"]?.value ?: 0.0 }
     if (carbs <= 0.0 || !carbs.isFinite()) return 0.0
     val normalizedTime = elapsedMinutes / formula.peakMinutes
-    return formula.carbsCoefficientPerGram * carbs * normalizedTime * exp(1.0 - normalizedTime)
+    return MEAL_RESPONSE_SCALE * formula.carbsCoefficientPerGram * carbs * mealGammaResponse(normalizedTime)
 }
+
+private fun mealGammaResponse(normalizedTime: Double): Double =
+    normalizedTime * normalizedTime * exp(2.0 * (1.0 - normalizedTime))
 
 private fun fitDrugFormulas(
     records: List<BloodGlucoseRecord>,
@@ -279,21 +311,25 @@ private fun fitDrugFormulas(
     .filter { !it.medicationId.isNullOrBlank() && it.doseValue.isFinite() && it.doseValue > 0f }
     .groupBy { it.medicationId!! }
     .map { (medicationId, medicationRecords) ->
+        val durationMinutes = medicationRecords
+            .map(::medicationEffectDurationMinutes)
+            .medianOr(DRUG_DEFAULT_DURATION_MINUTES)
         val samples = medicationRecords.mapNotNull { medication ->
             val dose = medication.doseValue.toDouble()
+            val responseEnd = medicationEffectDurationMinutes(medication)
             val before = records.lastOrNull {
                 it.timestamp in (medication.timestamp - 2 * 60 * 60_000L)..medication.timestamp
             } ?: return@mapNotNull null
             val response = records
                 .filter {
-                    it.timestamp in (medication.timestamp + DRUG_RESPONSE_START_MINUTES.toLong() * 60_000L)..(medication.timestamp + DRUG_RESPONSE_END_MINUTES.toLong() * 60_000L) &&
+                    it.timestamp in (medication.timestamp + DRUG_RESPONSE_START_MINUTES.toLong() * 60_000L)..(medication.timestamp + responseEnd.toLong() * 60_000L) &&
                         !hasPredictionEventBetween(medication.timestamp, it.timestamp, emptyList(), emptyList(), emptyList())
                 }
                 .minByOrNull(BloodGlucoseRecord::valueMmolPerL)
                 ?: return@mapNotNull null
             val peakMinutes = (response.timestamp - medication.timestamp) / 60_000.0
             val fall = before.valueMmolPerL - response.valueMmolPerL
-            if (fall <= 0.0 || peakMinutes !in DRUG_RESPONSE_START_MINUTES..DRUG_RESPONSE_END_MINUTES) return@mapNotNull null
+            if (fall <= 0.0 || peakMinutes !in DRUG_RESPONSE_START_MINUTES..responseEnd) return@mapNotNull null
             fall / dose to peakMinutes
         }
         BloodGlucoseDrugFormula(
@@ -302,10 +338,27 @@ private fun fitDrugFormulas(
             coefficientPerDose = samples.map { it.first }.medianOr(DRUG_DEFAULT_COEFFICIENT_PER_DOSE)
                 .coerceIn(0.0001, 4.0),
             peakMinutes = samples.map { it.second }.medianOr(DRUG_DEFAULT_PEAK_MINUTES)
-                .coerceIn(DRUG_RESPONSE_START_MINUTES, DRUG_RESPONSE_END_MINUTES),
+                .coerceIn(DRUG_RESPONSE_START_MINUTES, durationMinutes),
+            durationMinutes = durationMinutes,
             doseValues = medicationRecords.map { it.doseValue.toDouble() },
+            sampleCount = samples.size,
+            responseScale = DRUG_RESPONSE_SCALE,
+            enabled = samples.size >= MIN_DRUG_RESPONSE_SAMPLES,
         )
     }
+
+private fun medicationEffectDurationMinutes(medication: MedicationRecord): Double =
+    medicationEffectDurationMinutes(medication.frequency)
+
+private fun medicationEffectDurationMinutes(frequency: MedicationFrequency): Double {
+    if (frequency.type == MedicationFrequencyType.AS_NEEDED) return DRUG_DEFAULT_DURATION_MINUTES
+    val intervalMinutes = frequency.interval.toDouble() * when (frequency.unit) {
+        MedicationFrequencyUnit.MINUTE -> 1.0
+        MedicationFrequencyUnit.HOUR -> 60.0
+        MedicationFrequencyUnit.DAY -> 24.0 * 60.0
+    }
+    return (intervalMinutes / frequency.times.coerceAtLeast(1)).coerceAtLeast(DRUG_RESPONSE_START_MINUTES)
+}
 
 private fun drugGlucoseEffect(
     medication: MedicationRecord,
@@ -313,12 +366,13 @@ private fun drugGlucoseEffect(
     formulas: List<BloodGlucoseDrugFormula>,
 ): Double {
     val formula = formulas.firstOrNull { it.medicationId == medication.medicationId } ?: return 0.0
+    if (!formula.enabled) return 0.0
     val elapsedMinutes = (timestamp - medication.timestamp) / 60_000.0
-    if (elapsedMinutes < 0.0) return 0.0
+    if (elapsedMinutes < 0.0 || elapsedMinutes > formula.durationMinutes) return 0.0
     val dose = medication.doseValue.toDouble()
     if (!dose.isFinite() || dose <= 0.0) return 0.0
     val normalizedTime = elapsedMinutes / formula.peakMinutes
-    return -formula.coefficientPerDose * dose * normalizedTime * exp(1.0 - normalizedTime)
+    return -formula.responseScale * formula.coefficientPerDose * dose * riseDecayResponse(normalizedTime)
 }
 
 private fun fitSleepFormula(
@@ -346,14 +400,21 @@ private fun fitSleepFormula(
         slowMmolPerL = slow.coerceIn(-2.0, 2.0),
         stressCoefficientMmolPerL = stress.coerceIn(0.0, 1.0),
         stressDecayPerHour = SLEEP_DEFAULT_STRESS_DECAY_PER_HOUR,
+        sampleCount = samples.size,
+        enabled = samples.size >= MIN_SLEEP_RESPONSE_SAMPLES,
     )
 }
+
+private fun riseDecayResponse(normalizedTime: Double): Double =
+    (1.0 - exp(-RISE_DECAY_PEAK_NORMALIZER * normalizedTime)) *
+        exp(-RISE_DECAY_PEAK_NORMALIZER * normalizedTime / 2.0)
 
 private fun sleepGlucoseEffect(
     timestamp: Long,
     sleepRecords: List<SleepRecord>,
     formula: BloodGlucoseSleepFormula,
 ): Double = sleepRecords.sumOf { sleep ->
+    if (!formula.enabled) return@sumOf 0.0
     when {
         timestamp in sleep.sleepStartAt..(sleep.wakeUpAt ?: Long.MAX_VALUE) -> formula.slowMmolPerL
         sleep.wakeUpAt?.let { wake -> timestamp in wake..(wake + SLEEP_WAKE_RESPONSE_MINUTES.toLong() * 60_000L) } == true -> {
@@ -383,6 +444,11 @@ private fun hasPredictionEventBetween(
 private fun timeOfDayBucket(timestamp: Long, zoneId: ZoneId): Int {
     val local = Instant.ofEpochMilli(timestamp).atZone(zoneId)
     return (local.hour * 60 + local.minute) / SAME_TIME_BUCKET_MINUTES
+}
+
+private fun timeOfDayBucketDistance(first: Int, second: Int): Int {
+    val distance = kotlin.math.abs(first - second)
+    return minOf(distance, 48 - distance)
 }
 
 private fun List<Double>.medianOr(fallback: Double): Double {

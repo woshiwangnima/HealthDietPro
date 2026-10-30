@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 观颐 · 主题图标（单色）前景：碗身 + 椭圆圈足的剪影，四道刻纹与汤面不参与（系统只按 alpha 取形） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4.7,8.2A7.3,2.3 0 0 1 19.3,8.2C19.8,11.2 18.3,14.9 16,16.7C14.9,17.5 9.1,17.5 8,16.7C5.7,14.9 4.2,11.2 4.7,8.2Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M7,17.15a5,1.2 0 1 0 10,0a5,1.2 0 1 0 -10,0Z" />
+</vector>

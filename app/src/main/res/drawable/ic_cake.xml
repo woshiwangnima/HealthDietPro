@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  生日蛋糕（出生日期）：单层蛋糕 + 顶边四道奶油弧 + 蜡烛 + 火苗 + 托盘。
+  四道弧（半径 2）比五道小弧更像奶油花边；弧太大又会读成宫殿穹顶。
+  与时间选择、时间范围筛选用的 ic_birthday（日历）分开：那枚表达「某个日期」，
+  这枚表达「出生 / 生日」，只用在个人信息卡的出生日期一行。
+  画法同 §8.18：24 视口 / 实心 / 视觉粗细 2 / 外接 3–21。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 火苗 -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M12,3.4C13,4.3 13.3,5.2 12.8,6C12.45,6.6 11.4,6.6 11.1,6C10.6,5.2 11,4.3 12,3.4Z" />
+    <!-- 蜡烛 -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M11.3,6.8H12.7V13.4H11.3V6.8Z" />
+    <!-- 蛋糕体：顶边四道小弧当奶油，下沿平直 -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M4,19.6V15.4A2,2 0 0 1 8,15.4A2,2 0 0 1 12,15.4A2,2 0 0 1 16,15.4A2,2 0 0 1 20,15.4V19.6H4Z" />
+    <!-- 托盘 -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M2.8,19.6H21.2V21H2.8V19.6Z" />
+</vector>
