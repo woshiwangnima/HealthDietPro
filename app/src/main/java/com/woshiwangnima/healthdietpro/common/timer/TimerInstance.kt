@@ -41,11 +41,18 @@ internal fun TimerInstance.remainingNow(nowMillis: Long): Long = when (state) {
     else -> remainingSeconds.coerceAtLeast(0L)
 }
 
+/**
+ * 推进一次：把「已流逝」折进 [TimerInstance.remainingSeconds]，归零则转 FINISHED。
+ *
+ * 必须同时把 `startedAtMillis` 挪到 [nowMillis]——剩余量已经算到这一刻了，起点不跟着走，
+ * 下一次推进会把这同一段时间再减一遍（tick 每秒一次，累计起来是平方级衰减：
+ * 15 分钟的计时器四十来秒就报「结束」）。
+ */
 internal fun TimerInstance.advance(nowMillis: Long): TimerInstance {
     if (state != TimerState.RUNNING) return this
     val remaining = remainingNow(nowMillis)
     if (remaining <= 0L) return copy(state = TimerState.FINISHED, remainingSeconds = 0L)
-    return copy(remainingSeconds = remaining)
+    return copy(remainingSeconds = remaining, startedAtMillis = nowMillis)
 }
 
 internal fun TimerInstance.pause(nowMillis: Long): TimerInstance {

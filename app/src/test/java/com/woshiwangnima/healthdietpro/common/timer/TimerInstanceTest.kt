@@ -35,6 +35,36 @@ class TimerInstanceTest {
         assertEquals(541L, timer.remainingSeconds)
     }
 
+    /**
+     * 每秒 tick 一次推进两次，剩余量必须线性下降。
+     *
+     * 旧实现只改 `remainingSeconds` 不改 `startedAtMillis`，第二次推进会再减掉同一段流逝，
+     * 15 分钟的计时器四十来秒就报「结束」。
+     */
+    @Test
+    fun `advance rebases start so repeated ticks stay linear`() {
+        val first = instance(TimerState.RUNNING).advance(11_000L)
+        val second = first.advance(21_000L)
+        assertEquals(TimerState.RUNNING, second.state)
+        assertEquals(590L, first.remainingSeconds)
+        assertEquals(580L, second.remainingSeconds)
+        assertEquals(21_000L, second.startedAtMillis)
+    }
+
+    @Test
+    fun `advance counts down to real zero only`() {
+        // 从 1 000 ms 起、共 600 s：600 次「过 1 秒」之后才该结束。
+        var timer = instance(TimerState.RUNNING)
+        var now = 1_000L
+        repeat(599) {
+            now += 1_000L
+            timer = timer.advance(now)
+        }
+        assertEquals(TimerState.RUNNING, timer.state)
+        now += 1_000L
+        assertEquals(TimerState.FINISHED, timer.advance(now).state)
+    }
+
     @Test
     fun `pause freezes remaining`() {
         val paused = instance(TimerState.RUNNING).pause(61_000L)

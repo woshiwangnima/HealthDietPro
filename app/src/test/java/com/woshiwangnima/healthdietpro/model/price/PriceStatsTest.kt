@@ -64,9 +64,9 @@ class PriceStatsTest {
         assertEquals(1, stats.size)
         assertEquals(2, stats.single().recordCount)
         assertEquals(2, stats.single().regionCount)
-        assertEquals(3.2, stats.single().primary.low, 0.0001)
-        assertEquals(5.0, stats.single().primary.high, 0.0001)
-        assertEquals("3.2–5 元/斤", stats.single().primary.display)
+        assertEquals(3.2, stats.single().ranges.first().low, 0.0001)
+        assertEquals(5.0, stats.single().ranges.first().high, 0.0001)
+        assertEquals("3.2–5 元/斤", stats.single().ranges.first().display)
     }
 
     @Test
@@ -101,7 +101,7 @@ class PriceStatsTest {
 
         assertEquals(2, stat.recordCount)
         assertEquals(1, stat.ranges.size)
-        assertEquals("3.2–4 元/斤", stat.primary.display)
+        assertEquals("3.2–4 元/斤", stat.ranges.first().display)
     }
 
     @Test

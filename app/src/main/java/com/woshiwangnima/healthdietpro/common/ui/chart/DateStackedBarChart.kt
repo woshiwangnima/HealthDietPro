@@ -56,6 +56,7 @@ internal fun <T> DateStackedBarChart(
     onEntrySelected: (DateStackedBarEntry<T>) -> Unit,
     referenceLine: DateStackedBarReferenceLine? = null,
     yAxisTickCount: Int = 3,
+    columnWidth: Dp = 52.dp,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -67,7 +68,9 @@ internal fun <T> DateStackedBarChart(
     )
     val axisMax = if (maxValue <= 0.0) 100.0 else ceil(maxValue / 100.0) * 100.0
     val axisWidth = 58.dp
-    val dayWidth = 52.dp
+    // 每根柱占的宽度可调：7 天 7 根柱用 52 dp 会比卡片宽 20 多 dp，
+    // 横向可滚却让最右边的日期标签被切掉一半，看起来像画坏了；由调用方按天数收窄即可整屏放下。
+    val dayWidth = columnWidth
     val density = LocalDensity.current
     val plotTop = 28.dp
     val plotBottom = 168.dp

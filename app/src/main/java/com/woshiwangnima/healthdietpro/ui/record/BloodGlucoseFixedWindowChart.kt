@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -88,6 +89,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AnimatedDonutChart
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownField
 import com.woshiwangnima.healthdietpro.common.ui.AppDropdownOption
 import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
@@ -337,9 +339,38 @@ internal fun BloodGlucoseFixedWindowChart(
     }
 }
 
+/**
+ * 图表空态：一个与画布同高的卡片，说明文字居中。
+ *
+ * 不用一行裸文字的原因：只有一行字时，下面的图例、统计卡、八点血糖卡会整块上移，切时间范围
+ * 页面高度来回跳；而且「这一块是图表」的视觉位置消失了，看起来像这页本来就没有图表。
+ * 占住同样的位置，切换时间范围时布局是稳的，用户看到的也只是「图里暂时没有点」。
+ */
 @Composable
-private fun FixedLandscapeBox(content: @Composable () -> Unit) {
-    BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+private fun EmptyChartPlaceholder(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    val tokens = LocalAppTokens.current
+    AppSectionGroup(modifier = modifier, contentPadding = PaddingValues()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = tokens.spacing.s4),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = text,
+                style = tokens.type.bodyS,
+                color = tokens.colors.textMuted,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun FixedLandscapeBox(content: @Composable () -> Unit) {    BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         val modifier = if (maxWidth < maxHeight) {
             Modifier.requiredWidth(maxHeight).requiredHeight(maxWidth).graphicsLayer(rotationZ = 90f)
         } else {
@@ -419,7 +450,19 @@ private fun GlucoseChartSurface(
 
     Column(if (fullscreen) modifier else modifier.verticalScroll(rememberScrollState())) {
         if (slice.scoped.isEmpty() && predictions.isEmpty()) {
-            Text(stringResource(R.string.blood_glucose_chart_no_data_in_scope), modifier = Modifier.align(Alignment.CenterHorizontally), color = palette.axis)
+            EmptyChartPlaceholder(
+                text = stringResource(R.string.blood_glucose_chart_no_data_in_scope),
+                modifier = if (fullscreen) {
+                    Modifier.fillMaxSize().padding(8.dp)
+                } else {
+                    Modifier.fillMaxWidth().height(210.dp)
+                },
+            )
+            if (!fullscreen) {
+                // 有数据时画布下面还有一条拖动条（HorizontalPanArea），空态没有它，
+                // 不加这口气的话图例直接贴到卡片底边上。
+                Spacer(Modifier.height(LocalAppTokens.current.spacing.s2))
+            }
             if (!fullscreen) {
                 ChartBottomControls(
                     primaryStyle = primaryStyle,

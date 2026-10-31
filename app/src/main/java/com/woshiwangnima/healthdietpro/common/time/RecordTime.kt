@@ -53,8 +53,18 @@ private val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyy
 private val MINUTE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 private val SECOND_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 private val CLOCK_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+private val CLOCK_MINUTE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 internal fun formatRecordClock(epochMillis: Long, zoneId: ZoneId = ZoneId.systemDefault()): String =
     Instant.ofEpochMilli(epochMillis).atZone(zoneId).format(CLOCK_FORMATTER)
+
+/**
+ * 只到分钟的钟点（`23:14`）。
+ *
+ * 记录时间本身是分钟精度（`RecordTimePrecision.MINUTE`），用 [formatRecordClock] 会永远拖一个 `:00`：
+ * 卡片里多三位数字却没有任何信息，还挤掉了真正要看的时间段。
+ */
+internal fun formatRecordClockMinute(epochMillis: Long, zoneId: ZoneId = ZoneId.systemDefault()): String =
+    Instant.ofEpochMilli(epochMillis).atZone(zoneId).format(CLOCK_MINUTE_FORMATTER)
 
 internal fun formatMinuteOfDay(minuteOfDay: Int): String = "%02d:%02d".format(minuteOfDay / 60, minuteOfDay % 60)

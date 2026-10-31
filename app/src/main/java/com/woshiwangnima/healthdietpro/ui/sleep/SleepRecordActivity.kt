@@ -76,6 +76,7 @@ private fun SleepRoute(onFinish: () -> Unit, openEditorInitially: Boolean) {
             modifier = Modifier,
         )
         SleepRoute.SETTINGS -> SleepSettingsScreen(
+            prefs = prefs,
             onBack = { route = SleepRoute.LIST },
             onDefaultDuration = { route = SleepRoute.DEFAULT_DURATION },
         )

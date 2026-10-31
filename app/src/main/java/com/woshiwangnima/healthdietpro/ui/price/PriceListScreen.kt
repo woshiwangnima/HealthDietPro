@@ -3,7 +3,6 @@ package com.woshiwangnima.healthdietpro.ui.price
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,25 +20,24 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.window.DialogProperties
 import com.woshiwangnima.healthdietpro.R
@@ -50,7 +48,6 @@ import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
-import com.woshiwangnima.healthdietpro.common.ui.FoodSearchField
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.price.PriceGroup
@@ -69,9 +66,23 @@ import com.woshiwangnima.healthdietpro.model.price.PriceRecord
 @Composable
 internal fun PriceListScreen(
     uiState: PriceUiState,
-    onQueryChange: (String) -> Unit,
+    /**
+     * 当前 tab 的 id（`statistics` / `records`）。
+     *
+     * 状态放在**路由层**而不是本页：从统计页点进【物品历史】再返回时，本页会先离开组合树，
+     * `rememberSaveable` 存的是「进程重建」用的状态，救不回这种情况——用户会莫名其妙掉回【记录】页。
+     */
+    selectedTabId: String,
+    onSelectTab: (String) -> Unit,
+    onSelectItem: (String?) -> Unit,
     onToggleRegion: (String) -> Unit,
     onClearRegions: () -> Unit,
+    onSelectYear: (Int?) -> Unit,
+    onSelectMonth: (Int?) -> Unit,
+    onApplyFilters: () -> Unit,
+    onClearFilters: () -> Unit,
+    /** 点统计行进【物品历史】；参数是物品名，页面内部再归一化成物品键。 */
+    onOpenItemHistory: (String) -> Unit,
     onAdd: () -> Unit,
     onEdit: (PriceRecord) -> Unit,
     onDeleteGroup: (PriceGroup) -> Unit,
@@ -84,9 +95,7 @@ internal fun PriceListScreen(
             DetailTabItem("records", R.string.price_tab_records, R.drawable.ic_list),
         )
     }
-    var selectedTab by rememberSaveable {
-        mutableIntStateOf(tabs.indexOfFirst { it.id == "records" }.coerceAtLeast(0))
-    }
+    val selectedTab = tabs.indexOfFirst { it.id == selectedTabId }.coerceAtLeast(0)
     // 删除确认放在页面层而不是 tab 内：切 tab 时这个弹窗不该跟着消失或重建。
     var pendingDelete by remember { mutableStateOf<PriceGroup?>(null) }
     val colors = LocalAppTokens.current.colors
@@ -108,31 +117,26 @@ internal fun PriceListScreen(
                 if (tabs[tabIndex].id == "records") {
                     PriceRecordsTab(
                         uiState = uiState,
-                        onQueryChange = onQueryChange,
-                        onToggleRegion = onToggleRegion,
-                        onClearRegions = onClearRegions,
                         onAdd = onAdd,
                         onEdit = onEdit,
                         onDeleteRequest = { pendingDelete = it },
                     )
                 } else {
                     PriceStatisticsTab(
-                        stats = uiState.visibleStats,
-                        // 统计跟着记录页的筛选走，但筛选控件不在这页——必须在顶部说清楚，
-                        // 否则用户看到「少了几个物品」会以为是统计漏了数据。
-                        filterSummary = buildList {
-                            if (uiState.query.isNotBlank()) add("\u300c${uiState.query.trim()}\u300d")
-                            if (uiState.selectedRegions.isNotEmpty()) add(uiState.selectedRegions.joinToString("\u3001"))
-                        }.joinToString(" \u00b7 "),
-                        onClearFilter = {
-                            onQueryChange("")
-                            onClearRegions()
-                        },
+                        uiState = uiState,
+                        onSelectItem = onSelectItem,
+                        onToggleRegion = onToggleRegion,
+                        onClearRegions = onClearRegions,
+                        onSelectYear = onSelectYear,
+                        onSelectMonth = onSelectMonth,
+                        onApplyFilters = onApplyFilters,
+                        onClearFilters = onClearFilters,
+                        onOpenItemHistory = onOpenItemHistory,
                     )
                 }
             }
             DetailTabBar(items = tabs, selectedId = tabs[selectedTab].id) { item ->
-                selectedTab = tabs.indexOf(item)
+                onSelectTab(item.id)
             }
         }
     }
@@ -180,15 +184,13 @@ internal fun PriceListScreen(
 /**
  * 【记录】页：原始记录按「物品 + 地区 + 日期 + 单位」合并成区间卡片。
  *
- * 顺序按「先做 → 再看 → 后筛」排：主动作在最上，筛选放在记录之前，
- * 是因为筛选条件的产出（地区 chip）依赖已有记录，没有记录时不占位（§6.2 空态不留空白控件）。
+ * 这一页**只有主动作和流水**：筛选（地区 / 年份 / 月份 / 搜索）全部在【统计】页，因为那些条件
+ * 是为「看汇总时收窄范围」服务的。记录页一旦也能筛，用户切回来看到条数变少，就会以为记录丢了。
+ * 所以这里恒读 [PriceUiState.allGroups]，与统计页的筛选互不影响。
  */
 @Composable
 private fun PriceRecordsTab(
     uiState: PriceUiState,
-    onQueryChange: (String) -> Unit,
-    onToggleRegion: (String) -> Unit,
-    onClearRegions: () -> Unit,
     onAdd: () -> Unit,
     onEdit: (PriceRecord) -> Unit,
     onDeleteRequest: (PriceGroup) -> Unit,
@@ -197,7 +199,7 @@ private fun PriceRecordsTab(
     val colors = tokens.colors
     val spacing = tokens.spacing
     // 卡片是「合并后的区间」，不是单条记录：同条件多条合成一行（见 PriceGroup）。
-    val groups = uiState.visibleGroups
+    val groups = uiState.allGroups
 
     Column(
         modifier = Modifier
@@ -213,29 +215,6 @@ private fun PriceRecordsTab(
             onClick = onAdd,
             modifier = Modifier.fillMaxWidth(),
         )
-
-        // 没有记录时不摆一个筛不出东西的筛选项（§6.2）；但搜索词还在时保留卡片，否则用户看不到也清不掉它。
-        if (uiState.records.isNotEmpty() || uiState.query.isNotBlank()) {
-            AppSectionCard(
-                iconRes = R.drawable.ic_list,
-                title = stringResource(R.string.price_filter_section),
-            ) {
-                FoodSearchField(
-                    value = uiState.query,
-                    onValueChange = onQueryChange,
-                    placeholder = stringResource(R.string.price_search_hint),
-                )
-                if (uiState.regionOptions.isNotEmpty()) {
-                    Spacer(Modifier.height(spacing.s2))
-                    PriceRegionFilterRow(
-                        regions = uiState.regionOptions,
-                        selected = uiState.selectedRegions,
-                        onToggle = onToggleRegion,
-                        onClear = onClearRegions,
-                    )
-                }
-            }
-        }
 
         AppSectionCard(
             iconRes = R.drawable.ic_price,
@@ -256,25 +235,13 @@ private fun PriceRecordsTab(
             // 行自己带左右内边距，分隔线才能和文字左缘对齐（与「相关菜肴」一致）。
             contentPadding = PaddingValues(bottom = spacing.s2),
         ) {
-            when {
-                uiState.records.isEmpty() -> PriceEmptyState(
+            if (uiState.records.isEmpty()) {
+                PriceEmptyState(
                     title = stringResource(R.string.price_empty),
                     description = stringResource(R.string.price_empty_hint),
                 )
-
-                groups.isEmpty() -> {
-                    PriceEmptyState(
-                        title = stringResource(R.string.price_filter_empty),
-                        description = stringResource(R.string.price_filter_empty_hint),
-                    )
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        TextButton(onClick = { onQueryChange(""); onClearRegions() }) {
-                            Text(stringResource(R.string.price_filter_clear))
-                        }
-                    }
-                }
-
-                else -> groups.forEachIndexed { index, group ->
+            } else {
+                groups.forEachIndexed { index, group ->
                     if (index > 0) {
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = spacing.s3),
@@ -294,20 +261,31 @@ private fun PriceRecordsTab(
 }
 
 /**
- * 【统计】页：**只按物品聚合**的价格区间。
+ * 【统计】页：**只按物品聚合**的价格区间，筛选控件全部在这页。
  *
- * 同一个物品下可能出现多个单位（元/斤、元/个），各占一行——不同售卖单位的价格不可比，
- * 合成一个区间只会得到一个不存在的数（详见 `PriceUnitRange` 的注释）。
+ * 筛选（搜索 / 年份 / 月份 / 地区）是为「看汇总时收窄范围」服务的，所以它们跟着汇总走，
+ * 不留在【记录】页——那边是流水账，筛了只会让人以为记录丢了（见 [PriceRecordsTab]）。
+ *
+ * 同一个物品下可能出现多个单位（元/斤、元/个），**每个单位各占一行，全部列出**：
+ * 不同售卖单位的价格不可比，合成一个区间只会得到一个不存在的数（详见 `PriceUnitRange` 的注释）；
+ * 也不折叠成「另有 N 种单位」——单位数正是这里要回答的问题的一半，藏起来等于没答。
  */
 @Composable
 private fun PriceStatisticsTab(
-    stats: List<PriceItemStats>,
-    filterSummary: String,
-    onClearFilter: () -> Unit,
+    uiState: PriceUiState,
+    onSelectItem: (String?) -> Unit,
+    onToggleRegion: (String) -> Unit,
+    onClearRegions: () -> Unit,
+    onSelectYear: (Int?) -> Unit,
+    onSelectMonth: (Int?) -> Unit,
+    onApplyFilters: () -> Unit,
+    onClearFilters: () -> Unit,
+    onOpenItemHistory: (String) -> Unit,
 ) {
     val tokens = LocalAppTokens.current
     val colors = tokens.colors
     val spacing = tokens.spacing
+    val stats = uiState.visibleStats
 
     Column(
         modifier = Modifier
@@ -316,23 +294,19 @@ private fun PriceStatisticsTab(
             .padding(horizontal = spacing.page, vertical = spacing.s3),
         verticalArrangement = Arrangement.spacedBy(spacing.s4),
     ) {
-        if (filterSummary.isNotBlank()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.price_stats_filtered_by, filterSummary),
-                    style = tokens.type.caption,
-                    color = colors.textMuted,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                TextButton(onClick = onClearFilter) {
-                    Text(stringResource(R.string.price_filter_clear))
-                }
-            }
+        // 没有记录时不摆一个筛不出东西的筛选项（§6.2）；但还留着筛选条件（生效的或未提交的）时保留卡片，
+        // 否则用户看不到也清不掉它。
+        if (uiState.records.isNotEmpty() || uiState.hasFilters || uiState.hasPendingFilters) {
+            PriceFilterCard(
+                uiState = uiState,
+                onSelectItem = onSelectItem,
+                onToggleRegion = onToggleRegion,
+                onClearRegions = onClearRegions,
+                onSelectYear = onSelectYear,
+                onSelectMonth = onSelectMonth,
+                onApplyFilters = onApplyFilters,
+                onClearFilters = onClearFilters,
+            )
         }
 
         AppSectionCard(
@@ -352,14 +326,28 @@ private fun PriceStatisticsTab(
             },
             contentPadding = PaddingValues(bottom = spacing.s2),
         ) {
-            if (stats.isEmpty()) {
-                PriceEmptyState(
+            when {
+                uiState.records.isEmpty() -> PriceEmptyState(
                     iconRes = R.drawable.ic_chart,
                     title = stringResource(R.string.price_stats_empty),
                     description = stringResource(R.string.price_stats_empty_hint),
                 )
-            } else {
-                stats.forEachIndexed { index, item ->
+
+                // 有记录但筛完什么都没有：说清楚是筛掉的，并留一个出口（§6.2「无结果」）。
+                stats.isEmpty() -> {
+                    PriceEmptyState(
+                        iconRes = R.drawable.ic_search_empty,
+                        title = stringResource(R.string.price_filter_empty),
+                        description = stringResource(R.string.price_filter_empty_hint),
+                    )
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        TextButton(onClick = onClearFilters) {
+                            Text(stringResource(R.string.price_filter_clear))
+                        }
+                    }
+                }
+
+                else -> stats.forEachIndexed { index, item ->
                     if (index > 0) {
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = spacing.s3),
@@ -367,7 +355,10 @@ private fun PriceStatisticsTab(
                             color = colors.border,
                         )
                     }
-                    PriceStatsRow(item)
+                    PriceStatsRow(
+                        item = item,
+                        onClick = { onOpenItemHistory(item.itemName) },
+                    )
                 }
             }
         }
@@ -385,11 +376,238 @@ private fun PriceStatisticsTab(
 }
 
 /**
- * 统计行：左列物品名 + 「N 个地区 · N 条记录」，右列按单位分行显示区间。
- * 单位最多显示两行，再多给一行「另有 N 种单位」——再长会让行高失控，也不常用。
+ * 统计页顶部的筛选卡：**【开始查找】+ 两行四格**——商品 / 地区、年份 / 月份，每格都是下拉。
+ *
+ * 上一版是「一个搜索框 + 三行横滚 chip」。搜索框只能按关键词包含匹配，用户永远拿不到「只看苹果」
+ * 这个精确条件；三行 chip 又把卡片撑到半个屏幕，年份一多就要横向划。改成下拉后：
+ *
+ * - 【商品】的选项就是记录里真实出现过的物品名（不是全量食材库），展开后第一行是搜索框——
+ *   物品一多，靠划列表找比打字慢；选项里置顶「全部」。
+ * - 【地区】保留多选（下拉里打勾，点空白收起），因为「北京 + 上海比一比」是这页的真实用法；
+ *   置顶的「全部」＝清空多选。
+ * - 【年份】【月份】是单选，选中即收起。
+ *
+ * 四个格子只改**草稿**，点【开始查找】才一起生效：一次查清四个条件，而不是每点一格就让列表跳一次。
+ *
+ * 头一行是**【开始查找】+【清除筛选】**两个等宽按钮（图标 + 文字 + 描边），再往下才是四个格子：
+ * 条件填在下面、动作在上面，改完抬头就是它们；放底部时在小屏上会被两行下拉和键盘一起推下去。
+ * 两个按钮都常驻，只在这一下「有事可做」时才可点（没有待应用的改动 / 没有可清的条件就变淡），
+ * 行高不跳、位置不挪。禁用态的对比度刻意比 M3 默认高（见 [PriceFilterActionButton]）。
+ *
+ * 每一格都自带「全部」，所以清除单项不用另外找入口。
  */
 @Composable
-private fun PriceStatsRow(item: PriceItemStats) {
+private fun PriceFilterCard(
+    uiState: PriceUiState,
+    onSelectItem: (String?) -> Unit,
+    onToggleRegion: (String) -> Unit,
+    onClearRegions: () -> Unit,
+    onSelectYear: (Int?) -> Unit,
+    onSelectMonth: (Int?) -> Unit,
+    onApplyFilters: () -> Unit,
+    onClearFilters: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val spacing = tokens.spacing
+    val all = stringResource(R.string.price_filter_all)
+    val pending = uiState.hasPendingFilters
+    // 地区是多选，格子里放不下三个以上的地名：两个以上收成「已选 N 个」。
+    val regionSummary = when (uiState.selectedRegions.size) {
+        0 -> all
+        1 -> uiState.selectedRegions.first()
+        else -> stringResource(R.string.price_filter_region_count, uiState.selectedRegions.size)
+    }
+
+    AppSectionCard(
+        iconRes = R.drawable.ic_search_empty,
+        title = stringResource(R.string.price_filter_section),
+    ) {
+        // 两个动作同一行、同一套样式（图标 + 文字 + 描边）：都只在这一下「有事可做」时可点。
+        // 没有可应用的改动 / 没有可清的条件时它们变淡但仍占位，行高不跳、用户也知道下一步该先做什么。
+        Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
+            PriceFilterActionButton(
+                text = stringResource(R.string.price_filter_apply),
+                iconRes = R.drawable.ic_search_empty,
+                enabled = pending,
+                onClick = onApplyFilters,
+                modifier = Modifier.weight(1f),
+            )
+            PriceFilterActionButton(
+                text = stringResource(R.string.price_filter_clear),
+                iconRes = R.drawable.ic_refresh,
+                enabled = uiState.hasFilters || pending,
+                onClick = onClearFilters,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(Modifier.height(spacing.s2))
+        Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
+            PriceFilterDropdown(
+                label = stringResource(R.string.price_filter_item),
+                valueText = uiState.selectedItem ?: all,
+                active = uiState.selectedItem != null,
+                pinned = PriceDropdownOption(
+                    id = "__all",
+                    text = all,
+                    selected = uiState.selectedItem == null,
+                    onClick = { onSelectItem(null) },
+                ),
+                options = uiState.itemOptions.map { name ->
+                    PriceDropdownOption(
+                        id = name,
+                        text = name,
+                        selected = uiState.selectedItem == name,
+                        onClick = { onSelectItem(name) },
+                    )
+                },
+                searchHint = stringResource(R.string.price_search_hint),
+                searchEmptyText = stringResource(R.string.price_filter_item_empty),
+                modifier = Modifier.weight(1f),
+            )
+            PriceFilterDropdown(
+                label = stringResource(R.string.price_region),
+                valueText = regionSummary,
+                active = uiState.selectedRegions.isNotEmpty(),
+                // 地区是**多选**，「全部」不能只靠「没选中任何一项」隐含表达：选了京沪时也要有一眼可见的出口。
+                pinned = PriceDropdownOption(
+                    id = "__all",
+                    text = all,
+                    selected = uiState.selectedRegions.isEmpty(),
+                    onClick = onClearRegions,
+                ),
+                options = uiState.regionOptions.map { region ->
+                    PriceDropdownOption(
+                        id = region,
+                        text = region,
+                        selected = region in uiState.selectedRegions,
+                        onClick = { onToggleRegion(region) },
+                    )
+                },
+                multiSelect = true,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(Modifier.height(spacing.s2))
+        Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
+            // 年份：只列记录里真实出现过的年份，避免给出一个永远筛不出东西的选项。
+            PriceFilterDropdown(
+                label = stringResource(R.string.price_filter_year),
+                valueText = uiState.selectedYear?.toString() ?: all,
+                active = uiState.selectedYear != null,
+                pinned = PriceDropdownOption(
+                    id = "__all",
+                    text = all,
+                    selected = uiState.selectedYear == null,
+                    onClick = { onSelectYear(null) },
+                ),
+                options = uiState.yearOptions.map { year ->
+                    PriceDropdownOption(
+                        id = year.toString(),
+                        text = year.toString(),
+                        selected = uiState.selectedYear == year,
+                        onClick = { onSelectYear(year) },
+                    )
+                },
+                modifier = Modifier.weight(1f),
+            )
+            PriceFilterDropdown(
+                label = stringResource(R.string.price_filter_month),
+                valueText = uiState.selectedMonth
+                    ?.let { stringResource(R.string.price_filter_month_option, it) }
+                    ?: all,
+                active = uiState.selectedMonth != null,
+                pinned = PriceDropdownOption(
+                    id = "__all",
+                    text = all,
+                    selected = uiState.selectedMonth == null,
+                    onClick = { onSelectMonth(null) },
+                ),
+                options = (1..12).map { month ->
+                    PriceDropdownOption(
+                        id = month.toString(),
+                        text = stringResource(R.string.price_filter_month_option, month),
+                        selected = uiState.selectedMonth == month,
+                        onClick = { onSelectMonth(month) },
+                    )
+                },
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+/**
+ * 筛选卡里的动作按钮：图标 + 文字 + 1 dp 描边，两个按钮共用同一套尺寸与配色。
+ *
+ * 禁用态用 `textMuted` + `border`，而不是 M3 默认的 `onSurface` 38%：那层灰在深色卡片上几乎看不见，
+ * 读起来像「按钮没画完」，分不清「暂时不能点」和「这里坏了」。这里禁用时文字仍读得清，只是从主色
+ * 退回中性色、边框同时退一档——两个按钮并排，谁可点一眼就能比出来。
+ *
+ * 不禁用 `enabled` 也不用重色块：一个是「没改动」不该让按钮显得像主操作，另一个是重色块会盖过
+ * 真正要看清的四个格子（§1.3 一屏只有一个主操作）。
+ */
+@Composable
+private fun PriceFilterActionButton(
+    text: String,
+    @DrawableRes iconRes: Int,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val tokens = LocalAppTokens.current
+    val colors = tokens.colors
+    OutlinedButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier.heightIn(min = tokens.spacing.hitMin),
+        shape = RoundedCornerShape(tokens.radii.label),
+        border = BorderStroke(
+            width = tokens.radii.highlight,
+            color = if (enabled) colors.primary else colors.border,
+        ),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = colors.primary,
+            disabledContentColor = colors.textMuted,
+        ),
+        contentPadding = PaddingValues(horizontal = tokens.spacing.s2),
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(tokens.spacing.s4),
+        )
+        Spacer(Modifier.width(tokens.spacing.s1))
+        Text(
+            text = text,
+            // 禁用态再加一道删除线：灰字 + 灰框在浅色下仍像一个「画淡了的按钮」，
+            // 删除线是明确说「此刻按不动」，不必靠对比度去猜（用户反馈）。
+            // 写进 style 的 copy 而不是用 Text 的 textDecoration 参数：按钮内容会套上
+            // 一层 LocalTextStyle，style 内的装饰在合并后稳定生效。
+            style = if (enabled) {
+                tokens.type.bodyS
+            } else {
+                tokens.type.bodyS.copy(textDecoration = TextDecoration.LineThrough)
+            },
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/**
+ * 统计行：左列物品名 + 「N 个地区 · N 条记录」，右列**按单位逐行**显示区间。
+ *
+ * 单位不折叠：不同售卖单位的价格本来就不可比，用户看这一行就是要知道「这物品有哪几种卖法、各自什么价」，
+ * 藏掉后面几种等于只答一半。单位多时行自然变高，比给一个「另有 N 种」让人再点一次划算。
+ *
+ * 整行可点，进【物品历史】看这个物品的逐条记录与走势；右端箭头是这条路由的唯一提示，
+ * 不加就没人会去点一张看起来只是数据的行（§4.6 可点区域要有可视提示）。
+ */
+@Composable
+private fun PriceStatsRow(
+    item: PriceItemStats,
+    onClick: () -> Unit,
+) {
     val tokens = LocalAppTokens.current
     val colors = tokens.colors
     val spacing = tokens.spacing
@@ -397,14 +615,13 @@ private fun PriceStatsRow(item: PriceItemStats) {
         if (item.regionCount > 0) add(stringResource(R.string.price_stats_regions, item.regionCount))
         add(stringResource(R.string.price_stats_records, item.recordCount))
     }.joinToString(" · ")
-    val visibleRanges = item.ranges.take(2)
-    val hiddenCount = item.ranges.size - visibleRanges.size
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .heightIn(min = spacing.rowMinHeight)
-            .padding(horizontal = spacing.s3, vertical = spacing.s2),
+            .padding(start = spacing.s3, end = spacing.s1, top = spacing.s2, bottom = spacing.s2),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
@@ -431,7 +648,7 @@ private fun PriceStatsRow(item: PriceItemStats) {
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(spacing.s1),
         ) {
-            visibleRanges.forEach { range ->
+            item.ranges.forEach { range ->
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         text = range.rangeText,
@@ -439,7 +656,7 @@ private fun PriceStatsRow(item: PriceItemStats) {
                         color = colors.text,
                         maxLines = 1,
                     )
-                    Spacer(Modifier.width(spacing.s1))
+                    Spacer(Modifier.width(spacing.s2))
                     Text(
                         text = range.unitText,
                         style = tokens.type.caption,
@@ -448,86 +665,14 @@ private fun PriceStatsRow(item: PriceItemStats) {
                     )
                 }
             }
-            if (hiddenCount > 0) {
-                Text(
-                    text = stringResource(R.string.price_stats_more_units, hiddenCount),
-                    style = tokens.type.caption,
-                    color = colors.textMuted,
-                    maxLines = 1,
-                )
-            }
         }
-    }
-}
-
-/**
- * 地区筛选：横向可滚动的 chip 行。
- * chip 视觉高 28 dp（与站内其他筛选 chip 同档），外层补到 48 dp 热区（§2.1-2、§10.4）。
- */
-@Composable
-private fun PriceRegionFilterRow(
-    regions: List<String>,
-    selected: Set<String>,
-    onToggle: (String) -> Unit,
-    onClear: () -> Unit,
-) {
-    val tokens = LocalAppTokens.current
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (selected.isNotEmpty()) {
-            PriceFilterChip(
-                label = stringResource(R.string.price_filter_region_all),
-                selected = false,
-                onClick = onClear,
-            )
-        }
-        regions.forEach { region ->
-            PriceFilterChip(
-                label = region,
-                selected = region in selected,
-                onClick = { onToggle(region) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun PriceFilterChip(label: String, selected: Boolean, onClick: () -> Unit) {
-    val tokens = LocalAppTokens.current
-    val colors = tokens.colors
-    // 选中态用主色 2 dp 外描边 + 填充底，不只改文字颜色（§2.6、§4.6）。
-    Box(
-        modifier = Modifier
-            .heightIn(min = tokens.spacing.hitMin)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Surface(
-            shape = RoundedCornerShape(tokens.radii.label),
-            color = if (selected) colors.primaryContainer else Color.Transparent,
-            border = BorderStroke(
-                width = if (selected) tokens.radii.stroke else tokens.radii.highlight,
-                color = if (selected) colors.primary else colors.border,
-            ),
-        ) {
-            Box(
-                modifier = Modifier.padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s1),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = label,
-                    style = tokens.type.bodyS,
-                    color = if (selected) colors.onPrimaryContainer else colors.textMuted,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
+        Spacer(Modifier.width(spacing.s1))
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_right),
+            contentDescription = null,
+            modifier = Modifier.size(spacing.s5),
+            tint = colors.textMuted,
+        )
     }
 }
 
@@ -615,7 +760,7 @@ private fun PriceRecordRow(
 
 /** 空态：说明「为什么空、下一步做什么」，不留一片空白（§6.2）。 */
 @Composable
-private fun PriceEmptyState(
+internal fun PriceEmptyState(
     title: String,
     description: String,
     @DrawableRes iconRes: Int = R.drawable.ic_price,

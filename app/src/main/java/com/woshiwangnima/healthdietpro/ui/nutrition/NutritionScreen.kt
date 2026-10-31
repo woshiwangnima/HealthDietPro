@@ -198,7 +198,7 @@ private fun FoodKind.detailTitleRes(): Int = when (this) {
 }
 
 @StringRes
-private fun FoodKind.comparisonTitleRes(): Int = when (this) {
+internal fun FoodKind.comparisonTitleRes(): Int = when (this) {
     FoodKind.INGREDIENT -> R.string.nutrition_comparison_title_ingredient
     FoodKind.FOOD -> R.string.nutrition_comparison_title_food
     FoodKind.DISH -> R.string.nutrition_comparison_title_dish
@@ -222,7 +222,7 @@ private fun systemTagPresentation(tag: String): Pair<String, androidx.compose.ui
     else -> null
 }
 
-private fun FoodItem.imageKey(): String = image?.localKey
+internal fun FoodItem.imageKey(): String = image?.localKey
     ?.takeUnless { it == FoodImageStore.DEFAULT_KEY }
     ?: id
 
@@ -280,7 +280,14 @@ internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier =
     when {
         state.exerciseRequest != null -> ExerciseExpenditureScreen(requireNotNull(state.exerciseRequest), viewModel::closeExerciseExpenditure)
         state.editor != null -> NutritionEditorScreen(requireNotNull(state.editor), viewModel)
-        state.comparisonReturnTarget != null -> FoodComparisonScreen(requireNotNull(state.selectedFood), state.foods, viewModel.nutrientMetas(), viewModel::resolvePer100g, viewModel::closeComparison)
+        state.comparisonReturnTarget != null -> FoodComparisonScreen(
+            food = requireNotNull(state.selectedFood),
+            foods = state.foods,
+            nutrientMetas = viewModel.nutrientMetas(),
+            imageStore = viewModel.foodImages,
+            resolve = viewModel::resolvePer100g,
+            onBack = viewModel::closeComparison,
+        )
         state.selectedFood != null -> FoodDetailScreen(
             food = requireNotNull(state.selectedFood),
             isFavorite = requireNotNull(state.selectedFood).id in state.favoriteFoodIds,
@@ -1505,7 +1512,7 @@ private fun ResolvedNutrition?.nutrientEnergyItems(): List<NutrientEnergyItem>? 
     return items.takeIf { it.isNotEmpty() }
 }
 
-private fun ResolvedNutrition?.energyKilocalories(multiplier: Double = 1.0): Double? {
+internal fun ResolvedNutrition?.energyKilocalories(multiplier: Double = 1.0): Double? {
     val amount = this?.nutrients?.get("ENERGY") ?: return null
     return UnitConverter.toBase(
         "energy",
@@ -2725,101 +2732,6 @@ internal fun FoodImage(
         modifier = modifier.clip(RoundedCornerShape(AppRadiiDefault.label)),
         contentScale = contentScale,
         alignment = Alignment.Center,
-    )
-}
-
-@Composable
-private fun FoodComparisonScreen(
-    food: FoodItem,
-    foods: List<FoodItem>,
-    nutrientMetas: List<com.woshiwangnima.healthdietpro.model.food.NutrientMeta>,
-    resolve: (FoodItem) -> ResolvedNutrition,
-    onBack: () -> Unit,
-) {
-    var opponentId by remember(food.id) { mutableStateOf<String?>(null) }
-    var kindFilter by remember(food.id) { mutableStateOf<FoodKind?>(null) }
-    var query by remember(food.id) { mutableStateOf("") }
-    val opponents = remember(food.id, foods, kindFilter, query) {
-        foods.filter { candidate ->
-            candidate.id != food.id &&
-                (kindFilter == null || candidate.kind == kindFilter) &&
-                candidate.searchableNames().any { it.contains(query, ignoreCase = true) }
-        }
-    }
-    val opponent = opponents.firstOrNull { it.id == opponentId }
-    val language = LocalConfiguration.current.locales[0]?.language ?: "en"
-    BaseScreen(title = stringResource(food.kind.comparisonTitleRes()), onBack = onBack, includeStatusBarPadding = false) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(food.displayName(language), style = LocalAppTokens.current.type.titleS)
-            EqualWidthSegmentedTabs(
-                tabs = listOf<FoodKind?>(null, FoodKind.INGREDIENT, FoodKind.FOOD, FoodKind.DISH).map { kind ->
-                    EqualWidthTab.text(if (kind == null) stringResource(R.string.nutrition_compare_all) else stringResource(kind.detailTitleRes()))
-                },
-                selectedIndex = listOf<FoodKind?>(null, FoodKind.INGREDIENT, FoodKind.FOOD, FoodKind.DISH).indexOf(kindFilter),
-                onSelected = { kindFilter = listOf<FoodKind?>(null, FoodKind.INGREDIENT, FoodKind.FOOD, FoodKind.DISH)[it] },
-            )
-            OutlinedTextField(query, { query = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, label = { Text(stringResource(R.string.nutrition_compare_search)) })
-            Text(stringResource(R.string.nutrition_compare_candidates), style = LocalAppTokens.current.type.caption, color = LocalAppTokens.current.colors.textMuted)
-            AppDataTable(
-                rows = opponents,
-                rowKey = { _, candidate -> candidate.id },
-                showRowNumber = false,
-                showPager = false,
-                modifier = Modifier.height(150.dp),
-                columns = listOf(
-                    AppDataTableColumn("name", { AppDataTableHeaderText(stringResource(R.string.nutrition_compare_target)) }, ColumnWidth.Flex(1f, 140.dp)) { candidate ->
-                        AppDataTableText(candidate.displayName(language))
-                    },
-                    AppDataTableColumn("kind", { AppDataTableHeaderText(stringResource(R.string.nutrition_compare_type)) }, ColumnWidth.Fixed(88.dp)) { candidate ->
-                        AppDataTableText(stringResource(candidate.kind.detailTitleRes()))
-                    },
-                ),
-                onRowClick = { opponentId = it.id },
-            )
-            if (opponent == null) {
-                Text(stringResource(R.string.nutrition_compare_choose_target), color = LocalAppTokens.current.colors.textMuted)
-            } else {
-                val left = runCatching { resolve(food) }.getOrNull()
-                val right = runCatching { resolve(opponent) }.getOrNull()
-                val metaByCode = nutrientMetas.associateBy { it.code }
-                val rows = (left?.nutrients?.keys.orEmpty() + right?.nutrients?.keys.orEmpty())
-                    .distinct()
-                    .filter { it in metaByCode }
-                    .sortedBy { nutrientMetas.indexOf(metaByCode.getValue(it)) }
-                    .map { code -> ComparisonRow(metaByCode.getValue(code), left?.nutrients?.get(code), right?.nutrients?.get(code)) }
-                Surface(modifier = Modifier.fillMaxWidth().weight(1f), shape = RoundedCornerShape(8.dp), color = LocalAppTokens.current.colors.panelRaised.copy(alpha = 0.3f)) {
-                    Column(Modifier.padding(6.dp)) {
-                        Text(stringResource(R.string.nutrition_compare_results), style = LocalAppTokens.current.type.titleS)
-                        AppDataTable(
-                            rows = rows,
-                            rowKey = { _, row -> row.meta.code },
-                            showPager = false,
-                            showRowNumber = false,
-                            modifier = Modifier.weight(1f),
-                            columns = listOf(
-                                AppDataTableColumn("left", { AppDataTableHeaderText(food.displayName(language)) }, ColumnWidth.Flex(1f, 96.dp)) { ComparisonValue(it.left, it.right) },
-                                AppDataTableColumn("metric", { AppDataTableHeaderText(stringResource(R.string.nutrition_profile_item)) }, ColumnWidth.Flex(1f, 96.dp)) { AppDataTableText(it.meta.displayName(language)) },
-                                AppDataTableColumn("right", { AppDataTableHeaderText(opponent.displayName(language)) }, ColumnWidth.Flex(1f, 96.dp)) { ComparisonValue(it.right, it.left) },
-                            ),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-private data class ComparisonRow(val meta: com.woshiwangnima.healthdietpro.model.food.NutrientMeta, val left: com.woshiwangnima.healthdietpro.model.food.FoodAmount?, val right: com.woshiwangnima.healthdietpro.model.food.FoodAmount?)
-
-@Composable
-private fun ComparisonValue(value: com.woshiwangnima.healthdietpro.model.food.FoodAmount?, other: com.woshiwangnima.healthdietpro.model.food.FoodAmount?) {
-    val isHigher = value != null && (other == null || value.value > other.value)
-    Text(
-        text = value?.let { "${it.value.formatTableValue()} ${it.unitId}" } ?: "-",
-        style = if (isHigher) LocalAppTokens.current.type.titleS else LocalAppTokens.current.type.body,
-        fontWeight = if (isHigher) FontWeight.Bold else FontWeight.Normal,
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center,
     )
 }
 
