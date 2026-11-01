@@ -85,6 +85,7 @@ docs/*
 !docs/SLEEP_RECORD_DESIGN.md
 !docs/BLOOD_GLUCOSE_CHART_REFACTOR.md
 !docs/FOOD_CATALOG_ASSET_DESIGN.md
+!docs/RELEASE_BUILD.md
 
 # Hidden directories
 .*/
