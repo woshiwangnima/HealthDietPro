@@ -30,7 +30,7 @@
     <string name="nutrition_energy_for_basis">%1$.0f kcal / %2$.0f %3$s</string>
     <string name="nutrition_food_image">Food image</string>
     <string name="nutrition_favorite">Favorite</string>
-    <string name="nutrition_compare">Compare foods</string>
+    <string name="nutrition_compare">Compare</string>
     <string name="nutrition_compare_all">All</string>
     <string name="nutrition_compare_search">Search comparison target</string>
     <string name="nutrition_compare_selected">Selected</string>
@@ -1507,10 +1507,8 @@
     <string name="record_action_container">Containers</string>
     <!-- Sleep module -->
     <string name="sleep_title">Sleep Records</string>
-    <string name="sleep_add_short">Log</string>
-    <string name="sleep_overview_last">Last: %1$s</string>
-    <string name="sleep_overview_average_7">Daily average</string>
-    <string name="sleep_overview_records_7">%1$d records</string>
+    <string name="sleep_add_night">Log night sleep</string>
+    <string name="sleep_add_nap">Log nap</string>
     <string name="sleep_day_today">Today</string>
     <string name="sleep_day_yesterday">Yesterday</string>
     <string name="sleep_day_month_day">%1$d/%2$d</string>
@@ -1522,16 +1520,20 @@
     <string name="sleep_timer_finished">Timer finished</string>
     <string name="sleep_add">Add Sleep</string>
     <string name="sleep_edit">Edit Sleep</string>
-    <string name="sleep_delete">Delete sleep record</string>
+    <string name="sleep_delete">Delete</string>
     <string name="sleep_delete_message">Delete the sleep record from %1$s?</string>
     <string name="sleep_filter_empty">No records here</string>
-    <string name="sleep_filter_empty_hint">Switch category, or tap Log to add one.</string>
+    <string name="sleep_filter_empty_hint">Switch category, or use the buttons at the top to add one.</string>
     <string name="sleep_empty">No sleep records yet</string>
     <string name="sleep_empty_hint">Add your first night sleep or nap, and it will show up here.</string>
     <string name="sleep_kind_title">Sleep type</string>
     <string name="sleep_kind_night">Night sleep</string>
     <string name="sleep_kind_nap">Nap</string>
     <string name="sleep_filter_all">All</string>
+    <string name="sleep_filter_section">Search and filters</string>
+    <string name="sleep_filter_clear">Clear filters</string>
+    <string name="sleep_filter_range_label">Date range</string>
+    <string name="sleep_filter_kind_label">Record type</string>
     <string name="sleep_ongoing">In progress</string>
     <string name="sleep_history">History</string>
     <string name="sleep_editor_duration_preview">Duration</string>
@@ -1540,6 +1542,8 @@
     <string name="sleep_start_time">Sleep start</string>
     <string name="sleep_wake_time">Wake up</string>
     <string name="sleep_wake_time_empty">In progress (no wake time yet)</string>
+    <string name="sleep_time_derive_wake">From sleep start</string>
+    <string name="sleep_time_derive_start">From wake up</string>
     <string name="sleep_note">Note</string>
     <string name="sleep_note_hint">Optional note for this sleep.</string>
     <string name="sleep_save">Save sleep record</string>
@@ -1577,6 +1581,7 @@
     <string name="sleep_statistics_trend">Sleep duration trend</string>
     <string name="sleep_statistics_7_days">Last 7 days</string>
     <string name="sleep_statistics_30_days">Last 30 days</string>
+    <string name="sleep_statistics_90_days">Last 90 days</string>
     <string name="sleep_statistics_average">Average %1$s</string>
     <string name="sleep_statistics_selected_day">%1$s · %2$s</string>
     <string name="sleep_statistics_selected_day_empty">No sleep recorded this day</string>
@@ -1810,7 +1815,6 @@
     <string name="price_filter_item">Item</string>
     <string name="price_filter_item_empty">No items match</string>
     <string name="price_filter_region_count">%1$d selected</string>
-    <string name="price_filter_apply">Search</string>
     <string name="price_delete_confirm_title">Delete this price record?</string>
     <string name="price_delete_confirm_message">%1$s (%2$s) cannot be recovered after deletion.</string>
     <string name="price_section_item">Item</string>
@@ -1884,6 +1888,7 @@
     <string name="price_history_empty">No records for this item</string>
     <string name="price_history_empty_hint">The current filters on the Statistics tab leave nothing for this item. Go back and relax them.</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_more">More</string>
     <string name="common_tooltip_long_press">Show explanation</string>
     <string name="search_activity_clear">Clear</string>
     <string name="search_activity_clear_title">Clear %1$s?</string>

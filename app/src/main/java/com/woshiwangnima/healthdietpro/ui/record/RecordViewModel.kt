@@ -1,6 +1,7 @@
 package com.woshiwangnima.healthdietpro.ui.record
 
 import android.app.Application
+import com.woshiwangnima.healthdietpro.R
 import androidx.lifecycle.AndroidViewModel
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseRepository
 import com.woshiwangnima.healthdietpro.model.bloodpressure.BloodPressureRepository
@@ -130,10 +131,16 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
             },
             RecordActionId.Sleep to sleep?.let { record ->
                 val minutes = record.durationMinutes()
+                // 与睡眠页同一套写法（「8 小时 30 分」而不是「8h 30m」）：
+                // 一张列表里两种时长记法，读者要先换算一次才敢比较。
                 val duration = minutes?.let { value ->
                     val hours = value / 60
                     val rest = value % 60
-                    if (hours > 0) "${hours}h ${rest}m" else "${rest}m"
+                    when {
+                        hours > 0 && rest == 0L -> context.getString(R.string.sleep_duration_h, hours)
+                        hours > 0 -> context.getString(R.string.sleep_duration_hm, hours, rest)
+                        else -> context.getString(R.string.sleep_duration_m, rest)
+                    }
                 } ?: ""
                 RecordLatest(record.sleepStartAt, duration)
             },

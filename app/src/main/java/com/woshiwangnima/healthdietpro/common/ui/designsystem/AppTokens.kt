@@ -132,6 +132,38 @@ val AppFoodKindAccessible = AppFoodKindColors(
 )
 
 /**
+ * 睡眠两类各自的代表色（夜间睡眠 / 小憩）。
+ *
+ * 两类在列表卡片、统计图与新增按钮上必须是同一对颜色，用户才会把「靛蓝＝夜间睡眠、暖橙＝小憩」
+ * 当成固定标签，而不是每屏换一套的装饰色。取色避开主色蓝与提示紫：夜间睡眠用靛蓝（H≈235°）、
+ * 小憩用暖橙（H≈30°），与 `primary` 的 H≈214°、`info` 的 H≈306° 都留出可辨差距。
+ *
+ * 两套主题的取值都满足：白字压在色块上 ≥ 4.5:1（`caption` 小字也是正文），色块压在卡片底上 ≥ 3:1
+ * （非文本对比度，§11.1）。深色主题下如果把色块提亮到刚好压在黑底上显眼，白字就掉到 4:1 以下，
+ * 所以这里选择「暗色块 + 白字」，靠明度差而不是亮度做识别。
+ */
+@Immutable
+data class AppSleepColors(
+    val night: Color,
+    val nap: Color,
+    val onSleep: Color,
+) {
+    fun forKind(night: Boolean): Color = if (night) this.night else nap
+}
+
+val DarkAppSleepColors = AppSleepColors(
+    night = Color(0xFF5A66C9),
+    nap = Color(0xFFA05F10),
+    onSleep = Color(0xFFFFFFFF),
+)
+
+val LightAppSleepColors = AppSleepColors(
+    night = Color(0xFF33409E),
+    nap = Color(0xFF8F5A0B),
+    onSleep = Color(0xFFFFFFFF),
+)
+
+/**
  * 图表分类配色。每个色值都针对所在主题的面板底色校准到非文本对比度 ≥ 3:1（通用规范 §11.1、§9.4），
  * 且不能只靠颜色区分——图例必须同时给文字标签。
  */
@@ -303,6 +335,7 @@ data class AppTokens(
     val type: AppTypeScale,
     val motion: AppMotion,
     val foodKind: AppFoodKindColors,
+    val sleep: AppSleepColors,
     val chart: AppChartColors,
 )
 
@@ -313,6 +346,7 @@ val DarkAppTokens = AppTokens(
     type = AppTypeDefault,
     motion = AppMotionDefault,
     foodKind = AppFoodKindCurrent,
+    sleep = DarkAppSleepColors,
     chart = DarkAppChartColors,
 )
 
@@ -323,6 +357,7 @@ val LightAppTokens = AppTokens(
     type = AppTypeDefault,
     motion = AppMotionDefault,
     foodKind = AppFoodKindCurrent,
+    sleep = LightAppSleepColors,
     chart = LightAppChartColors,
 )
 

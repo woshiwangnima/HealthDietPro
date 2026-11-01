@@ -66,6 +66,41 @@ internal fun defaultSleepTimes(
     }
 }
 
+/** 习惯记录时机在编辑器里决定「另一端时间由谁推出来」。 */
+internal enum class SleepDerivedField {
+    /** 睡前记录：入睡时间是用户填的那一端，醒来时间＝入睡时间 + 默认时长。 */
+    WAKE,
+
+    /** 起床记录：醒来时间是用户填的那一端，入睡时间＝醒来时间 − 默认时长。 */
+    START,
+}
+
+/** 该类别的默认时长（分钟）。 */
+internal fun sleepDefaultMinutes(prefs: SleepPrefs, kind: SleepKind): Int =
+    if (kind == SleepKind.NIGHT_SLEEP) prefs.nightDefaultMinutes else prefs.napDefaultMinutes
+
+/** 该类别的习惯时机决定编辑器里该给哪个字段配推算按钮。 */
+internal fun sleepDerivedField(prefs: SleepPrefs, kind: SleepKind): SleepDerivedField {
+    val timing = if (kind == SleepKind.NIGHT_SLEEP) prefs.nightTiming else prefs.napTiming
+    return if (timing == SleepRecordTiming.BEFORE_SLEEP) SleepDerivedField.WAKE else SleepDerivedField.START
+}
+
+/**
+ * 按默认时长从一端推另一端。
+ *
+ * 睡前的习惯是「知道几点躺下」，起床的习惯是「知道几点起来」——被推出来的那一端
+ * 每次不同，所以按钮挂在被推导的字段上，而不是两个字段都挂（两个按钮等于让人猜哪个是默认的）。
+ */
+internal fun deriveSleepCounterpart(
+    prefs: SleepPrefs,
+    kind: SleepKind,
+    anchorMillis: Long,
+    deriveWake: Boolean,
+): Long {
+    val offset = sleepDefaultMinutes(prefs, kind).coerceAtLeast(1) * 60_000L
+    return if (deriveWake) anchorMillis + offset else anchorMillis - offset
+}
+
 private const val KEY_NIGHT_MINUTES = "sleep_night_default_minutes"
 private const val KEY_NAP_MINUTES = "sleep_nap_default_minutes"
 private const val KEY_NIGHT_UNIT = "sleep_night_unit_id"

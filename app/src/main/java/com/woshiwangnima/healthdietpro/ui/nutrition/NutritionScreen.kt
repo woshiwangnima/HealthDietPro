@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -56,6 +57,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -79,6 +81,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.ui.layout.ContentScale
@@ -214,11 +217,20 @@ private fun FoodKind.nameColors(): Pair<androidx.compose.ui.graphics.Color, andr
     FoodKind.DISH -> AppFoodKindCurrent.dish to AppFoodKindCurrent.onKind
 }
 
+/**
+ * 收藏态的「正红」：图片左上角那枚「收藏」文字角标、详情卡右上角的心形按钮点亮后，都取这一支。
+ *
+ * 之前心形走的是 `colors.warning`（琥珀金），角标却是 0xFFC62828，同一条数据在同一屏上
+ * 出现两种颜色，会被读成「两件事」。收藏是状态标记而不是告警，这里统一到角标的红，
+ * 与删除那类真正不可逆操作用的 danger 区分开（§2.3 危险色不借用于正向状态）。
+ */
+private val FavoriteAccentColor = Color(0xFFC62828)
+
 @Composable
-private fun systemTagPresentation(tag: String): Pair<String, androidx.compose.ui.graphics.Color>? = when (tag) {
-    "common" -> stringResource(R.string.nutrition_tag_common) to androidx.compose.ui.graphics.Color(0xFF2E7D32)
-    "favorite" -> stringResource(R.string.nutrition_tag_favorite) to androidx.compose.ui.graphics.Color(0xFFC62828)
-    "recent" -> stringResource(R.string.nutrition_tag_recent) to androidx.compose.ui.graphics.Color(0xFF1565C0)
+private fun systemTagPresentation(tag: String): Pair<String, Color>? = when (tag) {
+    "common" -> stringResource(R.string.nutrition_tag_common) to Color(0xFF2E7D32)
+    "favorite" -> stringResource(R.string.nutrition_tag_favorite) to FavoriteAccentColor
+    "recent" -> stringResource(R.string.nutrition_tag_recent) to Color(0xFF1565C0)
     else -> null
 }
 
@@ -1120,8 +1132,12 @@ private fun FoodDetailContent(
     val spacing = tokens.spacing
     Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = spacing.page, vertical = spacing.s3)) {
         DetailPanel {
-        // 高 104 = 两排 48 dp 图标按钮 + 8 dp 间距：相邻热区之间留够 8 dp，避免连带误触（规范 01 §三、07 检查项 04）。
-        Row(modifier = Modifier.height(104.dp), verticalAlignment = Alignment.Top) {
+        // 高 124：右侧只剩收藏 / 更多两枚按钮，竖排起来是 48×2+8 = 104 dp，这是卡高的下限；
+        // 剩下的 20 dp 留给幻灯片区——它跟着从 140 那版的 ~100 dp 收到 ~88 dp（名称条约 36 dp）。
+        // 原来 104 dp 的卡高是被「右侧两排各两个 48 dp 按钮」钉死的，那时候幻灯片只有 68 dp，
+        // 正文滚两行就见底；现在虽收了一点，仍比那版宽裕，且宽度上多出 56 dp（按钮列 104→48）。
+        // 缩略图仍按 96 dp：那是列表卡片沿用下来的 1:1 槽位，改它会让同一张图在两处对不齐。
+        Row(modifier = Modifier.height(124.dp), verticalAlignment = Alignment.Top) {
             FoodImageWithSystemTags(
                 food = food,
                 image = detailImage,
@@ -1145,32 +1161,14 @@ private fun FoodDetailContent(
                     modifier = Modifier.weight(1f),
                 ) { viewModel.openFood(it) }
             }
-            Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.SpaceBetween) {
-                if (isCustom) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
-                        IconButton(onClick = { viewModel.openEditor(food.kind, food.id) }) {
-                            Icon(Icons.Filled.Edit, stringResource(R.string.nutrition_editor_edit), tint = colors.textMuted)
-                        }
-                        // 删除是不可逆操作，允许使用危险色（§2.3），与「编辑」区分。
-                        IconButton(onClick = { confirmingDelete = true }) {
-                            Icon(Icons.Filled.Delete, stringResource(R.string.nutrition_editor_delete), tint = colors.danger)
-                        }
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
-                    IconButton(onClick = { viewModel.toggleFavorite(food) }) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = stringResource(R.string.nutrition_favorite),
-                            // 收藏是正向状态，按 §2.3 不得借用危险色（danger 只用于删除 / 不可逆操作）。
-                            tint = if (isFavorite) colors.warning else colors.textMuted,
-                        )
-                    }
-                        IconButton(onClick = onCompare) {
-                            Icon(painterResource(R.drawable.ic_vs), stringResource(R.string.nutrition_compare))
-                        }
-                }
-            }
+            FoodDetailActions(
+                isFavorite = isFavorite,
+                isCustom = isCustom,
+                onToggleFavorite = { viewModel.toggleFavorite(food) },
+                onCompare = onCompare,
+                onEdit = { viewModel.openEditor(food.kind, food.id) },
+                onDelete = { confirmingDelete = true },
+            )
         }
         FoodHeaderPager(
             page = headerPage,
@@ -1400,7 +1398,14 @@ private fun FoodHeaderPages(
     modifier: Modifier,
     onOpenFood: (FoodItem) -> Unit,
 ) {
-    AnimatedPageContent(page, modifier.fillMaxWidth(), direction = { _, _ -> direction }) { currentPage ->
+    // 幻灯片区嵌在白色详情卡里，底色要跟着卡片走（panelRaised），否则整块会铺上一层页面底色、
+    // 在卡中央显出一个浅灰矩形——页数小的时候不明显，加高加宽后一眼就能看出来。
+    AnimatedPageContent(
+        page,
+        modifier.fillMaxWidth(),
+        direction = { _, _ -> direction },
+        containerColor = LocalAppTokens.current.colors.panelRaised,
+    ) { currentPage ->
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             val textStyle = LocalAppTokens.current.type.bodyS
             if (currentPage == 0) {
@@ -1415,6 +1420,106 @@ private fun FoodHeaderPages(
             }
         }
     }
+}
+
+/**
+ * 详情卡右上角的操作区：**只留【收藏】在外面**，【对比】【编辑】【删除】收进【更多】菜单。
+ *
+ * 四个图标按钮平铺时，右半张卡是被按钮占掉的：两排各两个 48 dp 按钮钉死了卡高（104 dp），
+ * 中间的幻灯片区只能缩到 68 dp。这四件事里只有【收藏】是高频、且要看得到当前状态
+ * （空心 / 实心 = 未收藏 / 已收藏，这个必须在外观上常驻，收进菜单就看不见了）；
+ * 【编辑】【删除】只对自定义条目生效，【对比】是偶发的跳转动作，都适合放进菜单，
+ * 让它们不必再占用信息区的高度（§1.3 主要操作要在手边、次要操作不要挤压内容）。
+ *
+ * 剩下这两枚按钮按**竖排**（收藏在上、更多在下）而不是横排：横排要吃掉 48×2+8=104 dp 宽，
+ * 竖排只占 48 dp，宽度差全部还给了左边的幻灯片区；代价是要 48×2+8=104 dp 高，
+ * 所以卡片整体高度只从 140 收到 124——正好够两枚按钮放完，再矮就会挤压。
+ */
+@Composable
+private fun FoodDetailActions(
+    isFavorite: Boolean,
+    isCustom: Boolean,
+    onToggleFavorite: () -> Unit,
+    onCompare: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    var menuExpanded by remember { mutableStateOf(false) }
+    Column(
+        // 两枚 48 dp 图标按钮上下各留 8 dp 间距（规范 01 §三 相邻热区间距）。
+        verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        IconButton(onClick = onToggleFavorite) {
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = stringResource(R.string.nutrition_favorite),
+                // 点亮后取与图片「收藏」角标同一支红，保证同屏同一状态只有一个颜色（见 FavoriteAccentColor）。
+                tint = if (isFavorite) FavoriteAccentColor else tokens.colors.textMuted,
+            )
+        }
+        Box {
+            IconButton(onClick = { menuExpanded = true }) {
+                Icon(
+                    // 横置省略号：按钮已经竖排成一列，再用纵向的 MoreVert 会和这一列的
+                    // 方向打架，读起来像「还能往下展开」；横排的 … 才像「点开看更多」。
+                    imageVector = Icons.Filled.MoreHoriz,
+                    contentDescription = stringResource(R.string.common_more),
+                    tint = tokens.colors.textMuted,
+                )
+            }
+            // 菜单里的顺序按「用完去哪儿」排：对比是当前页的另一条岔路，编辑/删除才是动数据。
+            DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                // 对比沿用列表卡 / 对比页那枚「VS」徽章图形，用户在别处已经认过这个符号；
+                // 文案只留「对比」两字——卡片上下文已经说明比的是食物，不必再说一遍。
+                FoodDetailMenuAction(
+                    text = stringResource(R.string.nutrition_compare),
+                    iconRes = R.drawable.ic_vs,
+                    onClick = { menuExpanded = false; onCompare() },
+                )
+                if (isCustom) {
+                    FoodDetailMenuAction(
+                        text = stringResource(R.string.nutrition_editor_edit),
+                        imageVector = Icons.Filled.Edit,
+                        onClick = { menuExpanded = false; onEdit() },
+                    )
+                    // 删除是不可逆操作，允许使用危险色（§2.3），与上面两项区分开。
+                    FoodDetailMenuAction(
+                        text = stringResource(R.string.nutrition_editor_delete),
+                        imageVector = Icons.Filled.Delete,
+                        danger = true,
+                        onClick = { menuExpanded = false; onDelete() },
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** 【更多】菜单里的一行：图标（矢量或 drawable 二选一）+ 文字，删除项整行走 danger 色。 */
+@Composable
+private fun FoodDetailMenuAction(
+    text: String,
+    iconRes: Int? = null,
+    imageVector: ImageVector? = null,
+    danger: Boolean = false,
+    onClick: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val contentColor = if (danger) tokens.colors.danger else tokens.colors.text
+    val iconModifier = Modifier.size(tokens.spacing.s5)
+    DropdownMenuItem(
+        text = { Text(text, style = tokens.type.bodyS) },
+        onClick = onClick,
+        leadingIcon = {
+            when {
+                iconRes != null -> Icon(painterResource(iconRes), null, modifier = iconModifier, tint = contentColor)
+                imageVector != null -> Icon(imageVector, null, modifier = iconModifier, tint = contentColor)
+            }
+        },
+        colors = MenuDefaults.itemColors(textColor = contentColor, leadingIconColor = contentColor),
+    )
 }
 
 @Composable

@@ -30,7 +30,7 @@
     <string name="nutrition_energy_for_basis">%1$.0f 千卡 / %2$.0f %3$s</string>
     <string name="nutrition_food_image">食物图片</string>
     <string name="nutrition_favorite">收藏</string>
-    <string name="nutrition_compare">对比食物</string>
+    <string name="nutrition_compare">对比</string>
     <string name="nutrition_compare_all">全部</string>
     <string name="nutrition_compare_search">搜索对比目标</string>
     <string name="nutrition_compare_selected">已选</string>
@@ -1508,10 +1508,8 @@
     <string name="record_action_container">记容器</string>
     <!-- Sleep module -->
     <string name="sleep_title">睡眠记录</string>
-    <string name="sleep_add_short">记一笔</string>
-    <string name="sleep_overview_last">最近一次 · %1$s</string>
-    <string name="sleep_overview_average_7">日均睡眠</string>
-    <string name="sleep_overview_records_7">近 7 日 %1$d 条</string>
+    <string name="sleep_add_night">记夜间睡眠</string>
+    <string name="sleep_add_nap">记小憩</string>
     <string name="sleep_day_today">今天</string>
     <string name="sleep_day_yesterday">昨天</string>
     <string name="sleep_day_month_day">%1$d 月 %2$d 日</string>
@@ -1523,16 +1521,20 @@
     <string name="sleep_timer_finished">计时结束</string>
     <string name="sleep_add">添加睡眠</string>
     <string name="sleep_edit">编辑睡眠</string>
-    <string name="sleep_delete">删除睡眠记录</string>
+    <string name="sleep_delete">删除</string>
     <string name="sleep_delete_message">删除 %1$s 的睡眠记录？</string>
     <string name="sleep_filter_empty">这个类别下还没有记录</string>
-    <string name="sleep_filter_empty_hint">换一个类别，或点右下角的「记一笔」。</string>
+    <string name="sleep_filter_empty_hint">换一个类别，或用顶部的按钮记一笔。</string>
     <string name="sleep_empty">还没有睡眠记录</string>
     <string name="sleep_empty_hint">记录第一次夜间睡眠或小憩，这里就会出现。</string>
     <string name="sleep_kind_title">睡眠类型</string>
     <string name="sleep_kind_night">夜间睡眠</string>
     <string name="sleep_kind_nap">小憩</string>
     <string name="sleep_filter_all">全部</string>
+    <string name="sleep_filter_section">查找与筛选</string>
+    <string name="sleep_filter_clear">清除筛选</string>
+    <string name="sleep_filter_range_label">时间范围</string>
+    <string name="sleep_filter_kind_label">记录类型</string>
     <string name="sleep_ongoing">进行中</string>
     <string name="sleep_history">历史</string>
     <string name="sleep_editor_duration_preview">本次时长</string>
@@ -1541,6 +1543,8 @@
     <string name="sleep_start_time">入睡时间</string>
     <string name="sleep_wake_time">醒来时间</string>
     <string name="sleep_wake_time_empty">进行中（暂无醒来时间）</string>
+    <string name="sleep_time_derive_wake">按入睡时间调整</string>
+    <string name="sleep_time_derive_start">按醒来时间调整</string>
     <string name="sleep_note">备注</string>
     <string name="sleep_note_hint">可选的睡眠备注。</string>
     <string name="sleep_save">保存睡眠记录</string>
@@ -1578,6 +1582,7 @@
     <string name="sleep_statistics_trend">睡眠时长趋势</string>
     <string name="sleep_statistics_7_days">近 7 天</string>
     <string name="sleep_statistics_30_days">近 30 天</string>
+    <string name="sleep_statistics_90_days">近 90 天</string>
     <string name="sleep_statistics_average">平均 %1$s</string>
     <string name="sleep_statistics_selected_day">%1$s · %2$s</string>
     <string name="sleep_statistics_selected_day_empty">当天没有睡眠记录</string>
@@ -1811,7 +1816,6 @@
     <string name="price_filter_item">商品</string>
     <string name="price_filter_item_empty">没有匹配的商品</string>
     <string name="price_filter_region_count">已选 %1$d 个</string>
-    <string name="price_filter_apply">开始查找</string>
     <string name="price_delete_confirm_title">删除这条物价记录？</string>
     <string name="price_delete_confirm_message">%1$s（%2$s）删除后不可恢复。</string>
     <string name="price_section_item">物品</string>
@@ -1885,6 +1889,7 @@
     <string name="price_history_empty">这个物品没有可展示的记录</string>
     <string name="price_history_empty_hint">统计页当前的筛选把它筛掉了；回去放宽年份、月份或地区再看。</string>
     <string name="common_cancel">取消</string>
+    <string name="common_more">更多</string>
     <string name="common_tooltip_long_press">查看说明</string>
     <string name="search_activity_clear">清除</string>
     <string name="search_activity_clear_title">清空%1$s？</string>

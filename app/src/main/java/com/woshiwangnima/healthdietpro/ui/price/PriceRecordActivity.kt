@@ -69,7 +69,6 @@ private fun PriceRoute(onFinish: () -> Unit, openEditorInitially: Boolean) {
             onClearRegions = viewModel::clearRegionFilters,
             onSelectYear = viewModel::selectYear,
             onSelectMonth = viewModel::selectMonth,
-            onApplyFilters = viewModel::applyFilters,
             onClearFilters = viewModel::clearFilters,
             onOpenItemHistory = { name ->
                 historyItemName = name

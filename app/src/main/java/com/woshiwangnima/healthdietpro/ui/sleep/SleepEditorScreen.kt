@@ -55,10 +55,13 @@ import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSwitchRow
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.sleep.NocturiaRecord
+import com.woshiwangnima.healthdietpro.model.sleep.SleepDerivedField
 import com.woshiwangnima.healthdietpro.model.sleep.SleepKind
 import com.woshiwangnima.healthdietpro.model.sleep.SleepPrefs
 import com.woshiwangnima.healthdietpro.model.sleep.SleepRecord
 import com.woshiwangnima.healthdietpro.model.sleep.defaultSleepTimes
+import com.woshiwangnima.healthdietpro.model.sleep.deriveSleepCounterpart
+import com.woshiwangnima.healthdietpro.model.sleep.sleepDerivedField
 import com.woshiwangnima.healthdietpro.model.sleep.generateDefaultNocturia
 
 private val NAP_TIMER_MINUTES = listOf(10, 20, 30, 45, 60)
@@ -75,6 +78,8 @@ private val NIGHT_TIMER_MINUTES = listOf(15, 30, 45, 60)
 internal fun SleepEditorScreen(
     existing: SleepRecord?,
     prefs: SleepPrefs,
+    /** 新增时预选的类别：从【记夜间睡眠】或【记小憩】进来就已经定好，进页面后仍可切换。 */
+    initialKind: SleepKind = SleepKind.NIGHT_SLEEP,
     onBack: () -> Unit,
     onSave: (SleepRecord) -> Unit,
     onCreateTimer: (label: String, minutes: Int, notifyViaSystem: Boolean) -> com.woshiwangnima.healthdietpro.common.timer.TimerInstance,
@@ -82,33 +87,39 @@ internal fun SleepEditorScreen(
 ) {
     val tokens = LocalAppTokens.current
     val now = System.currentTimeMillis()
-    var kind by rememberSaveable(existing?.id) { mutableStateOf(existing?.kind ?: SleepKind.NIGHT_SLEEP) }
-    var sleepStartAt by rememberSaveable(existing?.id) { mutableStateOf(existing?.sleepStartAt ?: 0L) }
-    var wakeUpAt by rememberSaveable(existing?.id) { mutableStateOf(existing?.wakeUpAt) }
-    var recordedAt by rememberSaveable(existing?.id) {
-        mutableStateOf(existing?.recordedAt ?: normalizeRecordTimestamp(now, RecordTimePrecision.MINUTE))
+    // 表单初值（也是后面判脏的基线）：新增时按类别与偏好算好默认起止时间，编辑时就是存档原记录。
+    // 六个字段统一从这里取初值，不再各写一段 `existing?.x ?: 默认值`——旧版这么写时
+    // 「入睡/醒来」的默认值只能在组合过程中补一次赋值进去，于是刚进页面 `current`
+    // 就已经不是 `existing`，下面的 hasChanges 在第一帧就恒为真。
+    val initialForm = remember(existing?.id, initialKind, prefs) {
+        existing ?: run {
+            val (defaultStart, defaultWake) = defaultSleepTimes(prefs, initialKind, now)
+            SleepRecord(
+                id = "",
+                kind = initialKind,
+                sleepStartAt = normalizeRecordTimestamp(defaultStart, RecordTimePrecision.MINUTE),
+                wakeUpAt = normalizeRecordTimestamp(defaultWake, RecordTimePrecision.MINUTE),
+                recordedAt = normalizeRecordTimestamp(now, RecordTimePrecision.MINUTE),
+            )
+        }
     }
-    var note by rememberSaveable(existing?.id) { mutableStateOf(existing?.note.orEmpty()) }
-    var nocturiaCount by rememberSaveable(existing?.id) { mutableIntStateOf(existing?.nocturia?.size ?: 0) }
-    var nocturia by rememberSaveable(existing?.id) {
-        mutableStateOf(existing?.nocturia ?: emptyList())
-    }
-    var startTimerEnabled by rememberSaveable(existing?.id) { mutableStateOf(existing?.timerId != null) }
-    var timerMinutes by rememberSaveable(existing?.id) {
+    var kind by rememberSaveable(existing?.id, initialKind) { mutableStateOf(initialForm.kind) }
+    var sleepStartAt by rememberSaveable(existing?.id, initialKind) { mutableStateOf(initialForm.sleepStartAt) }
+    var wakeUpAt by rememberSaveable(existing?.id, initialKind) { mutableStateOf(initialForm.wakeUpAt) }
+    var recordedAt by rememberSaveable(existing?.id, initialKind) { mutableStateOf(initialForm.recordedAt) }
+    var note by rememberSaveable(existing?.id, initialKind) { mutableStateOf(initialForm.note) }
+    var nocturiaCount by rememberSaveable(existing?.id, initialKind) { mutableIntStateOf(initialForm.nocturia.size) }
+    var nocturia by rememberSaveable(existing?.id, initialKind) { mutableStateOf(initialForm.nocturia) }
+    var startTimerEnabled by rememberSaveable(existing?.id, initialKind) { mutableStateOf(initialForm.timerId != null) }
+    var timerMinutes by rememberSaveable(existing?.id, initialKind) {
         // 默认值必须落在当前类别的档位里：旧版一律取小憩的第一档（10 分钟），
         // 在夜间睡眠下这个值不在 15/30/45/60 里，界面上写着 10、存下去却被夹成 15。
         mutableIntStateOf(if (kind == SleepKind.NIGHT_SLEEP) NIGHT_TIMER_MINUTES.first() else NAP_TIMER_MINUTES.first())
     }
-    var notifyViaSystem by rememberSaveable(existing?.id) { mutableStateOf(false) }
+    var notifyViaSystem by rememberSaveable(existing?.id, initialKind) { mutableStateOf(false) }
     var pickField by remember { mutableStateOf<SleepTimeField?>(null) }
     var showSystemTimerConfirm by remember { mutableStateOf(false) }
-    var showDiscardDialog by rememberSaveable(existing?.id) { mutableStateOf(false) }
-
-    if (existing == null && sleepStartAt == 0L) {
-        val (defaultStart, defaultWake) = defaultSleepTimes(prefs, kind, now)
-        sleepStartAt = normalizeRecordTimestamp(defaultStart, RecordTimePrecision.MINUTE)
-        wakeUpAt = normalizeRecordTimestamp(defaultWake, RecordTimePrecision.MINUTE)
-    }
+    var showDiscardDialog by rememberSaveable(existing?.id, initialKind) { mutableStateOf(false) }
 
     fun applyKindDefaults(newKind: SleepKind) {
         if (existing == null) {
@@ -118,9 +129,11 @@ internal fun SleepEditorScreen(
         }
     }
 
-    val wakeUp = wakeUpAt
-    val timerVisible = wakeUp != null && wakeUp > now
-    val current = SleepRecord(
+    // 现场把表单读成一条记录。**回调里一律重新调它**，不要复用下面的 `current`：
+    // 返回键的回调在更早一次组合里就被注册/捕获，闭包里读派生 val 拿到的是那一刻的快照
+    //（真机上的表现：切到小憩后按系统返回，判定仍读到切之前的夜间睡眠，于是直接退走）。
+    // 这里的 kind / sleepStartAt 等都是 remember 出来的 State，闭包捕获的是 State 本身，读到的永远是最新值。
+    fun snapshot(): SleepRecord = SleepRecord(
         id = existing?.id.orEmpty(),
         kind = kind,
         sleepStartAt = sleepStartAt,
@@ -130,11 +143,21 @@ internal fun SleepEditorScreen(
         timerId = existing?.timerId,
         nocturia = if (kind == SleepKind.NIGHT_SLEEP) nocturia else emptyList(),
     )
-    val timerConfigChanged = timerVisible && startTimerEnabled != (existing?.timerId != null)
-    val hasChanges = current != existing || timerConfigChanged
+
+    val wakeUp = wakeUpAt
+    val current = snapshot()
+    // 判脏：拿当前表单跟「进页面那一下的表单」（initialForm）比，而不是跟 existing 比。
+    // 新增时 existing 恒为 null，`current != existing` 恒真——于是刚点开【记夜间睡眠】、
+    // 一个字没改，按返回也会被问一句「放弃未保存的修改」。默认起止时间是系统给的建议值，
+    // 不算改动；只有真的动了字段或计时器开关，才算「有未保存的修改」。
+    val timerVisible = sleepTimerVisible(wakeUp, now)
+    val hasChanges = sleepFormHasChanges(current, initialForm, timerVisible, startTimerEnabled)
     val valid = sleepStartAt > 0L && recordedAt > 0L && (wakeUp == null || wakeUp >= sleepStartAt) &&
         (kind != SleepKind.NIGHT_SLEEP || nocturia.all { it.endAt >= it.startAt })
-    val saveEnabled = valid && hasChanges
+    // 新增页允许「原样保存」：预填的默认时间本身就是一条可以直接入账的记录，
+    // 用户一路点进来什么都不改再点保存，不该被一处防呆挡住；
+    // 编辑页才要求有改动，否则按钮永远亮着、点了又什么都没存因人而异地困惑。
+    val saveEnabled = valid && (existing == null || hasChanges)
     val timerLabel = stringResource(if (kind == SleepKind.NAP) R.string.sleep_timer_nap_label else R.string.sleep_timer_night_label)
 
     fun regenerateNocturia() {
@@ -143,18 +166,27 @@ internal fun SleepEditorScreen(
     }
 
     fun save() {
-        if (timerVisible && startTimerEnabled && existing?.timerId == null) {
-            val minutes = if (kind == SleepKind.NAP) timerMinutes.coerceIn(NAP_TIMER_MINUTES) else timerMinutes.coerceIn(NIGHT_TIMER_MINUTES)
+        val form = snapshot()
+        val timerReady = sleepTimerVisible(form.wakeUpAt, System.currentTimeMillis())
+        if (timerReady && startTimerEnabled && existing?.timerId == null) {
+            val minutes = if (form.kind == SleepKind.NAP) timerMinutes.coerceIn(NAP_TIMER_MINUTES) else timerMinutes.coerceIn(NIGHT_TIMER_MINUTES)
             if (notifyViaSystem) { showSystemTimerConfirm = true; return }
             val timer = onCreateTimer(timerLabel, minutes, false)
-            onSave(current.copy(id = existing?.id ?: newSleepId(), timerId = timer.id))
+            onSave(form.copy(id = existing?.id ?: newSleepId(), timerId = timer.id))
             return
         }
-        onSave(current.copy(id = existing?.id ?: newSleepId()))
+        onSave(form.copy(id = existing?.id ?: newSleepId()))
     }
 
     fun requestBack() {
-        if (hasChanges) showDiscardDialog = true else onBack()
+        val form = snapshot()
+        val dirty = sleepFormHasChanges(
+            current = form,
+            baseline = initialForm,
+            timerVisible = sleepTimerVisible(form.wakeUpAt, System.currentTimeMillis()),
+            timerEnabled = startTimerEnabled,
+        )
+        if (dirty) showDiscardDialog = true else onBack()
     }
     androidx.activity.compose.BackHandler(onBack = ::requestBack)
 
@@ -210,11 +242,30 @@ internal fun SleepEditorScreen(
                         title = stringResource(R.string.sleep_time_section),
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2)) {
+                            // 推算按钮挂在「默认设置说该由系统推出来的那一端」：
+                            // 睡前记录 → 醒来时间由入睡时间 + 默认时长算出；起床记录 → 反过来。
+                            // 另一端才是用户真的会动手填的，按钮不该抢它的位置；
+                            // 锚点还没值时按钮不出现（算不出东西的按钮只会挡路）。
+                            val derived = sleepDerivedField(prefs, kind)
                             RecordTimePickerField(
                                 title = stringResource(R.string.sleep_start_time),
                                 valueMillis = sleepStartAt,
                                 precision = RecordTimePrecision.MINUTE,
                                 onClick = { pickField = SleepTimeField.START },
+                                assistIconRes = R.drawable.ic_refresh,
+                                assistLabel = if (derived == SleepDerivedField.START && wakeUpAt != null) {
+                                    stringResource(R.string.sleep_time_derive_start)
+                                } else {
+                                    null
+                                },
+                                onAssistClick = {
+                                    wakeUpAt?.let { wake ->
+                                        sleepStartAt = normalizeRecordTimestamp(
+                                            deriveSleepCounterpart(prefs, kind, wake, deriveWake = false),
+                                            RecordTimePrecision.MINUTE,
+                                        )
+                                    }
+                                },
                             )
                             RecordTimePickerField(
                                 title = stringResource(R.string.sleep_wake_time),
@@ -222,6 +273,20 @@ internal fun SleepEditorScreen(
                                 precision = RecordTimePrecision.MINUTE,
                                 onClick = { pickField = SleepTimeField.WAKE },
                                 emptyText = stringResource(R.string.sleep_wake_time_empty),
+                                assistIconRes = R.drawable.ic_refresh,
+                                assistLabel = if (derived == SleepDerivedField.WAKE && sleepStartAt > 0L) {
+                                    stringResource(R.string.sleep_time_derive_wake)
+                                } else {
+                                    null
+                                },
+                                onAssistClick = {
+                                    if (sleepStartAt > 0L) {
+                                        wakeUpAt = normalizeRecordTimestamp(
+                                            deriveSleepCounterpart(prefs, kind, sleepStartAt, deriveWake = true),
+                                            RecordTimePrecision.MINUTE,
+                                        )
+                                    }
+                                },
                             )
                         }
                     }

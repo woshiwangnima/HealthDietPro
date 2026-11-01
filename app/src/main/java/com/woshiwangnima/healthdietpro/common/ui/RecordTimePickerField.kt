@@ -1,5 +1,7 @@
 package com.woshiwangnima.healthdietpro.common.ui
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +36,9 @@ internal fun RecordTimePickerField(
     resetOffset: Duration? = null,
     resetLabel: String? = null,
     onResetClick: (() -> Unit)? = null,
+    @DrawableRes assistIconRes: Int? = null,
+    assistLabel: String? = null,
+    onAssistClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -60,32 +65,22 @@ internal fun RecordTimePickerField(
                 )
             }
             if (resetOffset != null && onResetClick != null) {
-                Surface(
-                    onClick = onResetClick,
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f),
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    shape = MaterialTheme.shapes.small,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
-                        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(3.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Refresh,
-                            contentDescription = resetLabel,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        resetLabel?.let {
-                            TextOverflowText(
-                                text = it,
-                                modifier = Modifier.weight(1f, fill = false),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                maxLines = 1,
-                            )
-                        }
-                    }
+                RecordTimeFieldAction(label = resetLabel, onClick = onResetClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Refresh,
+                        contentDescription = resetLabel,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
+            // 没标签就不画：只剩一个图标的按钮说不清它要干什么。
+            if (assistIconRes != null && assistLabel != null && onAssistClick != null) {
+                RecordTimeFieldAction(label = assistLabel, onClick = onAssistClick) {
+                    Icon(
+                        painter = painterResource(assistIconRes),
+                        contentDescription = assistLabel,
+                        modifier = Modifier.size(18.dp),
+                    )
                 }
             }
             Icon(
@@ -94,6 +89,43 @@ internal fun RecordTimePickerField(
                 modifier = Modifier.width(24.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+/**
+ * 时间字段右侧的小按钮（primaryContainer 底 + 短标签）。
+ *
+ * 它和整块字段的 `onClick`（打开选择器）是两个独立动作：按钮自己是一个 `Surface` 点击目标，
+ * 命中优先级高于外层 `Surface`，点按钮不会顺手把时间选择器也弹出来。
+ */
+@Composable
+private fun RecordTimeFieldAction(
+    label: String?,
+    onClick: () -> Unit,
+    icon: @Composable () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f),
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        shape = MaterialTheme.shapes.small,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(3.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            icon()
+            label?.let {
+                TextOverflowText(
+                    text = it,
+                    modifier = Modifier.weight(1f, fill = false),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    maxLines = 1,
+                )
+            }
         }
     }
 }

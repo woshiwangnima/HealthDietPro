@@ -50,8 +50,12 @@ fun DiscardChangesDialog(
             }
         },
         text = { Text(stringResource(R.string.form_discard_changes_message)) },
+        // 两个动作都做成按钮而不是文字按钮：这一屏只有两件事可做，其中一件不可逆，
+        // 一排灰字会让「放弃」和「保存」读起来一样轻。真正的出口另有右上角那个关闭。
         confirmButton = {
-            AppTextIconButton(
+            // 保存＝实心主按钮（这一屏唯一的主操作）；放弃＝danger 描边按钮：
+            // 它同样会让人关掉这一屏，但代价是丢内容，按钮的形状与颜色必须同时说明这一点。
+            AppIconTextButton(
                 text = stringResource(R.string.form_discard_changes_save),
                 iconRes = R.drawable.ic_save,
                 onClick = onSave,
@@ -59,10 +63,11 @@ fun DiscardChangesDialog(
             )
         },
         dismissButton = {
-            AppTextIconButton(
+            AppOutlinedIconTextButton(
                 text = stringResource(R.string.form_discard_changes_confirm),
                 iconRes = R.drawable.ic_cancel,
                 onClick = onDiscard,
+                danger = true,
             )
         },
     )

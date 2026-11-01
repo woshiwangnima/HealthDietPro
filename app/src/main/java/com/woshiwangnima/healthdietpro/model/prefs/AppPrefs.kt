@@ -196,4 +196,19 @@ object AppPrefs {
     fun setMedicationTab(context: Context, tab: Int) =
         user(context).putInt("tab_medication", tab)
 
+    /**
+     * 记睡眠首页停在哪个页签（0=统计，1=记录）。
+     *
+     * 存这里而不是 `rememberSaveable`：后者只管「进程重建」，用户退出应用再进来会掉回默认页；
+     * 记睡眠的主动作在【记录】页，但很多人习惯先看统计，退出时的页签应当原样保留
+     * （与用药记录同一个约定）。
+     */
+    fun getSleepTab(context: Context): Int =
+        user(context).getInt("tab_sleep", SLEEP_TAB_DEFAULT)
+    fun setSleepTab(context: Context, tab: Int) =
+        user(context).putInt("tab_sleep", tab)
+
+    /** 默认停在【记录】：这一页才有新增入口（统计在左、记录在右，顺序与物价 / 饮水一致）。 */
+    private const val SLEEP_TAB_DEFAULT = 1
+
 }

@@ -1,7 +1,8 @@
 package com.woshiwangnima.healthdietpro.ui.price
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,15 +17,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -37,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.window.DialogProperties
 import com.woshiwangnima.healthdietpro.R
@@ -48,7 +46,10 @@ import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppFilterActionButton
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionCard
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSplitCardBody
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSplitCardHead
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.price.PriceGroup
 import com.woshiwangnima.healthdietpro.model.price.PriceItemStats
@@ -79,7 +80,6 @@ internal fun PriceListScreen(
     onClearRegions: () -> Unit,
     onSelectYear: (Int?) -> Unit,
     onSelectMonth: (Int?) -> Unit,
-    onApplyFilters: () -> Unit,
     onClearFilters: () -> Unit,
     /** 点统计行进【物品历史】；参数是物品名，页面内部再归一化成物品键。 */
     onOpenItemHistory: (String) -> Unit,
@@ -129,7 +129,6 @@ internal fun PriceListScreen(
                         onClearRegions = onClearRegions,
                         onSelectYear = onSelectYear,
                         onSelectMonth = onSelectMonth,
-                        onApplyFilters = onApplyFilters,
                         onClearFilters = onClearFilters,
                         onOpenItemHistory = onOpenItemHistory,
                     )
@@ -270,6 +269,7 @@ private fun PriceRecordsTab(
  * 不同售卖单位的价格不可比，合成一个区间只会得到一个不存在的数（详见 `PriceUnitRange` 的注释）；
  * 也不折叠成「另有 N 种单位」——单位数正是这里要回答的问题的一半，藏起来等于没答。
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PriceStatisticsTab(
     uiState: PriceUiState,
@@ -278,7 +278,6 @@ private fun PriceStatisticsTab(
     onClearRegions: () -> Unit,
     onSelectYear: (Int?) -> Unit,
     onSelectMonth: (Int?) -> Unit,
-    onApplyFilters: () -> Unit,
     onClearFilters: () -> Unit,
     onOpenItemHistory: (String) -> Unit,
 ) {
@@ -287,96 +286,146 @@ private fun PriceStatisticsTab(
     val spacing = tokens.spacing
     val stats = uiState.visibleStats
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = spacing.page, vertical = spacing.s3),
-        verticalArrangement = Arrangement.spacedBy(spacing.s4),
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        // 列表自己不加 item 间距、也不留顶部 contentPadding：筛选卡被切成「卡头（悬浮）+ 条件（滚动）」
+        // 两片，只有间距为 0 它们才接成一张卡；而 contentPadding 的那条留白不裁内容，悬浮片吸顶后
+        // 会从上方那条缝里漏出正在滚动的卡片（同一套处理见【记睡眠】-【统计】）。
+        contentPadding = PaddingValues(
+            start = spacing.page,
+            end = spacing.page,
+            bottom = spacing.s6,
+        ),
     ) {
-        // 没有记录时不摆一个筛不出东西的筛选项（§6.2）；但还留着筛选条件（生效的或未提交的）时保留卡片，
+        // 没有记录时不摆一个筛不出东西的筛选项（§6.2）；但还留着筛选条件时保留卡片，
         // 否则用户看不到也清不掉它。
-        if (uiState.records.isNotEmpty() || uiState.hasFilters || uiState.hasPendingFilters) {
-            PriceFilterCard(
-                uiState = uiState,
-                onSelectItem = onSelectItem,
-                onToggleRegion = onToggleRegion,
-                onClearRegions = onClearRegions,
-                onSelectYear = onSelectYear,
-                onSelectMonth = onSelectMonth,
-                onApplyFilters = onApplyFilters,
-                onClearFilters = onClearFilters,
-            )
+        if (uiState.records.isNotEmpty() || uiState.hasFilters) {
+            // 【清除筛选】写在卡头里、紧贴卡标题下，并随列表吸顶：想把条件退回去，
+            // 往往是滚过一屏统计行之后才想起来的事，埋在卡尾就得先滑回顶部（§1.3）。
+            stickyHeader(key = "filter_head") {
+                PriceFilterCardHead(
+                    canClear = uiState.hasFilters,
+                    onClear = onClearFilters,
+                )
+            }
+            item(key = "filter_body") {
+                PriceFilterGrid(
+                    uiState = uiState,
+                    onSelectItem = onSelectItem,
+                    onToggleRegion = onToggleRegion,
+                    onClearRegions = onClearRegions,
+                    onSelectYear = onSelectYear,
+                    onSelectMonth = onSelectMonth,
+                )
+            }
         }
 
-        AppSectionCard(
-            iconRes = R.drawable.ic_chart,
-            title = stringResource(R.string.price_stats_section),
-            action = if (stats.isEmpty()) {
-                null
-            } else {
-                {
-                    Text(
-                        text = stringResource(R.string.price_stats_count, stats.size),
-                        style = tokens.type.bodyS,
-                        color = colors.textMuted,
-                        modifier = Modifier.padding(end = spacing.s2),
-                    )
-                }
-            },
-            contentPadding = PaddingValues(bottom = spacing.s2),
-        ) {
-            when {
-                uiState.records.isEmpty() -> PriceEmptyState(
-                    iconRes = R.drawable.ic_chart,
-                    title = stringResource(R.string.price_stats_empty),
-                    description = stringResource(R.string.price_stats_empty_hint),
-                )
-
-                // 有记录但筛完什么都没有：说清楚是筛掉的，并留一个出口（§6.2「无结果」）。
-                stats.isEmpty() -> {
-                    PriceEmptyState(
-                        iconRes = R.drawable.ic_search_empty,
-                        title = stringResource(R.string.price_filter_empty),
-                        description = stringResource(R.string.price_filter_empty_hint),
-                    )
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        TextButton(onClick = onClearFilters) {
-                            Text(stringResource(R.string.price_filter_clear))
-                        }
-                    }
-                }
-
-                else -> stats.forEachIndexed { index, item ->
-                    if (index > 0) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = spacing.s3),
-                            thickness = tokens.radii.highlight,
-                            color = colors.border,
+        item(key = "stats") {
+            AppSectionCard(
+                modifier = Modifier.padding(top = spacing.s4),
+                iconRes = R.drawable.ic_chart,
+                title = stringResource(R.string.price_stats_section),
+                action = if (stats.isEmpty()) {
+                    null
+                } else {
+                    {
+                        Text(
+                            text = stringResource(R.string.price_stats_count, stats.size),
+                            style = tokens.type.bodyS,
+                            color = colors.textMuted,
+                            modifier = Modifier.padding(end = spacing.s2),
                         )
                     }
-                    PriceStatsRow(
-                        item = item,
-                        onClick = { onOpenItemHistory(item.itemName) },
+                },
+                contentPadding = PaddingValues(bottom = spacing.s2),
+            ) {
+                when {
+                    uiState.records.isEmpty() -> PriceEmptyState(
+                        iconRes = R.drawable.ic_chart,
+                        title = stringResource(R.string.price_stats_empty),
+                        description = stringResource(R.string.price_stats_empty_hint),
                     )
+
+                    // 有记录但筛完什么都没有：说清楚是筛掉的，并留一个出口（§6.2「无结果」）。
+                    stats.isEmpty() -> {
+                        PriceEmptyState(
+                            iconRes = R.drawable.ic_search_empty,
+                            title = stringResource(R.string.price_filter_empty),
+                            description = stringResource(R.string.price_filter_empty_hint),
+                        )
+                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            TextButton(onClick = onClearFilters) {
+                                Text(stringResource(R.string.price_filter_clear))
+                            }
+                        }
+                    }
+
+                    else -> stats.forEachIndexed { index, item ->
+                        if (index > 0) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = spacing.s3),
+                                thickness = tokens.radii.highlight,
+                                color = colors.border,
+                            )
+                        }
+                        PriceStatsRow(
+                            item = item,
+                            onClick = { onOpenItemHistory(item.itemName) },
+                        )
+                    }
                 }
             }
         }
 
         // 说明统计口径，避免用户把「不同单位分行」误读成数据缺失。
         if (stats.isNotEmpty()) {
-            Text(
-                text = stringResource(R.string.price_stats_hint),
-                style = tokens.type.caption,
-                color = colors.textMuted,
-                modifier = Modifier.padding(horizontal = spacing.s1),
-            )
+            item(key = "stats_hint") {
+                Text(
+                    text = stringResource(R.string.price_stats_hint),
+                    style = tokens.type.caption,
+                    color = colors.textMuted,
+                    modifier = Modifier.padding(
+                        start = spacing.s1,
+                        end = spacing.s1,
+                        top = spacing.s4,
+                    ),
+                )
+            }
         }
     }
 }
 
 /**
- * 统计页顶部的筛选卡：**【开始查找】+ 两行四格**——商品 / 地区、年份 / 月份，每格都是下拉。
+ * 筛选卡的**上半片**：卡标题 + 【清除筛选】，由 LazyColumn 的 stickyHeader 承载。
+ *
+ * 只有列表直属的条目能吸顶，卡里的内容是随整张卡一起滚的，所以为了让【清除筛选】一直留在手边，
+ * 整张筛选卡必须切成「头 + 体」两片：两片共用同一套卡面（只是各自负责两个圆角），
+ * 列表里又不加 item 间距，静止时看上去仍是一张卡。
+ *
+ * 外层那圈是**页面底色**而不是透明：吸顶时它压在统计卡上，留白处不能漏出滚动的内容。
+ *
+ * 这里**没有**【开始查找】：四个格子改成点到即筛之后，「填完还得再点一次」只剩误导——
+ * 和多选地区这种逐步收窄的用法尤其合不来，选中第一个地区就该看到列表收窄。
+ */
+@Composable
+private fun PriceFilterCardHead(canClear: Boolean, onClear: () -> Unit) {
+    AppSplitCardHead(
+        iconRes = R.drawable.ic_search_empty,
+        title = stringResource(R.string.price_filter_section),
+    ) {
+        // 占满卡宽：这一个区域里唯一要做的动作就是「把条件退回去」，没理由只给它一半宽。
+        AppFilterActionButton(
+            text = stringResource(R.string.price_filter_clear),
+            iconRes = R.drawable.ic_refresh,
+            enabled = canClear,
+            onClick = onClear,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+/**
+ * 筛选卡的**下半片**：**两行四格**——商品 / 地区、年份 / 月份，每格都是下拉，跟着列表滚。
  *
  * 上一版是「一个搜索框 + 三行横滚 chip」。搜索框只能按关键词包含匹配，用户永远拿不到「只看苹果」
  * 这个精确条件；三行 chip 又把卡片撑到半个屏幕，年份一多就要横向划。改成下拉后：
@@ -387,60 +436,29 @@ private fun PriceStatisticsTab(
  *   置顶的「全部」＝清空多选。
  * - 【年份】【月份】是单选，选中即收起。
  *
- * 四个格子只改**草稿**，点【开始查找】才一起生效：一次查清四个条件，而不是每点一格就让列表跳一次。
- *
- * 头一行是**【开始查找】+【清除筛选】**两个等宽按钮（图标 + 文字 + 描边），再往下才是四个格子：
- * 条件填在下面、动作在上面，改完抬头就是它们；放底部时在小屏上会被两行下拉和键盘一起推下去。
- * 两个按钮都常驻，只在这一下「有事可做」时才可点（没有待应用的改动 / 没有可清的条件就变淡），
- * 行高不跳、位置不挪。禁用态的对比度刻意比 M3 默认高（见 [PriceFilterActionButton]）。
- *
- * 每一格都自带「全部」，所以清除单项不用另外找入口。
+ * 四格**点到即筛**：没有草稿层、也没有【开始查找】，每改一格列表立刻跟着变
+ * （理由见 [PriceUiState.selectedItem]）。每一格都自带「全部」，清单项不用另外找入口。
  */
 @Composable
-private fun PriceFilterCard(
+private fun PriceFilterGrid(
     uiState: PriceUiState,
     onSelectItem: (String?) -> Unit,
     onToggleRegion: (String) -> Unit,
     onClearRegions: () -> Unit,
     onSelectYear: (Int?) -> Unit,
     onSelectMonth: (Int?) -> Unit,
-    onApplyFilters: () -> Unit,
-    onClearFilters: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val tokens = LocalAppTokens.current
     val spacing = tokens.spacing
     val all = stringResource(R.string.price_filter_all)
-    val pending = uiState.hasPendingFilters
     // 地区是多选，格子里放不下三个以上的地名：两个以上收成「已选 N 个」。
     val regionSummary = when (uiState.selectedRegions.size) {
         0 -> all
         1 -> uiState.selectedRegions.first()
         else -> stringResource(R.string.price_filter_region_count, uiState.selectedRegions.size)
     }
-
-    AppSectionCard(
-        iconRes = R.drawable.ic_search_empty,
-        title = stringResource(R.string.price_filter_section),
-    ) {
-        // 两个动作同一行、同一套样式（图标 + 文字 + 描边）：都只在这一下「有事可做」时可点。
-        // 没有可应用的改动 / 没有可清的条件时它们变淡但仍占位，行高不跳、用户也知道下一步该先做什么。
-        Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
-            PriceFilterActionButton(
-                text = stringResource(R.string.price_filter_apply),
-                iconRes = R.drawable.ic_search_empty,
-                enabled = pending,
-                onClick = onApplyFilters,
-                modifier = Modifier.weight(1f),
-            )
-            PriceFilterActionButton(
-                text = stringResource(R.string.price_filter_clear),
-                iconRes = R.drawable.ic_refresh,
-                enabled = uiState.hasFilters || pending,
-                onClick = onClearFilters,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Spacer(Modifier.height(spacing.s2))
+    AppSplitCardBody(modifier = modifier) {
         Row(horizontalArrangement = Arrangement.spacedBy(spacing.s2)) {
             PriceFilterDropdown(
                 label = stringResource(R.string.price_filter_item),
@@ -533,64 +551,6 @@ private fun PriceFilterCard(
                 modifier = Modifier.weight(1f),
             )
         }
-    }
-}
-
-/**
- * 筛选卡里的动作按钮：图标 + 文字 + 1 dp 描边，两个按钮共用同一套尺寸与配色。
- *
- * 禁用态用 `textMuted` + `border`，而不是 M3 默认的 `onSurface` 38%：那层灰在深色卡片上几乎看不见，
- * 读起来像「按钮没画完」，分不清「暂时不能点」和「这里坏了」。这里禁用时文字仍读得清，只是从主色
- * 退回中性色、边框同时退一档——两个按钮并排，谁可点一眼就能比出来。
- *
- * 不禁用 `enabled` 也不用重色块：一个是「没改动」不该让按钮显得像主操作，另一个是重色块会盖过
- * 真正要看清的四个格子（§1.3 一屏只有一个主操作）。
- */
-@Composable
-private fun PriceFilterActionButton(
-    text: String,
-    @DrawableRes iconRes: Int,
-    enabled: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val tokens = LocalAppTokens.current
-    val colors = tokens.colors
-    OutlinedButton(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier.heightIn(min = tokens.spacing.hitMin),
-        shape = RoundedCornerShape(tokens.radii.label),
-        border = BorderStroke(
-            width = tokens.radii.highlight,
-            color = if (enabled) colors.primary else colors.border,
-        ),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = colors.primary,
-            disabledContentColor = colors.textMuted,
-        ),
-        contentPadding = PaddingValues(horizontal = tokens.spacing.s2),
-    ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            modifier = Modifier.size(tokens.spacing.s4),
-        )
-        Spacer(Modifier.width(tokens.spacing.s1))
-        Text(
-            text = text,
-            // 禁用态再加一道删除线：灰字 + 灰框在浅色下仍像一个「画淡了的按钮」，
-            // 删除线是明确说「此刻按不动」，不必靠对比度去猜（用户反馈）。
-            // 写进 style 的 copy 而不是用 Text 的 textDecoration 参数：按钮内容会套上
-            // 一层 LocalTextStyle，style 内的装饰在合并后稳定生效。
-            style = if (enabled) {
-                tokens.type.bodyS
-            } else {
-                tokens.type.bodyS.copy(textDecoration = TextDecoration.LineThrough)
-            },
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
     }
 }
 

@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 
 internal class PagePreloader {
     private val preloadedKeys = mutableSetOf<String>()
@@ -30,6 +31,9 @@ internal fun <T> AnimatedPageContent(
     targetState: T,
     modifier: Modifier = Modifier,
     direction: (initialState: T, targetState: T) -> Int = { _, _ -> 1 },
+    // 内容底色：默认铺页面底色，保证滑动过程中两页重叠时不会互相透出（§7 层叠）。
+    // 嵌在别的容器里（例如白色卡片内）时可传父容器色，否则会在卡片中央留下一块异色矩形。
+    containerColor: Color = MaterialTheme.colorScheme.background,
     content: @Composable (T) -> Unit,
 ) {
     AnimatedContent(
@@ -55,7 +59,7 @@ internal fun <T> AnimatedPageContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(containerColor),
         ) {
             content(state)
         }
