@@ -86,6 +86,9 @@ docs/*
 !docs/BLOOD_GLUCOSE_CHART_REFACTOR.md
 !docs/FOOD_CATALOG_ASSET_DESIGN.md
 !docs/RELEASE_BUILD.md
+!docs/PROJECT_CLEANUP.md
+!docs/DESIGN.md
+!docs/UI_SPEC_PROJECT.md
 
 # Hidden directories
 .*/
