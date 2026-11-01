@@ -106,7 +106,7 @@ grep "UnusedResources\]$" $R | grep -oE "R\.string\.[A-Za-z0-9_.]+"
 | `tools/*.mjs`（5 个）+ `blood_glucose_prediction_lab.py` | ~96 KB | 血糖预测离线拟合/回测实验脚本（9–10 月） |
 | `tools/BLOOD_GLUCOSE_PREDICTION_LAB.md`、`FINAL_OFFLINE_SCHEME.md` | 7 KB | 上述实验的笔记 |
 | `cache/` | 752 KB | 7 月地区数据抓取的调试缓存 |
-| `docs/launcher_icon_*.png`（37 张） | ~2.6 MB | v2–v9 图标设计草稿，定稿后无保留价值 |
+| ~~`docs/launcher_icon_*.png`（37 张）~~ | ~~1.8 MB~~ | **已于 2026-11-01 删除**。v2–v9 图标设计草稿，定稿后无保留价值；App 图标是矢量自适应图标（`mipmap-anydpi/ic_launcher.xml` → `drawable/ic_launcher_*.xml`），与之无关，删除不影响 |
 | `app/build/`、`build/`、`.gradle/`、`.kotlin/` | 765 MB+ | 构建产物，`./gradlew clean` 可清 |
 | `.probe/` | 550 KB | 3 张调试截图 |
 | `.superpowers/brainstorm` | — | 空目录 |

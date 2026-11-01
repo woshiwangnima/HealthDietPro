@@ -4,7 +4,9 @@
 
 ## 项目定位
 
-帮助用户管理日常饮食摄入，结合个人健康档案、地域性疾病流行度与营养建议，提供食物营养数据查询、饮食记录、身高/体重/BMI 历史图表等核心功能。支持多用户切换、本地优先的数据持久化与无网络环境下的完整体验。
+帮助用户管理日常饮食摄入，结合个人健康档案、地域性疾病流行度与营养建议，提供食材/食物/菜肴营养查询与对比、饮食与睡眠记录、物价记录、血糖/血压/体重等健康指标图表等核心功能。支持多用户切换、本地优先的数据持久化与无网络环境下的完整体验。
+
+**全部数据留在本地**：无账号、无网络请求、无埋点。
 
 ## 目标平台
 
@@ -15,189 +17,115 @@
 | compileSdk | 36 |
 | AGP | 9.2.1 |
 | Kotlin | 2.2.10 |
-| 构建工具 | Gradle Kotlin DSL |
+| 构建工具 | Gradle Kotlin DSL（Gradle 9.6） |
+| 语言 | 简体中文 / English（三套 `values`，随系统切换） |
 
-## 技术栈（已确定）
+## 技术栈
 
-- **语言**: Kotlin 2.2.10
-- **UI**: Jetpack Compose（Material Design 3）
-- **架构**: MVVM（ViewModel + StateFlow + 单向数据流）
-- **导航**: 单 Activity + 多 Composable 屏（Navigation Compose）
-- **持久化**: SharedPreferences 过渡到 DataStore（JSON 索引与多用户存档）
-- **序列化**: kotlinx.serialization（替换 Gson）
-- **协程**: Kotlin Coroutines + Flow
-- **依赖注入**: 手动构造 / 后续可接入 Hilt
+- **语言**：Kotlin 2.2.10
+- **UI**：Jetpack Compose + Material Design 3（已全面 Compose 化，无 XML 布局）
+- **架构**：MVVM（ViewModel + StateFlow + 单向数据流）
+- **导航**：单 Activity + 多 Composable 屏（`AnimatedPageContent` 横向切换）
+- **持久化**：SharedPreferences（JSON 索引 + 多用户存档）
+- **序列化**：Gson 与 kotlinx.serialization 并存（历史模块用 Gson，新模块用 kotlinx）
+- **图表**：全自研 Compose Canvas，非第三方图表库
 
-> 项目演进路线：从原 XML + DataBinding 单 Activity 多 Fragment 迁移至 Jetpack Compose + MVVM。本文档与配套设计文档 `docs/DESIGN.md` 描述目标架构。
+## 功能模块
 
-## 模块划分
+App 主界面为三个底部页签：**食材** / **记录** / **我的**。
 
-项目按职责拆分为 **9 个模块**：5 个功能/领域模块 + 界面模块 + 存档模块 + 静态数据只读模块 + 基础设施模块。
+### 食材（营养）
 
-### 功能/领域模块
-
-| 模块 | 职责 | 关键组件 | 状态 |
-|------|------|----------|------|
-| **单位切换** | 7 类 76 单位基准↔用户单位换算与本地化格式（含 ft/in）+ 单位选择 | `UnitConverter` | 已实现 |
-| **GPS 定位** | 无 GMS 单次定位（4s 超时、权限预检、最后已知兜底） | `CurrentLocationProvider` | 已实现（协程化为迁移项） |
-| **疾病与健康状况系统** | 静态目录、ICD-11 映射、分类、适用性、就诊科室、代码/本地化名称检索及营养规则 | `DiseaseRepository`、疾病目录 UI（待建） | 目录模型与查询已实现；UI 待实现 |
-| **个人信息** | 体征记录与详情，3 小模块：**身高** / **体重** / **BMI** | `Height/Weight/BmiDetailActivity`、`BmiUtil`、`BmiReferenceView`、`BmiCalculatorView` | 已实现（XML，待 Compose） |
-| **营养表系统** | 食物分类树 + 营养表浏览 + 每日饮食记录与摄入汇总 + 自定义食物 + 营养目标 + OCR/扫码 | 待建 | 待实现（绿地） |
-
-### 界面模块（仅屏，不含可复用 UI 元素）
-
-- 个人资料查看/编辑（`ProfileFragment`/`ProfileEditActivity`，整合 GPS + 疾病 + 地区）
-- 用药记录（`MedicationRecord*`）
-- 设置（`AppSettings`/`Preferences`/`Reminder`/`UserSettings`）
-- `MainActivity`（app shell + 底栏导航）
-
-### 存档模块（app 存档 + user 存档）
-
-- **app 存档**：`AppPrefs`、`TabPersistence`（图表状态键命名空间 + Tab 选择）
-- **user 存档**：`ProfilePrefs`（load/save/切换/删除级联 + 种子 + 迁移）、`UserPrefs`、`MedicationPrefs`、`UserProfile`/`BodyRecord` 实体、头像
-
-### 静态数据只读模块（只读，无写）
-
-- 仓储：`UnitRepository`/`DiseaseRepository`/`ProvinceRepository`/`RegionRepository`/`ChartTimeConfigRepository`（+未来 `FoodNutrientRepository`、营养素参考 Repository）
-- 查询算法：`PointInPolygon`、resolve 管线、索引、`getSorted`/`findByPoint`
-- 数据 schema：`Disease`/`Nutrient`/`UnitDef`/`Region`/`RegionSnapshot`/`Quantity`/`ChartTimeConfig`
-- 统一入口 `fromContext` / `fromAsset`
-
-### 基础设施模块（若干小模块）
-
-- **UI 公用**：`BaseBack`/`BaseActivity`、`TextOverflowUtil`、`ViewExtensions`、`ComposeDateTimePicker`、`WatermarkUtil`、**Tab 控件**（`TabBar`/`ToggleBar`/`FilterBar` + 三策略 `TabBinder`/`TabAnimator`/`TabIndicator` + `MultiLevelTabCoordinator`）
-- **多层 Tag**：GameplayTag 式层级标签系统（点分字符串、层级查询、继承/包含语义）——**待实现**；食物分类树（营养表系统）与 Tab 命名空间（`tab_${screenId}_level_${level}`）后续接入此能力替代字符串拼装
-- **图表渲染**：`ChartView`/`ChartCanvas`/`ChartMath`/`ChartSeries`/`LineStyle`/`ChartFragment`/`ChartFullscreen` + `DataPoint`/`RecordHistory`
-
-### 跨模块依赖
-
-```
-静态数据只读 ◀── 单位切换 / 疾病与健康状况 / 个人信息 / 营养表系统 / 图表渲染
-疾病系统（营养素+建议） ──▶ 营养表系统（摄入对照）
-图表渲染 ◀── 个人信息 / 营养表系统
-存档模块 ◀── 个人信息 / 界面模块 / Tab 控件
-界面模块（个人资料编辑） ──▶ GPS + 疾病 + 静态数据 + 存档
-```
-
-## 静态数据资产（静态数据只读模块）
-
-无网络层，所有静态数据位于 `app/src/main/assets/*.json` 与一处 `res/raw`：
-
-| 资源 | 内容 |
+| 功能 | 说明 |
 |------|------|
-| `units.json` | 7 类共 76 个单位（长度/质量/体积/密度/时间/能量/存储），基准单位 cm、kg、l、g_ml、s、kcal、b |
-| `diseases.json` | 12 条疾病与健康状况目录；全局分类、就诊科室和来源注册表，条目含中英文正名/别名/医学简介、ICD-11 映射、病程、适用性与五级营养规则 |
-| `provinces.json` | 34 省简化边界矩形 + 质心 |
-| `regions.json` | ~136 行市/区质心（无省级） |
-| `chart_time_config.json` | 时间范围 / 间隔 / 自动间隔阈值规则 |
-| `res/raw/bmi_classification.json` | 4 档 BMI 分带（中国标准） |
-| `food_catalog/` | 食物营养运行资产；维护源位于 `tools/food_catalog/source/records/` 的逐条分片，构建生成索引与 Android 运行资产 |
-| `nutrient_reference.json`（待建） | 营养素参考摄入（DRIs） |
+| 食材 / 食物 / 菜肴查询 | 263 条食材记录，含分类树、搜索索引、营养表浏览 |
+| 详情与对比 | 营养档案、系统标签（常见/收藏/最近）；两三条并排对比（VS 徽章） |
+| 自定义条目 | 自建食材/菜肴，编辑成分与营养素 |
+| 营养建议 | 按疾病营养规则（五级）标注营养素 |
 
-Repository 模式：按需求懒加载、内存缓存，查找通过预建索引（`byCode`、`citiesByProvince`、`districtsByCity`）。统一构造入口 `fromContext(context)`（运行时）与 `fromAsset(path)`（测试/离线）。**只读**：所有写操作走存档模块。
+### 记录
 
-跨仓库依赖：`ChartTimeConfigRepository` 依赖 `UnitRepository`（Quantity 转 ms）；`RegionRepository.resolve` 依赖 `ProvinceRepository`（省射线投射）后做质心下降。
+| 功能 | 说明 |
+|------|------|
+| 记血糖 | 记录与图表；**6 小时血糖预测**（叠加饮食/用药/睡眠修正线，运动线默认关闭），预测曲线与实际值隔离显示 |
+| 记血压 | 收缩压 / 舒张压记录与图表 |
+| 记用药 | 用药目录、用药记录，含位置水印元信息 |
+| 记疾病 | 疾病与健康状况记录（ICD-11 映射） |
+| 记饮水 | 每日饮水量记录 |
+| 记饮食 | 饮食记录、餐次列表、摄入汇总与营养目标进度 |
+| 记睡眠 | **夜间睡眠** 与 **小憩** 两类，入睡/醒来互推；统计页含时长分布与趋势 |
+| 记物价 | 按商品 + 地区记录价格，多选地区筛选，历史价格曲线 |
+| 记体重 / 身高 / 围度 | 体征记录（体重可标记"稳定体重"） |
+| 容器量具 | 自定义容器与横截面形状，用于估算食物份量 |
 
-区域解析混合策略：省 = 简化矩形射线投射 + 质心抢七；市/区 = 分层最近质心。以 <1 MB 数据换 ~1–3 km 边界误差。
+### 我的
 
-## 存档模块与多用户持久化
+- 个人资料查看与编辑：头像、姓名、性别、年龄、生日、三级省/市/区（含 GPS 反查）、疾病史
+- BMI：由体重 + 身高时间序列派生，图表 Y 轴按 BMI 类别着色，附中国标准对照卡与计算器
+- 多用户切换 / 创建 / 删除（删除时级联清理头像、偏好与相关存档键）
 
-存档模块分 **app 存档** 与 **user 存档** 两个小模块，负责所有需要持久化与序列化/反序列化的内容（静态数据模块只读，不写）。
+### 设置
 
-- **多用户**：所有 `UserProfile` JSON 序列化在 `health_diet_prefs/all_users`；当前用户 ID 在 `current_user_id`。
-- **体征记录**：`BodyRecord` 始终以基准单位存储（cm / kg）；UI 边界转换为用户偏好单位（保存时 `UnitConverter.toBase`，展示时 `fromBase`）。
-- **种子数据**：无记录的用户合并 `createSeedProfile`，约 30 天体重 + 6 个月身高 demo 点，保证新账号也有图表数据。
-- **每用户键**：图表 UI 状态、`UserPrefs`、`MedicationPrefs` 均以 `<baseKey>_<userId>` 命名空间隔离，`ProfilePrefs.makeChartStateKey` 为标准构造器。
-- **删除级联**：清理头像文件、`user_prefs_<uid>` 文件、以及 `health_diet_prefs` / `app_prefs` 中以 `_<uid>` 结尾的所有键。
-- **迁移**：`ProfilePrefs.ensureMigrated` 每次加载时桥接旧的单一 profile 形态和省份字符串到 `RegionSnapshot`。
+软件设置、用户设置、文字显示设置（字号缩放）、单位偏好、默认睡眠设置等。
 
-## 核心功能盘点
-
-### 单位切换模块
-7 类 76 单位的基准↔用户单位换算与本地化格式（含 ft/in 解析），由 `UnitConverter` 单例外壳封装 `UnitRepository`。单位选择写入 app 存档偏好。
-
-### GPS 定位模块
-无 GMS 单次 GPS 定位：优先 `GPS_PROVIDER` → 次选 `NETWORK_PROVIDER` → 兜底 `PASSIVE_PROVIDER.getLastKnownLocation`，4 秒超时 + consumed guard 防双触发，权限预检 + `SecurityException` 兜底。
-
-### 疾病与健康状况系统模块
-`diseases.json` 是只读目录包络，包含全局 `categories`、`departments`、`sources` 与疾病条目；科室和分类由稳定 ID 引用，避免条目内重复的多语言对象。条目通过 `clinicalKind` 区分疾病、综合征、风险状态和检验异常，保留既有稳定 ID 以兼容用户疾病史存档。
-
-`DiseaseRepository` 懒加载并预建 ID 索引，提供 `findById`、`findByIcd11Code`、`search(query, locale)`、`getByCategory`、`getByCourse` 和 `getByDepartment`。搜索覆盖稳定 ID、ICD-11 编码、当前本地化正名及其别名；目前无地区患病率字段或地区排序逻辑。
-
-ICD-11 映射以 WHO MMS `2025-01` 为固定版本，每条允许多个映射并以 `PRIMARY`、`BROADER_TERM`、`DIFFERENTIAL` 标示关系；映射仅为分类和检索参考，不能用于诊断。性别适用性不绑定用户性别身份，使用生理相关 `AnatomicalTrait` 条件（例如 PCOS 要求 `OVARIES`）；现有资料页的二元 `Gender` 仅是过渡映射，后续扩展用户性别系统时不改变疾病资产。
-
-营养建议保持 `INCREASE`、`FREE`、`LIMIT`、`STRICT_LIMIT`、`FORBID` 五级简单规则，供营养表按食材/食物/菜肴的营养素标注使用，不构成个体化饮食处方。疾病目录、详情、分类筛选和营养建议渲染 UI 待实现。
-
-### 个人信息模块
-- **身高 / 体重**：详情双 Tab（图表/数据），`ToggleBar` 共享控件，记录增删改通过 `onRecordsChanged` 回流，保存前 `UnitConverter.toBase` 保证存档恒为基础单位。
-- **BMI**：由体重+身高时间序列派生（`BmiUtil.buildBmiDataPoints` 双指针遍历），图表 Y 轴按 BMI 类别着色，附带 BMI 中国标准对照卡与 BMI 计算器卡。
-
-### 营养表系统模块（待实现）
-食物分类树展示与食物营养表浏览（按食物名/营养素筛选排序）+ 每日饮食记录与摄入汇总（与疾病营养建议对照）+ 自定义食物创建 + 营养目标 + OCR/扫码食物识别。模型层（`Nutrient`、`Disease.nutrientRecommendations`、`DietaryRecommendation`）已就绪，UI 与食物数据待建。
-
-### 界面模块
-- **个人资料**：只读档案卡（头像、姓名、性别、年龄、生日、地区、疾病史空时自动隐藏）；完整编辑（身份、三级省/市/区级联选择含 GPS 反查、按性别过滤的疾病多选）；返回自动保存。
-- **用药记录**：用药记录列表与录入，含位置水印元信息。
-- **设置**：软件设置、用户设置、提醒、偏好。
-
-### 基础设施亮点
-- **图表渲染（全自研 Canvas）**：`ChartView` + `ChartCanvas`，`ChartMath` 7 种线型插值（线性/阶梯/贝塞尔/Catmull-Rom/单调三次 Hermite/自然三次 Spline）+ `niceScale` 轴刻度；6 线型 5 点状虚/点/实线；触摸十字准线、时间轴拖动条、4 秒自动隐藏、Y 范围垂直滑动；横屏沉浸式全屏。
-- **Tab 控件（三策略）**：抽象 `TabBar`（水平/垂直、等权重 vs 可滚动、`CENTER_HIGHLIGHT`）+ `ToggleBar`（单选）/`FilterBar`（多选）+ `MultiLevelTabCoordinator` 多级命名空间；可插入 `TabBinder`/`TabAnimator`/`TabIndicator`。
-- **多层 Tag（待实现）**：GameplayTag 式层级标签系统，将替代当前 Tab 命名空间字符串拼装，并支撑食物分类树。
-- **Compose 设置行（`SettingRow`）**：可点击条目统一渲染——24dp 起 leading icon（`painterResource`，尺寸随 `titleLarge.fontSize` sp 动态缩放，跟随 `pref_font_scale` 偏好）、主标题 28sp 标题字号、功能说明副标题 12sp 脚注 + 中透明度（50%）、trailing `KeyboardArrowRight` 箭头区分可点击、动态值显示在箭头左侧、破坏性动作 `AlertDialog` 二次确认、文本走 `stringResource` 三套本地化。详见 `AGENTS.md`「Compose 设置行规范」。
-
-## 项目结构（目标 Compose 化后，按模块分组）
+## 项目结构
 
 ```
 app/src/main/java/com/woshiwangnima/healthdietpro/
-├── MainActivity.kt                  # app shell（界面模块）
-├── unit/                            # 单位切换
-│   └── UnitConverter.kt
-├── location/                        # GPS 定位
-│   └── CurrentLocationProvider.kt
-├── disease/                         # 疾病系统（UI）
-├── profile/                         # 个人信息
-│   ├── height/   weight/   bmi/
-├── nutrition/                       # 营养表系统（待实现）
-├── screens/                         # 界面模块（其余屏）
-│   ├── person/   medication/   settings/
-├── archive/                         # 存档模块
-│   ├── app/   user/
-├── data/                            # 静态数据只读
-│   ├── unit/   disease/   region/   chart/   food/(未来)
-├── common/                          # 基础设施
-│   ├── ui/   tab/   tag/   chart/
+├── MainActivity.kt              # app shell：三页签 + 路由 + 返回栈
+├── base/                        # Activity 基类（含未保存修改拦截 DirtyFormActivity）
+├── ui/                          # 界面（Composable）
+│   ├── nutrition/               # 食材 / 食物 / 菜肴
+│   ├── record/                  # 血糖 / 血压 / 用药 / 疾病 / 饮水
+│   ├── profile/                 # 身高 / 体重 / BMI / 围度 / 资料
+│   ├── sleep/                   # 记睡眠（列表 / 统计 / 编辑 / 设置）
+│   ├── price/                   # 记物价（列表 / 编辑 / 历史图表）
+│   ├── diet/                    # 记饮食（记录 / 统计 / 设置）
+│   ├── container/               # 容器量具与横截面
+│   ├── settings/                # 设置
+│   ├── widget/  event/  test/   # 公共挂件、事件、测试屏
+├── model/                       # 领域模型与仓储
+│   ├── food/  bloodglucose/  bloodpressure/  medication/  disease/
+│   ├── diet/  container/  sleep/  price/  water/
+│   ├── profile/  archive/  prefs/  region/  unit/  chart/  nutrient/  i18n/
+├── common/                      # 基础设施
+│   ├── ui/                      # 设计系统（AppTokens / AppSpacing / 公共组件）
+│   ├── timer/  time/  cache/  range/  notification/  format/
+├── util/                        # UnitConverter、定位、图片、系统导航模式
 ```
 
-> 上图为逻辑分组示意；现有 XML 实现的物理目录尚未按此调整，Compose 化迁移时逐步对齐。
+设计系统统一收敛在 `common/ui/designsystem/`（`AppTokens`、`AppSpacing`、
+`AppSplitCard` 等），新增界面应复用其中组件而非各自写样式。
 
-## 功能路线
+## 静态数据资产
 
-### 已完成（XML 形态，待 Compose 迁移）
+无网络层，所有静态数据位于 `app/src/main/assets/`：
 
-- [x] **单位切换**：单位换算与本地化格式
-- [x] **GPS 定位**：无 GMS 单次定位
-- [x] **静态数据**：营养素/疾病/单位/地区/图表配置/BMI 分带 Repository
-- [x] **个人信息**：身高/体重/BMI 历史图表与自研 Canvas 绘制
-- [x] **界面模块**：个人资料编辑、地区级联选择、GPS 反查、多用户切换/创建/删除与级联清理、用药记录
-- [x] **基础设施**：Tab 控件系统、图表 Canvas、公用组件
+| 资源 | 内容 |
+|------|------|
+| `units.json` | **9 类 78 个单位**（长度/质量/体积/密度/时间/能量/血糖/血压/存储），含 ft/in 等本地化符号 |
+| `diseases.json` | **24 条**疾病与健康状况；10 个分类、23 个就诊科室；条目含中英文正名/别名/医学简介、ICD-11 映射、病程、适用性与五级营养规则 |
+| `food_catalog/` | **263 条**食材记录 + 4 个索引 + 缩略图/详情图；维护源在 `tools/food_catalog/source/records/`，构建期由 `catalog_tool.py` 生成 |
+| `location/` | 34 省简化边界矩形 + 质心、市/区质心（`provinces.json` / `regions.json`） |
+| `DRIs/` | 营养素参考摄入 |
+| `serving_containers.json`、`cooking_methods.json` | 份量容器与烹饪方式 |
 
-### 进行中（Compose + MVVM 化）
+Repository 模式：按需懒加载、内存缓存，查找走预建索引。统一构造入口
+`fromContext(context)`（运行时）与 `fromAsset(path)`（测试/离线）。**只读**，所有写操作走存档模块。
 
-- [ ] 主题与导航迁至 Navigation Compose
-- [ ] `ProfileFragment` → `ProfileScreen` + `ProfileViewModel`
-- [ ] Tab 控件 Compose 化（保留三策略接入点）
-- [ ] `ChartView` → Compose Canvas，保留 7 种线型与十字准线
-- [ ] DataStore 取代 SharedPreferences（存档模块）
-- [ ] `CurrentLocationProvider` 协程化
+区域解析采用混合策略：省 = 简化矩形射线投射 + 质心抢七；市/区 = 分层最近质心。
+以 <1 MB 数据换 ~1–3 km 边界误差。
 
-### 待实现
+## 存档与多用户持久化
 
-- [ ] **疾病与健康状况系统** UI（目录、代码/本地化名称搜索、分类筛选、详情与营养建议渲染）
-- [ ] **营养表系统**：食物分类树 + 营养表浏览 + 每日饮食记录 + 自定义食物 + 营养目标 + OCR/扫码
-- [ ] **多层 Tag**：GameplayTag 式层级标签系统
-- [ ] `MultiLevelTabCoordinator` 与 `RecordHistory` 在生产屏接入
-- [ ] `ChartFullscreenData` Parcelable 化
+存档分 **app 存档** 与 **user 存档**：
+
+- **多用户**：所有 `UserProfile` JSON 序列化在 `health_diet_prefs/all_users`；当前用户 ID 在 `current_user_id`
+- **体征记录**：`BodyRecord` 始终以基准单位存储（cm / kg）；UI 边界转换为用户偏好单位（保存 `toBase`，展示 `fromBase`）
+- **种子数据**：无记录的用户合并 `createSeedProfile`，约 30 天体重 + 6 个月身高示例点，保证新账号也有图表数据
+- **每用户键**：图表 UI 状态、`UserPrefs`、`MedicationPrefs` 均以 `<baseKey>_<userId>` 命名空间隔离
+- **删除级联**：清理头像文件、`user_prefs_<uid>`，以及 `health_diet_prefs` / `app_prefs` 中以 `_<uid>` 结尾的所有键
+- **迁移**：`ProfilePrefs.ensureMigrated` 每次加载时桥接旧形态到 `RegionSnapshot`
 
 ## 构建指南
 
@@ -207,12 +135,36 @@ app/src/main/java/com/woshiwangnima/healthdietpro/
 
 # 安装到设备
 ./gradlew installDebug
+
+# 单元测试（基线：356 项，350 通过；6 项 FoodNutrientRepositoryTest 为历史失败）
+./gradlew testDebugUnitTest
 ```
+
+> 本机需指定 JDK：`JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"`
+> 食材目录与图片是构建期生成物（依赖 `uv`），首次构建会自动调用 `tools/food_catalog/catalog_tool.py`。
+
+### 打 release 包
+
+完整流程（版本号位置、签名密钥位置与备份要求、签名校验命令、已知坑）见
+[`docs/RELEASE_BUILD.md`](docs/RELEASE_BUILD.md)。
+
+产物：
+
+- `app/build/outputs/apk/release/app-release.apk` —— 可直接安装分发
+- `app/build/outputs/bundle/release/app-release.aab` —— Google Play 上架
 
 ## 数据来源
 
-疾病/营养建议、单位、地区质心与 BMI 中国标准均为本地 JSON 资源，离线可用。营养数据参考《中国食物成分表》（标准版）。
+疾病/营养建议、单位、地区质心与 BMI 中国标准均为本地 JSON 资源，离线可用。
+营养数据参考《中国食物成分表》（标准版）。ICD-11 映射以 WHO MMS `2025-01` 为固定版本，
+仅作分类与检索参考，不用于诊断。
 
 ## 设计文档
 
-详见 [`docs/DESIGN.md`](docs/DESIGN.md)，覆盖目标架构、9 模块职责、数据流与迁移路径。
+| 文档 | 内容 |
+|------|------|
+| [`docs/DESIGN.md`](docs/DESIGN.md) | 目标架构、模块职责、数据流与迁移路径 |
+| [`docs/UI_SPEC_PROJECT.md`](docs/UI_SPEC_PROJECT.md) | UI 规范：设计令牌、组件用法、图标画法 |
+| [`docs/RELEASE_BUILD.md`](docs/RELEASE_BUILD.md) | 构建与发布流程 |
+| [`docs/PROJECT_CLEANUP.md`](docs/PROJECT_CLEANUP.md) | 文件梳理：未使用资源清单与待更新项 |
+| [`docs/FOOD_CATALOG_ASSET_DESIGN.md`](docs/FOOD_CATALOG_ASSET_DESIGN.md) | 食材资产生成与维护 |
