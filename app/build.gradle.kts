@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.Exec
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -30,8 +31,13 @@ val buildFoodImages = tasks.register<Exec>("buildFoodImages") {
     outputs.file(rootProject.file("app/src/main/assets/food_catalog/images/manifest.json"))
 }
 
+// catalog / 图片是生成物，落在 `app/src/main/assets` 里。所有会读到这个目录的任务都必须在生成任务之后跑：
+// 只接 `merge*Assets` 时 lint 任务会漏（它直接扫 assets 目录），Gradle 9 会按「隐式依赖」直接判构建失败。
 tasks.configureEach {
-    if (name.startsWith("merge") && name.endsWith("Assets")) {
+    val readsAssets = name == "preBuild" ||
+        (name.startsWith("merge") && name.endsWith("Assets")) ||
+        name.startsWith("lint")
+    if (readsAssets) {
         dependsOn(compileFoodCatalog, buildFoodImages)
     }
 }
@@ -54,8 +60,30 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Release 签名：口令只放在仓库外的 keystore.properties（已 gitignore），
+    // 文件不存在时保持未签名构建，换机器/CI 也能正常 assembleRelease。
+    signingConfigs {
+        create("releaseKey") {
+            val propsFile = rootProject.file("keystore.properties")
+            if (propsFile.exists()) {
+                val props = Properties().apply {
+                    propsFile.inputStream().use { load(it) }
+                }
+                storeFile = rootProject.file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+                storeType = props.getProperty("storeType") ?: "pkcs12"
+            }
+        }
+    }
+
     buildTypes {
         release {
+            // 只有密钥齐全时才挂签名，否则仍产出未签名包、构建不失败。
+            if (rootProject.file("keystore.properties").exists()) {
+                signingConfig = signingConfigs.getByName("releaseKey")
+            }
             optimization {
                 enable = false
             }

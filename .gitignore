@@ -64,6 +64,9 @@ fabric.properties
 # Secrets
 secrets.properties
 .env
+# Release 签名：密钥库与口令一律不入库
+keystore.properties
+*.p12
 
 # Mac OS X
 .DS_Store
