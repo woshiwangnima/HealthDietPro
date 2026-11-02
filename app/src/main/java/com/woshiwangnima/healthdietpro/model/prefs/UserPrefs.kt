@@ -3,6 +3,7 @@ package com.woshiwangnima.healthdietpro.model.prefs
 import android.content.Context
 import android.util.AtomicFile
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -187,16 +188,14 @@ private class UserPreferencesArchiveStore(
         File(archiveFile.parentFile, "${archiveFile.name}.new").delete()
     }
 
-    private fun readArchive(): Map<String, Any>? = runCatching {
-        val raw = archiveFile.readText(Charsets.UTF_8)
-        val archive = json.decodeDomain(
-            raw,
-            DOMAIN_ID,
-            UserPreferencesArchive.serializer(),
-        )
-        val values = archive.values.mapValues { (_, value) -> decode(value) }.toSortedMap()
-        values
-    }.getOrNull()
+    private fun readArchive(): Map<String, Any>? {
+        val archive = json.decodeDomainSafely(archiveFile, DOMAIN_ID, UserPreferencesArchive.serializer())
+            ?: return null
+        // 存档本身有效，只有个别偏好项的类型不认识时才落到这里；那种情况不必隔离整个文件。
+        return runCatching {
+            archive.values.mapValues { (_, value) -> decode(value) }.toSortedMap()
+        }.getOrNull()
+    }
 
     private fun encode(value: Any): UserPreferenceValue = when (value) {
         is Boolean -> UserPreferenceValue(UserPreferenceType.BOOLEAN, boolean = value)
@@ -228,7 +227,7 @@ private class UserPreferencesArchiveStore(
     private companion object {
         const val DOMAIN_ID = "user_preferences"
         val locks = ConcurrentHashMap<String, Any>()
-        val json = Json { encodeDefaults = false; explicitNulls = false; ignoreUnknownKeys = false }
+        val json = Json { encodeDefaults = false; explicitNulls = false; ignoreUnknownKeys = true }
 
         fun safeUid(uid: String): String = uid.replace(Regex("[^A-Za-z0-9_-]"), "_")
     }

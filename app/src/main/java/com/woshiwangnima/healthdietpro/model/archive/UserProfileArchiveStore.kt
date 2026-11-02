@@ -35,8 +35,7 @@ internal class UserProfileArchiveStore(
         require(payload["id"]?.jsonPrimitive?.content == userId) { "Profile archive user id mismatch" }
         val profilePayload = JsonObject(payload.filterKeys { it !in BODY_METRIC_KEYS })
         val target = archiveFile(userId)
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(
             json.encodeToString(
                 DomainEnvelope.serializer(JsonObject.serializer()),
@@ -67,7 +66,7 @@ internal class UserProfileArchiveStore(
         require(envelope.domainId == DOMAIN_ID) { "Unexpected archive domain: ${envelope.domainId}" }
         require(envelope.schemaVersion <= ArchiveSchemaVersion.Current) { "Unsupported profile archive schema" }
         json.encodeToString(JsonObject.serializer(), envelope.payload)
-    }.getOrNull()
+    }.onFailure { quarantineArchive(file) }.getOrNull()
 
     private fun archiveFile(userId: String): File =
         File(userDirectory(userId), profileFileName)
@@ -82,6 +81,6 @@ internal class UserProfileArchiveStore(
     private companion object {
         const val DOMAIN_ID = "profile"
         val BODY_METRIC_KEYS = setOf("heightRecords", "weightRecords", "circumferenceRecords")
-        val json = Json { encodeDefaults = true; explicitNulls = false; ignoreUnknownKeys = false }
+        val json = Json { encodeDefaults = true; explicitNulls = false; ignoreUnknownKeys = true }
     }
 }

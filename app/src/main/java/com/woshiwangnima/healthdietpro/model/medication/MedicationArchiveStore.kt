@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.medication
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -34,8 +37,7 @@ internal class MedicationArchiveStore private constructor(
     fun save(archive: MedicationArchive) = synchronized(lock) {
         validateIds(archive)
         val file = archiveFile()
-        file.parentFile?.mkdirs()
-        val temporary = File(file.parentFile, "${file.name}.tmp")
+        val temporary = prepareArchiveWrite(file)
         temporary.writeText(json.encodeDomain(context, DOMAIN_ID, archive, MedicationArchive.serializer()), Charsets.UTF_8)
         check(temporary.renameTo(file)) { "Unable to replace medication archive" }
         writeUserArchiveManifest(context, userId)
@@ -47,14 +49,8 @@ internal class MedicationArchiveStore private constructor(
             transform(load()).also(::save)
         }
 
-    private fun read(): MedicationArchive? = runCatching {
-        val file = archiveFile()
-        if (!file.isFile) {
-            null
-        } else {
-            json.decodeDomain(file.readText(Charsets.UTF_8), DOMAIN_ID, MedicationArchive.serializer())
-        }
-    }.getOrNull()
+    private fun read(): MedicationArchive? =
+        json.decodeDomainSafely(archiveFile(), DOMAIN_ID, MedicationArchive.serializer())
 
     private fun archiveFile() = File(context.filesDir, "user_archives/${safeId(userId)}/medications.json")
 
@@ -73,7 +69,7 @@ internal class MedicationArchiveStore private constructor(
     companion object {
         private const val DOMAIN_ID = "medications"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
         fun current(context: Context) = MedicationArchiveStore(
             context.applicationContext,

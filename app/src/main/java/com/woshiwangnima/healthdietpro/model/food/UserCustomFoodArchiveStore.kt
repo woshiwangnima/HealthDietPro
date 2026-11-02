@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.food
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import java.io.File
@@ -41,21 +44,13 @@ internal class UserCustomFoodArchiveStore(
 
     private fun loadUnlocked(): UserCustomFoodArchive = read() ?: UserCustomFoodArchive()
 
-    private fun read(): UserCustomFoodArchive? = runCatching {
-        val target = file()
-        if (!target.isFile) {
-            null
-        } else {
-            val raw = target.readText(Charsets.UTF_8)
-            json.decodeDomain(raw, DOMAIN_ID, UserCustomFoodArchive.serializer()).also(::validate)
-        }
-    }.getOrNull()
+    private fun read(): UserCustomFoodArchive? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, UserCustomFoodArchive.serializer())?.also(::validate)
 
     private fun write(archive: UserCustomFoodArchive) {
         validate(archive)
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(json.encodeDomain(context, DOMAIN_ID, archive, UserCustomFoodArchive.serializer()), Charsets.UTF_8)
         check(temporary.renameTo(target)) { "Unable to replace custom foods archive" }
         writeUserArchiveManifest(context, userId)
@@ -114,7 +109,7 @@ internal class UserCustomFoodArchiveStore(
     companion object {
         private const val DOMAIN_ID = "custom_foods"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
         fun forUser(context: Context, userId: String) =
             UserCustomFoodArchiveStore(context.applicationContext, userId)

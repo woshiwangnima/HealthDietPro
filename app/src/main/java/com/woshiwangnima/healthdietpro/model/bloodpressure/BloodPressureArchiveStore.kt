@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.bloodpressure
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -34,20 +37,12 @@ internal class BloodPressureArchiveStore private constructor(
         replace(json.decodeDomain(raw, DOMAIN_ID, BloodPressureArchive.serializer()))
     }
 
-    private fun read(): BloodPressureArchive? = runCatching {
-        val target = file()
-        if (!target.isFile) {
-            null
-        } else {
-            val raw = target.readText(Charsets.UTF_8)
-            json.decodeDomain(raw, DOMAIN_ID, BloodPressureArchive.serializer())
-        }
-    }.getOrNull()
+    private fun read(): BloodPressureArchive? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, BloodPressureArchive.serializer())
 
     private fun write(archive: BloodPressureArchive) {
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(json.encodeDomain(context, DOMAIN_ID, archive, BloodPressureArchive.serializer()), Charsets.UTF_8)
         check(temporary.renameTo(target)) { "Unable to replace blood pressure archive" }
         writeUserArchiveManifest(context, userId)
@@ -65,7 +60,7 @@ internal class BloodPressureArchiveStore private constructor(
     companion object {
         private const val DOMAIN_ID = "blood_pressure"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
         fun current(context: Context) = BloodPressureArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
         fun forUser(context: Context, userId: String) = BloodPressureArchiveStore(context.applicationContext, userId)
     }

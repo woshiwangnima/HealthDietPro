@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.sleep
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -17,8 +20,7 @@ internal class SleepArchiveStore private constructor(
     fun save(archive: SleepArchive) = synchronized(lock) {
         validateSleepArchive(archive)
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(
             json.encodeDomain(
                 context,
@@ -41,11 +43,8 @@ internal class SleepArchiveStore private constructor(
         synchronized(lock) { validateSleepArchive(json.decodeDomain(raw, DOMAIN_ID, SleepArchive.serializer())) }
     }
 
-    private fun read(): SleepArchive? = runCatching {
-        file().takeIf(File::isFile)?.readText(Charsets.UTF_8)?.let {
-            json.decodeDomain(it, DOMAIN_ID, SleepArchive.serializer())
-        }
-    }.getOrNull()?.let { archive ->
+    private fun read(): SleepArchive? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, SleepArchive.serializer())?.let { archive ->
         val migrated = migrateSleepArchive(archive)
         if (migrated != archive) save(migrated)
         migrated
@@ -56,7 +55,7 @@ internal class SleepArchiveStore private constructor(
     companion object {
         private const val DOMAIN_ID = "sleep"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
         fun current(context: Context) = SleepArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
         fun forUser(context: Context, userId: String) = SleepArchiveStore(context.applicationContext, userId)
     }

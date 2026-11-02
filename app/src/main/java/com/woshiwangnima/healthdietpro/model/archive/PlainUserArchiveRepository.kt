@@ -385,7 +385,7 @@ internal class PlainUserArchiveRepository(
     private companion object {
         const val MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024
         const val USER_IMAGE_PREFIX = "user:"
-        val json = Json { encodeDefaults = true; explicitNulls = false; ignoreUnknownKeys = false }
+        val json = Json { encodeDefaults = true; explicitNulls = false; ignoreUnknownKeys = true }
 
         fun safeUserId(userId: String) = userId.replace(Regex("[^A-Za-z0-9_-]"), "_")
         fun safeFileName(fileName: String) = fileName.substringAfterLast('/').replace(Regex("[^A-Za-z0-9._-]"), "_")

@@ -2,6 +2,8 @@ package com.woshiwangnima.healthdietpro.model.disease
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -33,20 +35,13 @@ internal class UserDiseaseArchiveStore private constructor(
 
     private fun readCurrent(): UserDiseaseArchive? = read(file())
 
-    private fun read(file: File): UserDiseaseArchive? = runCatching {
-        if (!file.isFile) {
-            null
-        } else {
-            val raw = file.readText(Charsets.UTF_8)
-            json.decodeDomain(raw, DOMAIN_ID, UserDiseaseArchive.serializer())
-        }
-    }.getOrNull()
+    private fun read(file: File): UserDiseaseArchive? =
+        json.decodeDomainSafely(file, DOMAIN_ID, UserDiseaseArchive.serializer())
 
     private fun write(archive: UserDiseaseArchive) {
         validate(archive)
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(json.encodeDomain(context, DOMAIN_ID, archive, UserDiseaseArchive.serializer()), Charsets.UTF_8)
         check(temporary.renameTo(target)) { "Unable to replace user disease archive" }
         writeUserArchiveManifest(context, userId)
@@ -72,7 +67,7 @@ internal class UserDiseaseArchiveStore private constructor(
         private const val DOMAIN_ID = "disease_records"
         private const val FILE_NAME = "disease_records.json"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
         fun current(context: Context) = UserDiseaseArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
         fun forUser(context: Context, userId: String) = UserDiseaseArchiveStore(context.applicationContext, userId)

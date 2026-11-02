@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.bloodglucose
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -25,11 +28,8 @@ internal class BloodGlucosePredictionArchiveStore private constructor(
         ))
     }
 
-    private fun read(): BloodGlucosePredictionArchive? = runCatching {
-        file().takeIf(File::isFile)?.readText(Charsets.UTF_8)?.let {
-            json.decodeDomain(it, DOMAIN_ID, BloodGlucosePredictionArchive.serializer())
-        }
-    }.getOrNull()
+    private fun read(): BloodGlucosePredictionArchive? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, BloodGlucosePredictionArchive.serializer())
 
     private fun save(archive: BloodGlucosePredictionArchive) {
         require(archive.points.all { it.timestamp > 0 && it.valueMmolPerL in 1.1..33.3 && it.unitId == "mmol_per_l" })
@@ -37,8 +37,7 @@ internal class BloodGlucosePredictionArchiveStore private constructor(
             "Duplicate blood glucose prediction timestamps"
         }
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(json.encodeDomain(context, DOMAIN_ID, archive, BloodGlucosePredictionArchive.serializer()), Charsets.UTF_8)
         check(temporary.renameTo(target)) { "Unable to replace blood glucose prediction archive" }
         writeUserArchiveManifest(context, userId)
@@ -50,7 +49,7 @@ internal class BloodGlucosePredictionArchiveStore private constructor(
     companion object {
         private const val DOMAIN_ID = "blood_glucose_predictions"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
         fun current(context: Context) = BloodGlucosePredictionArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
     }
 }

@@ -2,6 +2,8 @@ package com.woshiwangnima.healthdietpro.model.profile
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import java.io.File
@@ -35,17 +37,12 @@ internal class BodyMetricsRepository private constructor(
         normalize(transform(readStored()?.let(::normalize) ?: BodyMetrics())).also(::save)
     }
 
-    private fun readStored(): BodyMetrics? = runCatching {
-        val file = archiveFile()
-        if (!file.isFile) return null
-        val raw = file.readText(Charsets.UTF_8)
-        json.decodeDomain(raw, DOMAIN_ID, BodyMetricsDto.serializer()).toDomain()
-    }.getOrNull()
+    private fun readStored(): BodyMetrics? =
+        json.decodeDomainSafely(archiveFile(), DOMAIN_ID, BodyMetricsDto.serializer())?.toDomain()
 
     private fun save(metrics: BodyMetrics) {
         val file = archiveFile()
-        file.parentFile?.mkdirs()
-        val temporary = File(file.parentFile, "${file.name}.tmp")
+        val temporary = prepareArchiveWrite(file)
         temporary.writeText(json.encodeDomain(context, DOMAIN_ID, metrics.toDto(), BodyMetricsDto.serializer()), Charsets.UTF_8)
         check(temporary.renameTo(file)) { "Unable to replace body metrics archive: ${file.name}" }
         writeUserArchiveManifest(context, userId)
@@ -82,7 +79,7 @@ internal class BodyMetricsRepository private constructor(
 
     companion object {
         private const val DOMAIN_ID = "body_metrics"
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
         private val lock = Any()
 
         fun current(context: Context): BodyMetricsRepository = forUser(context, ProfilePrefs.getCurrentUserId(context))

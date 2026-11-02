@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.bloodglucose
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -31,21 +34,13 @@ internal class BloodGlucoseArchiveStore private constructor(
         save(json.decodeDomain(raw, DOMAIN_ID, BloodGlucoseArchive.serializer()))
     }
 
-    private fun read(): BloodGlucoseArchive? = runCatching {
-        val file = file()
-        if (!file.isFile) {
-            null
-        } else {
-            val raw = file.readText(Charsets.UTF_8)
-            json.decodeDomain(raw, DOMAIN_ID, BloodGlucoseArchive.serializer())
-        }
-    }.getOrNull()
+    private fun read(): BloodGlucoseArchive? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, BloodGlucoseArchive.serializer())
 
     private fun save(archive: BloodGlucoseArchive) {
         validate(archive)
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(json.encodeDomain(context, DOMAIN_ID, archive, BloodGlucoseArchive.serializer()), Charsets.UTF_8)
         check(temporary.renameTo(target)) { "Unable to replace blood glucose archive" }
         writeUserArchiveManifest(context, userId)
@@ -85,7 +80,7 @@ internal class BloodGlucoseArchiveStore private constructor(
     companion object {
         private const val DOMAIN_ID = "blood_glucose"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
         fun current(context: Context) = BloodGlucoseArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
         fun forUser(context: Context, userId: String) = BloodGlucoseArchiveStore(context.applicationContext, userId)

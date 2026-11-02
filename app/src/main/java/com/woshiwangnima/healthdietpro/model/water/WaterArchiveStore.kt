@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.water
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -17,8 +20,7 @@ internal class WaterArchiveStore private constructor(
     fun save(archive: WaterArchive) = synchronized(lock) {
         validate(archive)
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(
             json.encodeDomain(context, DOMAIN_ID, archive.copy(records = archive.records.sortedByDescending(WaterRecord::timestamp)), WaterArchive.serializer()),
             Charsets.UTF_8,
@@ -36,11 +38,8 @@ internal class WaterArchiveStore private constructor(
         synchronized(lock) { validate(json.decodeDomain(raw, DOMAIN_ID, WaterArchive.serializer())) }
     }
 
-    private fun read(): WaterArchive? = runCatching {
-        file().takeIf(File::isFile)?.readText(Charsets.UTF_8)?.let {
-            json.decodeDomain(it, DOMAIN_ID, WaterArchive.serializer())
-        }
-    }.getOrNull()?.let { archive ->
+    private fun read(): WaterArchive? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, WaterArchive.serializer())?.let { archive ->
         val migrated = migrateWaterArchive(archive)
         // Persist the v1-to-v2 identity migration before callers can edit a preset.
         if (migrated != archive) save(migrated)
@@ -62,7 +61,7 @@ internal class WaterArchiveStore private constructor(
     companion object {
         private const val DOMAIN_ID = "water"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
         fun current(context: Context) = WaterArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
         fun forUser(context: Context, userId: String) = WaterArchiveStore(context.applicationContext, userId)
     }

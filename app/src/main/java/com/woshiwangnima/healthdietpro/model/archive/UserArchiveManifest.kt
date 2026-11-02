@@ -119,7 +119,9 @@ private fun readDomainFile(file: File, expectedDomainId: String): DomainFileRead
     if ("domainId" !in manifestJson.parseToJsonElement(raw).jsonObject) return DomainFileRead(null)
     val envelope = manifestJson.decodeFromString(DomainEnvelope.serializer(JsonElement.serializer()), raw).also { envelope ->
         require(envelope.domainId == expectedDomainId) { "Unexpected archive domain: ${envelope.domainId}" }
-        require(envelope.schemaVersion == ArchiveSchemaVersion.Current) { "Unsupported archive schema" }
+        // 与 decodeDomain 保持一致：旧版本存档视为可读（由领域 migrate 补齐），
+        // 只有高于当前版本的存档才算不可解读。这里若用相等会让校验层先把旧存档判成损坏。
+        require(envelope.schemaVersion <= ArchiveSchemaVersion.Current) { "Unsupported archive schema" }
     }
     DomainFileRead(envelope)
 }.getOrNull()

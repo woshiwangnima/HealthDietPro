@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.common.timer
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -18,8 +21,7 @@ internal class TimerArchiveStore private constructor(
 
     fun save(instances: List<TimerInstance>) = synchronized(lock) {
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(
             json.encodeDomain(context, DOMAIN_ID, TimerArchive(instances), TimerArchive.serializer()),
             Charsets.UTF_8,
@@ -33,18 +35,15 @@ internal class TimerArchiveStore private constructor(
         transform(read().orEmpty()).also(::save)
     }
 
-    private fun read(): List<TimerInstance>? = runCatching {
-        file().takeIf(File::isFile)?.readText(Charsets.UTF_8)?.let {
-            json.decodeDomain(it, DOMAIN_ID, TimerArchive.serializer()).instances
-        }
-    }.getOrNull()
+    private fun read(): List<TimerInstance>? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, TimerArchive.serializer())?.instances
 
     private fun file() = File(context.filesDir, "user_archives/${userId.replace(Regex("[^A-Za-z0-9_-]"), "_")}/timers.json")
 
     companion object {
         private const val DOMAIN_ID = "timers"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
         fun current(context: Context) = TimerArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
     }
 }

@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.price
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -21,8 +24,7 @@ internal class PriceArchiveStore private constructor(
     fun save(archive: PriceArchive) = synchronized(lock) {
         validatePriceArchive(archive)
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(
             json.encodeDomain(
                 context,
@@ -45,11 +47,8 @@ internal class PriceArchiveStore private constructor(
         synchronized(lock) { validatePriceArchive(json.decodeDomain(raw, DOMAIN_ID, PriceArchive.serializer())) }
     }
 
-    private fun read(): PriceArchive? = runCatching {
-        file().takeIf(File::isFile)?.readText(Charsets.UTF_8)?.let {
-            json.decodeDomain(it, DOMAIN_ID, PriceArchive.serializer())
-        }
-    }.getOrNull()
+    private fun read(): PriceArchive? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, PriceArchive.serializer())
 
     private fun file() = File(
         context.filesDir,
@@ -59,7 +58,7 @@ internal class PriceArchiveStore private constructor(
     companion object {
         private const val DOMAIN_ID = "prices"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
         fun current(context: Context) =
             PriceArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
         fun forUser(context: Context, userId: String) =

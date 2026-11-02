@@ -2,6 +2,9 @@ package com.woshiwangnima.healthdietpro.model.diet
 
 import android.content.Context
 import com.woshiwangnima.healthdietpro.model.archive.decodeDomain
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
+import com.woshiwangnima.healthdietpro.model.archive.prepareArchiveWrite
+import com.woshiwangnima.healthdietpro.model.archive.decodeDomainSafely
 import com.woshiwangnima.healthdietpro.model.archive.encodeDomain
 import com.woshiwangnima.healthdietpro.model.archive.writeUserArchiveManifest
 import com.woshiwangnima.healthdietpro.model.profile.ProfilePrefs
@@ -17,8 +20,7 @@ internal class DietArchiveStore private constructor(
     fun save(archive: DietArchive) = synchronized(lock) {
         validateDietArchive(archive)
         val target = file()
-        target.parentFile?.mkdirs()
-        val temporary = File(target.parentFile, "${target.name}.tmp")
+        val temporary = prepareArchiveWrite(target)
         temporary.writeText(
             json.encodeDomain(
                 context,
@@ -41,11 +43,8 @@ internal class DietArchiveStore private constructor(
         synchronized(lock) { validateDietArchive(json.decodeDomain(raw, DOMAIN_ID, DietArchive.serializer())) }
     }
 
-    private fun read(): DietArchive? = runCatching {
-        file().takeIf(File::isFile)?.readText(Charsets.UTF_8)?.let {
-            json.decodeDomain(it, DOMAIN_ID, DietArchive.serializer())
-        }
-    }.getOrNull()?.let { archive ->
+    private fun read(): DietArchive? =
+        json.decodeDomainSafely(file(), DOMAIN_ID, DietArchive.serializer())?.let { archive ->
         val migrated = migrateDietArchive(archive)
         if (migrated != archive) save(migrated)
         migrated
@@ -56,7 +55,7 @@ internal class DietArchiveStore private constructor(
     companion object {
         private const val DOMAIN_ID = "diet_records"
         private val lock = Any()
-        private val json = Json { ignoreUnknownKeys = false; encodeDefaults = true; explicitNulls = false }
+        private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
         fun current(context: Context) = DietArchiveStore(context.applicationContext, ProfilePrefs.getCurrentUserId(context))
         fun forUser(context: Context, userId: String) = DietArchiveStore(context.applicationContext, userId)
     }
