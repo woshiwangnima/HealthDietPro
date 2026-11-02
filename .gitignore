@@ -68,6 +68,9 @@ secrets.properties
 keystore.properties
 *.p12
 
+# 真机数据备份：含真实用户档案与健康记录，按设备分目录，一律不入库
+device-data/
+
 # Mac OS X
 .DS_Store
 
