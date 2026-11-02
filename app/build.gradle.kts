@@ -79,6 +79,15 @@ android {
     }
 
     buildTypes {
+        // debug 与 release 共用同一签名。Android 只按「包名 + 签名」判断能否覆盖安装，
+        // 两者签名不同时会强制要求先卸载，而卸载连 data/data 下的存档一起删掉——
+        // 这是真机数据丢失最常见的原因，统一签名后 AS Run 与 release APK 可以互相覆盖。
+        // 调试能力不受影响：debuggable 由 buildType 决定，与签名无关。
+        debug {
+            if (rootProject.file("keystore.properties").exists()) {
+                signingConfig = signingConfigs.getByName("releaseKey")
+            }
+        }
         release {
             // 只有密钥齐全时才挂签名，否则仍产出未签名包、构建不失败。
             if (rootProject.file("keystore.properties").exists()) {

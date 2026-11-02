@@ -92,6 +92,7 @@ docs/*
 !docs/PROJECT_CLEANUP.md
 !docs/DESIGN.md
 !docs/UI_SPEC_PROJECT.md
+!docs/ARCHIVE_SAFETY.md
 
 # Hidden directories
 .*/
