@@ -13,4 +13,6 @@
     <color name="nav_center_bg_selected">#FFC8E6C9</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- 系统启动窗口底色：与 Compose 启动页渐变顶部一致，避免出现第二层图标页 / 白屏。 -->
+    <color name="splash_background">#FFF3EDE0</color>
 </resources>

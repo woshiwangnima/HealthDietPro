@@ -2520,6 +2520,852 @@ fun selectTab(id: String) {
 | 小憩 | 按 90 分钟推（单测覆盖，界面同一条路径） |
 | 深 / 浅两套 | 按钮用 `primaryContainer`，与行内文字、`>` 都分得开 |
 
+## 8.41 导入/导出用户数据：整页重做 + 文件树预览（第三十九轮）
+
+### 8.41.1 旧版的实际问题
+
+旧入口是「我的 → 导入/导出用户数据」弹一个 `AlertDialog`（`ProfileScreen` 内联实现），五件事挤在一块：
+
+| 位置 | 问题 |
+| --- | --- |
+| 「数据格式」下拉 | 只有一个选项 `JSON`，`onValueChange` 是空函数——画了个下拉，点开没得选 |
+| 「压缩」下拉 | 同上，只有一个 `GZIP` |
+| 加密 | 一个复选框 + 一个密码框，**没有确认密码**：手滑打错也能导出，等到导入那天才发现解不开 |
+| 导出 | `confirmButton` 第一次点只生成预览，第二次点才真导出；按钮文案却一直是「导出」 |
+| 导入 | 要用户先在浮层里勾「加密」并填密码，再选文件——选错勾就直接失败，且提示只有一句 `Unable to complete the JSON operation` |
+| 明文预览 | 整份档案（含 `attachments` 里几十兆 base64）当一段流水行展示，看不出档案里有什么 |
+
+### 8.41.2 结构：独立页面，由控制器状态驱动
+
+- 新增 `ui/profile/archive/`：`ArchiveTransferController`（状态 + IO）、`ArchiveTransferScreen`（总览页）、
+  `ArchivePreviewScreen`（树 + 原文）、`ArchivePreviewState`。
+- `ProfileScreen` 不再持有任何存档弹窗状态，只保留一行入口；进哪一屏由 `controller.uiState.visible` 决定，
+  因此切标签页回来（`MainActivity.switchTab` 里显式 `close()`）不会停在半路。
+- 系统返回键由 `BackHandler` 接管（总览 → 退出、预览 → 回总览、单文件 → 回树），
+  不再落到 `MainActivity` 的「再按一次退出」。
+
+### 8.41.3 导出：三个真格式
+
+`ArchiveExportFormat` 三选一，全部走同一条 `exportCurrentUser()` 字节链，预览看到的就是写进文件的那一份：
+
+| 选项 | 产物 | 说明 |
+| --- | --- | --- |
+| 明文 JSON | `.json` | 可直接用文本编辑器打开，无密码 |
+| 明文 JSON（GZIP） | `.json.gz` | 体积更小，仍未加密 |
+| 加密存档 | `.hdp` | AES-256-GCM + PBKDF2（`SensitiveArchiveCodec`） |
+
+- 加密态下出现**密码 + 确认密码**两个字段，不一致时按钮禁用并给红字，不再让用户带着错密码导出。
+- 默认文件名带用户与时间戳（`health-diet-pro-<名字>-20261102-1430.json`），连续导出两次不再互相覆盖。
+- 未加密时卡片里常显一句「未加密存档包含健康数据」——`AGENTS.md` 要求的二次风险提示落在**选择格式处**，
+  不是导出后再弹一次框。
+
+### 8.41.4 导入：先识别格式，再预览，最后才覆盖
+
+1. 选文件（`OpenDocument` 用 `*/*`：聊天软件转存的档案常常没有正确后缀）。
+2. **按魔数识别**（`ArchivePayloadCodec`）：`HDP\x01` → 加密、`1f 8b` → GZIP 明文、其余当明文 JSON。
+   加密档案才弹密码框（`AppModal`，错密码就地红字重试），不再让用户先猜「这份文件加没加密」。
+3. 解析后走与真正导入**完全相同**的校验链（`PlainUserArchiveRepository.prepareImport`：领域解码、
+   信封版本、附件路径与引用），通过才进「导入预览」。
+4. 预览页底部是红字警告 + 「导入并覆盖」，点了还要过一遍 `ConfirmDialog`。
+5. 版本比本机新 → 预览页照常展示内容，但按钮禁用并注明「请先升级应用再导入」；
+   比本机旧 → 正常可导入（由各领域迁移链补齐），摘要里标「旧版本，导入时自动迁移」。
+
+`decodeBundle` 的版本判断同时从「等于当前版本」放宽到「≤ 当前版本」，与 `decodeDomain` 同一口径——
+否则 `1.0.x` 的老档案会被这一层先判死，迁移链根本没机会跑。
+
+### 8.41.5 明文预览：先看目录，再看文件
+
+档案本身是一个 JSON，但导入时会原样还原成 `user_archives/<uid>/` 的目录：
+
+```text
+profile.json
+body_metrics.json
+medications.json
+…
+user_preferences.json
+attachments/
+  avatar/…
+  foods/…
+```
+
+`buildUserArchiveSnapshot` 把这棵树从扁平 JSON 还原出来（`ArchiveNode`：文件夹 / JSON / 图片 / 二进制，
+带字节数与记录条数），预览页两个标签页：
+
+- **文件**：可折叠的树，文件夹在前、文件在后；JSON 行副标题是「领域名 · N 条记录」，
+  点开是单文件页（路径 / 体积 / 记录数 + 可折叠、带行号的 JSON）。二进制附件只报体积不渲染内容。
+- **原文**：整份档案的 JSON，沿用抽出来的 `JsonTextPanel`（行号 + 大括号折叠 + 横向滚动）。
+
+附件体积用 base64 长度反算，**不真的解码**：预览为了显示一个数字去解几十兆图片没有意义。
+
+### 8.41.6 顺带清掉的东西
+
+- `PlainTextPreviewScreen` 拆成 `JsonTextPanel`（只剩内容面板），旧文件删除。
+- 24 条只在旧弹窗里用的字符串（`profile_archive_*` / `profile_plain_json_*`）删除，
+  新增 75 条 `archive_*`（中英各一份）。
+- `MainActivity` 里三个旧存档函数（`exportPlainJsonArchive` / `handleArchiveAction` / `previewArchive`）
+  与四个 `pending*` 字段全部删除，SAF 只留三个 launcher（JSON 保存 / 二进制保存 / 打开）。
+- 新增 `ic_folder`（文件树用），其余图标复用 `ic_description` / `ic_photo` / `ic_shield`。
+
+### 8.41.7 验证
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` / `assembleRelease` | 通过 |
+| `UserArchiveSnapshotTest`（新增 10 条） | 通过：目录还原、附件分组与体积、记录数、三种兼容性、缺失领域不造文件 |
+| 存档相关全部单测（`model/archive/*`） | 通过 |
+| 真机走查 | **未做**：按用户要求不使用 adb 调试，等装机验收 |
+
+## 8.42 导入方式可选 + 领域注册表（第四十轮）
+
+### 8.42.1 需求
+
+1. 导入不能只有「覆盖当前用户」一种落点，要能把一份档案**导入成一个新用户**；
+2. 「以后存档有新内容，怎么保证一定能和导入/导出模块联动」——不能只写在文档里。
+
+第 2 条一问就查出了真问题：磁盘上一直存在的 `diet.json`、`timers.json`、`containers.json`、
+`prices.json`、`blood_glucose_predictions.json` 五个领域，**既没进导出也没进预览**，
+换设备时这部分数据直接少掉，而四份手写清单里没有任何一处会报错。
+
+### 8.42.2 导入卡片：先选落点，再选文件
+
+> 本节的「导入方式分段控件」已被 §8.43.3 改为单选列表，其余（落点语义、边界）不变。
+
+`归档 → 导入` 顶部加了等宽分段控件：
+
+| 选项 | 说明文案 | 颜色 |
+| --- | --- | --- |
+| 覆盖当前用户 | 沿用原来的红字警告（不可逆） | `danger` |
+| 导入为新用户 | 「保留现有用户，把这份档案导入成一个新的用户」 | `textMuted` |
+
+选完再点「选择文件」，后续流程不变（魔数识别 → 密码 → 导入预览）。预览页底部按钮随落点变成
+「导入并覆盖」/「导入为新用户」，确认框标题与正文也各自一套（覆盖强调不可逆，新建强调不影响现有数据）。
+成功后横幅显示「已导入为新用户「某某」」，并切到该用户。
+
+### 8.42.3 「导入为新用户」的边界
+
+- **新 id 不复用档案里的 `sourceUserId`**：档案可能就来自这台设备，复用等于覆盖原用户。
+- 附件里指向导出设备的路径（`user:user_archives/<uid>/attachments/…`）落盘前统一改写成本机新 id。
+- 目录事务不复制现有目录（`mergeExisting = false`）：新用户本就该从零开始。
+- 提交阶段失败 → 删掉新目录 + `discardRegisteredUser()` 撤索引；覆盖模式则恢复偏好与资料。
+- 时间戳沿用档案里的 `createdAtMillis`，用户列表里新旧账号的排序与导出设备一致。
+
+### 8.42.4 领域注册表：唯一清单 + 两道自动网
+
+新增 `model/archive/ArchiveDomainRegistry.kt`，`ArchiveDomains` 一条一个领域，带
+`id / fileName / labelRes / 是否读盘 / 导出加工 / extract / attach / validate / 附件改写`。
+导出、导入校验、附件改写、预览目录树、`manifest.json`、诊断报告**全部从它派生**，
+删掉了原来的四份手写清单（`readDomainSnapshot` 分支、`validateDomains` 的 `when`、
+`ArchiveDomainFiles`、`archiveDiagnosticFiles`）。
+
+漏登记由两道**自动化**网兜住，不依赖人记：
+
+| 漏法 | 谁来抓 | 表现 |
+| --- | --- | --- |
+| bundle 字段与注册表对不上 | `ArchiveDomainRegistryTest`（反射序列化描述符双向比对） | 单测红 |
+| 新存储层写了新文件却没进档案 | `unregisteredArchiveFiles()` | 状态卡红字「有 N 个文件未纳入档案 · xxx.json」 |
+
+顺带修掉两个会真丢数据的缺陷：
+
+- `stageUserDirectory` 原来按 `"$domainId.json"` 落盘，而 `diet_records` 的文件名是 `diet.json`——
+  按 id 拼会写出 `diet_records.json`，`DietArchiveStore` 根本读不到；现在文件名取自注册表。
+- 五个领域补进 `UserArchiveBundle`（可空字段，按 `ARCHIVE_SAFETY.md` 第 3 节「加字段不升版本」）。
+
+### 8.42.5 验证
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` / `assembleRelease` | 通过 |
+| 全量单测 | 381 项 375 过，6 条失败仍是 `FoodNutrientRepositoryTest`（Q-6 既有） |
+| 新增 `ArchiveDomainRegistryTest`（7 条） | 通过：字段↔注册表双向比对、id/文件名唯一、attach→extract 往返、profile/偏好特殊路径、diet 历史文件名、孤儿扫描排除簿记文件 |
+| 真机走查 | **未做**：按用户要求不使用 adb，等装机验收 |
+
+## 8.43 导出 / 导入改为同级切换（第四十一轮）
+
+### 8.43.1 需求
+
+用户不可能同时导出和导入。两件事并排堆在一页里，问题有三：导出卡与导入卡纵向累加后，
+第二张长期在首屏之外；两张卡都带主操作按钮（导出文件 / 选择文件），视觉上争主次；
+状态卡又同时为两者服务，读起来不知道属于哪一段。
+
+### 8.43.2 结构：固定头部 + 可滚动内容
+
+- **顶部固定**：结果横幅 → 覆盖警告（仅当存在未纳入档案的文件时出现）→ 等宽分段切换栏「导出 | 导入」；
+> §8.43.2 的「状态卡放在分区内容里」已被 §8.44 取代：状态卡现在固定在切换栏上方，
+> 内容区只剩操作卡。分区切换逻辑本身不变。
+
+- **下方可滚动**：按当前分区只渲染一组卡片，两个分区结构一致——**档案状态卡在上，操作卡在下**。
+
+| 分区 | 内容 |
+| --- | --- |
+| 导出 | 档案状态 + 导出格式（三种格式单选、密码与确认密码、明文预览 / 导出文件） |
+| 导入 | 档案状态 + 导入方式（两种落点单选、支持格式说明、选择文件） |
+
+分区状态放在 `ArchiveTransferUiState.section`，**不放在 Composable 的 `remember`**：
+打开明文预览时整页会提前 `return` 退出组合，`remember` 随之丢弃，返回时人会被弹回导出页。
+
+### 8.43.3 三处随之调整
+
+1. **导入方式改单选列表**（`AppRadioRow` ×2）：顶部已经是分段控件，同款控件再叠一层会分不清
+   哪一层在切什么；单选列表同时与导出格式的呈现方式对齐。
+   原来那句只在选中时出现的红字「不可撤销」并进了「覆盖当前用户」的副标题——选项常驻可见，
+   警告不该因为没选中就消失；确认框里仍有独立的红字提示。
+2. **卡片标题改写**：「导出」「导入」与切换栏重复，改成「导出格式」「导入方式」，描述内容而非动作
+   （新增 `archive_export_section_title` / `archive_import_section_title`，中英各一份）。
+3. **「N 个文件未纳入档案」上移**：从状态卡里移出，变成切换栏上方的红色警示条。这是数据完整性告警，
+   不该因为切到导入分区就看不见。
+
+### 8.43.4 验证
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过 |
+| `testDebugUnitTest`（archive 包） | 通过，无新增失败 |
+| 装机 | `adb install -r` 至 emulator-5554 成功，覆盖安装、数据未动 |
+
+截图走查未做（本机不使用截图调试）。
+
+## 8.44 档案状态卡上移 + 图表化（第四十二轮）
+
+### 8.44.1 需求
+
+状态卡原本在每个分区各渲染一份，切分区时跟着重画；形式上只是五行 `label / value` 文本。
+要求改为：放到「导出 / 导入」切换栏**上面**（两分区共用、切换时不重画），并做成带图表的现代仪表盘。
+
+### 8.44.2 位置与结构
+
+固定头部顺序：**结果横幅 → 档案状态卡 → 切换栏**；下方可滚动区只剩当前分区的操作卡。
+状态卡在分区切换时保持在组合中，展开状态与图例选中态不会因切分区丢失。
+实现拆到 `ui/profile/archive/ArchiveStatusCard.kt`，主屏删掉旧的
+`ArchiveStatusCard` / `IntegrityLine` / `ArchiveAttribute` / `ArchiveCoverageWarning`。
+
+### 8.44.3 两个图表与交互
+
+1. **覆盖率环**（自研 `Canvas.drawArc` + `Animatable` 700ms 渐进）：单段进度环，
+   中心大字百分比 + 「领域覆盖」。环色随完整性（正常绿 / 已重建清单黄 / 校验不一致红），
+   有孤儿文件时强制红。
+2. **内容构成堆叠条**：记录数据 / 偏好设置 / 附件三段，按导入后还原的目录树字节数分段，
+   颜色取 `primary / info / warning`。图例三等分，**点击某类高亮对应段、其余降到 30% 透明**，
+   再点取消；孤儿文件没有字节数，绝不伪造进条，只用红字单独报告。
+3. **详情折叠**：「查看详情 / 收起详情」带箭头 180° 旋转 + `AnimatedVisibility`，
+   收起时用户、格式版本、应用版本、生成时间、完整性五行不占高度。
+4. **完整性徽章**：从纯文本行改成 pill（色点 + 文案），与体积 / 文件数 / 领域三个 stat 同列。
+
+### 8.44.4 口径分离（这一轮最容易出错的地方）
+
+| 指标 | 口径 | 来源 |
+| --- | --- | --- |
+| 覆盖率环 | 已纳入领域文件 / （已纳入 + 未纳入的本机领域文件） | `snapshot.files` 计数 + `unregisteredFiles` |
+| 堆叠条 | 还原成目录后的体积构成 | `snapshot.files` 的 `byteSize` 求和 |
+| stat「体积」 | 导出 JSON 文件的真实体积 | `snapshot.totalBytes` |
+
+覆盖率**不用 `ArchiveDomains` 全部领域作分母**：没有数据的领域不会写文件，
+那样算会让一份完整档案天然显示不满 100%，属于误导性指标。三者互不相同，文案分别标注，不混算。
+
+### 8.44.5 为什么没有复用 `AnimatedDonutChart`
+
+`common/ui/AnimatedDonutChart.kt` 面向宽屏大图（216dp 画幅 + 环外动态标签布局 + 逐项静态图例），
+固定头部只有约 340dp 宽且要常驻，环外标签会挤成一团；它也没有「点击图例联动高亮」的能力。
+按 AGENTS.md「图表走自研 Canvas」重写一个紧凑版，不动公共组件，避免影响其它屏。
+
+### 8.44.6 验证
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过 |
+| 全量单测 | 381 项 375 过，6 条 `FoodNutrientRepositoryTest`（Q-6 既有） |
+| 安装冒烟 | `adb install -r` 至 emulator-5554 成功；启动 `MainActivity`，logcat 无 FATAL EXCEPTION |
+| 视觉走查 | **未做**（按用户要求不截图），环图动画与折叠需进页面验收 |
+
+**已知限制**：状态卡固定在头部约 270dp，小屏上内容区会被压缩但仍可独立滚动；
+展开「查看详情」时头部再增高约 100dp。`selectedPart` / `expanded` 是 Compose 局部状态，
+从预览页返回会复位（次要 UI 状态，不持久化）。
+
+## 8.45 食材 / 食物 / 菜肴排行页签（第四十三轮）
+
+### 8.45.1 旧界面实际上不存在
+
+详情页第二个页签早就有名字：食材显示「食材排行」、食物显示「食物排行」、菜肴显示「制作步骤」，
+但 `FoodDetailContent` 里只有 `tab == 1 && food is Dish`（食材清单 + 菜谱）和
+`tab == 1 && PreparedFood.components.isNotEmpty()`（食材清单）两条分支有内容，
+其余全部落到 `DetailEmptyState`「此内容正在规划中」。第三个页签「如何估重」也一直是同一个空态。
+
+这一轮把排行做成真功能，并顺手把页签结构修正：
+
+| 页签 | 食材 | 食物 | 菜肴 |
+| --- | --- | --- | --- |
+| 营养档案 | ✓ | ✓ | ✓ |
+| 排行 | 食材排行 | 食物排行 | **菜肴排行**（新增文案） |
+| 制作步骤 | — | 有组分时才有 | ✓ |
+| 如何估重 | ✓（仍为规划占位） | ✓ | ✓ |
+
+页签改成 `FoodDetailTab` 枚举 + `detailTabsFor(food)` 动态生成，不再用 Int 下标：
+菜肴多一个「制作步骤」时，写死的 `0/1/2` 会把「如何估重」挤到下标 3，而旧的 `if/else` 还按
+「不是 0 就是 1」判断，属于迟早会炸的隐式耦合。制作步骤的原实现完整保留，只是换了页签位置。
+
+### 8.45.2 数据层：一次解析，七个指标
+
+新增 `ui/nutrition/FoodRankingModel.kt`（同 `FoodCompareModel.kt` 的纯函数层），
+UI 只负责状态与绘制：
+
+- `collectRankSamples(foods, kind, resolve, metas)`：按 `FoodKind` 过滤后，每个条目只跑一次
+  `resolvePer100g`，一次取出 7 个指标值。切指标只重排，不再重跑 195 次营养解析。
+  解析失败（缺组分、循环引用）的条目留一个全 null 的 sample，不进任何榜。
+- 指标只列档案里**确实有数据**的 7 项：能量 / 蛋白质 / 脂肪 / 碳水 / 膳食纤维 / GI / GL。
+  维生素与矿物质目前 263 条里只有黄油一条完整（Q-11），放进来只会得到一堆空榜；
+  `availableRankMetrics` 还要求当前范围内**至少两项有值**才显示该指标的胶囊。
+- 范围：同 `FoodKind` 全部，或「同类别」（食材/食物取根分类 tag、菜肴取 cuisine id）。
+  当前条目没有分组键时不显示范围切换；范围切窄导致当前指标无数据时，自动回落到第一个可用指标。
+
+### 8.45.3 口径：整份菜肴必须折回每 100 g
+
+`NutritionResolver.resolvePer100g(Dish)` 名字叫 per100g，实际返回的是**整道菜合计**
+（`basis = 各组分克数之和`）。直接用它排序，一道 800 g 的菜会因为分量大而霸占所有榜单首位，
+那就不是营养密度排行而是菜量排行。模型层统一乘 `100 / basis.value`：
+
+| 条目 | basis | 原始 ENERGY | 折算后 |
+| --- | --- | --- | --- |
+| 食材 / 食物 | 100 g | 100 kcal | 100 kcal |
+| 整份菜肴 | 800 g | 800 kcal | 100 kcal |
+
+GI 是比值，不随份量折算；GL 语义是每 100 g 升糖负荷，同样折回。非克重 basis（100 ml 饮品）
+保持原值，不做假折算。口径写在概览卡脚注与卡头长按提示里，不藏在代码注释中。
+
+### 8.45.4 三块内容与 UX
+
+1. **名次概览**：自研 `Canvas.drawArc` 百分位环（`Animatable` 700 ms 渐进），
+   中心大字 `#N` + 「共 M 项」，右侧当前值 / 单位 / 「超过 X% 同类」pill / 中位数对比 / 范围。
+   环表达百分位、中心表达名次、文字表达数值，三者口径分开，不混算（沿用 §8.44.4 的教训）。
+2. **排行依据**：指标胶囊横滚、范围胶囊、方向胶囊（高→低 / 低→高），**切换即重排**，
+   没有「开始查找」这类二次确认；卡头长按给出 GI / GL 与折算口径的说明。
+3. **排行榜**：每行名次徽章（前三用指标色实心框，其余描边）+ 名称 + 6 dp 动画条形
+   （`animateFloatAsState` 400 ms，满量程取当前排序下的榜首）+ 数值；当前项整行高亮并挂「本条」pill；
+   点任一行 `viewModel.openFood` 跳详情。默认只渲染 10 行，「再看 N 项」增量展开，
+   当前项名次靠后时在列表底部单独补一行「本条位置」，不逼用户展开到 195 项才找到自己。
+
+空态走 `AppEmptyState`：说明「换一个指标，或先为同类条目补充营养数据」，不留一片空白。
+
+### 8.45.5 为什么没有复用 `AnimatedDonutChart`
+
+与 §8.44.5 同理：公共组件面向 216 dp 宽屏大图且没有图例联动，这里要的是 112 dp 紧凑环 +
+中心名次 + 点击式指标切换。按 AGENTS.md「图表走自研 Canvas」重写，不动公共组件。
+
+### 8.45.6 验证
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过 |
+| 全量单测 | 388 项 382 过，6 条 `FoodNutrientRepositoryTest`（Q-6 既有）失败；新增 `FoodRankingModelTest` 7 条全过 |
+| 视觉走查 | **未做**（按用户要求不截图、不用 adb 调试），环图动画 / 条形动画 / 四页签布局需进页面验收 |
+
+**已知限制**：GI / GL 的数据覆盖率低于宏量营养素，切到这两项时参与数会明显变少（界面已显式报数）；
+菜肴只有 10 条，同类别范围可能只剩 1 项。指标 / 范围 / 方向 / 展开数都是 Compose 局部状态，
+切换食物会复位，属次要 UI 状态不做持久化。
+
+## 8.46 排行页按两份 UI 规范重整（第四十四轮）
+
+用户反馈四点：① 非必要说明文字应作为长按标题显示的 tooltip（项目已有 `AppSectionCard(tooltip = …)` 实现）；
+② 筛选放在最上面，其次环形图显示排名，最后才是详细排行榜；③ 标题与标题图标应该更准确；
+④ 设计参照 `C:\Users\WSW\Desktop\游戏策划案\通用UI设计规范.md` 与
+`E:\Download\mobile-design-system-skill-main\mobile-design-system-skill-main` 项目规范。
+
+### 8.46.1 规范条款对照
+
+| 反馈 / 检查项 | 规范依据 | 落地 |
+| --- | --- | --- |
+| 说明文字收进长按 tooltip | 通用 §5.1-1 / §5.5.5（Tooltip 非阻断、纯文字、长按 500 ms、280 px、最多 2 行）；§1.3 就地优先与信息优先；项目 `AppSectionCard` 卡头长按 → `AppTooltipPopup` | 三张卡统一 `AppSectionCard`；`rank_basis_note` / `rank_list_note` / `rank_participants` 不再常显。折算口径并入筛选卡 tooltip，环与名次的含义写进概览卡 tooltip，交互说明写进榜单卡 tooltip |
+| 筛选置顶 | 通用 §4.8「滚动时固定表头与筛选栏」、§7.3 信息架构；移动规范 06 骨架「吸顶搜索栏 + 分段 Tab」 | 筛选卡固定在页签栏下，不随内容滚走；下面滚动区依次是名次环 → 完整榜单 |
+| 标题与图标语义 | 通用 §2.5「不同语义不得复用同一图标」、§4.2「排序=上下箭头 / 筛选=漏斗」、§12.3 精确命名 | 「排行依据」→「筛选条件」+ `ic_filter`；新增「我的名次」+ `ic_trophy`；「排行榜」→「同类榜单」+ `ic_leaderboard`；方向按钮 `ic_arrow_drop_down` → `ic_sort` |
+| 动效克制 | 通用 §9.1「默认 ≤ 400 ms」、§9.4「图表首次绘制 280 ms」、§2.9 动效令牌 | 环 700 ms → `motion.slowMs`(280)、条形 400 ms → `motion.baseMs`(180)，缓动统一 `AppEaseOut`，不再写死毫秒数 |
+| 触控与间距 | 移动规范 01 §三、07 门禁 03 / 04；通用 §4.6-3、§10.4 | 榜单行 `heightIn(rowMinHeight)` = 56 dp；相邻可点击行留白 `s1` → `s2`(8 dp)；胶囊与按钮沿用既有 48 dp 热区 |
+| 状态完整 | 通用 §6.2 空态、§6.4 反馈即时 | `AppEmptyState` 保留；参与数移到榜单卡头右侧作筛选结果计数，切条件即时可见 |
+
+### 8.46.2 具体改动
+
+- `ui/nutrition/FoodRankingScreen.kt`：外层 `Column` 拆成「固定筛选卡 + `weight(1f).verticalScroll` 的结果区」；
+  `RankOverviewCard` 从手搓 `Column + 底材` 改为 `AppSectionCard`，这样才有可长按的卡头挂 tooltip；
+  删掉三处常显 caption 与 `RankCriteriaCard.total` 参数。
+- 新增 4 个 24 dp vector：`ic_filter`（漏斗）、`ic_sort`（上下箭头）、`ic_trophy`（奖杯）、
+  `ic_leaderboard`（三柱榜）。空态图标同步换成 `ic_leaderboard`；「再看 N 项」仍用
+  `ic_arrow_drop_down`（展开语义正确，不改）。
+- 三语言 strings：`rank_criteria_title` →「筛选条件 / Filters」；`rank_list_title` →「同类榜单 / Peer ranking」；
+  `rank_participants` →「%1$d 项可比 / %1$d comparable」；新增 `rank_overview_title`（我的名次 / My rank）
+  与 `rank_overview_tooltip`；`rank_criteria_tooltip` 合并原 `rank_basis_note` 的折算口径；删除 `rank_basis_note`。
+  口径信息没有丢失，只是从常显脚注挪进长按提示。
+
+### 8.46.3 取舍与未改项
+
+- **不给详情页四个页签加图标**：`EqualWidthSegmentedTabs` 每段约 82 dp，加 16 dp 图标后四字中文标签会被
+  `TextOverflowText` 挤压；只给「排行」一格加图标又违反 §2.5「图标成族交付」。标题准确性通过卡片标题解决。
+- **参与数保留但换位置**：它是筛选结果计数（§6.4 反馈即时），不是说明文字；放在榜单卡头右侧，
+  与环图中心的名次分母数值一致但不重复写成一段话。
+- 说明收进 tooltip 不降低可发现性：项目卡头长按有全站统一的 `common_tooltip_long_press` 语义标签
+  （无障碍 `onLongClick`），且数值、名次、中位数、范围、参与数仍直接标注在卡内，符合
+  §5.5.5「关键信息不能只放在文字提示里」。
+- 榜单默认 10 行 + 增量展开，未改 `LazyColumn` 虚拟化：本页一次最多组合 195 行且默认只渲染 10 行，
+  改造收益低于引入嵌套滚动与动画 key 变化的风险（§4.8「嵌套滚动只允许一层」）。
+- §8.45 记录的 700 ms 环动画、400 ms 条形动画、概览卡脚注与三块顺序**由本轮取代**，
+  历史轮次保留原文以便追溯偏差。
+
+### 8.46.4 验证
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过（`compileDebugKotlin` / `dexBuilderDebug` 无错误） |
+| 全量单测 | 388 项 382 过；6 条 `FoodNutrientRepositoryTest`（Q-6 既有）失败，与 388 基线一致，无新增失败 |
+| 视觉走查 | **未做**（按用户要求不截图、不用 adb 调试）；固定筛选栏、三个 tooltip 与新图标需真机验收 |
+
+期间修掉一处重写时引入的编译错误：`PercentileBadge` 的 `verticalAlignment` 误写成 2D 的
+`Alignment.Center`，已改回 `Alignment.CenterVertically`。
+
+## 8.47 筛选去标题 + 名次金字塔（第四十五轮）
+
+用户反馈三点：① 「筛选条件的标题不需要」；② 筛选条件的按钮参考【记物价】-【统计】-【查找与筛选】；
+③ 【我的名次】用环形图不够直观，应新建金字塔一类的可视化，**要求新建 UI 方便扩展、UX 现代**。
+设计依据仍是通用规范《通用 UI 设计规范》与 `mobile-design-system-skill` 项目规范。
+
+### 8.47.1 为什么换掉环形图
+
+环只回答「超过百分之多少」，是一个**标量比例**：66% 与 33% 之间差多少、离榜首还有几层、
+这一档里有多少条同类，都要靠中心文字补，位置感是缺失的。金字塔把同一份数据沿纵向铺开，
+**上下位置本身就是序位**——越靠上越稀有（层宽递减是当前约定的视觉隐喻），当前层实色高亮并挂
+「你在这里」，层内直接写该档的名次与数值区间，一屏内同时给出「我在哪 / 这一档是什么 / 离中位数多远」。
+环图相关代码（`RankRing`、`Canvas.drawArc`）整体删除，没有保留双图切换。
+
+### 8.47.2 新建的两个可扩展组件
+
+| 组件 | 位置 | 扩展点 |
+| --- | --- | --- |
+| `AppPyramidChart` | `common/ui/designsystem/AppPyramidChart.kt` | 业务完全解耦：`PyramidBand(id, label, valueLabel, weight, color, labelColor, marker)` 由调用方给；层数任意、`weight` 递减即成漏斗、全为 1 即等高柱；`highlightedId` 持久高亮当前层；`selectedBandId + onBandSelect` 点选联动（其余层降到 38%）；`bandHeight` 默认 48 dp 满足 `hitMin` |
+| `AppFilterDropdown` | `common/ui/designsystem/AppFilterDropdown.kt` | 通用下拉筛选格：`options` / `pinned`（钉住的「全部」）/ `searchHint`（长列表钉顶搜索）/ `multiSelect` / `active`；加一个筛选维度＝多放一格，控件不动。形态与 `PriceFilterDropdown` 一致，后者保持原样未改，后续可平滑委托 |
+
+`AppPyramidChart` 的梯形用 `Canvas` + `Path` 自绘（相邻层斜边要连续，圆角矩形拼不出金字塔轮廓），
+文字用 Compose `Text` 叠在画布上以跟随字号缩放、被无障碍读取。首次绘制按 `motion.slowMs`(280)
+从中心线**逐层交错长出**，切指标 / 范围不重播动画（`LaunchedEffect(bands.size)` 只在层数变化时触发）。
+点选反馈就地发生（选中层描边、其余降透明、卡头显示该档计数），不往卡底补常显说明。
+
+### 8.47.3 分档口径与单一清单
+
+`FoodRankingModel.kt` 新增 `RankTiers` —— 与 `ArchiveDomains` 同一套「只改一处」约定：
+加一档 / 改阈值 / 改塔形只改这里，UI 层数与单测断言全部派生。档位按 `FoodRanking.percentile`
+（榜首 100、末名 0）切成 `[90,101)` / `[70,90)` / `[30,70)` / `[10,30)` / `[0,10)`，
+`weight` 从 0.52 递增到 1.0。`FoodRanking.pyramidBands()` 是纯函数，返回每层的
+名次区间 / 条目数 / 数值极值 / 是否当前层，不含文案与颜色，JVM 单测可直接断言。
+数值区间统一写 `min–max`，与「高→低」「低→高」两种方向都自洽；空档显示「—」，空榜直接走 `AppEmptyState`。
+
+### 8.47.4 筛选面板：去标题 + 对齐记物价
+
+| 【记物价】-【统计】-【查找与筛选】 | 本轮排行页筛选面板 |
+| --- | --- |
+| `AppSplitCardHead` 卡头「查找与筛选」+ `AppFilterActionButton`【清除筛选】 | **去掉标题行**（格子内标签已自解释，标题只是把条件下推）；`rank_criteria_title` 三语言删除 |
+| `AppSplitCardBody` 两行四格 `PriceFilterDropdown`（商品 / 地区、年份 / 月份），点到即筛 | 两行两格 `AppFilterDropdown`（指标 / 范围、排序 / 重置）；范围格用 `pinned` 给钉住的「全部」出口 |
+| 卡头动作按钮 1 dp 描边、禁用态删除线 | `AppFilterActionButton`【重置】原样复用：默认条件时禁用置灰带删除线，不抢筛选值的视觉权重（§1.3） |
+| 口径说明写在卡头（长按时） | 说明改挂右上角 `ic_info` 的**长按 tooltip**（与结果卡同一套 `AppTooltipPopup` + `onLongClick` 语义标签），48 dp 热区；第二行留等宽 `Spacer` 保持两行网格对齐 |
+
+原来的横滚 `AppFilterChip` 与方向按钮 `AppPillIconTextButton` 从本页移除；
+`onDirection` 改成传布尔值而非取反，避免下拉选项与 toggle 语义打架。
+切指标 / 范围 / 方向时统一清空 `selectedTierId` 与展开行数，防止选中一个已经不存在的档。
+
+概览卡重排为：**名次行（`#N / 共 M 项` + 超过 X% 徽章）→ 当前值行 → 五层金字塔 → 中位数 / 范围**。
+当前层用 `primary / onPrimary`（两套主题都已校准对比度），其余层用指标色 `copy(alpha = 0.18f)`；
+选中某层时卡头右侧显示「档位名 · N 项」，属于状态反馈而非说明脚注（沿用 §8.46.3 的判据）。
+
+### 8.47.5 取舍与未改项
+
+- **不改 `PriceFilterDropdown`**：用户说的是「参考」而非「统一」，动记物价的筛选会引入无关回归；
+  新通用件保留与其相同的 API 形状，后续要统一只需一层委托。
+- **点选金字塔只做视觉联动，不联动过滤下方榜单**：让榜单在不同档位间反复切换语义会让
+  「本条位置」分支与「再看 N 项」计数互相打架；当前做法反馈即时、状态可逆（再点一次取消）。
+- 五层 × 48 dp ≈ 240 dp，概览卡比环图版高，但结果区本就可滚；换来的位置感与档位信息值得。
+- `ic_trophy` / `ic_leaderboard` 继续用于两张结果卡；§8.46 新增的 `ic_filter` / `ic_sort`
+  因控件形态改变而闲置，**保留为备用图标资源**（未删除，避免误伤潜在引用）。
+- 榜单卡、条形动画、空态、增量展开、四页签结构一概未动；「如何估重」仍是规划占位。
+- §8.46 的「筛选卡卡头 + 环形概览」由本轮取代，历史轮次原文保留以便追溯偏差。
+
+### 8.47.6 验证
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过（`compileDebugKotlin` / `dexBuilderDebug` 无错误） |
+| 全量单测 | **393 项 387 过**；6 条 `FoodNutrientRepositoryTest`（Q-6 既有）失败，与 388 基线一致、无新增失败。新增 `FoodRankingModelTest` 5 条分档单测全过（分档互斥且覆盖全部名次、榜首/末名落层、数值区间随排序方向、空榜、单条目） |
+| 视觉走查 | **未做**（按用户要求不截图、不用 adb 调试）；两行下拉格、五层金字塔、逐层动画与点选联动需真机验收 |
+
+期间修掉一处编译错误：`rankGroupLabelRes(groupTag)` 原来位于 `if (groupTag != null)` 块内靠智能转换
+收窄，重写到块外后 `String?` 无法传给非空参数，改为 `groupTag?.let` 后再查标签资源。
+
+## 8.48 排行页控件归位 + 左图右文概览（第四十六轮）
+
+### 8.48.1 反馈与判据
+
+用户第四十六轮反馈（逐条）：
+
+1. 【同类榜单】标题文本改【排行榜】；
+2. 【排序】下拉改为「切换图标 + 文字」按钮，放到【排行榜】右上角；
+3. 【重置】按钮删除；
+4. 「排序的 tooltip 图标和提示文本」删除——判为筛选面板右上角那枚 `ic_info` 长按说明，
+   其文本 `rank_criteria_tooltip` 首句即「切换指标、范围或方向即刻重排」，与排序语义绑定；
+5. 【中位数 XX】【低于中位数 XX】等文本不应堆在金字塔下方，应「左金字塔 / 右说明文字」，
+   或「金字塔各层可点击，点击后高亮轮廓加重并显示相关信息」。
+
+第 5 条给了「或者」两个方向，本轮**合并落地**：默认即左图右文，同时保留并强化金字塔点选，
+点中后轮廓加重、右侧切换为该档详情。理由：两案不互斥——右栏承担数值、金字塔承担位置感，
+点选只是把右栏的「当前项读数」换成「该档读数」，不需要新增卡片或把说明堆回卡底。
+
+### 8.48.2 控件归属：谁的结果谁来控制
+
+| 控件 | 原位置 | 现在 | 理由 |
+| --- | --- | --- | --- |
+| 指标 / 范围 | 筛选面板第一行 | 不变（一行两格） | 决定「跟谁比」 |
+| 排序方向 | 筛选面板第二行下拉 | 【排行榜】卡头右上角「图标 + 文字」切换按钮 | 决定「怎么排队」，是榜单属性 |
+| 重置 | 筛选面板第二行 | **删除** | 指标 / 范围 / 方向都可一键回退，不再需要单独复位 |
+| 口径说明 | 筛选面板右上角 `ic_info` 长按 | **删除** | 与排序绑定的说明图标；结果卡长按卡头仍保留各自说明 |
+| 参与数 | 排行榜卡头右侧 | 卡内第一行 | 卡头让给排序按钮，计数仍在结果区顶部（§6.4 状态反馈） |
+
+筛选面板第二行整行移除，面板从「两行四格」收成「一行两格」。
+排序按钮复用 `AppPillIconTextButton`：文字显示当前方向（`高 → 低` / `低 → 高`），
+图标按方向在新增的 `ic_sort_desc` / `ic_sort_asc` 间切换，点一下即刻重排。
+两个 vector 都是 24 dp，用「递减 / 递增横条 + 向下 / 向上箭头」表达方向，
+不再用 `ic_arrow_drop_down`（那是展开语义，见 §8.46 的图标准确性约定）。
+
+### 8.48.3 概览卡：左金字塔 / 右说明栏
+
+`RankOverviewCard` 主体改为 `Row`：
+
+- **左（weight 0.56）**：`AppPyramidChart(compact = true, bandHeight = 46.dp)`。
+  紧凑模式下层内只留一行 `caption` 字号的档位名，`valueLabel` 传空串、`marker` 传 null——
+  窄栏不塞「你在这里 · 领先 10%」这种双行长文本。
+- **右（weight 0.44）**：新增 `RankOverviewDetail`，两态共用同一块位置：
+  - 默认态：`#N / 共 M 项` → `超过 X% 同类` 徽章 → 指标 + 当前值 →
+    **中位数 XX** 与 **低于 / 高于中位数 XX%**（用户点名要挪的两条，现分两行） →
+    `你在这里 · 当前档名` → 范围。
+  - 点选态：档位名 →（若当前层）`你在这里` → 名次区间 / 条目数 / 数值区间三行 →
+    `AppPillIconTextButton`【返回】。空档直接给「此档暂无条目」，不重复三行空值。
+
+中位数两行刻意**不用好坏色**：降序排脂肪时排在前面反而是坏事，方向高低不等于营养好坏，
+只做中性 `text / textMuted` 陈述（§9.4 不靠颜色单独表意）。
+
+### 8.48.4 金字塔组件的两处增强（仍业务解耦）
+
+`AppPyramidChart.kt` 增加两个纯展示能力，组件仍不认识名次 / 营养：
+
+- `compact: Boolean`：层内标签降为 `caption`、`valueLabel` 为空时不渲染第二行；
+  `semantics` 用 `filter { it.isNotEmpty() }` 去掉空串，避免无障碍播报带尾空格。
+- 点选轮廓加重：`selectedBandId` 命中的层描边由 `highlight`(1 dp) `borderStrong`
+  升级为 `stroke`(2 dp) `primary`；`highlightedId`（当前层）仍是细描边且永不淡化。
+  其余层在点选时保持 38% 不透明度，形成「点哪层、哪层跳出来」的即时反馈。
+
+`RankTiers` / `pyramidBands()` / 单测一概未动：本轮只改展示，分档口径仍是单一清单派生
+（§8.47.3）。`selectedTierId` 仍在控制器层，切指标 / 范围 / 方向时由 `LaunchedEffect` 清空，
+避免指向不存在的档。
+
+### 8.48.5 取舍与未改项
+
+- **未把点选档过滤下方榜单**：与 §8.47.5 同一判据，避免「本条位置」「再看 N 项」计数语义打架。
+- **未给详情页页签加图标**：沿用 §8.46 判据（四字中文 + 82 dp 段宽，图标成族交付）。
+- **保留两张结果卡的长按卡头 tooltip**：用户删的是「排序的」说明图标，
+  `rank_overview_tooltip` 反而扩写成含点选 / 返回路径，`rank_list_note` 原样保留。
+- `ic_filter` / `ic_sort` / `ic_refresh` 闲置但**未删除**（避免误伤潜在引用）；
+  新增 `ic_sort_desc` / `ic_sort_asc` 两个方向图标。
+- `AppFilterDropdown` / `PriceFilterDropdown` / 榜单行 / 条形动画 / 空态 / 增量展开 /
+  四页签结构 / 三语言其它文案一概未动。
+
+### 8.48.6 文案与验证
+
+三语言 `strings.xml`：`rank_list_title` → 「排行榜 / Leaderboard」；
+删 `rank_filter_sort`、`rank_filter_reset`、`rank_criteria_tooltip`、
+`rank_pyramid_no_value`、`rank_pyramid_band_summary` 5 条；
+新增 7 条 `rank_detail_*`（名次区间 / 条目数 / 数值区间 / 空档 / 返回）；
+`rank_vs_median_same` 英文首字母大写（现独立成行，不再是拼接后半句）；
+`rank_overview_tooltip` 扩写含点选与返回路径。三文件各 7 条、无残留引用。
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过（`compileDebugKotlin` / `dexBuilderDebug` 无错误） |
+| 全量单测 | **393 项 387 过**；6 条 `FoodNutrientRepositoryTest`（Q-6 既有）失败，与 §8.47 基线一致、无新增失败。本轮无新增纯函数，未加单测 |
+| 视觉走查 | **未做**（按用户要求不截图、不用 adb）；一行筛选格、榜卡右上角切换按钮、左图右文两态与轮廓加重需真机验收 |
+
+## 8.49 排行概览三行卡片化 + 颜色统一入口（第四十七轮）
+
+### 8.49.1 反馈与判据
+
+用户第四十七轮反馈（逐条）：
+
+1. 全览的【能量】【中位数】【低于中位数】统一样式和格式：**文字在前，使用轮播文字，数字在后，
+   文字和数字使用卡片包裹**；
+2. 删除全览底部的【你在这里 · 档名】与【全部食材】——两者都属无效信息；
+3. 【排行榜】的高低排序按钮与【N 项可比】都放在标题右侧、共行并列；
+4. 金字塔各可比项的代表颜色需要统一获取入口，先对齐【营养档案】-【营养素供能】的环形图
+   与【记饮食】-【统计】-【当日摄入】的代表颜色。
+
+第 2 条与 §8.48 的判断一致：当前档已由金字塔的实色高亮表达，范围已由筛选格表达，
+右栏再写一遍只是把同一状态说两次，所以直接删除而不换位置。
+
+### 8.49.2 概览右栏：三行同构的「文字卡 + 数字卡」
+
+新增 `RankOverviewStat(label, value, accent)`，全览与点选态共用：
+
+| 部位 | 样式 | 说明 |
+| --- | --- | --- |
+| 文字卡 | `weight(1f)`、`radii.label`、`panel` 底 + `border` 描边、`caption` + `textMuted` | 吃满剩余宽度，文字走 `TextOverflowText(overflowMode = "marquee")` |
+| 数字卡 | `widthIn(max = 96.dp)`（自适应内容）、指标色 14% 底 + 45% 描边、`bodyS` + `text` | 数字在后；颜色只做辅助，不承担唯一表意 |
+
+全览固定三行：**当前指标值 → 中位数 → 与中位数的差距**。差距行把原来的一整句
+「低于中位数 30%」拆成标签「低于中位数」与数字「30%」，与另外两行同构；中位数缺失时
+第二行数字给「—」，差距算不出来（中位数为 0 或缺失）时整行省略，不显示假结论。
+点选态的三行（名次区间 / 条目数 / 数值区间）也改用同一组件，两态不再各有一套排版。
+
+文字必须轮播的理由：右栏只有概览卡内容的 0.44 权重，中文标签「低于中位数」在 360 dp 屏上
+可用的文字卡宽度约 55～70 dp；缩字号会跌破 12 sp 下限，截断会丢掉「高 / 低」方向，
+横向轮播是唯一不牺牲信息的做法。放得下时 `basicMarquee` 完全静止，不产生无意义动画。
+
+### 8.49.3 排行榜卡头：计数与方向并列
+
+`RankListCard` 的 `AppSectionCard(action = …)` 改为一个 `Row`：
+
+```
+[标题 排行榜]                         [195 项可比] [⭱ 高 → 低]
+```
+
+- 「N 项可比」从卡内第一行移到卡头右侧，与排序按钮同一行、间距 `s1`；
+- 排序按钮仍用 `AppPillIconTextButton`（图标随方向切 `ic_sort_desc` / `ic_sort_asc`），
+  点击即重排；
+- 计数已覆盖 `ranking == null` 的 0 项情形，空态内容区不再重复写参与数。
+
+### 8.49.4 颜色统一入口
+
+`common/ui/NutrientColors.kt` 从「一组写死的色值 + 同名函数」改为**唯一的组合期入口**：
+
+```kotlin
+@Composable
+internal fun nutrientColor(nutrientId: String): Color =
+    LocalAppTokens.current.chart.forNutrient(nutrientId)
+```
+
+三处调用点全部收敛到它：
+
+| 位置 | 原来 | 现在 |
+| --- | --- | --- |
+| 营养档案-营养素供能环图 | `tokens.chart.forNutrient(...)` | `nutrientColor(...)` |
+| 记饮食-统计-当日摄入（四张指标卡 / 供能环 / 餐次进度 / 趋势条形） | `NutrientColors` 固定色值 | `nutrientColor(...)` |
+| 详情-排行（金字塔淡底、榜单条形、前三徽章） | `tokens.chart.forNutrient(...)` + GI/GL 用 `info` | `rankMetricColor(...)` → `nutrientColor(...)`；GI/GL 仍用 `info` |
+
+实际色值以 `AppChartColors`（深浅色各一套、已按面板底校准对比度）为准。因此**当日摄入的
+代表色会随主题变化**：深色下能量由 `#F57C00` 变为环图既有的 `#E0A96D`，浅色下改用
+`#8A5A00` 等深色值，白底对比度从原来固定色的 2～3:1 提升到 ≥ 3:1。这是统一的预期结果，
+不是回退。
+
+`RankMetric` 的 GI / GL 不是营养素、没有供能占比，继续取 `colors.info`，避免假装它们也属于
+三大产能营养素；`periodColor` 是**餐次**色板（七个时段各一支），与营养素色是两套语义，
+仍独立维护并在注释中写明，避免下一次「颜色统一」误把餐次也接进来。
+
+### 8.49.5 文案与验证
+
+三语言 `strings.xml`：
+
+- 删 `rank_kind_ingredient` / `rank_kind_food` / `rank_kind_dish`（随「全部食材」一起失效）、
+  `rank_scope_kind`、`rank_median_missing`、`rank_median_value`、`rank_vs_median_above`、
+  `rank_vs_median_below`；
+- 新增 `rank_median_label`（中位数 / Median）、`rank_vs_median_above_label`、
+  `rank_vs_median_below_label`、`rank_percent_value`（`%1$d%%`）；
+- `rank_vs_median_same` 保留，作为「与中位数持平」的纯标签。
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过（`compileDebugKotlin` / `dexBuilderDebug` 无错误） |
+| 全量单测 | **393 项 387 过**；6 条 `FoodNutrientRepositoryTest`（Q-6 既有）失败，与 §8.48 基线一致、无新增失败；本轮无新增纯函数，未加单测 |
+| 视觉走查 | **未做**（按用户要求不截图、不用 adb）；三行卡片在浅 / 深色下的宽度、轮播触发点与卡头并列按钮需真机验收 |
+
+**已知限制**：数字卡上限 96 dp，超长数值（如六位整数 + 单位）会在卡内轮播而不是换行；
+全览右栏的排序仍是「当前指标值 / 中位数 / 差距」固定顺序，不随排序方向翻转。
+
+## 8.50 清除缓存弹层重做 + 缓存注册表收紧（第四十八轮）
+
+### 8.50.1 反馈
+
+用户第四十八轮反馈：
+
+1. 【软件设置】-【清除缓存】弹层的 UI 参考【导入导出用户数据】-【档案状态】-【内容构成】；
+2. 缓存系统改为更严格、正规的设计：以后模块接入缓存时自动与【清除缓存】联动，不能只靠文档说明；
+3. 顺手修掉当前【清除缓存】里的 BUG。
+
+### 8.50.2 旧实现的四个结构性问题
+
+| 问题 | 后果 |
+| --- | --- |
+| `AppCacheKind` 是封闭 enum，设置页再维护一份 kind → 文案 `mapOf` 与 `requireNotNull` | 新模块加缓存时必须同时改 enum / 设置页 / `isDiskCache`，漏一处就在打开设置页时 `requireNotNull` 崩溃 |
+| `register` 只接收 `ClearableMemoryCache`，不返回凭据、没有 `unregister` | `NutritionViewModel` 每次重建都往应用级注册表塞一份新缓存，旧缓存被强引用，条目越积越多；活动销毁后仍显示 |
+| `clearAll` 只把磁盘释放量作为 `releasedDiskBytes` 返回 | 只清内存缓存时 toast 显示「已清理 0 KB」，用户以为没清掉；清理失败 / 文件被占用也完全不可见 |
+| 磁盘目录写死在 registry 里，删除递归不校验 canonical 子树 | 未来要加磁盘缓存只能改 registry；一旦目录里出现指向 `filesDir` 的符号链接，存在误删风险 |
+
+另有若干小问题：`FoodImageStore.clear()` 把 `LruCache.size()`（字节）同时当日志里的条目数与字节数；
+`formatStorageSize` 固定用用户首选存储单位，用户选 GB 时 5 MB 缓存显示成 `0.0 GB`；
+`snapshot()` 与 `clearAll()` 各取一次内存缓存列表，两次之间注册的缓存会被统计但不被清理。
+
+### 8.50.3 新的缓存契约
+
+新增 `common/cache/AppCache.kt`：
+
+```kotlin
+enum class AppCacheStorage { DISK, MEMORY }
+
+data class AppCacheSpec(val id: String, @StringRes val labelRes: Int, val storage: AppCacheStorage)
+
+interface AppCache {
+    val spec: AppCacheSpec
+    fun stats(): AppCacheStats
+    fun clearStorage()
+    fun clear(): AppCacheClearOutcome { /* 清理前后各统计一次，自动算 released / remaining */ }
+}
+```
+
+`AppCacheRegistry` 的约束：
+
+- `register(cache)` 校验 id（`^[a-z][a-z0-9_]*$`）与 `labelRes != 0`，重复 id 直接抛异常；
+- 返回 `AppCacheRegistration`，`close()` 只移除「注册时那个实例」，旧凭据延迟关闭不会误摘同 id 的新缓存；
+- `snapshot()` 对每个缓存单独 `runCatching`，读失败保留条目并标记 `readFailed`；
+- `clearAll()` 汇总磁盘 + 内存的释放字节与条目数，抛异常或清理后仍有残留的缓存 id 进入 `failedCacheIds`；
+- 磁盘缓存统一用 `DirectoryAppCache`，删除只在目录的 canonical 子树内进行，符号链接只删链接本身、不跟进去；
+- 设置页从 `snapshot()` 自动派生构成条 / 图例，**不再有 kind → 文案的映射表**；新模块注册即出现。
+
+生命周期由持有者负责：`NutritionViewModel.onCleared()` 关闭 `FoodImageStore` 与 `FoodCardMetadataCache`
+的 registration；`ProfileAvatarBitmapCache` 归 `HealthDietProApplication` 所有并在首次访问时注册一次——
+它不能跟随 `MainActivity` 重建，否则旋转屏幕后保留的 `ProfileUserInfoViewModel` 会继续持有已注销的旧缓存，
+「清除缓存」就统计不到它。
+
+### 8.50.4 弹层 UI：总量 → 构成条 → 图例
+
+`ui/settings/CacheClearDialog.kt` 用 `AppModal`（S 宽度）替换原来的 `ConfirmDialog` 纯文本：
+
+- **总量摘要**：大字显示可清理总量 + 「共 N 项」+ 绿色「可安全清理」徽章；
+- **构成条**：10 dp 圆角条，按每个已注册缓存的字节数分段，颜色按注册顺序取自
+  `primary / info / warning / success / fiber / other / carbs` 七色板；点图例某一行其余段降到 30%；
+- **图例**：每行 48 dp 热区，色点 + 缓存名 + 「N 项 · X%」+ 右侧大小；点击高亮、再点取消；
+- **安全说明**：绿色盾牌 + 「只清理可再生的临时文件与内存缓存；用户存档、原始图片与附件不会被删除」；
+- **空 / 扫描态**：`AppEmptyState` 与转圈 +「正在统计缓存…」；扫描期间保留旧条目并显示进度，不闪白；
+- 底部固定「取消 / 清除」；扫描中或没有可清理条目时「清除」禁用。
+
+不画【档案状态】的覆盖率环：所有已注册缓存都会被清理，覆盖率天然 100%，没有信息量；
+把空间留给构成条和图例，才是「内容构成」这一段真正可复用的部分。
+
+**与 `AlertDialog` 约定的偏差**：AGENTS 要求破坏性动作先弹 `AlertDialog` 二次确认，这里是
+`AppModal`。原因是构成条 + 多行图例 + 安全说明在 `AlertDialog` 的窄内容区里放不下；
+`AppModal` 同样保留遮罩、取消 / 确认、系统返回与「点外部取消」，二次确认语义没有变，
+只是容器换成能承载图表的全宽模态。其它删除类动作仍用 `ConfirmDialog`。
+
+### 8.50.5 BUG 修复清单
+
+| 修复 | 说明 |
+| --- | --- |
+| 缓存注册泄漏 | registration 生命周期绑定 ViewModel（`onCleared`）；头像缓存归 Application，避免旋转后 ViewModel 持旧缓存 |
+| toast 只算磁盘 | `clearAll()` 返回磁盘 + 内存总释放量；`settings_cache_cleared` 用格式化后的总量 |
+| 失败不可见 | `failedCacheIds` →「部分缓存未能清理」toast；清理后仍保留的条目在重新统计时继续显示 |
+| 新缓存类型崩溃 | 删除设置页 `requireNotNull(cacheLabels[kind])`，文案由 `AppCacheSpec.labelRes` 自带 |
+| 两次快照不一致 | `clearAll()` 只取一次注册列表；清理用同一份 |
+| 0.0 GB | 缓存大小按字节数量级挑最大可用单位，不再固定首选单位 |
+| 图片缓存日志 | `FoodImageStore.clearStorage()` 分别记录 `snapshot().size` 条目与 `size()` 字节 |
+| 符号链接风险 | `DirectoryAppCache` 删除限制在 canonical 子树内，符号链接只删链接 |
+
+### 8.50.6 验证
+
+三语言 `strings.xml`：更新 `settings_clear_cache_desc` / `confirm_message`，删除
+`settings_cache_cleared_mb` / `settings_cache_cleared_kb` / `settings_clear_cache_confirm_contents` /
+`settings_cache_entry` / `settings_cache_entry_with_count`，新增 13 条缓存弹层文案。
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过 |
+| 全量单测 | **403 项 397 过**；6 条 `FoodNutrientRepositoryTest`（Q-6 既有）失败，其余全过。新增 `AppCacheRegistryTest` 10 条（重复 id / 非法 id / 顺序 / 凭据误摘 / 汇总 / 部分失败 / 内存重填不算失败 / 读失败隔离 / 目录统计清理 / 空目录） |
+| 视觉走查 | **未做**（按用户要求不截图、不用 adb）；构成条、图例点选、扫描态与空态需真机验收 |
+
+**已知限制**：构成条最多显示七种颜色，超过七类缓存时颜色循环复用（图例仍靠文案区分）；
+`FoodCardMetadataCache` 的字节数按 512 B/条估算，仅用于量级展示，不作为内存上限。
+
+## 8.51 启动页题字 + 启动页展示开关（第四十九轮）
+
+### 8.51.1 需求与限制
+
+用户要求：启动界面图标的右下方加入斜向艺术字「自求口实，养正不移。」；
+软件设置增加【启动页展示】开关，并完整实现存档等内容。
+
+Android 12+ 的**系统启动画面**（`windowSplashScreen*`）只接受图标与背景，不能放自定义文字。
+为让它不再表现为「第一个只有图标的启动页」，MainActivity 改用 `Theme.HealthDietPro.Splash`：
+`windowSplashScreenAnimatedIcon` 指向透明 drawable、`windowSplashScreenIconBackgroundColor` 透明、
+`windowSplashScreenBackground` / `windowBackground` 取与 Compose 启动页顶部相同的
+`splash_background`（浅色宣纸 `#F3EDE0` / 深色墨绿 `#12261F`）。系统窗口因此只铺一层品牌底色，
+图标与题字全部由应用内启动页绘制，用户只看到一页。
+
+### 8.51.2 启动页
+
+新增 `ui/splash/StartupSplash.kt`：
+
+| 元素 | 做法 |
+| --- | --- |
+| 图标 | `ic_app_badge`（与启动图标同源的圆角绿底碗），132 dp；外圈 156 dp 金色细描边 + 232 dp 金色径向光晕 |
+| 题字 | `自求口实，\n养正不移。`，系统衬线族 + 合成斜体 + `letterSpacing = 3 sp`，20 sp / 32 sp 行高，两行居中对齐；`offset(x = 38.dp)` + `rotate(-12f)` 落在图标右下方 |
+| 配色 | 固定品牌底：浅色 `#F3EDE0 → #EADFC8` 宣纸渐变、深色 `#12261F → #0B1712` 墨绿渐变；题字浅色墨绿、深色谷物金；金色另用于外框、光晕与字影 |
+| 动效 | 首帧即静态显示图标与题字（不做 alpha 0 渐入）；停留 **2 400 ms** 后 220 ms 整体淡出 |
+| 交互 | 启动页吞掉点击、`BackHandler` 拦截返回；首帧只画启动页，下一帧才组合主界面与预热 |
+| 生命周期 | 只在冷启动（`savedInstanceState == null`）展示；旋转 / 改字号重建不重播 |
+
+`StartupSplashHost(enabled, onFinished, content)` 负责「首帧先只画启动页 → 下一帧组合主界面 →
+到点淡出」。启动阶段的职责分配：
+
+| 阶段 | 做什么 |
+| --- | --- |
+| 首帧前 | 只做轻量同步初始化：`UnitConverter.init`、恢复 Tab、创建 `ArchiveTransferController`、恢复深浅色 / 语言、读取启动页开关 |
+| 首帧 | 只组合启动页（两次 `withFrameNanos` 后再把 `contentReady` 置 true），让系统启动窗口尽快退场 |
+| 启动页期间 | 下一帧起在底下组合主界面；当前页 ViewModel 的 `init` 加载与缓存预热并行进行 |
+| 启动页淡出后 | 才弹首次引导、记录本次打开、预热其余主页，并分发自定义食物编辑 / 详情 / AGP 导入等外部深链 |
+
+**首次引导等 `Dialog` 必须等 `onFinished` 再弹**：`AlertDialog` 是独立窗口，会盖在启动页上面；
+`checkFirstLaunch()` 与外部深链分发因此从 `onCreate` 移到 `onFinished`。
+外部深链（自定义食物编辑 / 食物详情 / AGP 导入）在 `hasExternalLaunchIntent()` 判定后直接跳过启动页，
+避免工具链多等 2.4 秒。
+
+不引入第三方书法字体：中文字体会让安装包增加数 MB，且缺字时仍需回退；这里用系统衬线族 +
+合成斜体 + 字距 + 旋转做出「题字」观感，换机、换字号都不会出现豆腐块。
+
+### 8.51.3 【软件设置】-【启动页展示】
+
+`AppSettingsScreen` 的「显示」组增加 `AppSwitchRow`（新图标 `ic_startup`：页面 + 一道斜线），
+标题「启动页展示」，长按 tooltip 说明该开关随当前用户存档导入导出。
+
+存储走**用户级** `AppPrefs.isSplashEnabled`（`pref_show_splash`，默认 `true`）：
+`UserPrefs` 的 `user_preferences.json` 本身就是通用键值域，因此无需新增档案领域、
+不需要 `UserArchiveBundle` 字段，也不需要提升 `archiveSchemaVersion`；
+导出时该布尔值随偏好域一起带走，导入旧档案没有这个键时按默认开启。
+删除用户时会随 `user_preferences.json` 一并清理，符合用户隔离不变量。
+
+### 8.51.4 验证
+
+三语言 `strings.xml`：新增 `settings_splash_title`、`settings_splash_desc`、`splash_motto`。
+`splash_motto` 是三套资源里的同一句中文题字（品牌语保持原文），`values` / `values-en`
+带注释说明；`settings_splash_desc` 明确「随当前用户存档导入导出」。
+
+| 项 | 结果 |
+| --- | --- |
+| `assembleDebug` | 通过 |
+| 全量单测 | **403 项 397 过**；6 条 `FoodNutrientRepositoryTest`（Q-6 既有）失败，无新增失败。本轮为纯 Compose / 偏好改动，未新增纯函数单测 |
+| 视觉走查 | **未做**（按用户要求不截图、不用 adb）；题字角度、两行断句、浅 / 深色对比与启动页停留需真机验收 |
+
+**已知限制**：系统启动窗口仍会先铺一层与启动页顶部同色的品牌底（透明图标），随后应用内页面
+在第一帧就完整出现；关闭开关只关闭应用内题字页，系统启动窗口是平台行为。
+开关按用户隔离，切换用户后下次冷启动使用该用户自己的选择。
+
+### 8.51.5 白屏诊断（第五十轮）
+
+用户反馈：题字启动页之前仍有一段白屏。实测链路有三段叠加，单改其中一段都不够：
+
+| 原因 | 机制 | 处理 |
+| --- | --- | --- |
+| 系统启动窗口底色接近白 | `windowSplashScreenBackground` / `windowBackground` 原本取 `#F4F6FB`，在屏幕上就是白色 | 透明图标保留，底色改成宣纸 `#F3EDE0` / 墨绿 `#12261F`，与 Compose 启动页顶部完全一致 |
+| 首帧仍在组合主界面 | `StartupSplashHost` 原先先 `content()` 再盖启动页，首帧要等 `MainShell`、ViewModel、列表初始化完成，系统启动窗口被拉长 | 首帧只组合启动页，两次 `withFrameNanos` 后下一帧才 `contentReady = true`；其余主页预热延到启动页淡出后，主界面预热仍在启动页期间完成 |
+| 启动页自身 alpha 从 0 渐入 | 图标/题字 `reveal` 0→1 的头 400 ms 只有底色 | 删除 alpha 渐入，首帧即静态显示图标与题字；只保留宿主整体淡出 |
+| 深浅色资源不一致 | 进程启动时未恢复 `AppCompatDelegate`，系统窗口可能按浅色取资源、Compose 已按深色渲染 | `HealthDietProApplication.onCreate` 先恢复已保存深浅色，系统窗口与 Compose 同套 |
+| `windowDisablePreview` 直接跳过启动窗口 | 该属性在某些系统上会留下纯白/纯黑空白窗口，而不是走 splash 主题 | 删除该属性，让系统用 `Theme.HealthDietPro.Splash` 的品牌底 + 透明图标正常显示 |
+
+系统启动窗口是平台强制窗口，无法从应用侧完全删除；现在它只剩一层与启动页同色的品牌底，
+且首帧从「主界面组合」缩短为「只画启动页」，所以不再出现可见的白屏。
+
 ## 9. 待决事项
 
 | 编号 | 事项 | 影响 | 需要谁定 |

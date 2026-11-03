@@ -42,13 +42,14 @@ internal data class UserArchiveIntegrityReport(
 
 internal fun writeUserArchiveManifest(context: Context, userId: String, directory: File = userArchiveDirectory(context, userId)) {
     val now = System.currentTimeMillis()
-    val existing = File(directory, "manifest.json").takeIf(File::isFile)?.let { file ->
+    val existing = File(directory, MANIFEST_FILE_NAME).takeIf(File::isFile)?.let { file ->
         runCatching { manifestJson.decodeFromString(UserArchiveManifest.serializer(), file.readText(Charsets.UTF_8)) }.getOrNull()
     }
-    val domains = DOMAIN_FILE_NAMES.mapNotNull { (domainId, fileName) ->
-        File(directory, fileName).takeIf(File::isFile)?.let { file ->
-            val envelope = readDomainFile(file, domainId)?.envelope
-            domainId to DomainManifest(
+    // 清单也走注册表：新增领域自动进 manifest，不用再抄一份文件名。
+    val domains = ArchiveDomains.mapNotNull { domain ->
+        File(directory, domain.fileName).takeIf(File::isFile)?.let { file ->
+            val envelope = readDomainFile(file, domain.id)?.envelope
+            domain.id to DomainManifest(
                 schemaVersion = envelope?.schemaVersion ?: ArchiveSchemaVersion.Current,
                 updatedAtMillis = envelope?.updatedAtMillis ?: file.lastModified(),
                 byteSize = file.length(),
@@ -65,7 +66,7 @@ internal fun writeUserArchiveManifest(context: Context, userId: String, director
         domains = domains,
     )
     directory.mkdirs()
-    val target = File(directory, "manifest.json")
+    val target = File(directory, MANIFEST_FILE_NAME)
     val temporary = File(directory, "${target.name}.tmp")
     temporary.writeText(manifestJson.encodeToString(manifest), Charsets.UTF_8)
     check(temporary.renameTo(target)) { "Unable to replace user archive manifest" }
@@ -77,23 +78,23 @@ internal fun verifyOrRepairUserArchiveManifest(context: Context, userId: String)
 internal fun inspectUserArchive(context: Context, userId: String): UserArchiveIntegrityReport {
     val directory = userArchiveDirectory(context, userId)
     if (!directory.isDirectory) return UserArchiveIntegrityReport(UserArchiveIntegrity.MISSING)
-    val manifestFile = File(directory, "manifest.json")
+    val manifestFile = File(directory, MANIFEST_FILE_NAME)
     val manifest = runCatching {
         manifestJson.decodeFromString(UserArchiveManifest.serializer(), manifestFile.readText(Charsets.UTF_8))
     }.getOrNull()
-    val invalidDomainIds = DOMAIN_FILE_NAMES.mapNotNull { (domainId, fileName) ->
-        val file = File(directory, fileName)
-        domainId.takeIf { file.isFile && readDomainFile(file, domainId) == null }
+    val invalidDomainIds = ArchiveDomains.mapNotNull { domain ->
+        val file = File(directory, domain.fileName)
+        domain.id.takeIf { file.isFile && readDomainFile(file, domain.id) == null }
     }
     if (invalidDomainIds.isNotEmpty()) {
         return UserArchiveIntegrityReport(UserArchiveIntegrity.INCONSISTENT, invalidDomainIds)
     }
     val valid = manifest?.takeIf { it.userId == userId }?.let { stored ->
-        val expectedDomainIds = DOMAIN_FILE_NAMES.filterValues { fileName ->
-            File(directory, fileName).isFile
-        }.keys
+        val expectedDomainIds = ArchiveDomains.filter { domain ->
+            File(directory, domain.fileName).isFile
+        }.map(ArchiveDomain::id).toSet()
         stored.domains.keys == expectedDomainIds && stored.domains.all { (domainId, domain) ->
-            val fileName = DOMAIN_FILE_NAMES[domainId] ?: return@all false
+            val fileName = ArchiveDomains.firstOrNull { it.id == domainId }?.fileName ?: return@all false
             val file = File(directory, fileName)
             val envelope = readDomainFile(file, domainId)?.envelope
             file.isFile &&
@@ -130,23 +131,9 @@ private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-25
     .digest(bytes)
     .joinToString("") { "%02x".format(it) }
 
-private val DOMAIN_FILE_NAMES = linkedMapOf(
-    "profile" to "profile.json",
-    "body_metrics" to "body_metrics.json",
-    "medications" to "medications.json",
-    "blood_glucose" to "blood_glucose.json",
-    "blood_pressure" to "blood_pressure.json",
-    "water" to "water.json",
-    "disease_records" to "disease_records.json",
-    "custom_foods" to "custom_foods.json",
-    "sleep" to "sleep.json",
-    "diet_records" to "diet.json",
-    "user_preferences" to "user_preferences.json",
-)
-
 private val manifestJson = Json { encodeDefaults = true; explicitNulls = false }
 
 internal fun readUserArchiveManifest(context: Context, userId: String): UserArchiveManifest? = runCatching {
-    val file = File(userArchiveDirectory(context, userId), "manifest.json")
+    val file = File(userArchiveDirectory(context, userId), MANIFEST_FILE_NAME)
     manifestJson.decodeFromString(UserArchiveManifest.serializer(), file.readText(Charsets.UTF_8))
 }.getOrNull()

@@ -15,10 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.produceState
 import androidx.core.content.ContextCompat
 import com.woshiwangnima.healthdietpro.R
-import com.woshiwangnima.healthdietpro.common.cache.AppCacheEntry
-import com.woshiwangnima.healthdietpro.common.cache.AppCacheKind
-import com.woshiwangnima.healthdietpro.common.cache.AppCacheRegistry
-import com.woshiwangnima.healthdietpro.common.cache.ClearableMemoryCache
+import com.woshiwangnima.healthdietpro.common.cache.AppCache
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheSpec
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheStats
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -26,31 +26,30 @@ import kotlinx.serialization.json.Json
 
 internal class FoodImageStore(
     private val context: Context,
-    cacheRegistry: AppCacheRegistry? = null,
-) : ClearableMemoryCache {
+) : AppCache {
     private val cache = object : LruCache<String, ImageBitmap>(8 * 1024 * 1024) {
         override fun sizeOf(key: String, value: ImageBitmap): Int =
             (value.width.toLong() * value.height.toLong() * 4L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
     }
     private val imagePaths by lazy { loadImageManifest() }
 
-    override val cacheKind = AppCacheKind.FoodImages
+    override val spec = AppCacheSpec(
+        id = "food_images",
+        labelRes = R.string.settings_cache_entry_food_images,
+        storage = AppCacheStorage.MEMORY,
+    )
 
-    init {
-        cacheRegistry?.register(this)
-    }
-
-    fun clear() {
-        Log.d(TAG, "clear image cache: ${cache.size()} entries, ${cache.size()} bytes")
+    override fun clearStorage() {
+        val entryCount = cache.snapshot().size
+        val byteCount = cache.size().toLong()
         cache.evictAll()
+        Log.d(TAG, "clear image cache: $entryCount entries, $byteCount bytes")
     }
 
-    override fun clearCache() = clear()
-
-    override fun cacheEntry(): AppCacheEntry {
+    override fun stats(): AppCacheStats {
         val images = cache.snapshot().values
         val byteCount = images.sumOf { it.width.toLong() * it.height * 4L }
-        return AppCacheEntry(cacheKind, byteCount, images.size)
+        return AppCacheStats(byteCount, images.size)
     }
 
     fun image(key: String?): ImageBitmap = load(key ?: DEFAULT_KEY, ImageVariant.THUMB)

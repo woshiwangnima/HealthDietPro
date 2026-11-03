@@ -2,23 +2,26 @@ package com.woshiwangnima.healthdietpro.ui.profile
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.woshiwangnima.healthdietpro.common.cache.AppCacheEntry
-import com.woshiwangnima.healthdietpro.common.cache.AppCacheKind
-import com.woshiwangnima.healthdietpro.common.cache.AppCacheRegistry
-import com.woshiwangnima.healthdietpro.common.cache.ClearableMemoryCache
+import com.woshiwangnima.healthdietpro.R
+import com.woshiwangnima.healthdietpro.common.cache.AppCache
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheSpec
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheStats
+import com.woshiwangnima.healthdietpro.common.cache.AppCacheStorage
 import java.util.LinkedHashMap
 
 internal class ProfileAvatarBitmapCache(
     private val maxEntries: Int = 12,
-    cacheRegistry: AppCacheRegistry? = null,
-) : ClearableMemoryCache {
+) : AppCache {
     private val bitmaps = LinkedHashMap<String, Bitmap>(maxEntries, 0.75f, true)
 
-    override val cacheKind = AppCacheKind.ProfileAvatars
+    override val spec = AppCacheSpec(
+        id = "profile_avatars",
+        labelRes = R.string.settings_cache_entry_profile_avatars,
+        storage = AppCacheStorage.MEMORY,
+    )
 
     init {
         require(maxEntries > 0)
-        cacheRegistry?.register(this)
     }
 
     @Synchronized
@@ -36,14 +39,13 @@ internal class ProfileAvatarBitmapCache(
     }
 
     @Synchronized
-    override fun cacheEntry(): AppCacheEntry = AppCacheEntry(
-        kind = cacheKind,
+    override fun stats(): AppCacheStats = AppCacheStats(
         byteCount = bitmaps.values.sumOf { it.allocationByteCount.toLong() },
         itemCount = bitmaps.size,
     )
 
     @Synchronized
-    override fun clearCache() {
+    override fun clearStorage() {
         bitmaps.clear()
     }
 }

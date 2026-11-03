@@ -130,6 +130,7 @@ import com.woshiwangnima.healthdietpro.common.ui.AnimatedPageContent
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
 import com.woshiwangnima.healthdietpro.common.ui.MarqueeRow
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
+import com.woshiwangnima.healthdietpro.common.ui.nutrientColor
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppBottomSheet
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppFoodKindCurrent
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppRadiiDefault
@@ -302,6 +303,7 @@ internal fun NutritionScreen(viewModel: NutritionViewModel, modifier: Modifier =
         )
         state.selectedFood != null -> FoodDetailScreen(
             food = requireNotNull(state.selectedFood),
+            foods = state.foods,
             isFavorite = requireNotNull(state.selectedFood).id in state.favoriteFoodIds,
             isRecent = requireNotNull(state.selectedFood).id in state.recentFoodIds,
             viewModel = viewModel,
@@ -1055,9 +1057,25 @@ private fun glycemicDropPath(width: Float, height: Float): androidx.compose.ui.g
     return path
 }
 
+/**
+ * 详情页页签按条目类型动态生成：营养档案 / 排行三项共有，制作步骤只有带配方的食物与菜肴才有。
+ *
+ * 用枚举而不是 Int 下标，是因为页签数量会随 kind 变化——写死 0/1/2 时，菜肴多出一个
+ * 「制作步骤」就会把「如何估重」挤到下标 3，而旧的 else 分支还在按「不是 0 就是 1」判断。
+ */
+private enum class FoodDetailTab { PROFILE, RANKING, RECIPE, ESTIMATE }
+
+private fun detailTabsFor(food: FoodItem): List<FoodDetailTab> = buildList {
+    add(FoodDetailTab.PROFILE)
+    add(FoodDetailTab.RANKING)
+    if (food is Dish || (food is PreparedFood && food.components.isNotEmpty())) add(FoodDetailTab.RECIPE)
+    add(FoodDetailTab.ESTIMATE)
+}
+
 @Composable
 private fun FoodDetailScreen(
     food: FoodItem,
+    foods: List<FoodItem>,
     isFavorite: Boolean,
     isRecent: Boolean,
     viewModel: NutritionViewModel,
@@ -1071,6 +1089,7 @@ private fun FoodDetailScreen(
     AppTheme(darkTheme = rememberAppDarkTheme()) {
         FoodDetailContent(
             food = food,
+            foods = foods,
             isFavorite = isFavorite,
             isRecent = isRecent,
             viewModel = viewModel,
@@ -1087,6 +1106,7 @@ private fun FoodDetailScreen(
 @Composable
 private fun FoodDetailContent(
     food: FoodItem,
+    foods: List<FoodItem>,
     isFavorite: Boolean,
     isRecent: Boolean,
     viewModel: NutritionViewModel,
@@ -1098,7 +1118,8 @@ private fun FoodDetailContent(
     onCompare: () -> Unit,
 ) {
     val imageStore = viewModel.foodImages
-    var tab by remember { mutableIntStateOf(0) }
+    val tabs = remember(food.id) { detailTabsFor(food) }
+    var tab by remember(food.id) { mutableStateOf(FoodDetailTab.PROFILE) }
     var headerPage by remember(food.id) { mutableIntStateOf(0) }
     var headerDirection by remember(food.id) { mutableIntStateOf(1) }
     val resolved = remember(food.id) { runCatching { viewModel.resolvePer100g(food) }.getOrNull() }
@@ -1184,16 +1205,21 @@ private fun FoodDetailContent(
         )
         }
         EqualWidthSegmentedTabs(
-            tabs = listOf(
-                EqualWidthTab(R.string.nutrition_tab_profile),
-                EqualWidthTab(food.rankingTabLabelRes()),
-                EqualWidthTab(R.string.nutrition_tab_estimate),
-            ),
-            selectedIndex = tab,
-            onSelected = { tab = it },
+            tabs = tabs.map { detailTab ->
+                EqualWidthTab(
+                    when (detailTab) {
+                        FoodDetailTab.PROFILE -> R.string.nutrition_tab_profile
+                        FoodDetailTab.RANKING -> food.rankingTabLabelRes()
+                        FoodDetailTab.RECIPE -> R.string.nutrition_tab_recipe_steps
+                        FoodDetailTab.ESTIMATE -> R.string.nutrition_tab_estimate
+                    },
+                )
+            },
+            selectedIndex = tabs.indexOf(tab).coerceAtLeast(0),
+            onSelected = { tab = tabs[it] },
             modifier = Modifier.padding(top = spacing.s4),
         )
-        if (tab == 0) Column(
+        if (tab == FoodDetailTab.PROFILE) Column(
             modifier = Modifier.weight(1f).padding(top = spacing.s3).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(spacing.s4),
         ) {
@@ -1301,14 +1327,23 @@ private fun FoodDetailContent(
                 )
             }
         }
-        else if (tab == 1 && food is Dish) {
+        else if (tab == FoodDetailTab.RANKING) {
+            FoodRankingTab(
+                food = food,
+                foods = foods,
+                viewModel = viewModel,
+                language = language,
+                modifier = Modifier.weight(1f).padding(top = spacing.s3),
+            )
+        }
+        else if (tab == FoodDetailTab.RECIPE && food is Dish) {
             Column(
                 modifier = Modifier.weight(1f).padding(top = spacing.s3).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(spacing.s4),
             ) {
                 DishRecipeSection(food, viewModel, language) { viewModel.openFood(it) }
             }
-        } else if (tab == 1 && food is PreparedFood && food.components.isNotEmpty()) {
+        } else if (tab == FoodDetailTab.RECIPE && food is PreparedFood && food.components.isNotEmpty()) {
             Column(
                 modifier = Modifier.weight(1f).padding(top = spacing.s3).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(spacing.s4),
@@ -1662,7 +1697,7 @@ private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?) {
                     id = item.nutrientId,
                     label = nutrientEnergyLabel(item.nutrientId, item.kcal / totalItemsKcal * 100.0),
                     value = item.kcal,
-                    color = tokens.chart.forNutrient(item.nutrientId),
+                    color = nutrientColor(item.nutrientId),
                 ),
             )
         }
@@ -1672,7 +1707,7 @@ private fun MacronutrientEnergyChart(resolved: ResolvedNutrition?) {
                     id = "other",
                     label = stringResource(R.string.nutrition_energy_other, otherKcal / totalItemsKcal * 100.0),
                     value = otherKcal,
-                    color = tokens.chart.other,
+                    color = nutrientColor("OTHER"),
                 ),
             )
         }
@@ -2157,11 +2192,11 @@ private fun StepTimer(minutes: Int) {
 /** 等宽时间显示所需的最小宽度：8 个字符（含冒号）在 monospace 下的安全值。 */
 private val StepTimerTextWidth = 124.dp
 
-/** 搜索面板限高：给下方分类栏与结果列表留出空间，超出部分在面板内滚动。 */
+/** 排行页签按条目类型分别命名；「制作步骤」已拆成独立页签，不再占用这个名字。 */
 private fun FoodItem.rankingTabLabelRes(): Int = when (kind) {
     FoodKind.INGREDIENT -> R.string.nutrition_tab_ingredient_ranking
     FoodKind.FOOD -> R.string.nutrition_tab_ranking
-    FoodKind.DISH -> R.string.nutrition_tab_recipe_steps
+    FoodKind.DISH -> R.string.nutrition_tab_dish_ranking
 }
 
 @Composable

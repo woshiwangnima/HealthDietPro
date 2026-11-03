@@ -54,6 +54,56 @@
    用专门的一次构建跑完整流程。
 5. **新增存储层**时照抄现有写法：读取用 `json.decodeDomainSafely(file, DOMAIN_ID, ...)`，
    写入用 `prepareArchiveWrite(file)`。不要再用裸 `runCatching { ... }.getOrNull()`。
+6. **导入只有一条校验链**。界面的「导入预览」与真正的导入都走
+   `PlainUserArchiveRepository.prepareImport`（领域解码 + 信封版本 + 附件路径与引用），
+   预览页不得为了「先给用户看一眼」另写一套宽松解析——两套标准迟早分叉，
+   变成「预览通过、导入失败」或者更糟的「预览没看出来、导入把数据写坏」。
+7. **外部档案版本判断一律 `<=` 当前版本**。`decodeBundle` 与 `decodeDomain` 同一口径：
+   老档案交给迁移链，新档案直接拒绝并提示升级。用 `==` 会让所有未升级的老档案在导入这一步被判死。
+
+## 3.1 新领域/新字段怎么接进导入导出（不靠记忆）
+
+「新增的存档内容能不能自动进导出、导入、预览」这件事，以前是四份手写清单各自维护：
+导出的 `readDomainSnapshot`、导入的 `validateDomains`、预览的 `ArchiveDomainFiles`、
+诊断的 `archiveDiagnosticFiles`。结果是 `diet.json`、`timers.json`、`containers.json`、
+`prices.json`、`blood_glucose_predictions.json` 五个**磁盘上真实存在**的领域，
+既不在导出里也不在预览里，谁也没发现——用户换设备时就少带这部分数据。
+
+现在的规则只有一条：**`model/archive/ArchiveDomainRegistry.kt` 的 `ArchiveDomains`
+是唯一清单**。导出、导入校验、附件路径改写、预览目录树、档案清单（manifest）、
+诊断报告全部从它派生，不再有第二份文件名表。
+
+新增一个领域：
+
+1. 在 `UserArchiveBundle` 加一个可空字段（`ignoreUnknownKeys = true` 保证旧档案照常读，
+   按第 3 节第 2 条，加字段不升版本）；
+2. 在 `ArchiveDomains` 加一条，把 `extract` / `attach` 接上；有附件就再给 `rewrite`。
+
+漏了会怎样——两道自动化网，都不需要人记得：
+
+| 漏法 | 谁抓到 | 表现 |
+|---|---|---|
+| 字段加了，注册表没登记（或反过来） | `ArchiveDomainRegistryTest`（反射 `UserArchiveBundle.serializer().descriptor`，与注册表 id 双向比对） | 单测直接红，`testDebugUnitTest` 失败 |
+| 新存储层写了新文件，压根没进档案 | `unregisteredArchiveFiles()` | 「导入/导出用户数据」页的状态卡出现红字「有 N 个文件未纳入档案 · xxx.json」 |
+
+第 2 条只能靠运行时，因为「磁盘上多了一个 json」在编译期不可见；但它出现在用户看得到的
+首页状态卡上，也出现在每次 `reload()` 时，开发期一眼就能发现。
+`manifest.json`、`.prev`、`.corrupt-*` 这类档案自身的簿记文件不在提示范围内。
+
+## 3.2 导入落点
+
+导入有两种落点，共用同一条校验链（第 3 节第 6 条），区别只在提交阶段：
+
+| 落点 | 目标用户 id | 对现有数据的影响 |
+|---|---|---|
+| 覆盖当前用户（`importIntoCurrentUser`） | 当前用户 | 全量替换，失败整目录回滚 |
+| 导入为新用户（`importAsNewUser`） | `ProfilePrefs.allocateUserId()` 新分配 | 不碰任何现有用户，失败时撤索引 + 删新目录 |
+
+「导入为新用户」**故意不复用档案里的 `sourceUserId`**：档案可能就来自这台设备，
+复用 id 会直接覆盖原用户，与「新建一个用户」的语义相反。
+附件里指向导出设备的路径（`user:user_archives/<uid>/attachments/...`）在落盘前统一改写成本机新 id，
+否则新用户会指向别人的目录。
+
 
 ## 4. debug 与 release 之间互转
 

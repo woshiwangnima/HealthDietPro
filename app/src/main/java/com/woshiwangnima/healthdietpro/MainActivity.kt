@@ -43,8 +43,7 @@ import com.woshiwangnima.healthdietpro.HealthDietProApplication
 import com.woshiwangnima.healthdietpro.model.medication.MedicationCatalogItem
 import com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs
 import com.woshiwangnima.healthdietpro.model.medication.MedicationRecord
-import com.woshiwangnima.healthdietpro.model.archive.PlainUserArchiveRepository
-import com.woshiwangnima.healthdietpro.model.archive.SensitiveArchiveCodec
+import com.woshiwangnima.healthdietpro.ui.profile.archive.ArchiveTransferController
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.UserPrefs
 import com.woshiwangnima.healthdietpro.model.prefs.serializeSearchHistory
@@ -77,8 +76,8 @@ import com.woshiwangnima.healthdietpro.ui.profile.BodyMetricRecordActivity
 import com.woshiwangnima.healthdietpro.ui.profile.HeightDetailActivity
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileEditActivity
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileScreen
-import com.woshiwangnima.healthdietpro.ui.profile.ProfileAvatarBitmapCache
 import com.woshiwangnima.healthdietpro.ui.profile.ProfileUserInfoViewModel
+import com.woshiwangnima.healthdietpro.ui.splash.StartupSplashHost
 import com.woshiwangnima.healthdietpro.ui.profile.UserSwitchActivity
 import com.woshiwangnima.healthdietpro.ui.profile.WeightDetailActivity
 import com.woshiwangnima.healthdietpro.ui.profile.CircumferenceDetailActivity
@@ -126,9 +125,9 @@ class MainActivity : BaseActivity() {
 
     private val recordViewModel: RecordViewModel by viewModels()
     private val nutritionViewModel: NutritionViewModel by viewModels()
-    private val profileAvatarBitmapCache by lazy {
-        ProfileAvatarBitmapCache(cacheRegistry = (application as HealthDietProApplication).cacheRegistry)
-    }
+    // 头像缓存归 Application 所有：ViewModel 跨配置变更保留，缓存不能跟着 Activity 重建。
+    private val profileAvatarBitmapCache
+        get() = (application as HealthDietProApplication).profileAvatarBitmapCache
     private val profileViewModel: ProfileUserInfoViewModel by viewModels {
         androidx.lifecycle.ViewModelProvider.NewInstanceFactory().let { factory ->
             object : androidx.lifecycle.ViewModelProvider.Factory {
@@ -154,11 +153,8 @@ class MainActivity : BaseActivity() {
     private var testPage by mutableStateOf(TestPage.Landing)
     private var commonUiTestCategory by mutableStateOf<CommonUiTestCategory?>(null)
     private val pagePreloader = PagePreloader()
-    private val plainUserArchiveRepository by lazy { PlainUserArchiveRepository(this) }
-    private var pendingPlainArchiveContent: String? = null
-    private var pendingEncryptedArchive: ByteArray? = null
-    private var pendingArchivePassword: CharArray? = null
-    private var pendingArchiveEncryptedImport = false
+    private var archiveController: ArchiveTransferController? = null
+    private var startupSplashVisible = false
 
     private val onboardingLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -171,6 +167,7 @@ class MainActivity : BaseActivity() {
     private val profileEditLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
+        profileAvatarBitmapCache.clear()
         profileViewModel.refresh()
         recordViewModel.refresh()
         nutritionViewModel.refreshDiseaseRisk()
@@ -179,6 +176,7 @@ class MainActivity : BaseActivity() {
     private val userSwitchLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
+        profileAvatarBitmapCache.clear()
         profileViewModel.refresh()
         nutritionViewModel.refreshUser()
         recordViewModel.refresh()
@@ -241,85 +239,74 @@ class MainActivity : BaseActivity() {
         recordViewModel.refresh()
     }
 
-    private val plainJsonExportLauncher = registerForActivityResult(
+    // 导入/导出用系统文件选择器：导出按格式分两个 contract（MIME 在注册时就固定了），
+    // 导入统一用 */* —— 用户从聊天软件、网盘存的档案常常没有正确后缀，按 MIME 过滤只会让人找不到文件。
+    private val archiveSaveJsonLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/json"),
-    ) { uri ->
-        val archiveContent = pendingPlainArchiveContent
-        val encryptedArchive = pendingEncryptedArchive
-        pendingPlainArchiveContent = null
-        pendingEncryptedArchive = null
-        if (uri == null || (archiveContent == null && encryptedArchive == null)) return@registerForActivityResult
-        lifecycleScope.launch {
-            val saved = withContext(Dispatchers.IO) {
-                runCatching {
-                    checkNotNull(contentResolver.openOutputStream(uri)).use { output ->
-                        if (encryptedArchive != null) output.write(encryptedArchive)
-                        else output.bufferedWriter(Charsets.UTF_8).use { it.write(requireNotNull(archiveContent)) }
-                    }
-                }
-            }
-            Toast.makeText(
-                this@MainActivity,
-                if (saved.isSuccess) R.string.profile_plain_json_export_success else R.string.profile_plain_json_operation_failed,
-                Toast.LENGTH_SHORT,
-            ).show()
-        }
-    }
+    ) { uri -> archiveController?.onExportTargetPicked(uri) }
 
-    private val plainJsonImportLauncher = registerForActivityResult(
+    private val archiveSaveBinaryLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/octet-stream"),
+    ) { uri -> archiveController?.onExportTargetPicked(uri) }
+
+    private val archiveOpenLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument(),
-    ) { uri ->
-        if (uri == null) {
-            pendingArchivePassword?.fill('\u0000')
-            pendingArchivePassword = null
-            pendingArchiveEncryptedImport = false
-            return@registerForActivityResult
-        }
-        lifecycleScope.launch {
-            val imported = withContext(Dispatchers.IO) {
-                runCatching {
-                    checkNotNull(contentResolver.openInputStream(uri)).use { input ->
-                        if (pendingArchiveEncryptedImport) {
-                            SensitiveArchiveCodec().decryptAndDecompress(input.readBytes(), requireNotNull(pendingArchivePassword))
-                        } else {
-                            input.bufferedReader(Charsets.UTF_8).use { it.readText() }
-                        }
-                    }
-                }.fold(
-                    onSuccess = plainUserArchiveRepository::importIntoCurrentUser,
-                    onFailure = { error -> Result.failure(error) },
-                )
-            }
-            if (imported.isSuccess) {
-                profileAvatarBitmapCache.clearCache()
-                profileViewModel.refresh()
-                nutritionViewModel.refreshUser()
-                recordViewModel.refresh()
-            }
-            pendingArchivePassword?.fill('\u0000')
-            pendingArchivePassword = null
-            pendingArchiveEncryptedImport = false
-            Toast.makeText(
-                this@MainActivity,
-                if (imported.isSuccess) R.string.profile_plain_json_import_success else R.string.profile_plain_json_operation_failed,
-                Toast.LENGTH_SHORT,
-            ).show()
-        }
-    }
+    ) { uri -> archiveController?.onImportFilePicked(uri) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 启动阶段只做必须发生在首帧前的轻量同步初始化；数据加载交给启动页期间的
+        // 主界面组合与 preloadMainPages，引导弹窗 / 外部深链则等启动页淡出后再分发。
         UnitConverter.init(this)
+        val launchSplash = savedInstanceState == null &&
+            !hasExternalLaunchIntent() &&
+            AppPrefs.isSplashEnabled(this)
+        startupSplashVisible = launchSplash
+        archiveController = ArchiveTransferController(
+            context = this,
+            scope = lifecycleScope,
+            launchOpenDocument = { archiveOpenLauncher.launch(it) },
+            launchCreateDocument = { mimeType, fileName ->
+                when (mimeType) {
+                    "application/json" -> archiveSaveJsonLauncher.launch(fileName)
+                    else -> archiveSaveBinaryLauncher.launch(fileName)
+                }
+            },
+            onImported = {
+                profileAvatarBitmapCache.clear()
+                profileViewModel.refresh()
+                nutritionViewModel.refreshUser()
+                recordViewModel.refresh()
+            },
+        )
         selectedRoute = restoredRoute()
         setContent {
             HealthDietProTheme {
-                MainShell()
+                StartupSplashHost(
+                    enabled = launchSplash,
+                    // 引导弹窗是独立 Dialog 窗口，必须等启动页淡出后再弹，否则会盖在启动页上。
+                    // 外部深链也在此时再分发，避免工具链启动时被启动页拖慢。
+                    onFinished = {
+                        startupSplashVisible = false
+                        ProfilePrefs.noteApplicationOpened(this@MainActivity)
+                        // 当前页的 ViewModel 已在启动页期间加载；其余主页的预热放到淡出后，
+                        // 避免它们的构造与首帧抢主线程。
+                        preloadMainPages()
+                        checkFirstLaunch()
+                        handleCustomFoodEditorIntent()
+                        handleFoodDetailIntent()
+                        handleAgpPreviewImportIntent()
+                    },
+                ) {
+                    MainShell()
+                }
             }
         }
-        window.decorView.post(::preloadMainPages)
+        // 首帧只画启动页；其余主页预热由启动页 onFinished 触发，避免和首帧抢主线程。
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                if (startupSplashVisible) return
                 if (selectedRoute == ROUTE_NUTRITION && nutritionViewModel.navigateBack()) {
                     return
                 } else if (selectedRoute == ROUTE_TEST && testAccessViewModel.isVerified.value) {
@@ -331,12 +318,6 @@ class MainActivity : BaseActivity() {
                 } else handleDoubleBackExit()
             }
         })
-
-        checkFirstLaunch()
-        ProfilePrefs.noteApplicationOpened(this)
-        handleCustomFoodEditorIntent()
-        handleFoodDetailIntent()
-        handleAgpPreviewImportIntent()
     }
 
     private fun handleAgpPreviewImportIntent() {
@@ -538,8 +519,7 @@ class MainActivity : BaseActivity() {
                         onOpenUserSwitch = {
                             userSwitchLauncher.launch(Intent(this@MainActivity, UserSwitchActivity::class.java))
                         },
-                        onArchiveAction = ::handleArchiveAction,
-                        onArchivePreview = ::previewArchive,
+                        archiveController = requireNotNull(archiveController),
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -581,10 +561,19 @@ class MainActivity : BaseActivity() {
         showOnboarding = AppPrefs.isFirstLaunch(this)
     }
 
+    /** 外部工具直接打开编辑 / 详情 / AGP 导入时跳过启动页，避免多等 1.2 秒。 */
+    private fun hasExternalLaunchIntent(): Boolean =
+        intent.hasExtra(EXTRA_OPEN_NUTRITION_EDITOR_KIND) ||
+            intent.hasExtra(EXTRA_OPEN_NUTRITION_DETAIL_ID) ||
+            intent.getBooleanExtra(EXTRA_IMPORT_AGP_PREVIEW, false)
+
     private fun switchTab(route: String) {
         if (route == selectedRoute || isMainPageTransitionRunning) return
         val index = navItems.indexOfFirst { it.route == route }
         if (index == -1) return
+
+        // 离开「我的」时收起导入/导出页：否则切回来会停在半路，用户以为入口没了。
+        if (route != ROUTE_PROFILE) archiveController?.close()
 
         if (route == ROUTE_TEST) {
             routeBeforeTest = selectedRoute
@@ -609,60 +598,6 @@ class MainActivity : BaseActivity() {
     }
 
     private fun addTestHeightRecord(count: Int) = addTestBodyRecords(isWeight = false, count = count)
-
-    private fun exportPlainJsonArchive() {
-        lifecycleScope.launch {
-            val archive = withContext(Dispatchers.IO) {
-                plainUserArchiveRepository.exportCurrentUser()
-            }
-            archive.onSuccess { content ->
-                pendingPlainArchiveContent = content
-                plainJsonExportLauncher.launch("health-diet-pro-user.json")
-            }.onFailure {
-                Toast.makeText(
-                    this@MainActivity,
-                    R.string.profile_plain_json_operation_failed,
-                    Toast.LENGTH_SHORT,
-                ).show()
-            }
-        }
-    }
-
-    private fun handleArchiveAction(export: Boolean, encrypted: Boolean, password: String) {
-        if (!export) {
-            pendingArchiveEncryptedImport = encrypted
-            pendingArchivePassword = password.toCharArray()
-            plainJsonImportLauncher.launch(arrayOf("application/json", "application/octet-stream", "text/plain"))
-            return
-        }
-        lifecycleScope.launch {
-            val archive = withContext(Dispatchers.IO) { plainUserArchiveRepository.exportCurrentUser() }
-            archive.onSuccess { json ->
-                if (encrypted) {
-                    val passwordChars = password.toCharArray()
-                    pendingEncryptedArchive = try {
-                        SensitiveArchiveCodec().encryptAndCompress(json, passwordChars)
-                    } finally {
-                        passwordChars.fill('\u0000')
-                    }
-                    plainJsonExportLauncher.launch("health-diet-pro-user.hdp")
-                } else {
-                    pendingPlainArchiveContent = json
-                    plainJsonExportLauncher.launch("health-diet-pro-user.json")
-                }
-            }.onFailure { Toast.makeText(this@MainActivity, R.string.profile_plain_json_operation_failed, Toast.LENGTH_SHORT).show() }
-        }
-    }
-
-    private fun previewArchive(onPreview: (Result<String>) -> Unit) {
-        lifecycleScope.launch {
-            val archive = withContext(Dispatchers.IO) { plainUserArchiveRepository.exportCurrentUser() }
-            archive.onSuccess { onPreview(Result.success(it)) }.onFailure { error ->
-                Toast.makeText(this@MainActivity, R.string.profile_plain_json_operation_failed, Toast.LENGTH_SHORT).show()
-                onPreview(Result.failure(error))
-            }
-        }
-    }
 
     private fun addTestWeightRecord(count: Int) = addTestBodyRecords(isWeight = true, count = count)
 

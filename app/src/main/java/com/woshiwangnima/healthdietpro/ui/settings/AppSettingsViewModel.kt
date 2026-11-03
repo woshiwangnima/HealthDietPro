@@ -4,18 +4,19 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.woshiwangnima.healthdietpro.HealthDietProApplication
-import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.cache.AppCacheRegistry
-import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
 import com.woshiwangnima.healthdietpro.model.unit.UnitCategoryType
 import com.woshiwangnima.healthdietpro.util.UnitConverter
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -26,42 +27,64 @@ internal class AppSettingsViewModel(application: Application) : AndroidViewModel
     val uiState: StateFlow<AppSettingsUiState> = _uiState.asStateFlow()
 
     sealed interface Toast {
-        data class Mb(val value: Float) : Toast
-        data class Kb(val value: Int) : Toast
+        data class Cleared(val sizeText: String, val partial: Boolean) : Toast
+        data class Empty(val partial: Boolean) : Toast
     }
 
     private val _toastMessage = MutableSharedFlow<Toast>(extraBufferCapacity = 1)
     val toastMessage: SharedFlow<Toast> = _toastMessage.asSharedFlow()
+
+    private var refreshJob: Job? = null
 
     init {
         UnitConverter.init(getApplication())
         refreshCacheSize()
     }
 
+    /**
+     * 重新统计缓存。扫描在 IO 线程执行，旧任务先取消，避免连续打开对话框时两次扫描互相覆盖。
+     * 统计期间保留上一次的条目，只把 [AppSettingsUiState.cacheLoading] 置 true，
+     * 界面因此可以先显示旧构成、再原位更新，而不是闪成空白。
+     */
     fun refreshCacheSize() {
-        viewModelScope.launch {
-            val entries = withContext(Dispatchers.IO) {
-                cacheRegistry.snapshot()
-            }
+        refreshJob?.cancel()
+        refreshJob = viewModelScope.launch {
+            _uiState.update { it.copy(cacheLoading = true) }
+            val snapshots = withContext(Dispatchers.IO) { cacheRegistry.snapshot() }
+            val totalBytes = snapshots.sumOf { it.stats.byteCount }
             _uiState.value = AppSettingsUiState(
-                cacheSizeText = formatStorageSize(entries.sumOf { it.byteCount }),
-                cacheEntries = entries.map { entry ->
+                cacheSizeText = formatStorageSize(totalBytes),
+                cacheEntries = snapshots.map { snapshot ->
                     CacheEntryUiState(
-                        kind = entry.kind,
-                        sizeText = formatStorageSize(entry.byteCount),
-                        itemCount = entry.itemCount,
+                        id = snapshot.spec.id,
+                        labelRes = snapshot.spec.labelRes,
+                        byteCount = snapshot.stats.byteCount,
+                        itemCount = snapshot.stats.itemCount,
+                        sizeText = formatStorageSize(snapshot.stats.byteCount),
+                        percent = if (totalBytes > 0L) {
+                            (snapshot.stats.byteCount * 100.0 / totalBytes).roundToInt()
+                        } else {
+                            0
+                        },
+                        readFailed = snapshot.readFailed,
                     )
                 },
+                cacheLoading = false,
             )
         }
     }
 
     fun clearCache() {
+        refreshJob?.cancel()
         viewModelScope.launch {
-            val freedKb = withContext(Dispatchers.IO) {
-                cacheRegistry.clearAll().releasedDiskBytes / 1024
+            _uiState.update { it.copy(cacheLoading = true) }
+            val result = withContext(Dispatchers.IO) { cacheRegistry.clearAll() }
+            val partial = result.failedCacheIds.isNotEmpty()
+            val toast = if (result.releasedBytes <= 0L && result.clearedItems <= 0) {
+                Toast.Empty(partial = partial)
+            } else {
+                Toast.Cleared(sizeText = formatStorageSize(result.releasedBytes), partial = partial)
             }
-            val toast = if (freedKb >= 1024) Toast.Mb(freedKb / 1024f) else Toast.Kb(freedKb.toInt())
             _toastMessage.emit(toast)
             refreshCacheSize()
         }
@@ -70,9 +93,9 @@ internal class AppSettingsViewModel(application: Application) : AndroidViewModel
     private fun formatStorageSize(bytes: Long): String {
         val repo = UnitConverter.getRepository() ?: return formatLegacy(bytes)
         val storage = repo.getCategory(UnitCategoryType.Storage.id) ?: return formatLegacy(bytes)
-        val preferredUnitId = AppPrefs.getUnit(getApplication(), UnitCategoryType.Storage.id, storage.baseUnit)
-        val best = storage.units.firstOrNull { it.id == preferredUnitId }
-            ?: storage.units.lastOrNull { bytes >= it.toBase }
+        // 缓存通常只有 KB～MB 级；沿用「首选存储单位」会在用户选 GB 时显示成 0.0 GB，
+        // 所以这里按实际字节数量级挑最大的可用单位，0 字节回落到最小单位。
+        val best = storage.units.lastOrNull { bytes >= it.toBase }
             ?: storage.units.firstOrNull()
             ?: return formatLegacy(bytes)
         val converted = UnitConverter.fromBase(UnitCategoryType.Storage.id, bytes.toFloat(), best.id)

@@ -36,13 +36,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.woshiwangnima.healthdietpro.R
-import com.woshiwangnima.healthdietpro.common.cache.AppCacheKind
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
-import com.woshiwangnima.healthdietpro.common.ui.ConfirmDialog
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRow
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppListRowDivider
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppRadioRow
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSectionGroup
+import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppSwitchRow
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.LocalAppTokens
 import com.woshiwangnima.healthdietpro.model.archive.appVersion
 import com.woshiwangnima.healthdietpro.model.prefs.AppPrefs
@@ -76,54 +75,37 @@ internal fun AppSettingsScreen(
     var language by remember { mutableStateOf(AppPrefs.getAppLanguage(context)) }
     var darkMode by remember { mutableStateOf(AppPrefs.getDarkMode(context)) }
     var firstDayOfWeek by remember { mutableStateOf(AppPrefs.getFirstDayOfWeek(context)) }
+    var splashEnabled by remember { mutableStateOf(AppPrefs.isSplashEnabled(context)) }
     val notificationPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
-    val toastMbTemplate = stringResource(R.string.settings_cache_cleared_mb)
-    val toastKbTemplate = stringResource(R.string.settings_cache_cleared_kb)
-    val cacheLabels = mapOf(
-        AppCacheKind.AppFiles to stringResource(R.string.settings_cache_entry_app_files),
-        AppCacheKind.CodeFiles to stringResource(R.string.settings_cache_entry_code_files),
-        AppCacheKind.ExternalFiles to stringResource(R.string.settings_cache_entry_external_files),
-        AppCacheKind.FoodImages to stringResource(R.string.settings_cache_entry_food_images),
-        AppCacheKind.FoodCardMetadata to stringResource(R.string.settings_cache_entry_food_card_metadata),
-        AppCacheKind.ProfileAvatars to stringResource(R.string.settings_cache_entry_profile_avatars),
-    )
-    val cacheEntryTemplate = stringResource(R.string.settings_cache_entry)
-    val cacheEntryWithCountTemplate = stringResource(R.string.settings_cache_entry_with_count)
-    val cacheDetails = uiState.cacheEntries.joinToString(separator = "\n") { entry ->
-        val label = requireNotNull(cacheLabels[entry.kind])
-        if (entry.itemCount > 0) {
-            cacheEntryWithCountTemplate.format(label, entry.sizeText, entry.itemCount)
-        } else {
-            cacheEntryTemplate.format(label, entry.sizeText)
-        }
-    }
-    val clearCacheMessage = listOf(
-        stringResource(R.string.settings_clear_cache_confirm_message),
-        stringResource(R.string.settings_clear_cache_confirm_contents, cacheDetails),
-    ).joinToString(separator = "\n\n")
+    val clearedTemplate = stringResource(R.string.settings_cache_cleared)
+    val clearedPartialTemplate = stringResource(R.string.settings_cache_cleared_partial)
+    val emptyCacheText = stringResource(R.string.settings_cache_clear_empty)
+    val emptyPartialCacheText = stringResource(R.string.settings_cache_clear_partial_empty)
 
     LaunchedEffect(Unit) {
         viewModel.toastMessage.collect { toast ->
             val msg = when (toast) {
-                is AppSettingsViewModel.Toast.Mb -> toastMbTemplate.format(toast.value)
-                is AppSettingsViewModel.Toast.Kb -> toastKbTemplate.format(toast.value)
+                is AppSettingsViewModel.Toast.Cleared -> {
+                    val template = if (toast.partial) clearedPartialTemplate else clearedTemplate
+                    template.format(toast.sizeText)
+                }
+                is AppSettingsViewModel.Toast.Empty -> {
+                    if (toast.partial) emptyPartialCacheText else emptyCacheText
+                }
             }
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 
     if (showClearCacheConfirm) {
-        ConfirmDialog(
-            title = stringResource(R.string.settings_clear_cache_confirm_title),
-            message = clearCacheMessage,
-            confirmText = stringResource(R.string.settings_clear_cache_confirm_ok),
-            cancelText = stringResource(R.string.settings_clear_cache_cancel),
+        CacheClearDialog(
+            state = uiState,
+            onDismiss = { showClearCacheConfirm = false },
             onConfirm = {
                 showClearCacheConfirm = false
                 viewModel.clearCache()
             },
-            onDismiss = { showClearCacheConfirm = false },
         )
     }
 
@@ -214,6 +196,17 @@ internal fun AppSettingsScreen(
 
             // 显示
             AppSectionGroup {
+                AppSwitchRow(
+                    title = stringResource(R.string.settings_splash_title),
+                    checked = splashEnabled,
+                    onCheckedChange = { enabled ->
+                        splashEnabled = enabled
+                        AppPrefs.setSplashEnabled(context, enabled)
+                    },
+                    iconRes = R.drawable.ic_startup,
+                    tooltip = stringResource(R.string.settings_splash_desc),
+                )
+                AppListRowDivider()
                 AppListRow(
                     title = stringResource(R.string.text_display_settings_title),
                     iconRes = R.drawable.ic_font_size,
@@ -274,7 +267,10 @@ internal fun AppSettingsScreen(
                     iconRes = R.drawable.ic_broom_clean,
                     trailingValue = uiState.cacheSizeText,
                     tooltip = stringResource(R.string.settings_clear_cache_desc),
-                    onClick = { showClearCacheConfirm = true },
+                    onClick = {
+                        viewModel.refreshCacheSize()
+                        showClearCacheConfirm = true
+                    },
                 )
             }
 

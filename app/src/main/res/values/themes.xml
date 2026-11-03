@@ -6,4 +6,17 @@
     </style>
 
     <style name="Theme.HealthDietPro" parent="Base.Theme.HealthDietPro" />
+
+    <!--
+        启动窗口只画底色，不画应用图标：Android 12+ 的系统启动画面无法承载题字，
+        如果保留图标，用户会先看到「只有图标」的一页、再看到应用内启动页，形成两个启动页。
+        图标与题字全部交给 ui/splash/StartupSplash 绘制；底色与它的渐变顶部一致，过渡不闪。
+    -->
+    <style name="Theme.HealthDietPro.Splash" parent="Theme.HealthDietPro">
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_transparent</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/splash_background</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
 </resources>

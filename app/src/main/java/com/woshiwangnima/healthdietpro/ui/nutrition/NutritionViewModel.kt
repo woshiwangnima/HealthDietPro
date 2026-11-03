@@ -101,11 +101,12 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
     private var tagRepository = UserFoodTagRepository.fromContext(application)
     private var customRepository = UserCustomFoodRepository.fromContext(application)
     private var foodCollections = UserItemCollectionRepository.fromContext(application, NUTRITION_FOOD_COLLECTIONS_KEY)
-    val foodImages = FoodImageStore(
-        context = application,
-        cacheRegistry = (application as HealthDietProApplication).cacheRegistry,
+    val foodImages = FoodImageStore(context = application)
+    private val cardMetadataCache = FoodCardMetadataCache()
+    private val cacheRegistrations = listOf(
+        (application as HealthDietProApplication).cacheRegistry.register(foodImages),
+        (application as HealthDietProApplication).cacheRegistry.register(cardMetadataCache),
     )
-    private val cardMetadataCache = FoodCardMetadataCache().also { (application as HealthDietProApplication).cacheRegistry.register(it) }
     private var userId = ProfilePrefs.getCurrentUserId(application)
     private val _state = MutableStateFlow(NutritionUiState())
     val state: StateFlow<NutritionUiState> = _state.asStateFlow()
@@ -309,6 +310,9 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         viewModelScope.launch(Dispatchers.IO) { targetRepository.save(tags) }
     }
     fun refreshUser() {
+        // 用户切换 / 导入后用户图片目录会换成另一套；内存里按 key 缓存的缩略图必须一起失效，
+        // 否则同一个 key 会继续显示上一个用户的图片。
+        foodImages.clearStorage()
         val targetUserId = ProfilePrefs.getCurrentUserId(getApplication())
         userId = targetUserId
         tagRepository = UserFoodTagRepository.fromContext(getApplication())
@@ -589,6 +593,12 @@ internal class NutritionViewModel(application: Application) : AndroidViewModel(a
         if (prefs.contains(NUTRITION_RECENT_FOODS_KEY)) prefs.remove(NUTRITION_RECENT_FOODS_KEY)
         return collections
     }
+
+    override fun onCleared() {
+        cacheRegistrations.forEach { it.close() }
+        super.onCleared()
+    }
+
     private companion object {
         const val NUTRITION_SEARCH_HISTORY_KEY = "nutrition_search_history_v1"
         const val NUTRITION_FOOD_COLLECTIONS_KEY = "nutrition_food_collections_v1"

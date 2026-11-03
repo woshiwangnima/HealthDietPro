@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * **存储归属**：
  * - **app 级**（`app_prefs` 文件）：首次启动标记、字体风格令牌（alpha/token）。
  * - **用户级**（委托 [UserPrefs.current]，`user_prefs_<uid>` 文件）：单位选择、
- *   首日、深色、字号、文字溢出、轮播速度、图表状态键、Tab 选中、提醒开关。
+ *   首日、深色、字号、文字溢出、轮播速度、图表状态键、Tab 选中、提醒开关、启动页展示。
  *   按当前登录用户隔离，删用户时随文件清理。
  *
  * **契约**：`getChart*(ctx, chartStateKey)` / `setChart*(...)` 涵盖
@@ -30,6 +30,7 @@ object AppPrefs {
     private const val KEY_MARQUEE_SPEED = "pref_marquee_speed"
     private const val KEY_MARQUEE_ITERATIONS = "pref_marquee_iterations"
     private const val KEY_APP_LANGUAGE = "pref_app_language"
+    private const val KEY_SHOW_SPLASH = "pref_show_splash"
     private val darkModeState = MutableStateFlow("FOLLOW_SYSTEM")
     val darkMode = darkModeState.asStateFlow()
 
@@ -120,6 +121,16 @@ object AppPrefs {
         appPrefs(context).edit().putInt(KEY_MARQUEE_SPEED, speed.coerceIn(50, 2000)).apply()
     fun getMarqueeIterations(context: Context): Int = appPrefs(context).getInt(KEY_MARQUEE_ITERATIONS, 0).coerceAtLeast(0)
     fun setMarqueeIterations(context: Context, count: Int) = appPrefs(context).edit().putInt(KEY_MARQUEE_ITERATIONS, count.coerceAtLeast(0)).apply()
+
+    /**
+     * 启动页展示：用户级偏好，随 `user_preferences.json` 一起导出 / 导入。
+     *
+     * 默认开启；旧档案没有这个键时也按开启处理，新版本不会因为导入旧档而突然不显示启动页。
+     */
+    fun isSplashEnabled(context: Context): Boolean =
+        user(context).getBoolean(KEY_SHOW_SPLASH, true)
+    fun setSplashEnabled(context: Context, enabled: Boolean) =
+        user(context).putBoolean(KEY_SHOW_SPLASH, enabled)
 
     fun getReminderDrinkWater(context: Context): Boolean =
         user(context).getBoolean("reminder_drink_water", false)

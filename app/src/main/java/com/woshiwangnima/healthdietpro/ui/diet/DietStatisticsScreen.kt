@@ -54,11 +54,6 @@ import com.woshiwangnima.healthdietpro.common.ui.AppOutlinedIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.ComposeDatePickerDialog
 import com.woshiwangnima.healthdietpro.common.ui.DonutChartSegment
 import com.woshiwangnima.healthdietpro.common.ui.LinearProgressWithPercent
-import com.woshiwangnima.healthdietpro.common.ui.NutrientCarbsColor
-import com.woshiwangnima.healthdietpro.common.ui.NutrientEnergyColor
-import com.woshiwangnima.healthdietpro.common.ui.NutrientFatColor
-import com.woshiwangnima.healthdietpro.common.ui.NutrientProteinColor
-import com.woshiwangnima.healthdietpro.common.ui.NutrientOtherColor
 import com.woshiwangnima.healthdietpro.common.ui.TextOverflowText
 import com.woshiwangnima.healthdietpro.common.ui.WaterGlassProgress
 import com.woshiwangnima.healthdietpro.common.ui.rememberAttentionShakeOffset
@@ -148,8 +143,9 @@ internal fun DietStatisticsTab(
     val periodColors = remember {
         MealPeriod.entries.associateWith(::periodColor)
     }
-    val primaryColor = LocalAppTokens.current.colors.primary
-    val entries = remember(dates, dayTrendTotals, trendMetric, primaryColor) {
+    // 代表色在组合期取一次：remember 的 lambda 不是 @Composable，不能在里面查主题令牌。
+    val trendColor = nutrientColor(trendMetric.id)
+    val entries = remember(dates, dayTrendTotals, trendMetric, trendColor) {
         dates.map { date ->
             val totals = dayTrendTotals[date] ?: DayNutrients()
             val value = totals.value(trendMetric)
@@ -157,7 +153,7 @@ internal fun DietStatisticsTab(
                 date = date,
                 label = "%02d-%02d".format(date.monthValue, date.dayOfMonth),
                 segments = buildList {
-                    if (value > 0.0) add(DateStackedBarSegment("value", value, nutrientColor(trendMetric.id)))
+                    if (value > 0.0) add(DateStackedBarSegment("value", value, trendColor))
                 },
             )
         }
@@ -472,10 +468,16 @@ private fun dayRangeLabelRes(days: Int): Int = when (days) {
     else -> R.string.diet_statistics_90_days
 }
 
+/**
+ * 餐次代表色：七个时段各一支，保证图例、圆环与「餐次小计」的色点一一对应。
+ *
+ * 它和「营养素代表色」是两套语义（餐次不是营养素），所以**不**接 [nutrientColor] 入口；
+ * 色值沿用既有七段色板，避免同一餐次在不同统计图里换色。
+ */
 internal fun periodColor(period: MealPeriod): Color {
     val palette = listOf(
-        NutrientProteinColor, NutrientCarbsColor, Color(0xFF8E24AA),
-        Color(0xFF00897B), Color(0xFF039BE5), NutrientEnergyColor, NutrientFatColor,
+        Color(0xFF43A047), Color(0xFFF9A825), Color(0xFF8E24AA),
+        Color(0xFF00897B), Color(0xFF039BE5), Color(0xFFF57C00), Color(0xFFE53935),
     )
     return palette[MealPeriod.entries.indexOf(period) % palette.size]
 }
@@ -794,7 +796,7 @@ private fun NutrientEnergyDonut(totals: DayNutrients) {
                 id = id,
                 label = "${nutrientEnergyName(id)} ${"%.1f".format(percent)}%",
                 value = kcal.toFloat(),
-                color = if (id == "OTHER") NutrientOtherColor else nutrientColor(id),
+                color = nutrientColor(id),
             )
         },
         centerValue = stringResource(R.string.nutrition_energy_kcal_value, formatGroupedInteger(total)),
@@ -813,6 +815,7 @@ private fun nutrientEnergyName(id: String): String = when (id.uppercase()) {
     else -> stringResource(R.string.nutrition_nutrient_other)
 }
 
+@Composable
 internal fun MetricColor(metric: NutrientMetric): Color = nutrientColor(metric.id)
 
 internal fun sumNutrients(records: List<DietRecord>): DayNutrients = records.fold(DayNutrients()) { totals, record ->

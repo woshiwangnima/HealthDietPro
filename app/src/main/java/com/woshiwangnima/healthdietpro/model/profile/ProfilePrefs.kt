@@ -252,6 +252,69 @@ object ProfilePrefs {
         return readUserMetadata(context).firstOrNull { it.id == userId }
     }
 
+    /**
+     * 为「导入为新用户」分配一个本机尚未占用的 id。
+     *
+     * 不复用档案里的 `sourceUserId`：那份档案可能就来自这台设备，
+     * 复用 id 会直接覆盖掉原用户，与「新建一个用户」的语义相反。
+     */
+    internal fun allocateUserId(context: Context): String {
+        val taken = getAllUserMetadata(context).mapTo(HashSet()) { it.id }
+        var candidate = genId()
+        while (candidate.isBlank() || candidate in taken) candidate = genId()
+        return candidate
+    }
+
+    /**
+     * 用导入的档案新建一个用户并切换过去。
+     *
+     * 与 [save] 的差别：不改动任何既有用户的资料，且保留档案里的创建时间，
+     * 这样用户列表里新旧账号的先后顺序与导出设备一致。
+     */
+    internal fun registerArchiveUser(
+        context: Context,
+        profile: UserProfile,
+        createdAtMillis: Long,
+        lastActiveAtMillis: Long,
+    ): String {
+        val userId = profile.id.ifBlank { allocateUserId(context) }
+        val stored = writeArchiveUser(context, profile.copy(id = userId))
+        val now = System.currentTimeMillis()
+        val created = createdAtMillis.takeIf { it > 0L } ?: now
+        val active = lastActiveAtMillis.takeIf { it >= created } ?: now
+        val metadata = readUserMetadata(context).filterNot { it.id == userId } + stored.toMetadata(
+            createdAtMillis = created,
+            lastActiveAtMillis = active,
+            updatedAtMillis = now,
+        )
+        saveUserMetadata(context, metadata)
+        prefs(context).edit().putStringSet(
+            KEY_USER_ARCHIVE_IDS,
+            prefs(context).getStringSet(KEY_USER_ARCHIVE_IDS, emptySet()).orEmpty() + userId,
+        ).apply()
+        setCurrentUserId(context, userId)
+        return userId
+    }
+
+    /**
+     * 新建用户的导入在提交阶段失败时的回滚：把刚登记的索引项撤掉。
+     *
+     * 只删索引和元数据，不动磁盘目录——目录由导入事务自己回滚，
+     * 这里再删一遍会把「事务已经还原成功的旧目录」误删。
+     */
+    internal fun discardRegisteredUser(context: Context, userId: String) {
+        val remaining = readUserMetadata(context).filterNot { it.id == userId }
+        saveUserMetadata(context, remaining)
+        prefs(context).edit().putStringSet(
+            KEY_USER_ARCHIVE_IDS,
+            prefs(context).getStringSet(KEY_USER_ARCHIVE_IDS, emptySet()).orEmpty() - userId,
+        ).apply()
+        val fallback = remaining.map { it.id }.firstOrNull()
+        if (getCurrentUserId(context) == userId) {
+            prefs(context).edit().putString(KEY_CURRENT_USER_ID, fallback.orEmpty()).apply()
+        }
+    }
+
     fun getCurrentUserId(context: Context): String {
         ensureLegacyUsersMigrated(context)
         val id = prefs(context).getString(KEY_CURRENT_USER_ID, null)

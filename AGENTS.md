@@ -71,6 +71,7 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - 食材/食物/菜肴用 `FoodKind` 固定色（食材 叶绿 `0xFF43A047`／食物 橙 `0xFFF57C00`／菜肴 番茄红 `0xFFE53935`，配白字）圆角背景包裹**正名**区分，不用名字旁色卡且不依赖主题色（深浅色一致、与绿色主题对比鲜明）；`添加自定义XX` 按钮与 `自定义XX` 一级筛选背景同色。自定义条目正名前置「笔」图标示可编辑。卡片名字行由左至右：笔图标(自定义) + 正名(彩色圆角) + 同字号括号烹饪方式(食物) + 小字号别名(`/` 分隔)。
 - `食材`/`食物`/`菜肴` 分类选择走公共 `common/ui/MultiLevelTagSelector`（多级 Tag、可多选多个），领域侧存 `categoryTags: List<String>`。
 - 自定义食材营养素编辑必须列出 `assets/DRIs/nutrients_meta.json` 全部营养素；仅 `ENERGY/PROTEIN/FAT/CHO` 必填（编辑器分「必填/选填」两段并本地化标注），其余可选填。营养素单位取 `NutrientMeta.baseUnit`。可选营养素折叠展开，避免一次组合 40+ 输入框卡顿。食材 GI/GL 为可选输入。
+- 营养素代表色（【营养档案】-【营养素供能】环图、【记饮食】-【统计】-【当日摄入】、【详情】-【排行】金字塔）统一经 `common/ui/NutrientColors.kt` 的 `nutrientColor()` 获取，色值由 `AppChartColors` 按深浅主题给出；禁止在页面里再写死 `Color(0x…)`。GI / GL 不是营养素，走 `colors.info`；餐次色板 `periodColor` 与营养素色正交，不接此入口。
 - 嵌套于 `MainActivity` Scaffold 内的营养屏（详情/对比/编辑）用 `BaseScreen(includeStatusBarPadding = false)`，避免与父 Scaffold 的 `statusBars` 内边距叠加导致顶栏下移；独立 Activity 屏保持默认 `true`。
 - 所有嵌套于 `MainActivity` Scaffold 的新 `BaseScreen`（包括预览、工具和二级界面）同样必须传入 `includeStatusBarPadding = false`；仅独立 Activity 使用默认状态栏内边距，避免返回图标与一级标题整体下移。
 - 详情/对比屏标题随 `FoodKind` 切换；详情右侧图标分两行（自定义时上行 编辑/删除，下行 收藏/对比）。健康指标表恒显示 GI/GL/炎症指数行，缺失填 `-`。
@@ -91,6 +92,13 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 - `ui/test/` 下的测试界面仅供开发验证，功能开发完成后删除。
 - 测试界面不要求本地化，可直接使用硬编码测试文案；正式业务界面仍必须遵守三套资源本地化规范。
 - 测试数据必须仍通过当前用户的存档入口写入，禁止绕过用户隔离或写入静态数据模块。
+
+## 启动页
+
+- 启动页由 `ui/splash/StartupSplash.kt` 提供，开关为用户级 `AppPrefs.isSplashEnabled`（键 `pref_show_splash`，默认开启），随 `user_preferences.json` 存档导入导出。
+- 系统启动窗口必须使用 `Theme.HealthDietPro.Splash`：图标透明、底色与启动页渐变顶部一致，禁止让它表现为「只有图标的第一页」；图标与题字只在应用内启动页绘制。
+- Android 12+ 系统启动画面只接受图标与背景，艺术字由应用内启动页承接；外部深链（自定义食物编辑 / 食物详情 / AGP 导入）不展示启动页；首次引导等 `Dialog` 必须等启动页淡出后再弹。
+- 启动页必须吞掉点击并拦截返回；不得使用截图 / Bitmap / UI Layer 作为启动页。
 
 ## Compose 设置行 / 可点击条目规范
 
@@ -115,8 +123,8 @@ HealthDietPro agent 规范。目标架构：Kotlin + Jetpack Compose + MVVM + 9 
 ## 页面预加载与切换动画
 
 - 页面数据预热统一通过 `common/ui/PageMotion.kt` 的 `PagePreloader.preloadData()` 协调；入口 Activity 在首帧后预热相邻或高频主页，预热仅可触发 Repository 缓存或 ViewModel 的幂等加载，不得提前执行写入、弹窗、权限申请或导航。主页切换必须采用数据缓存 + 实时 Compose 绘制，禁止使用页面截图、Bitmap 或 UI Layer 作为跨页面渲染缓存。动画容器必须裁剪越界内容并为每个页面提供不透明主题背景，避免透明叠层导致花屏与闪烁。
-- 所有可清理缓存必须向 `common/cache/AppCacheRegistry` 注册：缓存需提供条目数、近似字节数和清理实现；设置页“清除缓存”对话框必须列出将清理的项目，且只允许清理临时文件与可再生内存缓存，不得删除用户存档或静态资产。
-- 存档必须携带三段式 `archiveSchemaVersion`（`major` / `minor` / `patch`）与当前安装包版本（通过 `model/archive/ArchiveVersion.kt` 读取）；缺失版本字段统一视为 `0.0.0`，旧单整数版本映射为历史 `0.0.x`。读写存档前必须执行同一条幂等迁移链（按版本递增的代码块），迁移成功后立即持久化。新增或修改存档字段时，必须增加下一版本迁移节点、兼容旧字段默认值，并补充导入前校验与 JVM 单测。
+- 所有可清理缓存必须实现 `AppCache` 并向 `common/cache/AppCacheRegistry` 注册：`AppCacheSpec` 自带稳定 id、文案资源与存储层；`register` 返回 `AppCacheRegistration`，模块级持有者必须在 `onCleared()` / `onDestroy()` 关闭（应用级常驻缓存除外）。设置页「清除缓存」必须从 `snapshot()` 自动派生构成条与图例，禁止在 UI 里再维护 kind → 文案清单；磁盘缓存一律通过 `DirectoryAppCache` 声明目录，删除只允许发生在已注册目录的 canonical 子树内（跳过符号链接），自定义磁盘缓存目录不得与已注册目录重叠，不得删除用户存档、原始图片或静态资产。
+- 存档必须携带三段式 `archiveSchemaVersion`（`major` / `minor` / `patch`）与当前安装包版本（通过 `model/archive/ArchiveVersion.kt` 读取）；缺失版本字段统一视为 `0.0.0`，旧单整数版本映射为历史 `0.0.x`。读写存档前必须执行同一条幂等迁移链（按版本递增的代码块），迁移成功后立即持久化。新增或修改存档字段时，必须增加下一版本迁移节点、兼容旧字段默认值，并补充导入前校验与 JVM 单测。新增存档领域（`user_archives/<uid>/` 下多一个文件）必须同时登记到 `model/archive/ArchiveDomainRegistry.kt` 的 `ArchiveDomains`：导出、导入校验、附件路径改写、预览目录树、`manifest.json`、诊断全部由它派生，禁止再新增手写的领域/文件名清单；`ArchiveDomainRegistryTest` 会对 `UserArchiveBundle` 字段与注册表做双向比对。
 - 敏感存档导入导出默认通过 `model/archive/SensitiveArchiveCodec`：先序列化为 JSON 或 CSV，再 GZIP 压缩并使用 PBKDF2 + AES-GCM 加密；导入时必须先完成解密、解压、格式版本校验与迁移，再替换本地存档。仅当产品明确提供“明文 JSON”操作时，允许经系统文件选择器读写；必须二次确认风险、提示文件未加密、禁止写入共享目录、日志或缓存目录，并在导入前完成格式版本校验与迁移。
 - 页面内容切换统一使用 `AnimatedPageContent`；主页默认采用 180ms 短距离横向进入与 140ms 横向退出，插值器使用 `FastOutSlowInEasing`，避免全屏淡入淡出导致的双层 Alpha 合成。横向导航必须按目标相对位置决定方向：切往右侧/后续项时旧页向左退出、新页从右进入；切往左侧/前序项时旧页向右退出、新页从左进入。切换未结束时必须禁用重复导航点击，避免叠加多个页面过渡。禁止在页面间使用突变替换或超过 300ms 的阻塞式动画。
 - 同一页面的图表/数据等二级内容切换复用上述标准或共享导航动画组件；动画必须在浅色和深色主题下均保持可辨识的前景与背景对比。
