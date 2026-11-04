@@ -6,8 +6,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- 记便签的语音录入；导入手机已有音频走 SAF，不需要读存储权限。 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
         android:name=".HealthDietProApplication"
@@ -96,6 +99,10 @@
         <activity
             android:name=".ui.price.PriceRecordActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.memo.MemoRecordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.sleep.SleepRecordActivity"
             android:exported="false" />

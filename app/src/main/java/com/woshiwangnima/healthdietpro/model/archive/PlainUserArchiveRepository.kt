@@ -274,6 +274,22 @@ internal class PlainUserArchiveRepository(
                     }
                 }
         }
+        // 便签语音：`voiceFile` 是裸文件名，导出侧的 prepare 已剔除失效块，
+        // 所以这里可以严格比对——引用不到附件说明档案被改坏了。
+        domains["notes"]?.let { domain ->
+            val archive = json.decodeDomain(
+                domain.toString(),
+                "notes",
+                com.woshiwangnima.healthdietpro.model.memo.MemoArchive.serializer(),
+            )
+            archive.notes.flatMap { it.blocks }
+                .filter { it.kind == com.woshiwangnima.healthdietpro.model.memo.MemoBlockKind.VOICE }
+                .forEach { block ->
+                    require("attachments/notes/voice/${block.voiceFile}" in paths) {
+                        "Memo voice file is not included in archive"
+                    }
+                }
+        }
     }
 
     /**
@@ -437,6 +453,7 @@ internal data class UserArchiveBundle(
     val containers: JsonElement? = null,
     val timers: JsonElement? = null,
     val prices: JsonElement? = null,
+    val notes: JsonElement? = null,
     val bloodGlucosePredictions: JsonElement? = null,
     val userPreferences: Map<String, UserArchivePreference> = emptyMap(),
     val attachments: List<UserArchiveAttachment> = emptyList(),

@@ -17,6 +17,10 @@ import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodArchive
 import com.woshiwangnima.healthdietpro.model.food.UserCustomFoodArchiveStore
 import com.woshiwangnima.healthdietpro.model.medication.MedicationArchive
 import com.woshiwangnima.healthdietpro.model.medication.MedicationArchiveStore
+import com.woshiwangnima.healthdietpro.model.memo.MemoArchive
+import com.woshiwangnima.healthdietpro.model.memo.MemoArchiveStore
+import com.woshiwangnima.healthdietpro.model.memo.MemoBlockKind
+import com.woshiwangnima.healthdietpro.model.memo.MemoVoiceStore
 import com.woshiwangnima.healthdietpro.model.price.PriceArchiveStore
 import com.woshiwangnima.healthdietpro.model.profile.BodyMetricsRepository
 import com.woshiwangnima.healthdietpro.model.sleep.SleepArchiveStore
@@ -231,6 +235,19 @@ internal val ArchiveDomains: List<ArchiveDomain> = listOf(
         },
     ),
     ArchiveDomain(
+        id = "notes",
+        fileName = "notes.json",
+        labelRes = R.string.archive_domain_notes,
+        // 语音文件按裸名存在 attachments/notes/voice/，导出前把找不到文件的块剔掉，
+        // 免得导出一份「笔记引用了档案里没有的音频」的档案，在导入端才报错。
+        prepare = ::pruneMissingMemoVoices,
+        extract = { it.notes },
+        attach = { bundle, element -> bundle.copy(notes = element) },
+        validate = { context, userId, element ->
+            MemoArchiveStore.forUser(context, userId).validateJson(element.toString())
+        },
+    ),
+    ArchiveDomain(
         id = "blood_glucose_predictions",
         fileName = "blood_glucose_predictions.json",
         labelRes = R.string.archive_domain_blood_glucose_predictions,
@@ -357,6 +374,35 @@ private fun rewriteCustomFoodImagePaths(
     return registryJson.parseToJsonElement(
         registryJson.encodeDomain(context, "custom_foods", archive.copy(foods = foods), UserCustomFoodArchive.serializer()),
     )
+}
+
+/** 便签：导出前剔除指向已不存在语音文件的块，保证档案自洽（附件收集是整目录扫的）。 */
+private fun pruneMissingMemoVoices(
+    context: Context,
+    userId: String,
+    domain: JsonElement,
+): ArchiveDomainPayload {
+    val archive = runCatching {
+        registryJson.decodeDomain(domain.toString(), "notes", MemoArchive.serializer())
+    }.getOrElse { return ArchiveDomainPayload(domain) }
+    val voices = MemoVoiceStore.forUser(context, userId)
+    var changed = false
+    val notes = archive.notes.map { note ->
+        val blocks = note.blocks.filter { block ->
+            block.kind != MemoBlockKind.VOICE || voices.detailFile(block.voiceFile) != null
+        }
+        if (blocks.size == note.blocks.size) {
+            note
+        } else {
+            changed = true
+            note.copy(blocks = blocks)
+        }
+    }
+    if (!changed) return ArchiveDomainPayload(domain)
+    val element = registryJson.parseToJsonElement(
+        registryJson.encodeDomain(context, "notes", archive.copy(notes = notes), MemoArchive.serializer()),
+    )
+    return ArchiveDomainPayload(element)
 }
 
 private fun rewriteMedicationAttachmentPaths(

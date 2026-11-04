@@ -56,6 +56,7 @@ class RecordViewModelTest {
             listOf(
                 RecordActionId.Container,
                 RecordActionId.Price,
+                RecordActionId.Memo,
                 RecordActionId.Habit,
                 RecordActionId.Feeling,
             ),
@@ -92,7 +93,7 @@ class RecordViewModelTest {
             sections[1].items.map { it.id },
         )
         assertEquals(
-            listOf(RecordActionId.Container, RecordActionId.Habit, RecordActionId.Feeling),
+            listOf(RecordActionId.Container, RecordActionId.Memo, RecordActionId.Habit, RecordActionId.Feeling),
             sections[4].items.map { it.id },
         )
         assertTrue(sections[0].items.isNotEmpty())

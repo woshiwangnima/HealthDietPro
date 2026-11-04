@@ -88,6 +88,7 @@ import com.woshiwangnima.healthdietpro.ui.record.BloodPressureActivity
 import com.woshiwangnima.healthdietpro.ui.record.DiseaseRecordActivity
 import com.woshiwangnima.healthdietpro.ui.record.WaterRecordActivity
 import com.woshiwangnima.healthdietpro.ui.container.ContainerRecordActivity
+import com.woshiwangnima.healthdietpro.ui.memo.MemoRecordActivity
 import com.woshiwangnima.healthdietpro.ui.price.PriceRecordActivity
 import com.woshiwangnima.healthdietpro.ui.sleep.SleepRecordActivity
 import com.woshiwangnima.healthdietpro.ui.diet.DietRecordActivity
@@ -103,6 +104,11 @@ import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestScreen
 import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestCategory
 import com.woshiwangnima.healthdietpro.ui.test.TestLandingScreen
 import com.woshiwangnima.healthdietpro.ui.test.CrossSectionUiTestScreen
+import com.woshiwangnima.healthdietpro.model.memo.MemoArchiveStore
+import com.woshiwangnima.healthdietpro.model.memo.MemoTestCommand
+import com.woshiwangnima.healthdietpro.model.memo.MemoTestCommandRunner
+import com.woshiwangnima.healthdietpro.model.memo.MemoTestResult
+import com.woshiwangnima.healthdietpro.model.memo.MemoVoiceStore
 import com.woshiwangnima.healthdietpro.common.ui.ComponentsPreviewScreen
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabPersistence
 import com.woshiwangnima.healthdietpro.util.UnitConverter
@@ -528,7 +534,7 @@ class MainActivity : BaseActivity() {
                     if (isVerified) {
                         when (testPage) {
                             TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.Features }, { testPage = TestPage.CommonUi }, { testPage = TestPage.CrossSection }, Modifier.fillMaxSize())
-                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTodayWaterRecords, ::addTestSearchHistories, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
+                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTodayWaterRecords, ::addTestSearchHistories, ::runMemoTestCommand, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
                             TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing }, includeStatusBarPadding = false)
                             TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
                             TestPage.CrossSection -> CrossSectionUiTestScreen(onBack = { testPage = TestPage.Landing }, Modifier.fillMaxSize())
@@ -723,6 +729,36 @@ class MainActivity : BaseActivity() {
         Toast.makeText(this, "已为当前用户添加 $count 条随机搜索历史", Toast.LENGTH_SHORT).show()
     }
 
+    /** 【测试指令 · 记便签】：指令自带参数，执行与结果反馈集中在模型层的 Runner 里。 */
+    private fun runMemoTestCommand(command: MemoTestCommand) {
+        ProfilePrefs.createDefaultIfEmpty(this)
+        val result = MemoTestCommandRunner(
+            store = MemoArchiveStore.current(this),
+            voices = MemoVoiceStore.current(this),
+            tempDir = cacheDir,
+        ).run(command)
+        Toast.makeText(this, describeMemoTestResult(result), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun describeMemoTestResult(result: MemoTestResult): String {
+        val parts = buildList {
+            if (result.createdNotes > 0) {
+                add(
+                    "已创建 ${result.createdNotes} 条随机笔记" +
+                        if (result.createdVoices > 0) "（含 ${result.createdVoices} 条语音）" else "",
+                )
+            }
+            if (result.deletedNotes > 0) add("已删除 ${result.deletedNotes} 条笔记")
+            if (result.createdFolders > 0) add("已创建 ${result.createdFolders} 个笔记文件夹")
+            if (result.deletedFolders > 0) add("已删除 ${result.deletedFolders} 个笔记文件夹")
+            if (result.createdTodos > 0) add("已创建 ${result.createdTodos} 条随机待办")
+            if (result.deletedTodos > 0) add("已删除 ${result.deletedTodos} 条待办")
+            if (result.updatedTodos > 0) add("已更新 ${result.updatedTodos} 条待办的勾选状态")
+            if (result.prunedVoiceFiles > 0) add("清理 ${result.prunedVoiceFiles} 个语音文件")
+        }
+        return parts.ifEmpty { listOf("没有可处理的数据") }.joinToString("，")
+    }
+
     private fun addYesterdayGlucoseSeries(count: Int) = addTestGlucoseSeries(daysAgo = 1, count = count, messageRes = R.string.test_gm_yesterday_glucose_added)
     private fun addTodayGlucoseSeries(count: Int) = addTestGlucoseSeries(daysAgo = 0, count = count, messageRes = R.string.test_gm_today_glucose_added)
 
@@ -785,6 +821,7 @@ class MainActivity : BaseActivity() {
             RecordActionId.Sleep -> startActivity(Intent(this, SleepRecordActivity::class.java))
             RecordActionId.Diet -> startActivity(Intent(this, DietRecordActivity::class.java))
             RecordActionId.Price -> startActivity(Intent(this, PriceRecordActivity::class.java))
+            RecordActionId.Memo -> startActivity(Intent(this, MemoRecordActivity::class.java))
             RecordActionId.Period,
             RecordActionId.Exercise,
             RecordActionId.Bowel,
@@ -816,6 +853,7 @@ class MainActivity : BaseActivity() {
             RecordActionId.Sleep -> startActivity(Intent(this, SleepRecordActivity::class.java).putExtra(SleepRecordActivity.EXTRA_OPEN_EDITOR, true))
             RecordActionId.Diet -> startActivity(Intent(this, DietRecordActivity::class.java).putExtra(DietRecordActivity.EXTRA_OPEN_EDITOR, true))
             RecordActionId.Price -> startActivity(Intent(this, PriceRecordActivity::class.java).putExtra(PriceRecordActivity.EXTRA_OPEN_EDITOR, true))
+            RecordActionId.Memo -> startActivity(Intent(this, MemoRecordActivity::class.java).putExtra(MemoRecordActivity.EXTRA_NEW_NOTE, true))
             else -> Unit
         }
     }

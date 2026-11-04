@@ -22,6 +22,7 @@ import com.woshiwangnima.healthdietpro.R
 import com.woshiwangnima.healthdietpro.common.ui.ActionSectionCard
 import com.woshiwangnima.healthdietpro.common.ui.AppIconTextButton
 import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
+import com.woshiwangnima.healthdietpro.model.memo.MemoTestCommand
 
 @Composable
 internal fun TestGmScreen(
@@ -33,6 +34,7 @@ internal fun TestGmScreen(
     onAddTodayGlucose: (Int) -> Unit,
     onAddTodayWater: (Int) -> Unit,
     onAddSearchHistories: (Int) -> Unit,
+    onRunMemoCommand: (MemoTestCommand) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -54,7 +56,7 @@ internal fun TestGmScreen(
                 OutlinedTextField(
                     value = countText,
                     onValueChange = { value -> if (value.all(Char::isDigit)) countText = value },
-                    label = { Text("每次添加条目数量（1 至 100）") },
+                    label = { Text("每次添加条目数量（1 至 100，供上方既有指令使用）") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
@@ -79,6 +81,11 @@ internal fun TestGmScreen(
                     AppIconTextButton("添加随机食材、食物和菜肴", R.drawable.ic_add, { onAddNutritionFoods(count) }, Modifier.fillMaxWidth())
                     AppIconTextButton("添加随机搜索历史", R.drawable.ic_add, { onAddSearchHistories(count) }, Modifier.fillMaxWidth())
                 }
+            }
+            // 按记录功能分类：每个记录功能一张（或多张）卡。
+            // 记便签起，指令自带参数输入，不再吃顶上的全局数量。
+            item {
+                MemoTestSection(onRun = onRunMemoCommand)
             }
         }
     }

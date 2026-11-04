@@ -111,7 +111,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 ## 5. 单测基线
 
-`testDebugUnitTest` 当前 **403 项，397 过，6 失败**。
+`testDebugUnitTest` 当前 **432 项，426 过，6 失败**。
 失败的 6 项全部是 `FoodNutrientRepositoryTest`（food 资产标签/密度数据问题，编号 Q-6），
 **与本轮改动无关，属既有问题**。只要不是新出现的失败，就算通过。
 
@@ -234,7 +234,7 @@ git -c http.sslBackend=openssl \
 | AAB SHA-256 | `9B91B2BF107464FC48A20117723827EE7F720B2856FBCA4E008E39700765FD06` |
 | 签名 | `V2 Signer`：`CN=HealthDietPro, OU=Dev, O=woshiwangnima, L=Shenzhen, ST=Guangdong, C=CN` |
 | 证书 SHA-256 | `04ab3e1f7a7e4cf2785d3d6f1679b2f766b793c3609aa9acbbe5b30771dc57fb` |
-| 单测 | 403 项 397 过；6 条既有 `FoodNutrientRepositoryTest`（Q-6）失败 |
+| 单测 | 432 项 426 过；6 条既有 `FoodNutrientRepositoryTest`（Q-6）失败 |
 | Lint | `lintVitalRelease` 通过 |
 
 > 构建日志里两条 `Multiple substitutions ... nutrition_help_*` 是既有资源警告，不影响产物；
