@@ -2,6 +2,7 @@ package com.woshiwangnima.healthdietpro.ui.profile.archive
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -343,7 +344,10 @@ internal class ArchiveTransferController(
                     )
                     reload()
                 },
-                onFailure = {
+                // 落盘阶段的异常只在界面上一句话带过，用户与开发都无从下手；
+                // 这里留一条带堆栈的日志，出问题时 `adb logcat -s ArchiveImport` 就能定位。
+                onFailure = { error ->
+                    Log.e(IMPORT_LOG_TAG, "import into archive failed (mode=$mode)", error)
                     uiState = uiState.copy(busy = false, failure = ArchiveFailure.IMPORT_FAILED)
                 },
             )
@@ -403,6 +407,8 @@ internal class ArchiveTransferController(
         return "health-diet-pro-$user-$stamp.${format.extension}"
     }
 }
+
+private const val IMPORT_LOG_TAG = "ArchiveImport"
 
 private fun Throwable.isPasswordFailure(): Boolean =
     this is AEADBadTagException ||

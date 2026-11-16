@@ -56,6 +56,24 @@ internal class MemoRepository(private val store: MemoArchiveStore) {
         archive.copy(todos = archive.todos.filterNot { it.id == merged.id } + merged)
     }
 
+    // —— 批量入口：语义都在 `MemoArchive` 的纯函数里，这里只负责「一次 update 一次落盘」。 ——
+
+    fun deleteNotes(noteIds: Set<String>): MemoArchive = store.update { it.deletedNotes(noteIds) }
+
+    fun moveNotes(noteIds: Set<String>, folderId: String?): MemoArchive =
+        store.update { it.movedNotes(noteIds, folderId) }
+
+    fun setNotesPinned(noteIds: Set<String>, pinned: Boolean): MemoArchive =
+        store.update { it.pinnedNotes(noteIds, pinned) }
+
+    fun deleteTodos(todoIds: Set<String>): MemoArchive = store.update { it.deletedTodos(todoIds) }
+
+    fun setTodosDone(
+        todoIds: Set<String>,
+        done: Boolean,
+        now: Long = System.currentTimeMillis(),
+    ): MemoArchive = store.update { it.todosDone(todoIds, done, now) }
+
     fun deleteTodo(todoId: String): MemoArchive = store.update { archive ->
         archive.copy(todos = archive.todos.filterNot { it.id == todoId })
     }

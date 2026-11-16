@@ -73,9 +73,9 @@ private fun MemoRoute(onFinish: () -> Unit, openNewNote: Boolean) {
                 editingNoteId = noteId
                 routeName = MemoRoute.NOTE_EDITOR.name
             },
-            onDeleteNote = viewModel::deleteNote,
-            onMoveNote = { note, folderId -> viewModel.moveNote(note.id, folderId) },
-            onTogglePin = { note -> viewModel.setNotePinned(note.id, !note.pinned) },
+            onDeleteNotes = viewModel::deleteNotes,
+            onMoveNotes = viewModel::moveNotes,
+            onPinNotes = viewModel::setNotesPinned,
             onCreateTodo = {
                 editingTodoId = null
                 routeName = MemoRoute.TODO_EDITOR.name
@@ -85,7 +85,8 @@ private fun MemoRoute(onFinish: () -> Unit, openNewNote: Boolean) {
                 routeName = MemoRoute.TODO_EDITOR.name
             },
             onToggleTodoItem = viewModel::toggleTodoItem,
-            onDeleteTodo = { todo -> viewModel.deleteTodo(todo.id) },
+            onDeleteTodos = viewModel::deleteTodos,
+            onCompleteTodos = viewModel::setTodosDone,
             onOpenSettings = { routeName = MemoRoute.SETTINGS.name },
             onBack = onFinish,
         )

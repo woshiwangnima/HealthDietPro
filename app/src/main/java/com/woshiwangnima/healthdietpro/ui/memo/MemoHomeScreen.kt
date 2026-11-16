@@ -1,6 +1,7 @@
 package com.woshiwangnima.healthdietpro.ui.memo
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,9 +22,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Checkbox
@@ -32,6 +37,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,6 +68,7 @@ import com.woshiwangnima.healthdietpro.common.ui.BaseScreen
 import com.woshiwangnima.healthdietpro.common.ui.ConfirmDialog
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabBar
 import com.woshiwangnima.healthdietpro.common.ui.DetailTabItem
+import com.woshiwangnima.healthdietpro.common.ui.adaptiveNavigationBarWindowInsets
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppBottomSheet
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppChipSelectedAlpha
 import com.woshiwangnima.healthdietpro.common.ui.designsystem.AppEmptyState
@@ -134,6 +141,10 @@ internal fun MemoArchive.notesFor(key: String): List<MemoNote> = when {
  *
  * 文件夹不做抽屉：笔记的层级通常只有两三层，用「面包屑 + 当前层子文件夹横滑」
  * 比抽屉少两次点击，也不会把整页内容挤成一条；面包屑跟着列表一起滚走，把纵向空间留给内容。
+ *
+ * **多选**：长按任一卡片进入多选，底部切换栏整条换成批量操作栏（全选 / 移动 / 置顶 / 删除）。
+ * 单条操作仍然走卡片行尾的省略号菜单——长按不再抢它，两种手势各管一件事：
+ * 长按 = 「这批要一起处理」，省略号 = 「就这一条」。
  */
 @Composable
 internal fun MemoHomeScreen(
@@ -145,22 +156,37 @@ internal fun MemoHomeScreen(
     folderOps: FolderOps,
     onCreateNote: () -> Unit,
     onOpenNote: (String) -> Unit,
-    onDeleteNote: (MemoNote) -> Unit,
-    onMoveNote: (MemoNote, String?) -> Unit,
-    onTogglePin: (MemoNote) -> Unit,
+    onDeleteNotes: (Set<String>) -> Unit,
+    onMoveNotes: (Set<String>, String?) -> Unit,
+    onPinNotes: (Set<String>, Boolean) -> Unit,
     onCreateTodo: () -> Unit,
     onOpenTodo: (String) -> Unit,
     onToggleTodoItem: (String, String) -> Unit,
-    onDeleteTodo: (MemoTodo) -> Unit,
+    onDeleteTodos: (Set<String>) -> Unit,
+    onCompleteTodos: (Set<String>, Boolean) -> Unit,
     onOpenSettings: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val tokens = LocalAppTokens.current
     val archive = uiState.archive
-    var movingNote by remember { mutableStateOf<MemoNote?>(null) }
-    var deletingNote by remember { mutableStateOf<MemoNote?>(null) }
-    var deletingTodo by remember { mutableStateOf<MemoTodo?>(null) }
-    var query by rememberSaveable { mutableStateOf("") }
+
+    // 两个板块各存一份选中集：切换板块时清空，避免「在笔记里选了两条，切到待办还亮着批量栏」。
+    var noteSelection by remember { mutableStateOf(emptySet<String>()) }
+    var todoSelection by remember { mutableStateOf(emptySet<String>()) }
+    // 多选**态**与选中集分开：全选后再点「取消全选」选中集会被清空，但用户还在多选里，
+    // 批量栏必须留着（否则一取消全选就整条消失，用户得重新长按才能继续）。
+    var selectMode by remember { mutableStateOf(false) }
+    var movingNotes by remember { mutableStateOf<Set<String>?>(null) }
+    var deletingNotes by remember { mutableStateOf<Set<String>?>(null) }
+    var deletingTodos by remember { mutableStateOf<Set<String>?>(null) }
+    // 笔记与待办各存一份搜索词：从笔记切到待办时，不该拿「标题/正文/路径」去筛待办项。
+    var noteQuery by rememberSaveable { mutableStateOf("") }
+    var todoQuery by rememberSaveable { mutableStateOf("") }
+
+    fun clearSelection() {
+        noteSelection = emptySet()
+        todoSelection = emptySet()
+        selectMode = false
+    }
 
     val tabs = remember {
         listOf(
@@ -170,17 +196,46 @@ internal fun MemoHomeScreen(
     }
     val selectedIndex = tabs.indexOfFirst { it.id == tab.id }.coerceAtLeast(0)
 
+    val query = if (tab == MemoTab.NOTES) noteQuery else todoQuery
+    val searching = query.isNotBlank()
+    val visibleNotes = (
+        if (searching && tab == MemoTab.NOTES) {
+            archive.notes.filter { it.matchesQuery(query, archive.folders.pathStringOf(it.folderId)) }
+        } else {
+            archive.notesFor(folderKey)
+        }
+        ).withPinnedFirst()
+    val visibleTodos = (
+        if (searching && tab == MemoTab.TODOS) {
+            archive.todos.filter { it.matchesQuery(query) }
+        } else {
+            archive.todos
+        }
+        ).sortedForDisplay()
+
+    val selection = if (tab == MemoTab.NOTES) noteSelection else todoSelection
+    val selecting = selectMode
+    val visibleIds = if (tab == MemoTab.NOTES) {
+        visibleNotes.mapTo(LinkedHashSet()) { it.id }
+    } else {
+        visibleTodos.mapTo(LinkedHashSet()) { it.id }
+    }
+    val allSelected = visibleIds.isNotEmpty() && visibleIds.all { it in selection }
+
+    BackHandler(enabled = selecting) { clearSelection() }
+
     BaseScreen(
         title = stringResource(R.string.memo_title),
-        onBack = onBack,
-        // 底部让给 DetailTabBar，由它自己处理系统导航栏安全区。
+        // 多选态下返回先退多选：顶栏返回与系统返回手势行为保持一致。
+        onBack = { if (selecting) clearSelection() else onBack() },
+        // 底部让给 DetailTabBar / 批量栏，由它们自己处理系统导航栏安全区。
         includeNavigationBarPadding = false,
         actions = {
             IconButton(onClick = onOpenSettings) {
                 Icon(
                     painter = painterResource(R.drawable.ic_settings),
                     contentDescription = stringResource(R.string.memo_settings_title),
-                    tint = tokens.colors.primary,
+                    tint = LocalAppTokens.current.colors.primary,
                 )
             }
         },
@@ -191,12 +246,15 @@ internal fun MemoHomeScreen(
                 onCreateNote = onCreateNote,
                 onCreateTodo = onCreateTodo,
             )
-            if (tab == MemoTab.NOTES) {
-                MemoSearchField(
-                    query = query,
-                    onQueryChange = { query = it },
-                )
-            }
+            MemoSearchField(
+                query = query,
+                hint = stringResource(
+                    if (tab == MemoTab.NOTES) R.string.memo_search_hint else R.string.memo_search_todo_hint,
+                ),
+                onQueryChange = { next ->
+                    if (tab == MemoTab.NOTES) noteQuery = next else todoQuery = next
+                },
+            )
             AnimatedPageContent(
                 selectedIndex,
                 Modifier.weight(1f),
@@ -204,70 +262,176 @@ internal fun MemoHomeScreen(
             ) { index ->
                 if (tabs[index].id == MemoTab.TODOS.id) {
                     TodoTab(
-                        todos = archive.todos.sortedForDisplay(),
+                        todos = visibleTodos,
+                        searching = searching,
+                        selectionMode = selecting,
+                        selection = todoSelection,
                         onOpenTodo = onOpenTodo,
                         onToggleTodoItem = onToggleTodoItem,
-                        onDeleteTodo = { deletingTodo = it },
+                        onToggleSelect = { todoId ->
+                            selectMode = true
+                            todoSelection = todoSelection.toggle(todoId)
+                        },
+                        onDeleteTodo = { todo -> deletingTodos = setOf(todo.id) },
                     )
                 } else {
                     NoteTab(
                         archive = archive,
-                        folderKey = folderKey,
+                        notes = visibleNotes,
+                        searching = searching,
                         query = query,
+                        folderKey = folderKey,
+                        selectionMode = selecting,
+                        selection = noteSelection,
                         onSelectFolder = onSelectFolder,
                         onOpenNote = onOpenNote,
-                        onMoveNote = { movingNote = it },
-                        onTogglePin = onTogglePin,
-                        onDeleteNote = { deletingNote = it },
+                        onToggleSelect = { noteId ->
+                            selectMode = true
+                            noteSelection = noteSelection.toggle(noteId)
+                        },
+                        onMoveNote = { note -> movingNotes = setOf(note.id) },
+                        onTogglePin = { note -> onPinNotes(setOf(note.id), !note.pinned) },
+                        onDeleteNote = { note -> deletingNotes = setOf(note.id) },
                     )
                 }
             }
-            DetailTabBar(items = tabs, selectedId = tabs[selectedIndex].id) { item ->
-                onSelectTab(MemoTab.ofId(item.id))
+            if (selecting) {
+                if (tab == MemoTab.NOTES) {
+                    MemoBatchBar(
+                        count = noteSelection.size,
+                        allSelected = allSelected,
+                        onToggleSelectAll = {
+                            noteSelection = if (allSelected) emptySet() else visibleIds
+                        },
+                        onExit = { clearSelection() },
+                    ) {
+                        val hasSelection = noteSelection.isNotEmpty()
+                        BatchAction(
+                            text = stringResource(R.string.memo_batch_move),
+                            iconRes = R.drawable.ic_folder,
+                            enabled = hasSelection,
+                            onClick = { movingNotes = noteSelection },
+                        )
+                        val allPinned = noteSelection.all { id ->
+                            archive.notes.firstOrNull { it.id == id }?.pinned == true
+                        }
+                        BatchAction(
+                            text = stringResource(
+                                if (allPinned) R.string.memo_note_unpin else R.string.memo_note_pin,
+                            ),
+                            iconRes = R.drawable.ic_pin,
+                            enabled = hasSelection,
+                            onClick = { onPinNotes(noteSelection, !allPinned) },
+                        )
+                        BatchAction(
+                            text = stringResource(R.string.memo_delete),
+                            iconRes = R.drawable.ic_delete,
+                            enabled = hasSelection,
+                            danger = true,
+                            onClick = { deletingNotes = noteSelection },
+                        )
+                    }
+                } else {
+                    MemoBatchBar(
+                        count = todoSelection.size,
+                        allSelected = allSelected,
+                        onToggleSelectAll = {
+                            todoSelection = if (allSelected) emptySet() else visibleIds
+                        },
+                        onExit = { clearSelection() },
+                    ) {
+                        val hasSelection = todoSelection.isNotEmpty()
+                        BatchAction(
+                            text = stringResource(R.string.memo_batch_todo_done),
+                            iconRes = R.drawable.ic_check,
+                            enabled = hasSelection,
+                            onClick = {
+                                onCompleteTodos(todoSelection, true)
+                                clearSelection()
+                            },
+                        )
+                        BatchAction(
+                            text = stringResource(R.string.memo_batch_todo_undo),
+                            iconRes = R.drawable.ic_undo,
+                            enabled = hasSelection,
+                            onClick = {
+                                onCompleteTodos(todoSelection, false)
+                                clearSelection()
+                            },
+                        )
+                        BatchAction(
+                            text = stringResource(R.string.memo_delete),
+                            iconRes = R.drawable.ic_delete,
+                            enabled = hasSelection,
+                            danger = true,
+                            onClick = { deletingTodos = todoSelection },
+                        )
+                    }
+                }
+            } else {
+                DetailTabBar(items = tabs, selectedId = tabs[selectedIndex].id) { item ->
+                    clearSelection()
+                    onSelectTab(MemoTab.ofId(item.id))
+                }
             }
         }
     }
 
-    movingNote?.let { note ->
+    movingNotes?.let { ids ->
         MoveNoteSheet(
             folders = archive.folders,
             ops = folderOps,
-            onDismiss = { movingNote = null },
+            onDismiss = { movingNotes = null },
             onSelect = { folderId ->
-                onMoveNote(note, folderId)
-                movingNote = null
+                onMoveNotes(ids, folderId)
+                movingNotes = null
+                clearSelection()
             },
         )
     }
 
-    deletingNote?.let { note ->
+    deletingNotes?.let { ids ->
         ConfirmDialog(
-            title = stringResource(R.string.memo_delete_note_title),
+            title = if (ids.size > 1) {
+                stringResource(R.string.memo_batch_delete_note_title, ids.size)
+            } else {
+                stringResource(R.string.memo_delete_note_title)
+            },
             message = stringResource(R.string.memo_delete_note_message),
             confirmText = stringResource(R.string.memo_delete),
             cancelText = stringResource(R.string.common_cancel),
             onConfirm = {
-                onDeleteNote(note)
-                deletingNote = null
+                onDeleteNotes(ids)
+                deletingNotes = null
+                clearSelection()
             },
-            onDismiss = { deletingNote = null },
+            onDismiss = { deletingNotes = null },
         )
     }
 
-    deletingTodo?.let { todo ->
+    deletingTodos?.let { ids ->
         ConfirmDialog(
-            title = stringResource(R.string.memo_delete_todo_title),
+            title = if (ids.size > 1) {
+                stringResource(R.string.memo_batch_delete_todo_title, ids.size)
+            } else {
+                stringResource(R.string.memo_delete_todo_title)
+            },
             message = stringResource(R.string.memo_delete_todo_message),
             confirmText = stringResource(R.string.memo_delete),
             cancelText = stringResource(R.string.common_cancel),
             onConfirm = {
-                onDeleteTodo(todo)
-                deletingTodo = null
+                onDeleteTodos(ids)
+                deletingTodos = null
+                clearSelection()
             },
-            onDismiss = { deletingTodo = null },
+            onDismiss = { deletingTodos = null },
         )
     }
 }
+
+/** 选中集合的开关：点一下进、再点一下出，空了就自动退出多选（`selecting` 由它派生）。 */
+private fun Set<String>.toggle(id: String): Set<String> =
+    if (id in this) this - id else this + id
 
 /**
  * 顶部常驻的新建入口（参考记睡眠页顶部两个记录按钮）。
@@ -345,6 +509,7 @@ internal fun MemoPillAction(
 @Composable
 private fun MemoSearchField(
     query: String,
+    hint: String,
     onQueryChange: (String) -> Unit,
 ) {
     val tokens = LocalAppTokens.current
@@ -382,7 +547,7 @@ private fun MemoSearchField(
                 Box {
                     if (query.isEmpty()) {
                         Text(
-                            text = stringResource(R.string.memo_search_hint),
+                            text = hint,
                             style = tokens.type.bodyS,
                             color = tokens.colors.textMuted,
                         )
@@ -409,23 +574,20 @@ private fun MemoSearchField(
 @Composable
 private fun NoteTab(
     archive: MemoArchive,
-    folderKey: String,
+    notes: List<MemoNote>,
+    searching: Boolean,
     query: String,
+    folderKey: String,
+    selectionMode: Boolean,
+    selection: Set<String>,
     onSelectFolder: (String) -> Unit,
     onOpenNote: (String) -> Unit,
+    onToggleSelect: (String) -> Unit,
     onMoveNote: (MemoNote) -> Unit,
     onTogglePin: (MemoNote) -> Unit,
     onDeleteNote: (MemoNote) -> Unit,
 ) {
     val tokens = LocalAppTokens.current
-    val searching = query.isNotBlank()
-    val notes = (
-        if (searching) {
-            archive.notes.filter { it.matchesQuery(query, archive.folders.pathStringOf(it.folderId)) }
-        } else {
-            archive.notesFor(folderKey)
-        }
-        ).withPinnedFirst()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().fillMaxWidth(),
@@ -479,7 +641,10 @@ private fun NoteTab(
                     archive.folderName(note.folderId)
                 },
                 query = query,
+                selectionMode = selectionMode,
+                selected = note.id in selection,
                 onOpen = { onOpenNote(note.id) },
+                onToggleSelect = { onToggleSelect(note.id) },
                 onMove = { onMoveNote(note) },
                 onTogglePin = { onTogglePin(note) },
                 onDelete = { onDeleteNote(note) },
@@ -491,8 +656,12 @@ private fun NoteTab(
 @Composable
 private fun TodoTab(
     todos: List<MemoTodo>,
+    searching: Boolean,
+    selectionMode: Boolean,
+    selection: Set<String>,
     onOpenTodo: (String) -> Unit,
     onToggleTodoItem: (String, String) -> Unit,
+    onToggleSelect: (String) -> Unit,
     onDeleteTodo: (MemoTodo) -> Unit,
 ) {
     val tokens = LocalAppTokens.current
@@ -506,19 +675,43 @@ private fun TodoTab(
         ),
         verticalArrangement = Arrangement.spacedBy(tokens.spacing.s3),
     ) {
+        if (searching) {
+            item(key = "search-count") {
+                Text(
+                    text = stringResource(R.string.memo_search_todo_result_count, todos.size),
+                    style = tokens.type.caption,
+                    color = tokens.colors.textMuted,
+                )
+            }
+        }
         if (todos.isEmpty()) {
             item {
                 AppEmptyState(
-                    title = stringResource(R.string.memo_empty_todos_title),
-                    description = stringResource(R.string.memo_empty_todos_desc),
-                    iconRes = R.drawable.ic_todo,
+                    title = stringResource(
+                        if (searching) {
+                            R.string.memo_search_todo_empty_title
+                        } else {
+                            R.string.memo_empty_todos_title
+                        },
+                    ),
+                    description = stringResource(
+                        if (searching) {
+                            R.string.memo_search_todo_empty_desc
+                        } else {
+                            R.string.memo_empty_todos_desc
+                        },
+                    ),
+                    iconRes = if (searching) R.drawable.ic_search else R.drawable.ic_todo,
                 )
             }
         }
         items(todos, key = MemoTodo::id) { todo ->
             TodoCard(
                 todo = todo,
+                selectionMode = selectionMode,
+                selected = todo.id in selection,
                 onOpen = { onOpenTodo(todo.id) },
+                onToggleSelect = { onToggleSelect(todo.id) },
                 onToggle = { item -> onToggleTodoItem(todo.id, item.id) },
                 onDelete = { onDeleteTodo(todo) },
             )
@@ -591,7 +784,8 @@ private fun FolderBar(
         ) {
             if (!rootMode) {
                 FolderChip(
-                    text = stringResource(R.string.memo_folder_up),
+                    name = stringResource(R.string.memo_folder_up),
+                    count = null,
                     selected = false,
                     onClick = {
                         val parentId = path.dropLast(1).lastOrNull()?.id
@@ -600,19 +794,22 @@ private fun FolderBar(
                 )
             } else {
                 FolderChip(
-                    text = stringResource(R.string.memo_filter_all),
+                    name = stringResource(R.string.memo_filter_all),
+                    count = archive.notes.size,
                     selected = folderKey == MEMO_FILTER_ALL,
                     onClick = { onSelectFolder(MEMO_FILTER_ALL) },
                 )
                 FolderChip(
-                    text = stringResource(R.string.memo_filter_unfiled),
+                    name = stringResource(R.string.memo_filter_unfiled),
+                    count = archive.notes.count { it.folderId == null },
                     selected = folderKey == MEMO_FILTER_UNFILED,
                     onClick = { onSelectFolder(MEMO_FILTER_UNFILED) },
                 )
             }
             children.forEach { folder ->
                 FolderChip(
-                    text = folderChipLabel(archive, folder),
+                    name = folder.name,
+                    count = archive.notes.count { it.folderId == folder.id },
                     selected = currentFolderId == folder.id,
                     onClick = { onSelectFolder(memoFolderKey(folder.id)) },
                 )
@@ -621,21 +818,23 @@ private fun FolderBar(
     }
 }
 
+/**
+ * 文件夹胶囊：名称与笔记数分成两段文字。
+ *
+ * 数字单独一色是因为它跟名称同色时，「工作 12」会被读成一个词；分色后名称是主体、
+ * 数字是计数。两态的取色都保证与名称形成对比：未选中名称是次要灰、数字用主色；
+ * 选中时胶囊底是主色容器，名称保留主色、数字换成容器上的高对比前景色。
+ */
 @Composable
-private fun folderChipLabel(archive: MemoArchive, folder: MemoFolder): String {
-    val count = archive.notes.count { it.folderId == folder.id }
-    return if (count > 0) "${folder.name} $count" else folder.name
-}
-
-@Composable
-private fun FolderChip(text: String, selected: Boolean, onClick: () -> Unit) {
+private fun FolderChip(
+    name: String,
+    count: Int?,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
     val tokens = LocalAppTokens.current
     val shape = RoundedCornerShape(tokens.radii.pill)
-    Text(
-        text = text,
-        style = tokens.type.caption,
-        color = if (selected) tokens.colors.primary else tokens.colors.textMuted,
-        maxLines = 1,
+    Row(
         modifier = Modifier
             .clip(shape)
             .background(if (selected) tokens.colors.primaryContainer else tokens.colors.panel)
@@ -643,7 +842,24 @@ private fun FolderChip(text: String, selected: Boolean, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .heightIn(min = 32.dp)
             .padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s1),
-    )
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = name,
+            style = tokens.type.caption,
+            color = if (selected) tokens.colors.primary else tokens.colors.textMuted,
+            maxLines = 1,
+        )
+        if (count != null && count > 0) {
+            Spacer(Modifier.width(tokens.spacing.s1))
+            Text(
+                text = count.toString(),
+                style = tokens.type.caption.copy(fontWeight = FontWeight.SemiBold),
+                color = if (selected) tokens.colors.onPrimaryContainer else tokens.colors.primary,
+                maxLines = 1,
+            )
+        }
+    }
 }
 
 /**
@@ -653,14 +869,20 @@ private fun FolderChip(text: String, selected: Boolean, onClick: () -> Unit) {
  * 与文件夹行尾的【更多】同一套语法。置顶只改排序标记，不碰内容也不压历史版本；
  * 复制文件夹路径是为了之后的搜索：把路径粘进搜索框就能直达那个文件夹下的笔记。
  * 搜索态下标题与摘要里的关键词用主色加粗高亮，扫一眼就知道为什么这条会出现在结果里。
+ *
+ * 多选时行尾换成勾选圈、点卡片改为选中：这时候「打开这条笔记」不是用户想做的事。
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NoteCard(
     note: MemoNote,
     folderPath: String,
     folderLabel: String?,
     query: String,
+    selectionMode: Boolean,
+    selected: Boolean,
     onOpen: () -> Unit,
+    onToggleSelect: () -> Unit,
     onMove: () -> Unit,
     onTogglePin: () -> Unit,
     onDelete: () -> Unit,
@@ -674,9 +896,16 @@ private fun NoteCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(tokens.colors.panelRaised)
-            .border(tokens.radii.highlight, tokens.colors.border, shape)
-            .clickable(onClick = onOpen)
+            .background(if (selected) tokens.colors.primary.copy(alpha = 0.08f) else tokens.colors.panelRaised)
+            .border(
+                if (selected) 1.5.dp else tokens.radii.highlight,
+                if (selected) tokens.colors.primary else tokens.colors.border,
+                shape,
+            )
+            .combinedClickable(
+                onClick = { if (selectionMode) onToggleSelect() else onOpen() },
+                onLongClick = { onToggleSelect() },
+            )
             .padding(start = tokens.spacing.s3, end = tokens.spacing.s1, top = tokens.spacing.s3, bottom = tokens.spacing.s2),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -696,55 +925,59 @@ private fun NoteCard(
                 maxLines = 2,
                 modifier = Modifier.weight(1f),
             )
-            Box {
-                IconButton(onClick = { menuOpen = true }, modifier = Modifier.size(tokens.spacing.hitMin)) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_more_vert),
-                        contentDescription = stringResource(R.string.memo_note_more),
-                        tint = tokens.colors.textMuted,
-                    )
-                }
-                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.memo_move_to)) },
-                        onClick = {
-                            menuOpen = false
-                            onMove()
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                stringResource(
-                                    if (note.pinned) R.string.memo_note_unpin else R.string.memo_note_pin,
-                                ),
-                            )
-                        },
-                        onClick = {
-                            menuOpen = false
-                            onTogglePin()
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.memo_note_copy_path)) },
-                        onClick = {
-                            menuOpen = false
-                            if (folderPath.isBlank()) {
-                                Toast.makeText(context, R.string.memo_note_copy_path_none, Toast.LENGTH_SHORT).show()
-                            } else {
-                                clipboard.setText(AnnotatedString(folderPath))
-                                Toast.makeText(context, R.string.memo_note_copy_path_done, Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                    )
-                    HorizontalDivider(color = tokens.colors.border)
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.memo_delete), color = tokens.colors.danger) },
-                        onClick = {
-                            menuOpen = false
-                            onDelete()
-                        },
-                    )
+            if (selectionMode) {
+                SelectionMark(selected = selected, onToggle = onToggleSelect)
+            } else {
+                Box {
+                    IconButton(onClick = { menuOpen = true }, modifier = Modifier.size(tokens.spacing.hitMin)) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_more_vert),
+                            contentDescription = stringResource(R.string.memo_note_more),
+                            tint = tokens.colors.textMuted,
+                        )
+                    }
+                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.memo_move_to)) },
+                            onClick = {
+                                menuOpen = false
+                                onMove()
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    stringResource(
+                                        if (note.pinned) R.string.memo_note_unpin else R.string.memo_note_pin,
+                                    ),
+                                )
+                            },
+                            onClick = {
+                                menuOpen = false
+                                onTogglePin()
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.memo_note_copy_path)) },
+                            onClick = {
+                                menuOpen = false
+                                if (folderPath.isBlank()) {
+                                    Toast.makeText(context, R.string.memo_note_copy_path_none, Toast.LENGTH_SHORT).show()
+                                } else {
+                                    clipboard.setText(AnnotatedString(folderPath))
+                                    Toast.makeText(context, R.string.memo_note_copy_path_done, Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                        )
+                        HorizontalDivider(color = tokens.colors.border)
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.memo_delete), color = tokens.colors.danger) },
+                            onClick = {
+                                menuOpen = false
+                                onDelete()
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -759,15 +992,80 @@ private fun NoteCard(
                 modifier = Modifier.padding(end = tokens.spacing.s2, top = tokens.spacing.s1),
             )
         }
-        MemoMetaLine(
-            parts = buildList {
-                add(formatMemoTime(note.updatedAtMillis))
-                add(stringResource(R.string.memo_meta_words, note.wordCount))
-                if (note.voiceCount > 0) add(stringResource(R.string.memo_meta_voices, note.voiceCount))
-                folderLabel?.let { add(it) }
-            },
-            modifier = Modifier.padding(top = tokens.spacing.s2, end = tokens.spacing.s2),
-        )
+        // 页脚分两角：左下是「时间 + 字数 + 语音数」（时间带年份，跨年翻旧笔记不会误读），
+        // 右下是分类。分类靠右是为了让同类卡片的归属对齐成一列，扫一眼就能按文件夹分组看。
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = tokens.spacing.s2, end = tokens.spacing.s2),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = buildList {
+                    add(formatMemoTimeFull(note.updatedAtMillis))
+                    add(stringResource(R.string.memo_meta_words, note.wordCount))
+                    if (note.voiceCount > 0) add(stringResource(R.string.memo_meta_voices, note.voiceCount))
+                }.joinToString(" · "),
+                style = tokens.type.caption,
+                color = tokens.colors.textMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            if (!folderLabel.isNullOrBlank()) {
+                Spacer(Modifier.width(tokens.spacing.s2))
+                Icon(
+                    painter = painterResource(R.drawable.ic_folder),
+                    contentDescription = null,
+                    tint = tokens.colors.textMuted,
+                    modifier = Modifier.size(12.dp),
+                )
+                Spacer(Modifier.width(tokens.spacing.s1))
+                Text(
+                    text = folderLabel,
+                    style = tokens.type.caption,
+                    color = tokens.colors.textMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.widthIn(max = 150.dp),
+                )
+            }
+        }
+    }
+}
+
+/** 多选勾选圈：20dp 圆形，选中时填主色 + 对勾；点击区域仍是整行高的 48dp。 */
+@Composable
+private fun SelectionMark(selected: Boolean, onToggle: () -> Unit) {
+    val tokens = LocalAppTokens.current
+    Box(
+        modifier = Modifier
+            .size(tokens.spacing.hitMin)
+            .clip(CircleShape)
+            .clickable(onClick = onToggle),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(20.dp)
+                .clip(CircleShape)
+                .background(if (selected) tokens.colors.primary else Color.Transparent)
+                .border(
+                    width = if (selected) 0.dp else 1.5.dp,
+                    color = if (selected) tokens.colors.primary else tokens.colors.borderStrong,
+                    shape = CircleShape,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (selected) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_check),
+                    contentDescription = null,
+                    tint = tokens.colors.onPrimary,
+                    modifier = Modifier.size(14.dp),
+                )
+            }
+        }
     }
 }
 
@@ -825,96 +1123,151 @@ private fun HighlightedText(
  * - **多项时标题固定【待办清单】**：这里不再是「给这条待办起名字」，而是「这一摞事」，
  *   名字随内容变会让同一张卡每次刷新都换个抬头；
  * - 多项卡右侧才有 `完成/总数` 与展开收起箭头：单项时没有可折叠的内容，摆一个箭头是骗点击；
- * - 点卡片进编辑，长按出菜单（目前只有删除），勾选只动勾选框本身——
- *   三种手势各自的落点写在卡片上，不用再额外摆一排图标。
+ * - 行尾固定一个省略号【更多】给单条操作（目前只有删除），长按留给多选——
+ *   与笔记卡同一套手势语法：长按 = 批处理，省略号 = 就这一条。
+ * - 多选态下待办项的勾选框**暂时收起**：那个勾是「这一项做完了」，卡片的选中是「批处理这条」，
+ *   两个勾同屏时会点错也看不出错在哪。整行的点击此时统一归「选中这条」，要勾选先退出多选。
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TodoCard(
     todo: MemoTodo,
+    selectionMode: Boolean,
+    selected: Boolean,
     onOpen: () -> Unit,
+    onToggleSelect: () -> Unit,
     onToggle: (MemoTodoItem) -> Unit,
     onDelete: () -> Unit,
 ) {
     val tokens = LocalAppTokens.current
     val shape = RoundedCornerShape(tokens.radii.container)
-    var menuOpen by remember { mutableStateOf(false) }
     var expanded by remember(todo.id) { mutableStateOf(true) }
     val isList = todo.items.size > 1
 
-    Box {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape)
-                .background(tokens.colors.panelRaised)
-                .border(tokens.radii.highlight, tokens.colors.border, shape)
-                .combinedClickable(onClick = onOpen, onLongClick = { menuOpen = true })
-                .padding(vertical = if (isList) tokens.spacing.s1 else 0.dp),
-        ) {
-            if (isList) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = tokens.spacing.hitMin)
-                        .padding(start = tokens.spacing.s3, end = tokens.spacing.s1),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = stringResource(R.string.memo_todo_list_title),
-                        style = tokens.type.body.copy(fontWeight = FontWeight.SemiBold),
-                        color = tokens.colors.text,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Text(
-                        text = stringResource(R.string.memo_todo_progress, todo.doneCount, todo.items.size),
-                        style = tokens.type.caption,
-                        color = if (todo.isCompleted) tokens.colors.success else tokens.colors.textMuted,
-                    )
-                    IconButton(
-                        onClick = { expanded = !expanded },
-                        modifier = Modifier.size(tokens.spacing.hitMin),
-                    ) {
-                        Icon(
-                            painter = painterResource(
-                                if (expanded) R.drawable.ic_expand_less else R.drawable.ic_expand_more,
-                            ),
-                            contentDescription = stringResource(
-                                if (expanded) R.string.memo_todo_collapse else R.string.memo_todo_expand,
-                            ),
-                            tint = tokens.colors.textMuted,
-                        )
-                    }
-                }
-            }
-            val visibleItems = if (isList && !expanded) emptyList() else todo.displayItems()
-            visibleItems.forEach { item ->
-                TodoItemRow(item = item, onToggle = onToggle)
-            }
-            if (!isList && todo.items.isEmpty()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(if (selected) tokens.colors.primary.copy(alpha = 0.08f) else tokens.colors.panelRaised)
+            .border(
+                if (selected) 1.5.dp else tokens.radii.highlight,
+                if (selected) tokens.colors.primary else tokens.colors.border,
+                shape,
+            )
+            .combinedClickable(
+                onClick = { if (selectionMode) onToggleSelect() else onOpen() },
+                onLongClick = { onToggleSelect() },
+            )
+            .padding(vertical = if (isList) tokens.spacing.s1 else 0.dp),
+    ) {
+        if (isList) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = tokens.spacing.hitMin)
+                    .padding(start = tokens.spacing.s3, end = tokens.spacing.s1),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Text(
-                    text = stringResource(R.string.memo_untitled_todo),
-                    style = tokens.type.bodyS,
-                    color = tokens.colors.textMuted,
-                    modifier = Modifier.padding(
-                        start = tokens.spacing.s3,
-                        end = tokens.spacing.s3,
-                        top = tokens.spacing.s3,
-                        bottom = tokens.spacing.s3,
-                    ),
+                    text = stringResource(R.string.memo_todo_list_title),
+                    style = tokens.type.body.copy(fontWeight = FontWeight.SemiBold),
+                    color = tokens.colors.text,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = stringResource(R.string.memo_todo_progress, todo.doneCount, todo.items.size),
+                    style = tokens.type.caption,
+                    color = if (todo.isCompleted) tokens.colors.success else tokens.colors.textMuted,
+                )
+                IconButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.size(tokens.spacing.hitMin),
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            if (expanded) R.drawable.ic_expand_less else R.drawable.ic_expand_more,
+                        ),
+                        contentDescription = stringResource(
+                            if (expanded) R.string.memo_todo_collapse else R.string.memo_todo_expand,
+                        ),
+                        tint = tokens.colors.textMuted,
+                    )
+                }
+                TodoTrailing(
+                    selectionMode = selectionMode,
+                    selected = selected,
+                    onToggleSelect = onToggleSelect,
+                    onDelete = onDelete,
                 )
             }
-            if (isList) Spacer(Modifier.height(tokens.spacing.s1))
+            if (expanded) {
+                todo.displayItems().forEach { item ->
+                    TodoItemRow(item = item, onToggle = onToggle, selectionMode = selectionMode)
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = tokens.spacing.hitMin),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val item = todo.items.firstOrNull()
+                if (item == null) {
+                    Text(
+                        text = stringResource(R.string.memo_untitled_todo),
+                        style = tokens.type.bodyS,
+                        color = tokens.colors.textMuted,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = tokens.spacing.s3, end = tokens.spacing.s3),
+                    )
+                } else {
+                    TodoItemRow(
+                        item = item,
+                        onToggle = onToggle,
+                        modifier = Modifier.weight(1f),
+                        selectionMode = selectionMode,
+                    )
+                }
+                TodoTrailing(
+                    selectionMode = selectionMode,
+                    selected = selected,
+                    onToggleSelect = onToggleSelect,
+                    onDelete = onDelete,
+                )
+            }
         }
-        DropdownMenu(
-            expanded = menuOpen,
-            onDismissRequest = { menuOpen = false },
-            modifier = Modifier.align(Alignment.TopEnd),
-        ) {
+    }
+}
+
+/** 卡片行尾槽位：平常是省略号菜单，多选时换成勾选圈。 */
+@Composable
+private fun TodoTrailing(
+    selectionMode: Boolean,
+    selected: Boolean,
+    onToggleSelect: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    var menuOpen by remember { mutableStateOf(false) }
+    if (selectionMode) {
+        SelectionMark(selected = selected, onToggle = onToggleSelect)
+        return
+    }
+    Box {
+        IconButton(onClick = { menuOpen = true }, modifier = Modifier.size(tokens.spacing.hitMin)) {
+            Icon(
+                painter = painterResource(R.drawable.ic_more_vert),
+                contentDescription = stringResource(R.string.memo_note_more),
+                tint = tokens.colors.textMuted,
+            )
+        }
+        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.memo_delete)) },
+                text = { Text(stringResource(R.string.memo_delete), color = tokens.colors.danger) },
                 onClick = {
                     menuOpen = false
                     onDelete()
@@ -925,23 +1278,33 @@ private fun TodoCard(
 }
 
 @Composable
-private fun TodoItemRow(item: MemoTodoItem, onToggle: (MemoTodoItem) -> Unit) {
+private fun TodoItemRow(
+    item: MemoTodoItem,
+    onToggle: (MemoTodoItem) -> Unit,
+    modifier: Modifier = Modifier,
+    selectionMode: Boolean = false,
+) {
     val tokens = LocalAppTokens.current
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .heightIn(min = tokens.spacing.hitMin)
-            .padding(start = tokens.spacing.s2, end = tokens.spacing.s3),
+            .padding(start = tokens.spacing.s2, end = tokens.spacing.s1),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Checkbox(
-            checked = item.done,
-            onCheckedChange = { onToggle(item) },
-            colors = CheckboxDefaults.colors(
-                checkedColor = tokens.colors.primary,
-                uncheckedColor = tokens.colors.textMuted,
-            ),
-        )
+        // 多选时勾选框暂时收起：这里的勾是「这一项做完了」，卡片的选中是「批处理这条待办」，
+        // 两个勾并排出现时点错也看不出错的是哪一个。只留同宽空位，文字不左右跳。
+        if (selectionMode) {
+            Spacer(Modifier.width(48.dp))
+        } else {
+            Checkbox(
+                checked = item.done,
+                onCheckedChange = { onToggle(item) },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = tokens.colors.primary,
+                    uncheckedColor = tokens.colors.textMuted,
+                ),
+            )
+        }
         Text(
             text = item.text,
             style = tokens.type.bodyS,
@@ -953,21 +1316,135 @@ private fun TodoItemRow(item: MemoTodoItem, onToggle: (MemoTodoItem) -> Unit) {
     }
 }
 
+/**
+ * 多选操作栏：占据底部切换栏的位置。
+ *
+ * 顶行是「已选 N 项 + 全选 / 退出」，下面一行是批量动作——批量动作与切换栏同一个高度带，
+ * 拇指不用移动就能从「看列表」切到「处理这批」。删掉的动作不做二次确认以外的手势保护：
+ * 批量删除已经有一次确认弹窗，伤害面比误触一次勾选大得多。
+ */
 @Composable
-private fun MemoMetaLine(parts: List<String>, modifier: Modifier = Modifier) {
+private fun MemoBatchBar(
+    count: Int,
+    allSelected: Boolean,
+    onToggleSelectAll: () -> Unit,
+    onExit: () -> Unit,
+    actions: @Composable RowScope.() -> Unit,
+) {
     val tokens = LocalAppTokens.current
-    Text(
-        text = parts.joinToString(" · "),
-        style = tokens.type.caption,
-        color = tokens.colors.textMuted,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier,
-    )
+    Surface(
+        color = tokens.colors.panel,
+        shadowElevation = 12.dp,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(adaptiveNavigationBarWindowInsets())
+                .padding(
+                    start = tokens.spacing.page,
+                    end = tokens.spacing.page,
+                    top = tokens.spacing.s1,
+                    bottom = tokens.spacing.s2,
+                ),
+            verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.memo_batch_selected, count),
+                    style = tokens.type.bodyS.copy(fontWeight = FontWeight.SemiBold),
+                    color = tokens.colors.primary,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = stringResource(
+                        if (allSelected) R.string.memo_batch_clear_all else R.string.memo_batch_select_all,
+                    ),
+                    style = tokens.type.caption,
+                    color = tokens.colors.primary,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(tokens.radii.pill))
+                        .clickable(onClick = onToggleSelectAll)
+                        .padding(horizontal = tokens.spacing.s2, vertical = tokens.spacing.s1),
+                )
+                IconButton(onClick = onExit, modifier = Modifier.size(tokens.spacing.hitMin)) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_cancel),
+                        contentDescription = stringResource(R.string.memo_batch_exit),
+                        tint = tokens.colors.textMuted,
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+                content = actions,
+            )
+        }
+    }
+}
+
+/** 批量动作按钮：图标 + 文案等分一行，危险动作换成红字淡红底；没有选中项时置灰不可点。 */
+@Composable
+private fun RowScope.BatchAction(
+    text: String,
+    iconRes: Int,
+    enabled: Boolean = true,
+    danger: Boolean = false,
+    onClick: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    val shape = RoundedCornerShape(tokens.radii.pill)
+    val contentColor = when {
+        !enabled -> tokens.colors.disabled
+        danger -> tokens.colors.danger
+        else -> tokens.colors.text
+    }
+    val containerColor = when {
+        !enabled -> tokens.colors.panel
+        danger -> tokens.colors.danger.copy(alpha = 0.12f)
+        else -> tokens.colors.panelRaised
+    }
+    val borderColor = when {
+        !enabled -> tokens.colors.border
+        danger -> tokens.colors.danger.copy(alpha = 0.5f)
+        else -> tokens.colors.border
+    }
+    Row(
+        modifier = Modifier
+            .weight(1f)
+            .heightIn(min = 44.dp)
+            .clip(shape)
+            .background(containerColor)
+            .border(tokens.radii.highlight, borderColor, shape)
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = tokens.spacing.s2),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = contentColor,
+        )
+        Spacer(Modifier.width(tokens.spacing.s1))
+        Text(
+            text = text,
+            style = tokens.type.bodyS,
+            color = contentColor,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 internal fun formatMemoTime(millis: Long): String =
     SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(millis))
+
+/** 带年份的完整时刻：列表页脚与历史版本用，跨年翻旧内容时不会把 2025 的当成今年的。 */
+internal fun formatMemoTimeFull(millis: Long): String =
+    SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(millis))
 
 /**
  * 移动到文件夹。首页卡片菜单与笔记编辑器右上角菜单共用同一份。

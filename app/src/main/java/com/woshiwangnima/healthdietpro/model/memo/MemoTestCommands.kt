@@ -11,9 +11,6 @@ import kotlin.random.Random
  */
 internal sealed interface MemoTestCommand {
 
-    /** 创建 X 条随机笔记：无语音、未归档——最小可用的列表占位数据。 */
-    data class CreatePlainNotes(val count: Int) : MemoTestCommand
-
     /** 创建随机笔记（自定义参数）：块数 / 字数 / 语音 / 归档 / 置顶 / 历史版本 / 时间跨度全部可调。 */
     data class CreateRichNotes(
         val count: Int,
@@ -254,10 +251,6 @@ internal class MemoTestCommandRunner(
     private val tempDir: File? = null,
 ) {
     fun run(command: MemoTestCommand): MemoTestResult = when (command) {
-        is MemoTestCommand.CreatePlainNotes -> createNotes(
-            RandomNoteSpec(count = command.count, voiceBlocksPerNote = 0, assignToFolders = false),
-        )
-
         is MemoTestCommand.CreateRichNotes -> createNotes(
             RandomNoteSpec(
                 count = command.count,

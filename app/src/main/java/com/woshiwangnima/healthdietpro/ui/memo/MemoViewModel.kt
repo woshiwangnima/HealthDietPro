@@ -72,6 +72,20 @@ internal class MemoViewModel(application: Application) : AndroidViewModel(applic
 
     fun setNotePinned(noteId: String, pinned: Boolean) = mutate { it.setNotePinned(noteId, pinned) }
 
+    fun deleteNotes(noteIds: Set<String>) = mutate { repo ->
+        val archive = repo.deleteNotes(noteIds)
+        pruneOrphanVoices(archive)
+        archive
+    }
+
+    fun moveNotes(noteIds: Set<String>, folderId: String?) = mutate { it.moveNotes(noteIds, folderId) }
+
+    fun setNotesPinned(noteIds: Set<String>, pinned: Boolean) = mutate { it.setNotesPinned(noteIds, pinned) }
+
+    fun deleteTodos(todoIds: Set<String>) = mutate { it.deleteTodos(todoIds) }
+
+    fun setTodosDone(todoIds: Set<String>, done: Boolean) = mutate { it.setTodosDone(todoIds, done) }
+
     fun saveTodo(todo: MemoTodo) = mutate { it.saveTodo(todo) }
 
     fun deleteTodo(todoId: String) = mutate { it.deleteTodo(todoId) }

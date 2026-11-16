@@ -10,6 +10,7 @@ import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucoseArchiveSto
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionArchive
 import com.woshiwangnima.healthdietpro.model.bloodglucose.BloodGlucosePredictionArchiveStore
 import com.woshiwangnima.healthdietpro.model.bloodpressure.BloodPressureArchiveStore
+import com.woshiwangnima.healthdietpro.model.container.ContainerArchive
 import com.woshiwangnima.healthdietpro.model.container.ContainerArchiveStore
 import com.woshiwangnima.healthdietpro.model.diet.DietArchiveStore
 import com.woshiwangnima.healthdietpro.model.disease.UserDiseaseArchiveStore
@@ -211,6 +212,9 @@ internal val ArchiveDomains: List<ArchiveDomain> = listOf(
             ContainerArchiveStore.forUser(context, userId).validateJson(element.toString())
         },
         warmUp = { context, userId -> ContainerArchiveStore.forUser(context, userId).load() },
+        // 容器照片是 `user_archives/<uid>/attachments/containers/...` 形式的绝对相对路径，
+        // 导入到别的用户（新装设备必然如此）时必须跟着改，否则照片全丢。
+        rewrite = ::rewriteContainerAttachmentPaths,
     ),
     ArchiveDomain(
         id = "timers",
@@ -403,6 +407,34 @@ private fun pruneMissingMemoVoices(
         registryJson.encodeDomain(context, "notes", archive.copy(notes = notes), MemoArchive.serializer()),
     )
     return ArchiveDomainPayload(element)
+}
+
+/**
+ * 容器：`imagePaths` 与药品一样，是 `user_archives/<uid>/attachments/containers/...` 的路径。
+ *
+ * 缺了这一步，档案导入到新用户目录后容器照片会全部指向导出设备的目录而失效；
+ * 新装设备上导入必然换用户 id，所以这不是边缘情况。
+ */
+private fun rewriteContainerAttachmentPaths(
+    context: Context,
+    userId: String,
+    domain: JsonElement,
+): JsonElement {
+    val archive = registryJson.decodeDomain(domain.toString(), "containers", ContainerArchive.serializer())
+    val rootPath = userArchiveDirectory(context, userId).relativeTo(context.filesDir).invariantSeparatorsPath
+    fun rewrite(path: String): String = path
+        .substringAfter("/attachments/", missingDelimiterValue = "")
+        .takeIf { path.startsWith("user_archives/") && it.startsWith("containers/") }
+        ?.let { "$rootPath/attachments/$it" }
+        ?: path
+    val rewritten = archive.copy(
+        containers = archive.containers.map { container ->
+            container.copy(imagePaths = container.imagePaths.map(::rewrite))
+        },
+    )
+    return registryJson.parseToJsonElement(
+        registryJson.encodeDomain(context, "containers", rewritten, ContainerArchive.serializer()),
+    )
 }
 
 private fun rewriteMedicationAttachmentPaths(

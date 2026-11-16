@@ -264,4 +264,78 @@ class MemoModelsTest {
         assertTrue(target.matchesQuery("工作", folderPath = "工作/2026"))
         assertTrue(!target.matchesQuery("工作"))
     }
+
+    @Test
+    fun batchDeleteRemovesOnlySelectedIdsAndShortCircuitsOnEmpty() {
+        val archive = MemoArchive(
+            notes = listOf(note().copy(id = "n1"), note().copy(id = "n2"), note().copy(id = "n3")),
+        )
+        assertEquals(listOf("n2"), archive.deletedNotes(setOf("n1", "n3")).notes.map(MemoNote::id))
+        // 空集合 = 不动，连对象都不换（避免空批处理白写一次磁盘）。
+        assertSame(archive, archive.deletedNotes(emptySet()))
+    }
+
+    @Test
+    fun batchMoveAndPinLeaveUntouchedNotesAlone() {
+        val archive = MemoArchive(
+            notes = listOf(
+                note().copy(id = "n1", updatedAtMillis = 10L),
+                note().copy(id = "n2", updatedAtMillis = 20L),
+            ),
+        )
+        val moved = archive.movedNotes(setOf("n1"), "f1")
+        assertEquals(listOf("f1", null), moved.notes.map(MemoNote::folderId))
+        // 置顶是排序元数据：不刷更新时间，因此不会压历史版本。
+        val pinned = archive.pinnedNotes(setOf("n1"), true)
+        assertEquals(listOf(true, false), pinned.notes.map(MemoNote::pinned))
+        assertEquals(listOf(10L, 20L), pinned.notes.map(MemoNote::updatedAtMillis))
+    }
+
+    @Test
+    fun batchToggleMarksWholeTodoAndStampsAscendingTimes() {
+        val todo = MemoTodo(
+            id = "t1",
+            items = listOf(MemoTodoItem("i1", "a"), MemoTodoItem("i2", "b"), MemoTodoItem("i3", "c")),
+            createdAtMillis = 0L,
+            updatedAtMillis = 1L,
+        )
+        val other = todo.copy(id = "t2")
+        val archive = MemoArchive(todos = listOf(todo, other))
+        val done = archive.todosDone(setOf("t1"), done = true, now = 100L)
+        assertEquals(true, done.todos.first { it.id == "t1" }.isCompleted)
+        assertEquals(listOf(100L, 101L, 102L), done.todos.first { it.id == "t1" }.items.map(MemoTodoItem::doneAtMillis))
+        // 没被选中的那条原样不动（同一个实例，不是等价副本）。
+        assertSame(other, done.todos.first { it.id == "t2" })
+
+        val undone = done.todosDone(setOf("t1"), done = false, now = 200L)
+        assertEquals(false, undone.todos.first { it.id == "t1" }.items.any(MemoTodoItem::done))
+    }
+
+    @Test
+    fun markAllReturnsSameInstanceWhenAlreadyInTargetState() {
+        val allDone = MemoTodo(
+            id = "t",
+            items = listOf(MemoTodoItem("i1", "a", done = true, doneAtMillis = 5L)),
+            createdAtMillis = 0L,
+            updatedAtMillis = 1L,
+        )
+        assertSame(allDone, allDone.markAll(done = true, now = 99L))
+        val empty = MemoTodo(id = "empty", createdAtMillis = 0, updatedAtMillis = 0)
+        assertSame(empty, empty.markAll(true, 1L))
+    }
+
+    @Test
+    fun todoMatchesQueryLooksAtItemsAndIsCaseInsensitive() {
+        val todo = MemoTodo(
+            id = "t",
+            items = listOf(MemoTodoItem("i1", "买牛奶"), MemoTodoItem("i2", "Buy Oat Milk")),
+            createdAtMillis = 0L,
+            updatedAtMillis = 1L,
+        )
+        assertTrue(todo.matchesQuery("牛奶"))
+        assertTrue(todo.matchesQuery("  oat  "))
+        // 空查询视为「不过滤」，与笔记的搜索语义一致。
+        assertTrue(todo.matchesQuery("   "))
+        assertTrue(!todo.matchesQuery("鸡蛋"))
+    }
 }

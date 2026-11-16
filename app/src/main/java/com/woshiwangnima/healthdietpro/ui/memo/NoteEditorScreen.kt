@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -30,6 +29,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -47,6 +47,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -105,8 +107,18 @@ private fun MemoNote.toEditorBlocks(): List<EditorBlock> {
             )
         }
     }
-    return mapped.ifEmpty { listOf(newTextBlock()) }
+    return ensureTrailingTextBlock(mapped.ifEmpty { listOf(newTextBlock()) })
 }
+
+/**
+ * 末尾是语音块时补一个空文本块。
+ *
+ * 语音块整条是可点的播放按钮，自身没有光标；它后面没有文本块时，用户就没有地方落光标，
+ * 「在语音后面接着写」这件事在界面上根本做不到。补一个空文本块，末尾永远有可输入的位置。
+ * 空文本块不会落盘（`editorBlocksToMemoBlocks` 会过滤），所以补完不改变存档。
+ */
+private fun ensureTrailingTextBlock(blocks: List<EditorBlock>): List<EditorBlock> =
+    if (blocks.lastOrNull()?.kind == MemoBlockKind.VOICE) blocks + newTextBlock() else blocks
 
 private fun newTextBlock(text: String = ""): EditorBlock = EditorBlock(
     id = newMemoId("block"),
@@ -188,6 +200,7 @@ private class EditorHistory(initial: EditorSnapshot) {
  * 标题是名字、统计是说明书、正文是内容，各自是不同性质的东西，不能糊成一团。
  * 右上角有两副面孔：**光标落在标题或正文里**（正在写）时换成【上一步】【下一步】【保存】
  * ——写作时要的是撤销与落盘，移动到 / 删除 / 历史版本这时候只会误触；**没在写**时才回到【更多】。
+ * 【保存】点完即收工：清焦点（光标与键盘一起收起），右上角随即换回【更多】。
  *
  * 撤销栈覆盖标题与全部内容块（含语音的插入与删除），连击合并成一步；
  * 【保存】是主动落盘（带「已保存」反馈），退出编辑仍会自动兜底保存一次。
@@ -208,6 +221,8 @@ internal fun NoteEditorScreen(
     val scope = rememberCoroutineScope()
 
     val noteId = remember(existing) { existing?.id ?: newMemoId("note") }
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     var title by remember(noteId) { mutableStateOf(existing?.title.orEmpty()) }
     var blocks by remember(noteId) { mutableStateOf(existing?.toEditorBlocks() ?: listOf(newTextBlock())) }
     var folderId by remember(noteId) { mutableStateOf(existing?.folderId ?: initialFolderId) }
@@ -216,6 +231,8 @@ internal fun NoteEditorScreen(
     var titleFocused by remember { mutableStateOf(false) }
     var focusedBlockId by remember { mutableStateOf<String?>(null) }
     var historyOpen by remember { mutableStateOf(false) }
+    // 历史版本预览：非空时整页切成只读预览（标题栏换成该版本的时刻），返回回到版本列表。
+    var previewVersion by remember { mutableStateOf<MemoNoteVersion?>(null) }
     var menuOpen by remember { mutableStateOf(false) }
     var moveOpen by remember { mutableStateOf(false) }
     var deleteOpen by remember { mutableStateOf(false) }
@@ -298,18 +315,52 @@ internal fun NoteEditorScreen(
     fun applyUndo() {
         val previous = history.undo() ?: return
         title = previous.title
-        blocks = previous.blocks
+        blocks = ensureTrailingTextBlock(previous.blocks)
     }
 
     fun applyRedo() {
         val next = history.redo() ?: return
         title = next.title
-        blocks = next.blocks
+        blocks = ensureTrailingTextBlock(next.blocks)
+    }
+
+    /**
+     * 退出「正在写」：光标收起、键盘落下，右上角回到【更多】。
+     *
+     * 【保存】是「这一段写完了」的动作，不是「再存一次稿」。存完还把光标留在正文里，
+     * 用户就得先点一下空白处才能看到【移动到 / 历史版本 / 删除】——保存等于什么都没结束。
+     * 只清焦点：草稿仍在编辑器里，继续点正文还能接着写。
+     */
+    fun exitEditing() {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+    }
+
+    /** 关闭预览并回到版本列表：用户是「从列表点进来看」，退出来理应还在列表上。 */
+    fun closePreview() {
+        previewVersion = null
+        historyOpen = true
+    }
+
+    fun restoreVersion(version: MemoNoteVersion) {
+        val base = lastSaved ?: return
+        val restored = base.restoredFrom(version, historyDepth, System.currentTimeMillis())
+        lastSaved = restored
+        viewModel.saveNote(restored)
+        title = restored.title
+        blocks = restored.toEditorBlocks()
+        history.record(snapshot(), System.currentTimeMillis(), force = true)
+        previewVersion = null
+        historyOpen = false
     }
 
     BackHandler {
-        commitRef.value()
-        onBack()
+        if (previewVersion != null) {
+            closePreview()
+        } else {
+            commitRef.value()
+            onBack()
+        }
     }
 
     fun insertVoice(fileName: String, durationMs: Long, sourceName: String) {
@@ -323,7 +374,15 @@ internal fun NoteEditorScreen(
         val focusIndex = blocks.indexOfFirst { it.id == focusedBlockId }
         val target = blocks.getOrNull(focusIndex)
         if (target == null || target.kind != MemoBlockKind.TEXT) {
-            blocks = blocks + voice
+            // 没有可落光标的位置：语音接在末尾。末尾如果正好是一个空文本块，就把它挪到语音后面，
+            // 让它继续当「语音之后的落点」，免得语音前面多出一个空行。
+            val trailingEmpty = blocks.lastOrNull()
+                ?.takeIf { it.kind == MemoBlockKind.TEXT && it.value.text.isEmpty() }
+            blocks = if (trailingEmpty != null) {
+                blocks.dropLast(1) + voice + trailingEmpty
+            } else {
+                ensureTrailingTextBlock(blocks + voice)
+            }
             history.record(snapshot(), System.currentTimeMillis(), force = true)
             return
         }
@@ -333,9 +392,8 @@ internal fun NoteEditorScreen(
         val updated = blocks.toMutableList()
         updated[focusIndex] = target.copy(value = TextFieldValue(before, TextRange(before.length)))
         updated.add(focusIndex + 1, voice)
-        if (after.isNotEmpty()) {
-            updated.add(focusIndex + 2, newTextBlock(after))
-        }
+        // 光标后半段哪怕为空也要补一个文本块：语音后面必须留着可落光标的位置。
+        updated.add(focusIndex + 2, newTextBlock(after))
         blocks = updated
         history.record(snapshot(), System.currentTimeMillis(), force = true)
     }
@@ -343,7 +401,7 @@ internal fun NoteEditorScreen(
     fun removeBlock(blockId: String) {
         if (player.playingId == blockId) player.stop()
         val updated = blocks.filterNot { it.id == blockId }.ifEmpty { listOf(newTextBlock()) }
-        blocks = updated
+        blocks = ensureTrailingTextBlock(updated)
         history.record(snapshot(), System.currentTimeMillis(), force = true)
     }
 
@@ -428,223 +486,248 @@ internal fun NoteEditorScreen(
         }
     }
     val editingActive = titleFocused || focusedBlockId != null
-    BaseScreen(
-        title = "",
-        onBack = {
-            commitRef.value()
-            onBack()
-        },
-        actions = {
-            if (editingActive) {
-                // 正在写：给撤销 / 重做 / 主动保存，其余操作收起来防误触。
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { applyUndo() }, enabled = history.canUndo) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_undo),
-                            contentDescription = stringResource(R.string.memo_editor_undo),
-                            tint = if (history.canUndo) tokens.colors.primary else tokens.colors.disabled,
-                        )
-                    }
-                    IconButton(onClick = { applyRedo() }, enabled = history.canRedo) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_redo),
-                            contentDescription = stringResource(R.string.memo_editor_redo),
-                            tint = if (history.canRedo) tokens.colors.primary else tokens.colors.disabled,
-                        )
-                    }
-                    MemoPillAction(
-                        text = stringResource(R.string.memo_editor_save),
-                        iconRes = R.drawable.ic_check,
-                        onClick = {
-                            commitRef.value()
-                            savedFlash = true
-                        },
-                    )
-                }
-            } else {
-                Box {
-                    IconButton(onClick = { menuOpen = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_more_vert),
-                            contentDescription = stringResource(R.string.memo_note_more),
-                            tint = tokens.colors.primary,
-                        )
-                    }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.memo_move_to)) },
+    // 历史版本预览整页盖在编辑器上：编辑器留在下面继续持有未保存的草稿，
+    // 预览只是「读一版旧的」，退回列表后原来的草稿与光标都还在。
+    Box(Modifier.fillMaxSize()) {
+        BaseScreen(
+            title = "",
+            onBack = {
+                commitRef.value()
+                onBack()
+            },
+            actions = {
+                if (editingActive) {
+                    // 正在写：给撤销 / 重做 / 主动保存，其余操作收起来防误触。
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = { applyUndo() }, enabled = history.canUndo) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_undo),
+                                contentDescription = stringResource(R.string.memo_editor_undo),
+                                tint = if (history.canUndo) tokens.colors.primary else tokens.colors.disabled,
+                            )
+                        }
+                        IconButton(onClick = { applyRedo() }, enabled = history.canRedo) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_redo),
+                                contentDescription = stringResource(R.string.memo_editor_redo),
+                                tint = if (history.canRedo) tokens.colors.primary else tokens.colors.disabled,
+                            )
+                        }
+                        MemoPillAction(
+                            text = stringResource(R.string.memo_editor_save),
+                            iconRes = R.drawable.ic_check,
                             onClick = {
-                                menuOpen = false
-                                moveOpen = true
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.memo_history)) },
-                            onClick = {
-                                menuOpen = false
                                 commitRef.value()
-                                historyOpen = true
-                            },
-                        )
-                        HorizontalDivider(color = tokens.colors.border)
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.memo_delete), color = tokens.colors.danger) },
-                            onClick = {
-                                menuOpen = false
-                                deleteOpen = true
+                                savedFlash = true
+                                exitEditing()
                             },
                         )
                     }
+                } else {
+                    Box {
+                        IconButton(onClick = { menuOpen = true }) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_more_vert),
+                                contentDescription = stringResource(R.string.memo_note_more),
+                                tint = tokens.colors.primary,
+                            )
+                        }
+                        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.memo_move_to)) },
+                                onClick = {
+                                    menuOpen = false
+                                    moveOpen = true
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.memo_history)) },
+                                onClick = {
+                                    menuOpen = false
+                                    commitRef.value()
+                                    historyOpen = true
+                                },
+                            )
+                            HorizontalDivider(color = tokens.colors.border)
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.memo_delete), color = tokens.colors.danger) },
+                                onClick = {
+                                    menuOpen = false
+                                    deleteOpen = true
+                                },
+                            )
+                        }
+                    }
                 }
-            }
-        },
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .imePadding(),
-        ) {
-            NoteAudioBar(
-                recording = recording,
-                elapsedMs = elapsedMs,
-                onRecord = {
-                    notice = null
-                    val granted = ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.RECORD_AUDIO,
-                    ) == PackageManager.PERMISSION_GRANTED
-                    if (granted) startRecording() else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                },
-                onStop = { stopRecording() },
-                onImport = {
-                    notice = null
-                    audioPicker.launch(arrayOf("audio/*"))
-                },
-            )
-
-            notice?.let { messageRes ->
-                Text(
-                    text = stringResource(messageRes),
-                    style = tokens.type.caption,
-                    color = tokens.colors.danger,
-                    modifier = Modifier.padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s1),
-                )
-            }
-
-            if (savedFlash) {
-                Text(
-                    text = stringResource(R.string.memo_saved_notice),
-                    style = tokens.type.caption,
-                    color = tokens.colors.success,
-                    modifier = Modifier.padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s1),
-                )
-            }
-
+            },
+        ) { padding ->
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = tokens.spacing.page),
+                    .fillMaxSize()
+                    .padding(padding)
+                    .imePadding(),
             ) {
-                BasicTextField(
-                    value = title,
-                    onValueChange = { next ->
-                        title = next
-                        history.record(snapshot(), System.currentTimeMillis())
+                NoteAudioBar(
+                    recording = recording,
+                    elapsedMs = elapsedMs,
+                    onRecord = {
+                        notice = null
+                        val granted = ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.RECORD_AUDIO,
+                        ) == PackageManager.PERMISSION_GRANTED
+                        if (granted) startRecording() else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     },
-                    textStyle = tokens.type.body.copy(
-                        color = tokens.colors.text,
-                        fontWeight = FontWeight.SemiBold,
-                    ),
-                    cursorBrush = SolidColor(tokens.colors.primary),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { state -> titleFocused = state.isFocused }
-                        .padding(vertical = tokens.spacing.s2),
-                    decorationBox = { inner ->
-                        Box {
-                            if (title.isEmpty()) {
-                                Text(
-                                    text = stringResource(R.string.memo_note_title_hint),
-                                    style = tokens.type.body,
-                                    color = tokens.colors.textMuted,
-                                )
-                            }
-                            inner()
-                        }
+                    onStop = { stopRecording() },
+                    onImport = {
+                        notice = null
+                        audioPicker.launch(arrayOf("audio/*"))
                     },
                 )
-                // 标题是名字、统计是说明书、正文是内容：三段之间用细线隔开，扫视时各自成块。
-                HorizontalDivider(color = tokens.colors.border)
-                // 统计信息紧跟标题：它是这一页的说明书，不是落款。
-                Text(
-                    text = lastSaved?.let { saved ->
-                        stringResource(
-                            R.string.memo_editor_meta,
-                            formatMemoTime(saved.updatedAtMillis),
+
+                notice?.let { messageRes ->
+                    Text(
+                        text = stringResource(messageRes),
+                        style = tokens.type.caption,
+                        color = tokens.colors.danger,
+                        modifier = Modifier.padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s1),
+                    )
+                }
+
+                if (savedFlash) {
+                    Text(
+                        text = stringResource(R.string.memo_saved_notice),
+                        style = tokens.type.caption,
+                        color = tokens.colors.success,
+                        modifier = Modifier.padding(horizontal = tokens.spacing.page, vertical = tokens.spacing.s1),
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = tokens.spacing.page),
+                ) {
+                    BasicTextField(
+                        value = title,
+                        onValueChange = { next ->
+                            title = next
+                            history.record(snapshot(), System.currentTimeMillis())
+                        },
+                        textStyle = tokens.type.body.copy(
+                            color = tokens.colors.text,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                        cursorBrush = SolidColor(tokens.colors.primary),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { state -> titleFocused = state.isFocused }
+                            .padding(vertical = tokens.spacing.s2),
+                        decorationBox = { inner ->
+                            Box {
+                                if (title.isEmpty()) {
+                                    Text(
+                                        text = stringResource(R.string.memo_note_title_hint),
+                                        style = tokens.type.body,
+                                        color = tokens.colors.textMuted,
+                                    )
+                                }
+                                inner()
+                            }
+                        },
+                    )
+                    // 标题是名字、统计是说明书、正文是内容：三段之间用细线隔开，扫视时各自成块。
+                    HorizontalDivider(color = tokens.colors.border)
+                    // 统计信息紧跟标题：它是这一页的说明书，不是落款。
+                    Text(
+                        text = lastSaved?.let { saved ->
+                            stringResource(
+                                R.string.memo_editor_meta,
+                                formatMemoTime(saved.updatedAtMillis),
+                                liveBlocks.memoWordCount(),
+                                liveBlocks.memoVoiceCount(),
+                            )
+                        } ?: stringResource(
+                            R.string.memo_editor_meta_unsaved,
                             liveBlocks.memoWordCount(),
                             liveBlocks.memoVoiceCount(),
-                        )
-                    } ?: stringResource(
-                        R.string.memo_editor_meta_unsaved,
-                        liveBlocks.memoWordCount(),
-                        liveBlocks.memoVoiceCount(),
-                    ),
-                    style = tokens.type.caption,
-                    color = tokens.colors.textMuted,
-                    modifier = Modifier.padding(vertical = tokens.spacing.s2),
-                )
-                HorizontalDivider(color = tokens.colors.border)
-                blocks.forEach { block ->
-                    when (block.kind) {
-                        MemoBlockKind.TEXT -> BasicTextField(
-                            value = block.value,
-                            onValueChange = { next ->
-                                blocks = blocks.map { if (it.id == block.id) it.copy(value = next) else it }
-                                history.record(snapshot(), System.currentTimeMillis())
-                            },
-                            textStyle = tokens.type.body.copy(color = tokens.colors.text),
-                            cursorBrush = SolidColor(tokens.colors.primary),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .onFocusChanged { state ->
-                                    focusedBlockId = if (state.isFocused) {
-                                        block.id
-                                    } else {
-                                        focusedBlockId?.takeIf { it != block.id }
+                        ),
+                        style = tokens.type.caption,
+                        color = tokens.colors.textMuted,
+                        modifier = Modifier.padding(vertical = tokens.spacing.s2),
+                    )
+                    HorizontalDivider(color = tokens.colors.border)
+                    blocks.forEachIndexed { index, block ->
+                        // 紧跟语音的空文本块是「语音之后」的落点：给它更明确的提示与最小可点高度，
+                        // 否则一个空 TextField 只有占位字，用户不知道语音后面还能写。
+                        val afterVoice = block.kind == MemoBlockKind.TEXT &&
+                            (blocks.getOrNull(index - 1)?.kind == MemoBlockKind.VOICE)
+                        when (block.kind) {
+                            MemoBlockKind.TEXT -> BasicTextField(
+                                value = block.value,
+                                onValueChange = { next ->
+                                    blocks = blocks.map { if (it.id == block.id) it.copy(value = next) else it }
+                                    history.record(snapshot(), System.currentTimeMillis())
+                                },
+                                textStyle = tokens.type.body.copy(color = tokens.colors.text),
+                                cursorBrush = SolidColor(tokens.colors.primary),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .onFocusChanged { state ->
+                                        focusedBlockId = if (state.isFocused) {
+                                            block.id
+                                        } else {
+                                            focusedBlockId?.takeIf { it != block.id }
+                                        }
                                     }
-                                }
-                                .padding(vertical = tokens.spacing.s1),
-                            decorationBox = { inner ->
-                                Box {
-                                    if (block.value.text.isEmpty()) {
-                                        Text(
-                                            text = stringResource(R.string.memo_note_body_hint),
-                                            style = tokens.type.body,
-                                            color = tokens.colors.textMuted,
-                                        )
+                                    .heightIn(min = if (afterVoice) 44.dp else 0.dp)
+                                    .padding(vertical = tokens.spacing.s1),
+                                decorationBox = { inner ->
+                                    Box {
+                                        if (block.value.text.isEmpty()) {
+                                            Text(
+                                                text = stringResource(
+                                                    if (afterVoice) {
+                                                        R.string.memo_note_continue_hint
+                                                    } else {
+                                                        R.string.memo_note_body_hint
+                                                    },
+                                                ),
+                                                style = tokens.type.body,
+                                                color = tokens.colors.textMuted,
+                                            )
+                                        }
+                                        inner()
                                     }
-                                    inner()
-                                }
-                            },
-                        )
+                                },
+                            )
 
-                        MemoBlockKind.VOICE -> VoiceBlockRow(
-                            block = block,
-                            playing = player.playingId == block.id,
-                            fileAvailable = viewModel.voices.detailFile(block.voiceFile) != null,
-                            onToggle = {
-                                player.toggle(block.id, viewModel.voices.detailFile(block.voiceFile))
-                            },
-                            onRemove = { removeBlock(block.id) },
-                        )
+                            MemoBlockKind.VOICE -> VoiceBlockRow(
+                                block = block,
+                                playing = player.playingId == block.id,
+                                fileAvailable = viewModel.voices.detailFile(block.voiceFile) != null,
+                                onToggle = {
+                                    player.toggle(block.id, viewModel.voices.detailFile(block.voiceFile))
+                                },
+                                onRemove = { removeBlock(block.id) },
+                            )
+                        }
                     }
+                    Spacer(Modifier.size(tokens.spacing.s6))
                 }
-                Spacer(Modifier.size(tokens.spacing.s6))
             }
         }
+
+    // 预览盖在编辑器之上；编辑器一直留在组合里，草稿与光标状态不因为「看一眼旧版本」被销毁。
+    previewVersion?.let { version ->
+        VersionPreviewScreen(
+            version = version,
+            onBack = { closePreview() },
+            onRestore = { restoreVersion(version) },
+        )
+    }
     }
 
     if (moveOpen) {
@@ -681,15 +764,10 @@ internal fun NoteEditorScreen(
             versions = lastSaved?.versions.orEmpty(),
             depth = historyDepth,
             onDismiss = { historyOpen = false },
-            onRestore = { version ->
-                val base = lastSaved ?: return@HistorySheet
-                val restored = base.restoredFrom(version, historyDepth, System.currentTimeMillis())
-                lastSaved = restored
-                viewModel.saveNote(restored)
-                title = restored.title
-                blocks = restored.toEditorBlocks()
-                history.record(snapshot(), System.currentTimeMillis(), force = true)
+            onOpen = { version ->
+                // 先收起列表再开预览：两层都不关的话，预览会压在弹窗底下。
                 historyOpen = false
+                previewVersion = version
             },
         )
     }
@@ -812,12 +890,28 @@ private fun VoiceBlockRow(
                 )
             }
         }
-        IconButton(onClick = onRemove) {
+        // 删除是破坏性操作：用危险色 + 文字说明，不用一个没有标签的灰色图标——
+        // 图标单独出现时，用户分不清它是「删掉这段语音」还是「停止播放」。
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(tokens.radii.pill))
+                .background(tokens.colors.danger.copy(alpha = 0.12f))
+                .clickable(onClick = onRemove)
+                .heightIn(min = 36.dp)
+                .padding(horizontal = tokens.spacing.s2),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
+        ) {
             Icon(
                 painter = painterResource(R.drawable.ic_delete),
-                contentDescription = stringResource(R.string.memo_delete),
-                tint = tokens.colors.textMuted,
-                modifier = Modifier.size(18.dp),
+                contentDescription = null,
+                tint = tokens.colors.danger,
+                modifier = Modifier.size(16.dp),
+            )
+            Text(
+                text = stringResource(R.string.memo_delete),
+                style = tokens.type.caption.copy(fontWeight = FontWeight.Medium),
+                color = tokens.colors.danger,
             )
         }
     }
@@ -857,12 +951,19 @@ private fun EditorActionButton(
     }
 }
 
+/**
+ * 历史版本列表。
+ *
+ * 每个版本是一张**可点的卡**：时刻（带年份）、标题、完整统计（字数 / 语音数）与正文摘要都在卡上，
+ * 点进去是只读预览——不点进去只靠一行摘要，用户没法判断两个版本到底差在哪。
+ * 恢复动作收进预览页：先看清楚，再决定要不要用它覆盖当前内容。
+ */
 @Composable
 private fun HistorySheet(
     versions: List<MemoNoteVersion>,
     depth: Int,
     onDismiss: () -> Unit,
-    onRestore: (MemoNoteVersion) -> Unit,
+    onOpen: (MemoNoteVersion) -> Unit,
 ) {
     val tokens = LocalAppTokens.current
     AppBottomSheet(
@@ -876,55 +977,195 @@ private fun HistorySheet(
                 description = stringResource(R.string.memo_history_empty_desc),
                 iconRes = R.drawable.ic_history,
             )
+        } else {
+            Text(
+                text = stringResource(R.string.memo_history_open_hint),
+                style = tokens.type.caption,
+                color = tokens.colors.textMuted,
+                modifier = Modifier.padding(bottom = tokens.spacing.s2),
+            )
         }
         versions.reversed().forEach { version ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = tokens.spacing.s2),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = formatMemoTime(version.savedAtMillis),
-                        style = tokens.type.bodyS,
-                        color = tokens.colors.text,
-                    )
-                    Text(
-                        text = versionPreview(version),
-                        style = tokens.type.caption,
-                        color = tokens.colors.textMuted,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                Spacer(Modifier.width(tokens.spacing.s2))
-                EditorActionButton(
-                    text = stringResource(R.string.memo_history_restore),
-                    iconRes = R.drawable.ic_history,
-                    onClick = { onRestore(version) },
-                )
-            }
+            VersionCard(version = version, onClick = { onOpen(version) })
         }
         Spacer(Modifier.size(tokens.spacing.s3))
     }
 }
 
 @Composable
-private fun versionPreview(version: MemoNoteVersion): String {
-    val text = version.blocks.filter { it.kind == MemoBlockKind.TEXT }
-        .joinToString(" ") { it.text.trim() }
-        .replace(Regex("\\s+"), " ")
-        .take(80)
-    val voices = version.blocks.count { it.kind == MemoBlockKind.VOICE }
-    val title = version.title.ifBlank { stringResource(R.string.memo_untitled_note) }
-    return when {
-        text.isNotEmpty() && voices > 0 -> "$title · $text · " + stringResource(R.string.memo_meta_voices, voices)
-        text.isNotEmpty() -> "$title · $text"
-        voices > 0 -> "$title · " + stringResource(R.string.memo_meta_voices, voices)
-        else -> title
+private fun VersionCard(version: MemoNoteVersion, onClick: () -> Unit) {
+    val tokens = LocalAppTokens.current
+    val shape = RoundedCornerShape(tokens.radii.container)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = tokens.spacing.s1)
+            .clip(shape)
+            .background(tokens.colors.panelRaised)
+            .border(tokens.radii.highlight, tokens.colors.border, shape)
+            .clickable(onClick = onClick)
+            .padding(tokens.spacing.s3),
+        verticalArrangement = Arrangement.spacedBy(tokens.spacing.s1),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = formatMemoTimeFull(version.savedAtMillis),
+                style = tokens.type.bodyS.copy(fontWeight = FontWeight.SemiBold),
+                color = tokens.colors.text,
+                modifier = Modifier.weight(1f),
+            )
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_right),
+                contentDescription = null,
+                tint = tokens.colors.textMuted,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+        Text(
+            text = version.title.ifBlank { stringResource(R.string.memo_untitled_note) },
+            style = tokens.type.bodyS,
+            color = tokens.colors.text,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = versionStats(version),
+            style = tokens.type.caption,
+            color = tokens.colors.textMuted,
+        )
+        val preview = versionBodyPreview(version)
+        if (preview.isNotEmpty()) {
+            Text(
+                text = preview,
+                style = tokens.type.caption,
+                color = tokens.colors.textMuted,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
+
+/** 版本的完整统计：字数与语音数都给，0 条也写出来，免得「没写」和「只有语音」分不清。 */
+@Composable
+private fun versionStats(version: MemoNoteVersion): String = listOf(
+    stringResource(R.string.memo_meta_words, version.blocks.memoWordCount()),
+    stringResource(R.string.memo_meta_voices, version.blocks.memoVoiceCount()),
+).joinToString(" · ")
+
+/**
+ * 历史版本预览：整页只读，标题栏是这个版本的时刻，右上角是【恢复此版本】。
+ *
+ * 语音块只展示时长与来源，不提供播放——预览要回答的是「这版写了什么」，
+ * 播放留给正文编辑器，也避免两个页面同时抢播放器。
+ */
+@Composable
+private fun VersionPreviewScreen(
+    version: MemoNoteVersion,
+    onBack: () -> Unit,
+    onRestore: () -> Unit,
+) {
+    val tokens = LocalAppTokens.current
+    BackHandler { onBack() }
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = tokens.colors.bg,
+    ) {
+        BaseScreen(
+            title = formatMemoTimeFull(version.savedAtMillis),
+            onBack = onBack,
+            actions = {
+                MemoPillAction(
+                    text = stringResource(R.string.memo_history_restore_this),
+                    iconRes = R.drawable.ic_history,
+                    onClick = onRestore,
+                )
+            },
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = tokens.spacing.page),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+            ) {
+                Text(
+                    text = version.title.ifBlank { stringResource(R.string.memo_untitled_note) },
+                    style = tokens.type.body.copy(fontWeight = FontWeight.SemiBold),
+                    color = if (version.title.isBlank()) tokens.colors.textMuted else tokens.colors.text,
+                )
+                Text(
+                    text = versionStats(version),
+                    style = tokens.type.caption,
+                    color = tokens.colors.textMuted,
+                )
+                HorizontalDivider(color = tokens.colors.border)
+                version.blocks.forEach { block ->
+                    when (block.kind) {
+                        MemoBlockKind.TEXT -> if (block.text.isNotBlank()) {
+                            Text(
+                                text = block.text,
+                                style = tokens.type.body,
+                                color = tokens.colors.text,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                        MemoBlockKind.VOICE -> VersionVoiceRow(block = block)
+                    }
+                }
+                Spacer(Modifier.size(tokens.spacing.s6))
+            }
+        }
+    }
+}
+
+@Composable
+private fun VersionVoiceRow(block: MemoBlock) {
+    val tokens = LocalAppTokens.current
+    val shape = RoundedCornerShape(tokens.radii.container)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(tokens.colors.panel)
+            .border(tokens.radii.highlight, tokens.colors.border, shape)
+            .padding(horizontal = tokens.spacing.s3, vertical = tokens.spacing.s2),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(tokens.spacing.s2),
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_mic),
+            contentDescription = null,
+            tint = tokens.colors.primary,
+            modifier = Modifier.size(18.dp),
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.memo_voice_length, formatDuration(block.durationMs)),
+                style = tokens.type.bodyS,
+                color = tokens.colors.text,
+            )
+            if (block.sourceName.isNotBlank()) {
+                Text(
+                    text = block.sourceName,
+                    style = tokens.type.caption,
+                    color = tokens.colors.textMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+/** 版本正文摘要：压平空白、去掉语音块，最多 [limit] 字。 */
+private fun versionBodyPreview(version: MemoNoteVersion, limit: Int = 100): String =
+    version.blocks.filter { it.kind == MemoBlockKind.TEXT }
+        .joinToString(" ") { it.text.trim() }
+        .replace(Regex("\\s+"), " ")
+        .trim()
+        .take(limit)
 
 /** 语音条目的时长文案：`0:07` / `1:23`。 */
 internal fun formatDuration(millis: Long): String {

@@ -67,6 +67,21 @@ storeType=pkcs12
 
 ## 3. 构建命令
 
+**一键脚本（推荐）**：仓库根 `./release.sh`——依次做环境自检 → 编译校验 → 单测 → APK + AAB →
+签名校验 → 打印体积与 SHA-256。只打包，**不改版本号、不 commit、不 push**（那三件事仍按 §1/§6/§7 人工决定）。
+
+```bash
+./release.sh                # 完整流程
+./release.sh --skip-tests   # 只打包，临时验证用
+./release.sh --help         # 用法
+```
+
+脚本的单测闸门不拿 Gradle 退出码判断（基线本来就有 6 条既有失败），而是解析
+`app/build/test-results/testDebugUnitTest/*.xml`：只有**非** `FoodNutrientRepositoryTest`
+的失败才算新增失败并中止。
+
+手动分步（与脚本等价）：
+
 ```bash
 # 1) 编译校验（快，~10s）
 ./gradlew compileDebugKotlin
@@ -88,7 +103,8 @@ storeType=pkcs12
 | APK | `app/build/outputs/apk/release/app-release.apk` |
 | AAB | `app/build/outputs/bundle/release/app-release.aab` |
 
-当前基线：APK ≈ 58.7 MiB（61.6 MB），AAB ≈ 20.8 MiB（21.8 MB）（体积主要来自 `assets/food_catalog/images`）。
+当前基线：APK ≈ 59.3 MiB（62.2 MB，62,193,665 B），AAB ≈ 21.0 MiB（22.0 MB，22,013,686 B）
+（体积主要来自 `assets/food_catalog/images`）。
 release 的 `optimization.enable = false`，**未开启混淆/压缩**，所以体积与 debug 接近。
 
 ## 4. 签名校验（必做）
@@ -111,9 +127,9 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 ## 5. 单测基线
 
-`testDebugUnitTest` 当前 **432 项，426 过，6 失败**。
+`testDebugUnitTest` 当前 **455 项，449 过，6 失败**。
 失败的 6 项全部是 `FoodNutrientRepositoryTest`（food 资产标签/密度数据问题，编号 Q-6），
-**与本轮改动无关，属既有问题**。只要不是新出现的失败，就算通过。
+**与本轮改动无关，属既有问题**。只要不是新出现的失败，就算通过（`./release.sh` 已按此判定）。
 
 ## 6. Git 提交与推送（有坑，见 §8）
 
@@ -199,6 +215,11 @@ git -c http.sslBackend=openssl \
 
 ```bash
 cd "c:/Users/WSW/AndroidStudioProjects/HealthDietPro"
+
+# 打包 + 校验一次做完（编译 / 单测 / APK / AAB / 签名）
+./release.sh
+
+# 或者手动分步：
 export JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"
 export PATH="$JAVA_HOME/bin:$PATH"
 
@@ -234,7 +255,7 @@ git -c http.sslBackend=openssl \
 | AAB SHA-256 | `9B91B2BF107464FC48A20117723827EE7F720B2856FBCA4E008E39700765FD06` |
 | 签名 | `V2 Signer`：`CN=HealthDietPro, OU=Dev, O=woshiwangnima, L=Shenzhen, ST=Guangdong, C=CN` |
 | 证书 SHA-256 | `04ab3e1f7a7e4cf2785d3d6f1679b2f766b793c3609aa9acbbe5b30771dc57fb` |
-| 单测 | 432 项 426 过；6 条既有 `FoodNutrientRepositoryTest`（Q-6）失败 |
+| 单测 | 455 项 449 过；6 条既有 `FoodNutrientRepositoryTest`（Q-6）失败 |
 | Lint | `lintVitalRelease` 通过 |
 
 > 构建日志里两条 `Multiple substitutions ... nutrition_help_*` 是既有资源警告，不影响产物；

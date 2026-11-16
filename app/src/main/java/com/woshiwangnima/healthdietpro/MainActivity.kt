@@ -99,16 +99,29 @@ import com.woshiwangnima.healthdietpro.ui.settings.AppSettingsComposeActivity
 import com.woshiwangnima.healthdietpro.ui.settings.UserSettingsActivity
 import com.woshiwangnima.healthdietpro.ui.test.TestAccessScreen
 import com.woshiwangnima.healthdietpro.ui.test.TestAccessViewModel
-import com.woshiwangnima.healthdietpro.ui.test.TestGmScreen
+import com.woshiwangnima.healthdietpro.ui.test.BodyRecordsCommandsScreen
+import com.woshiwangnima.healthdietpro.ui.test.HealthRecordsCommandsScreen
+import com.woshiwangnima.healthdietpro.ui.test.MemoTestScreen
+import com.woshiwangnima.healthdietpro.ui.test.NutritionSearchCommandsScreen
+import com.woshiwangnima.healthdietpro.ui.test.PriceTestScreen
+import com.woshiwangnima.healthdietpro.ui.test.TestCommandGroup
+import com.woshiwangnima.healthdietpro.ui.test.TestCommandGroupsScreen
 import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestScreen
 import com.woshiwangnima.healthdietpro.ui.test.CommonUiTestCategory
 import com.woshiwangnima.healthdietpro.ui.test.TestLandingScreen
 import com.woshiwangnima.healthdietpro.ui.test.CrossSectionUiTestScreen
+import com.woshiwangnima.healthdietpro.model.food.FoodNutrientRepository
 import com.woshiwangnima.healthdietpro.model.memo.MemoArchiveStore
 import com.woshiwangnima.healthdietpro.model.memo.MemoTestCommand
 import com.woshiwangnima.healthdietpro.model.memo.MemoTestCommandRunner
 import com.woshiwangnima.healthdietpro.model.memo.MemoTestResult
 import com.woshiwangnima.healthdietpro.model.memo.MemoVoiceStore
+import com.woshiwangnima.healthdietpro.model.price.PriceArchiveStore
+import com.woshiwangnima.healthdietpro.model.price.PriceFoodRef
+import com.woshiwangnima.healthdietpro.model.price.PriceItemSource
+import com.woshiwangnima.healthdietpro.model.price.PriceTestCommand
+import com.woshiwangnima.healthdietpro.model.price.PriceTestCommandRunner
+import com.woshiwangnima.healthdietpro.model.price.PriceTestResult
 import com.woshiwangnima.healthdietpro.common.ui.ComponentsPreviewScreen
 import com.woshiwangnima.healthdietpro.ui.widget.tab.TabPersistence
 import com.woshiwangnima.healthdietpro.util.UnitConverter
@@ -157,6 +170,8 @@ class MainActivity : BaseActivity() {
     private var lastBackPressedAt = 0L
     private var previousSoftInputMode: Int? = null
     private var testPage by mutableStateOf(TestPage.Landing)
+    // 测试指令进到哪一组：null = 分组入口页。与 commonUiTestCategory 同一层语义。
+    private var commandGroup by mutableStateOf<TestCommandGroup?>(null)
     private var commonUiTestCategory by mutableStateOf<CommonUiTestCategory?>(null)
     private val pagePreloader = PagePreloader()
     private var archiveController: ArchiveTransferController? = null
@@ -317,6 +332,8 @@ class MainActivity : BaseActivity() {
                     return
                 } else if (selectedRoute == ROUTE_TEST && testAccessViewModel.isVerified.value) {
                     when {
+                        // 先退组内页，再退到测试首页，最后才离开测试区。
+                        commandGroup != null -> commandGroup = null
                         commonUiTestCategory != null -> commonUiTestCategory = null
                         testPage != TestPage.Landing -> testPage = TestPage.Landing
                         else -> returnFromTest()
@@ -534,7 +551,49 @@ class MainActivity : BaseActivity() {
                     if (isVerified) {
                         when (testPage) {
                             TestPage.Landing -> TestLandingScreen({ testPage = TestPage.Commands }, { testPage = TestPage.Features }, { testPage = TestPage.CommonUi }, { testPage = TestPage.CrossSection }, Modifier.fillMaxSize())
-                            TestPage.Commands -> TestGmScreen(::addTestHeightRecord, ::addTestWeightRecord, ::addTestMedicationRecord, ::addTestNutritionFoods, ::addYesterdayGlucoseSeries, ::addTodayGlucoseSeries, ::addTodayWaterRecords, ::addTestSearchHistories, ::runMemoTestCommand, { testPage = TestPage.Landing }, Modifier.fillMaxSize())
+                            TestPage.Commands -> {
+                                val group = commandGroup
+                                if (group == null) {
+                                    TestCommandGroupsScreen(
+                                        onOpen = { commandGroup = it },
+                                        onBack = { testPage = TestPage.Landing },
+                                        modifier = Modifier.fillMaxSize(),
+                                    )
+                                } else {
+                                    when (group) {
+                                        TestCommandGroup.BODY -> BodyRecordsCommandsScreen(
+                                            onAddHeightRecord = ::addTestHeightRecord,
+                                            onAddWeightRecord = ::addTestWeightRecord,
+                                            onBack = { commandGroup = null },
+                                            modifier = Modifier.fillMaxSize(),
+                                        )
+                                        TestCommandGroup.HEALTH -> HealthRecordsCommandsScreen(
+                                            onAddMedicationRecord = ::addTestMedicationRecord,
+                                            onAddYesterdayGlucose = ::addYesterdayGlucoseSeries,
+                                            onAddTodayGlucose = ::addTodayGlucoseSeries,
+                                            onAddTodayWater = ::addTodayWaterRecords,
+                                            onBack = { commandGroup = null },
+                                            modifier = Modifier.fillMaxSize(),
+                                        )
+                                        TestCommandGroup.NUTRITION -> NutritionSearchCommandsScreen(
+                                            onAddNutritionFoods = ::addTestNutritionFoods,
+                                            onAddSearchHistories = ::addTestSearchHistories,
+                                            onBack = { commandGroup = null },
+                                            modifier = Modifier.fillMaxSize(),
+                                        )
+                                        TestCommandGroup.MEMO -> MemoTestScreen(
+                                            onRun = ::runMemoTestCommand,
+                                            onBack = { commandGroup = null },
+                                            modifier = Modifier.fillMaxSize(),
+                                        )
+                                        TestCommandGroup.PRICE -> PriceTestScreen(
+                                            onRun = ::runPriceTestCommand,
+                                            onBack = { commandGroup = null },
+                                            modifier = Modifier.fillMaxSize(),
+                                        )
+                                    }
+                                }
+                            }
                             TestPage.Features -> ComponentsPreviewScreen(onBack = { testPage = TestPage.Landing }, includeStatusBarPadding = false)
                             TestPage.CommonUi -> CommonUiTestScreen(commonUiTestCategory, { commonUiTestCategory = it }, { if (commonUiTestCategory == null) testPage = TestPage.Landing else commonUiTestCategory = null }, Modifier.fillMaxSize())
                             TestPage.CrossSection -> CrossSectionUiTestScreen(onBack = { testPage = TestPage.Landing }, Modifier.fillMaxSize())
@@ -584,6 +643,7 @@ class MainActivity : BaseActivity() {
         if (route == ROUTE_TEST) {
             routeBeforeTest = selectedRoute
             testPage = TestPage.Landing
+            commandGroup = null
             commonUiTestCategory = null
             applyTestSoftInputMode()
         } else {
@@ -755,6 +815,49 @@ class MainActivity : BaseActivity() {
             if (result.deletedTodos > 0) add("已删除 ${result.deletedTodos} 条待办")
             if (result.updatedTodos > 0) add("已更新 ${result.updatedTodos} 条待办的勾选状态")
             if (result.prunedVoiceFiles > 0) add("清理 ${result.prunedVoiceFiles} 个语音文件")
+        }
+        return parts.ifEmpty { listOf("没有可处理的数据") }.joinToString("，")
+    }
+
+    /**
+     * 【测试指令 · 记物价】：与记便签同一套结构——参数在指令里，执行与计数在模型层的 Runner 里。
+     *
+     * 物品库是懒加载的：只有勾了「挂到库内物品」才去读那几千条食材，
+     * 其余指令不该为一次随机记录付这份开销。
+     */
+    private fun runPriceTestCommand(command: PriceTestCommand) {
+        ProfilePrefs.createDefaultIfEmpty(this)
+        val library: () -> List<PriceFoodRef> = {
+            runCatching {
+                FoodNutrientRepository.fromContext(this).foods().mapNotNull { food ->
+                    val name = food.displayName("zh")
+                    if (name.isBlank()) {
+                        null
+                    } else {
+                        PriceFoodRef(
+                            id = food.id,
+                            name = name,
+                            source = when (food.kind) {
+                                FoodKind.INGREDIENT -> PriceItemSource.INGREDIENT
+                                FoodKind.FOOD -> PriceItemSource.FOOD
+                                FoodKind.DISH -> PriceItemSource.DISH
+                            },
+                        )
+                    }
+                }
+            }.getOrDefault(emptyList())
+        }
+        val result = PriceTestCommandRunner(
+            store = PriceArchiveStore.current(this),
+            library = library,
+        ).run(command)
+        Toast.makeText(this, describePriceTestResult(result), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun describePriceTestResult(result: PriceTestResult): String {
+        val parts = buildList {
+            if (result.createdRecords > 0) add("已创建 ${result.createdRecords} 条物价记录")
+            if (result.deletedRecords > 0) add("已删除 ${result.deletedRecords} 条物价记录")
         }
         return parts.ifEmpty { listOf("没有可处理的数据") }.joinToString("，")
     }

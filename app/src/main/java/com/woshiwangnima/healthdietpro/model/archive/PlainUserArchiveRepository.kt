@@ -256,9 +256,14 @@ internal class PlainUserArchiveRepository(
             val referenced = archive.catalog.flatMap { it.imagePaths } + archive.records.flatMap {
                 it.medicationImagePaths + it.recordPhotoPaths
             }
-            referenced.forEach { path ->
-                val attachment = path.substringAfter("/attachments/", missingDelimiterValue = "")
-                require(attachment.startsWith("medications/") && "attachments/$attachment" in paths) {
+            referenced.forEach { reference ->
+                val attachment = archiveAttachmentPathOf(reference)
+                if (attachment != null && attachment in paths) return@forEach
+                // 老式键（`medication_photos/xxx.jpg`）指向的是 filesDir 下的全局目录，
+                // 旧版本一直这么存，档案里不保证有副本；这类引用解析不到就跳过——
+                // 图片本来就搬不走，记录本身是完整的，不该因此堵死整份导入。
+                // 只有本来就是档案路径（`.../attachments/...`）却找不到文件，才算档案坏了。
+                require(!reference.contains("/attachments/")) {
                     "Medication attachment is not included in archive"
                 }
             }
@@ -416,6 +421,28 @@ private data class PreparedImport(
     val domains: Map<String, JsonElement>,
     val targetUserId: String,
 )
+
+/**
+ * 把领域里的一条附件引用换算成档案内的相对路径（`attachments/...`）。
+ *
+ * 用药照片有两代键：
+ * - 新式：`user_archives/<uid>/attachments/medications/catalog|records/<文件>`，直接可用；
+ * - 老式：`medication_catalog_images/<文件>` 与 `medication_photos/<文件>`，相对 `filesDir`
+ *   而不是相对用户目录，档案里对应副本落在 `attachments/medications/catalog|records/` 下。
+ *
+ * 与 [com.woshiwangnima.healthdietpro.model.medication.MedicationPrefs.loadAttachment] 的
+ * 候选顺序保持一致：那边读图时同样会回退到档案内的副本。
+ *
+ * 返回 null 表示这条引用不指向档案内的附件（外链或已被清理的旧图）。
+ */
+internal fun archiveAttachmentPathOf(reference: String): String? = when {
+    "/attachments/" in reference -> "attachments/" + reference.substringAfter("/attachments/")
+    reference.startsWith("medication_catalog_images/") ->
+        "attachments/medications/catalog/" + reference.substringAfterLast('/')
+    reference.startsWith("medication_photos/") ->
+        "attachments/medications/records/" + reference.substringAfterLast('/')
+    else -> null
+}
 
 private class UserDirectoryTransaction(
     private val target: File,

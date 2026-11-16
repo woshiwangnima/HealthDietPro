@@ -219,6 +219,18 @@ internal fun MemoNote.matchesQuery(rawQuery: String, folderPath: String = ""): B
     return folderPath.contains(query, ignoreCase = true)
 }
 
+/**
+ * 待办搜索：命中任一项文本即算（`title` 只兼容旧存档，新数据不再写）。
+ *
+ * 待办没有文件夹，所以不像笔记那样把路径纳入匹配。
+ */
+internal fun MemoTodo.matchesQuery(rawQuery: String): Boolean {
+    val query = rawQuery.trim()
+    if (query.isEmpty()) return true
+    if (title.contains(query, ignoreCase = true)) return true
+    return items.any { it.text.contains(query, ignoreCase = true) }
+}
+
 /** 文件夹子级，保持创建顺序（不按名称排：中文按码位排出来对用户没有意义）。 */
 internal fun List<MemoFolder>.childrenOf(parentId: String?): List<MemoFolder> =
     filter { it.parentId == parentId }.sortedBy(MemoFolder::createdAtMillis)
@@ -297,6 +309,52 @@ internal fun MemoArchive.withoutFolder(folderId: String): MemoArchive {
     )
 }
 
+/**
+ * 批量操作：一次改多条，落盘只写一次。
+ *
+ * 写成 `MemoArchive` 上的纯函数而不是仓库方法，是为了能直接单测——
+ * 仓库依赖 `MemoArchiveStore`（要 `Context`），批量语义却是纯数据变换，混在一起就测不动。
+ * 空集合一律走「原样返回」短路，避免空批处理白写一次磁盘。
+ */
+internal fun MemoArchive.deletedNotes(noteIds: Set<String>): MemoArchive {
+    if (noteIds.isEmpty() || notes.none { it.id in noteIds }) return this
+    return copy(notes = notes.filterNot { it.id in noteIds })
+}
+
+internal fun MemoArchive.movedNotes(noteIds: Set<String>, folderId: String?): MemoArchive {
+    if (noteIds.isEmpty()) return this
+    return copy(
+        notes = notes.map { note -> if (note.id in noteIds) note.copy(folderId = folderId) else note },
+    )
+}
+
+/**
+ * 批量置顶：与单条一致，只改 `pinned`，不动 `updatedAtMillis`，因此不压历史版本。
+ */
+internal fun MemoArchive.pinnedNotes(noteIds: Set<String>, pinned: Boolean): MemoArchive {
+    if (noteIds.isEmpty()) return this
+    return copy(
+        notes = notes.map { note ->
+            if (note.id in noteIds && note.pinned != pinned) note.copy(pinned = pinned) else note
+        },
+    )
+}
+
+internal fun MemoArchive.deletedTodos(todoIds: Set<String>): MemoArchive {
+    if (todoIds.isEmpty() || todos.none { it.id in todoIds }) return this
+    return copy(todos = todos.filterNot { it.id in todoIds })
+}
+
+/** 批量勾选 / 取消勾选：`doneAtMillis` 按索引递增，保证沉底顺序与列表顺序一致。 */
+internal fun MemoArchive.todosDone(todoIds: Set<String>, done: Boolean, now: Long): MemoArchive {
+    if (todoIds.isEmpty()) return this
+    return copy(
+        todos = todos.map { todo ->
+            if (todo.id in todoIds) todo.markAll(done, now) else todo
+        },
+    )
+}
+
 internal fun MemoTodo.pendingItems(): List<MemoTodoItem> = items.filterNot(MemoTodoItem::done)
 
 internal fun MemoTodo.doneItems(): List<MemoTodoItem> = items.filter(MemoTodoItem::done).sortedBy(MemoTodoItem::doneAtMillis)
@@ -330,6 +388,22 @@ internal fun MemoTodo.toggledItem(itemId: String, now: Long): MemoTodo {
             } else {
                 item.copy(done = nextDone, doneAtMillis = if (nextDone) now else 0L)
             }
+        },
+        updatedAtMillis = now,
+    )
+}
+
+/**
+ * 整条待办一律勾上 / 一律取消。
+ *
+ * 已经全是目标状态时原样返回：批量勾选里混着「本来就完成」的条目时，
+ * 不该为了它们白刷一次 `updatedAtMillis`（那会把整条待办顶到列表最前）。
+ */
+internal fun MemoTodo.markAll(done: Boolean, now: Long): MemoTodo {
+    if (items.isEmpty() || items.all { it.done == done }) return this
+    return copy(
+        items = items.mapIndexed { index, item ->
+            item.copy(done = done, doneAtMillis = if (done) now + index else 0L)
         },
         updatedAtMillis = now,
     )
