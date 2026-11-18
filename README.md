@@ -68,6 +68,17 @@ App 主界面为三个底部页签：**食材** / **记录** / **我的**。
 
 软件设置、用户设置、文字显示设置（字号缩放）、单位偏好、默认睡眠设置等。
 
+## 运行截图
+
+> 真机运行截图（Android 15，1080 × 2400），点击图片可查看原图。
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="screenshots/01-splash.jpg" width="210"><br><sub>开屏界面</sub> | <img src="screenshots/02-nutrition-home.jpg" width="210"><br><sub>食材（营养）主界面</sub> | <img src="screenshots/03-food-nutrition-profile.jpg" width="210"><br><sub>食材营养档案</sub> |
+| <img src="screenshots/04-food-ranking.jpg" width="210"><br><sub>食材排行</sub> | <img src="screenshots/05-records-home.jpg" width="210"><br><sub>记录主界面</sub> | <img src="screenshots/06-blood-glucose-records.jpg" width="210"><br><sub>血糖数据记录</sub> |
+| <img src="screenshots/07-blood-glucose-chart.jpg" width="210"><br><sub>血糖记录图表</sub> | <img src="screenshots/08-sleep-records.jpg" width="210"><br><sub>睡眠记录</sub> | <img src="screenshots/09-price-records.jpg" width="210"><br><sub>记物价</sub> |
+| <img src="screenshots/10-bmi.jpg" width="210"><br><sub>BMI</sub> | <img src="screenshots/11-settings.jpg" width="210"><br><sub>软件设置</sub> | |
+
 ## 项目结构
 
 ```
